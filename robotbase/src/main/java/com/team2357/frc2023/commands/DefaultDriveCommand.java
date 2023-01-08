@@ -11,7 +11,7 @@ public class DefaultDriveCommand extends CommandBase {
     private final SwerveDriveControls m_controls;
 
     public DefaultDriveCommand(SwerveDriveSubsystem drivetrainSubsystem,
-                               SwerveDriveControls controls) {
+            SwerveDriveControls controls) {
         m_drivetrainSubsystem = drivetrainSubsystem;
         m_controls = controls;
 
@@ -23,8 +23,7 @@ public class DefaultDriveCommand extends CommandBase {
         m_drivetrainSubsystem.drive(
                 m_controls.getY(),
                 m_controls.getX(),
-                m_controls.getRotation()
-        );
+                m_controls.getRotation());
     }
 
     @Override
