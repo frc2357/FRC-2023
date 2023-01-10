@@ -1,14 +1,25 @@
 package com.team2357.frc2023.controls;
 
+import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
+import com.team2357.lib.util.XboxRaw;
+
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 public class SwerveDriveControls {
     private XboxController m_controller;
     private double m_deadband;
 
+    private JoystickButton m_backButton;
+
     public SwerveDriveControls(XboxController controller, double deadband) {
         m_controller = controller;
         m_deadband = deadband;
+
+        m_backButton = new JoystickButton(m_controller, XboxRaw.Back.value);
+
+        m_backButton.onTrue(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().zeroGyroscope()));
     }
 
     public double getX() {
