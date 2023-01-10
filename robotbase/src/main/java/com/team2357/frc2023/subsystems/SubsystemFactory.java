@@ -13,7 +13,7 @@ public class SubsystemFactory {
     public SwerveDriveSubsystem CreateSwerveDriveSubsystem() {
         ShuffleboardTab tab = Shuffleboard.getTab("Drivetrain");
 
-        WPI_Pigeon2 pigeon = new WPI_Pigeon2(Constants.CAN_ID.PIGEON_ID);
+        WPI_Pigeon2 pigeon = new WPI_Pigeon2(Constants.CAN_ID.PIGEON_ID, Constants.CAN_ID.DRIVE_CANBUS);
 
         SwerveModule frontLeft = Mk4iSwerveModuleHelper.createFalcon500(
                 tab.getLayout("Front Left Module", BuiltInLayouts.kList)
