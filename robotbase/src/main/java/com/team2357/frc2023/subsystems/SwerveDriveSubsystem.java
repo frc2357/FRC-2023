@@ -7,9 +7,14 @@ package com.team2357.frc2023.subsystems;
 import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPoint;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import com.swervedrivespecialties.swervelib.AbsoluteEncoder;
@@ -20,6 +25,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -59,10 +65,14 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		/**
 		 * The left-to-right distance between the drivetrain wheels (measured from
 		 * center to center)
+		 * The left-to-right distance between the drivetrain wheels (measured from
+		 * center to center)
 		 */
 		public double m_trackwidthMeters;
 
 		/**
+		 * The front-to-back distance between the drivetrain wheels (measured from
+		 * center to center)
 		 * The front-to-back distance between the drivetrain wheels (measured from
 		 * center to center)
 		 */
@@ -83,13 +93,20 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
 		/**
 		 * The maximum angular velocity of the robot in radians per second
+		 * The maximum angular velocity of the robot in radians per second
 		 * (how fast the robot can rotate in place)
 		 * 
+		 * Formula: m_maxVelocityMetersPerSecond / Math.hypot(m_trackwidthMeters / 2,
+		 * m_wheelbaseMeters / 2)
 		 * Formula: m_maxVelocityMetersPerSecond / Math.hypot(m_trackwidthMeters / 2,
 		 * m_wheelbaseMeters / 2)
 		 */
 		//
 		public double m_maxAngularVelocityRadiansPerSecond;
+
+		public double m_trajectoryMaxVelocityMetersPerSecond;
+
+		public double m_trajectoryMaxAccelerationMetersPerSecond;
 
 		public PIDController m_xController;
 		public PIDController m_yController;
@@ -281,12 +298,35 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		Logger.getInstance().recordOutput("Robot Pose", m_odometry.getPoseMeters());
 	}
 
+	public PathPlannerTrajectory twoPointTrajectory(Pose2d startPose, Pose2d endPose) {
+		ArrayList<PathPoint> points = new ArrayList<PathPoint>();
+
+		PathPoint startPoint = new PathPoint(startPose.getTranslation(), startPose.getRotation(),
+				startPose.getRotation());
+		points.add(startPoint);
+
+		PathPoint endPoint = new PathPoint(endPose.getTranslation(), endPose.getRotation(), 
+				endPose.getRotation());
+
+		points.add(startPoint);
+		points.add(endPoint);
+
+		PathConstraints constraints = new PathConstraints(m_config.m_trajectoryMaxVelocityMetersPerSecond,
+				m_config.m_trajectoryMaxAccelerationMetersPerSecond);
+
+		return PathPlanner.generatePath(
+				constraints, false, points);
+	}
+
 	// TODO Abstract this function out similair to 2022 code
 	// Pick back up here with path following constant placeholders
 	public SequentialCommandGroup followPathCommand(final boolean shouldResetOdometry, String trajectoryFileName) {
-
-		// final Trajectory trajectory = generateTrajectory(waypoints);
 		final PathPlannerTrajectory trajectory = PathPlanner.loadPath(trajectoryFileName, 2, 3);
+		return followPathCommand(shouldResetOdometry, trajectory);
+	}
+
+	public SequentialCommandGroup followPathCommand(final boolean shouldResetOdometry,
+			PathPlannerTrajectory trajectory) {
 		// double Seconds = 0.0;
 		// System.out.println("===== Begin Sampling path =====");
 		// while(trajectory.getTotalTimeSeconds() > Seconds) {
