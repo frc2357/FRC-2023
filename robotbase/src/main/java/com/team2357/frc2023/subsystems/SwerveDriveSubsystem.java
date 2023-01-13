@@ -319,7 +319,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	// TODO Abstract this function out similair to 2022 code
 	// Pick back up here with path following constant placeholders
 	public SequentialCommandGroup followPathCommand(final boolean shouldResetOdometry, String trajectoryFileName) {
-		final PathPlannerTrajectory trajectory = PathPlanner.loadPath(trajectoryFileName, 2, 3);
+		final PathPlannerTrajectory trajectory = PathPlanner.loadPath(trajectoryFileName, m_config.m_trajectoryMaxVelocityMetersPerSecond, m_config.m_trajectoryMaxAccelerationMetersPerSecond);
 		return followPathCommand(shouldResetOdometry, trajectory);
 	}
 
