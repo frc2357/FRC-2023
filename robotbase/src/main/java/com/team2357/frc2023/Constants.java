@@ -8,6 +8,8 @@ import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -68,7 +70,7 @@ public final class Constants {
 
             config.m_xController = new PIDController(.56122, 0, 0);
             config.m_yController = new PIDController(.56122, 0, 0);
-            config.m_thetaController = new PIDController(2.15, 0, 0);
+            config.m_thetaController = new ProfiledPIDController(2.15, 0, 0, new TrapezoidProfile.Constraints(config.m_maxAngularVelocityRadiansPerSecond, null));
 
             return config;
         }
