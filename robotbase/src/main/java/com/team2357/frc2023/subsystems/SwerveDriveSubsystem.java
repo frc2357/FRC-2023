@@ -4,6 +4,7 @@
 
 package com.team2357.frc2023.subsystems;
 
+import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
@@ -119,6 +120,14 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
 	public void zeroGyroscope() {
 		m_pigeon.reset();
+	}
+
+	public double getPitch() {
+		return m_pigeon.getPitch();
+	}
+
+	public double getRoll() {
+		return m_pigeon.getRoll();
 	}
 
 	public Rotation2d getGyroscopeRotation() {
