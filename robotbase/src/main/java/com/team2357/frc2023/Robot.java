@@ -9,7 +9,6 @@ import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
-
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -35,15 +34,15 @@ public class Robot extends LoggedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     Logger.getInstance().recordMetadata("ProjectName", "MyProject"); // Set a metadata value
-
 if (isReal()) {
-    Logger.getInstance().addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB stick
+    Logger.getInstance().addDataReceiver(new WPILOGWriter("/lvuser/Logs")); // Log to a directory in lvuser
+    //use WinSCP to get the log files easily.
     new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
 } else {
     setUseTiming(false); // Run as fast as possible
     String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
     Logger.getInstance().setReplaySource(new WPILOGReader(logPath)); // Read replay log
-    Logger.getInstance().addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+    Logger.getInstance().addDataReceiver(new WPILOGWriter("/lvuser/Logs")); // Save outputs to a new log
 }
 
 Logger.getInstance().start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
