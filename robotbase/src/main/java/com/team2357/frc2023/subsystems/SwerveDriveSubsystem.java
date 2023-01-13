@@ -82,6 +82,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		//
 		public double m_maxAngularVelocityRadiansPerSecond;
 
+		public double m_maxAngularAccelerationRadiansPerSecondSquared;
+
 
 		public PIDController m_xController;
 		public PIDController m_yController;
