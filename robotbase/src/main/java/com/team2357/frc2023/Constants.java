@@ -4,6 +4,7 @@
 
 package com.team2357.frc2023;
 
+import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 
@@ -31,7 +32,7 @@ public final class Constants {
          * 
          * Use name of Canivore device to use Canivore
          */
-        public static final String DRIVE_CANBUS = "CANivore";
+        public static final String DRIVE_CANBUS = "rio";
         
         public static final int PIGEON_ID = 5;
 
@@ -70,13 +71,24 @@ public final class Constants {
             config.m_yController = new PIDController(.56122, 0, 0);
             config.m_thetaController = new PIDController(2.15, 0, 0);
 
+            config.m_sensorPositionCoefficient = 2.0 * Math.PI / Constants.DRIVE.TICKS_PER_ROTATION * SdsModuleConfigurations.MK4I_L2.getSteerReduction();
+
             return config;
         }
 
         public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(162.7);
-        public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(135.08);
-        public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(125);
+        public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(135.08); 
+        public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(125); 
         public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(9.45);
+        
+        // public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(0);
+        // public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(0); 
+        // public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(0); 
+        // public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(0);
+
+        public static final PIDController CHARGE_STATION_BALANCE_CONTROLLER = new PIDController(0.5, 0, 0);
+
+        public static final double TICKS_PER_ROTATION = 2048.0;
     }
 
     public static final class CONTROLLER {

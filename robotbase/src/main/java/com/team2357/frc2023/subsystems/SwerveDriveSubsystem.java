@@ -4,6 +4,7 @@
 
 package com.team2357.frc2023.subsystems;
 
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
@@ -84,6 +85,13 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		public PIDController m_xController;
 		public PIDController m_yController;
 		public PIDController m_thetaController;
+
+		/**
+		 * Conversion coefficient to go from degrees to Falcon500 sensor units
+		 * 
+		 * Formula: 2.0 * Math.PI / TICKS_PER_ROTATION * moduleConfiguration.getSteerReduction()
+		 */
+		public double m_sensorPositionCoefficient;
 	}
 
 	public SwerveDriveSubsystem(WPI_Pigeon2 pigeon, SwerveModule frontLeft, SwerveModule frontRight,
@@ -115,6 +123,47 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
 						m_frontRightModule.getPosition(),
 						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
+	}
+
+	public boolean readyToZero() {
+		if (readyToZero(m_frontLeftModule) && readyToZero(m_frontRightModule) && readyToZero(m_backLeftModule) && readyToZero(m_backRightModule)) {
+			// Set status
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean readyToZero(SwerveModule module) {
+		WPI_TalonFX steerMotor;
+		steerMotor = (WPI_TalonFX)(module.getSteerMotor());
+
+		double absoluteAngle = module.getSteerEncoder().getAbsoluteAngle();
+		((WPI_TalonFX)(module.getSteerMotor())).setSelectedSensorPosition(absoluteAngle / m_config.m_sensorPositionCoefficient);
+		// ((WPI_TalonFX)(module.getSteerMotor())).setSelectedSensorPosition(1.0);
+
+		// System.out.print("CANCoder: ");
+		// System.out.println(module.getSteerEncoder().getAbsoluteAngle() / m_config.m_sensorPositionCoefficient);
+		// System.out.print("Falcon: ");
+		// System.out.println(steerMotor.getSelectedSensorPosition());
+
+		return Math.abs(steerMotor.getSelectedSensorPosition() - module.getSteerEncoder().getAbsoluteAngle() / m_config.m_sensorPositionCoefficient) < 10;
+	}
+
+	public void zero() {
+		SwerveModuleState state = new SwerveModuleState(0.0, Rotation2d.fromDegrees(0.0));
+
+		m_frontLeftModule.set(
+				state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
+				state.angle.getRadians());
+		m_frontRightModule.set(
+				state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
+				state.angle.getRadians());
+		m_backLeftModule.set(
+				state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
+				state.angle.getRadians());
+		m_backRightModule.set(
+				state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
+				state.angle.getRadians());
 	}
 
 	public void zeroGyroscope() {
