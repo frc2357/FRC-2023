@@ -24,6 +24,7 @@ public class CanCoderFactoryBuilder {
 
     public AbsoluteEncoderFactory<CanCoderAbsoluteConfiguration> build() {
         return configuration -> {
+            // Make minimal changes to not confiure CANCoders
             CANCoderConfiguration config = new CANCoderConfiguration();
             config.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
             config.magnetOffsetDegrees = Math.toDegrees(configuration.getOffset());
@@ -31,11 +32,10 @@ public class CanCoderFactoryBuilder {
             config.initializationStrategy = configuration.getInitStrategy();
 
             WPI_CANCoder encoder = new WPI_CANCoder(configuration.getId(), configuration.getCanbus());
-            CtreUtils.checkCtreError(encoder.configAllSettings(config, 250), "Failed to configure CANCoder");
-
+            // CtreUtils.checkCtreError(encoder.configAllSettings(config, 250), "Failed to configure CANCoder");
             CtreUtils.checkCtreError(encoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, periodMilliseconds, 250), "Failed to configure CANCoder update rate");
 
-            return new EncoderImplementation(encoder);
+            return new EncoderImplementation(encoder, configuration.getOffset());
         };
     }
 
@@ -43,14 +43,16 @@ public class CanCoderFactoryBuilder {
         private final int ATTEMPTS = 3; // TODO: Allow changing number of tries for getting correct position
 
         private final WPI_CANCoder encoder;
+        private final double offsetRadians;
 
-        private EncoderImplementation(WPI_CANCoder encoder) {
+        private EncoderImplementation(WPI_CANCoder encoder, double offsetRadians) {
             this.encoder = encoder;
+            this.offsetRadians = offsetRadians;
         }
 
         @Override
         public double getAbsoluteAngle() {
-            double angle = Math.toRadians(encoder.getAbsolutePosition());
+            double angle = getPositionRadians();
 
             ErrorCode code = encoder.getLastError();
 
@@ -60,7 +62,7 @@ public class CanCoderFactoryBuilder {
                     Thread.sleep(10);
                 } catch (InterruptedException e) {
                 }
-                angle = Math.toRadians(encoder.getAbsolutePosition());
+                angle = getPositionRadians();
                 code = encoder.getLastError();
             }
 
@@ -77,6 +79,10 @@ public class CanCoderFactoryBuilder {
         @Override
         public Object getInternal() {
             return this.encoder;
+        }
+
+        public double getPositionRadians() {
+            return Math.toRadians(encoder.getAbsolutePosition());
         }
     }
 
