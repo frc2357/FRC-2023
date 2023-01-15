@@ -69,7 +69,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return m_drivetrainSubsystem.followPathCommand(true, "figure8");
+    return m_drivetrainSubsystem.followPathCommand(true, "New Path");
   }
 
 }
