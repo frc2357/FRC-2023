@@ -9,6 +9,7 @@ import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
+import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import com.swervedrivespecialties.swervelib.AbsoluteEncoder;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 
@@ -205,6 +206,10 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	}
 
 	public void drive(ChassisSpeeds chassisSpeeds) {
+		if (!m_isZeroed) {
+			return;
+		}
+
 		m_chassisSpeeds = chassisSpeeds;
 
 		m_odometry.update(getGyroscopeRotation(),
