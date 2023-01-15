@@ -25,14 +25,14 @@ public class CanCoderFactoryBuilder {
     public AbsoluteEncoderFactory<CanCoderAbsoluteConfiguration> build() {
         return configuration -> {
             // Make minimal changes to not confiure CANCoders
-            // CANCoderConfiguration config = new CANCoderConfiguration();
-            // config.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
-            // config.magnetOffsetDegrees = Math.toDegrees(configuration.getOffset());
-            // config.sensorDirection = direction == Direction.CLOCKWISE;
-            // config.initializationStrategy = configuration.getInitStrategy();
+            CANCoderConfiguration config = new CANCoderConfiguration();
+            config.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
+            config.magnetOffsetDegrees = Math.toDegrees(configuration.getOffset());
+            config.sensorDirection = direction == Direction.CLOCKWISE;
+            config.initializationStrategy = configuration.getInitStrategy();
 
             WPI_CANCoder encoder = new WPI_CANCoder(configuration.getId(), configuration.getCanbus());
-            //CtreUtils.checkCtreError(encoder.configAllSettings(config, 250), "Failed to configure CANCoder");
+            CtreUtils.checkCtreError(encoder.configAllSettings(config, 250), "Failed to configure CANCoder");
             CtreUtils.checkCtreError(encoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, periodMilliseconds, 250), "Failed to configure CANCoder update rate");
 
             return new EncoderImplementation(encoder, configuration.getOffset());
@@ -82,7 +82,7 @@ public class CanCoderFactoryBuilder {
         }
 
         public double getPositionRadians() {
-            return Math.toRadians(encoder.getAbsolutePosition()) + offsetRadians;
+            return Math.toRadians(encoder.getAbsolutePosition());
         }
     }
 

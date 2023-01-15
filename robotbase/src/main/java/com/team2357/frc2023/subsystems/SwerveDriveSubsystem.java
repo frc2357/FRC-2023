@@ -206,9 +206,9 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	}
 
 	public void drive(ChassisSpeeds chassisSpeeds) {
-		if (!m_isZeroed) {
-			return;
-		}
+		// if (!m_isZeroed) {
+		// 	return;
+		// }
 
 		m_chassisSpeeds = chassisSpeeds;
 
