@@ -76,6 +76,11 @@ public final class Constants {
             return config;
         }
 
+        // absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
+        // magnetOffsetDegrees = Math.toDegrees(configuration.getOffset());
+        // sensorDirection = false;
+        // initializationStrategy = bootToAbsValue;
+
         public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(162.7);
         public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(135.08); 
         public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(125); 

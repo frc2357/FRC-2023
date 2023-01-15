@@ -32,7 +32,7 @@ public class CanCoderFactoryBuilder {
             config.initializationStrategy = configuration.getInitStrategy();
 
             WPI_CANCoder encoder = new WPI_CANCoder(configuration.getId(), configuration.getCanbus());
-            CtreUtils.checkCtreError(encoder.configAllSettings(config, 250), "Failed to configure CANCoder");
+            // CtreUtils.checkCtreError(encoder.configAllSettings(config, 250), "Failed to configure CANCoder");
             CtreUtils.checkCtreError(encoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, periodMilliseconds, 250), "Failed to configure CANCoder update rate");
 
             return new EncoderImplementation(encoder, configuration.getOffset());
@@ -52,7 +52,7 @@ public class CanCoderFactoryBuilder {
 
         @Override
         public double getAbsoluteAngle() {
-            double angle = Math.toRadians(getPositionRadians());
+            double angle = getPositionRadians();
 
             ErrorCode code = encoder.getLastError();
 
