@@ -220,11 +220,6 @@ public final class Falcon500SteerControllerFactoryBuilder {
 
             motor.set(motorControlMode, adjustedReferenceAngleRadians / motorEncoderPositionCoefficient);
 
-            System.out.print("Adjusted: ");
-            System.out.println(adjustedReferenceAngleRadians);
-            System.out.print("Falcon: ");
-            System.out.println(motor.getSelectedSensorPosition() * motorEncoderPositionCoefficient);
-
             this.referenceAngleRadians = referenceAngleRadians;
         }
 

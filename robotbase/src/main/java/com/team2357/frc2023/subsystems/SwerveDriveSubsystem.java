@@ -9,7 +9,7 @@ import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
-import com.pathplanner.lib.commands.PPSwerveControllerCommand;
+import com.swervedrivespecialties.swervelib.AbsoluteEncoder;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -21,6 +21,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -28,6 +29,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SwerveDriveSubsystem extends SubsystemBase {
 	private static SwerveDriveSubsystem instance = null;
+
+	private boolean m_isZeroed;
 
 	public static SwerveDriveSubsystem getInstance() {
 		return instance;
@@ -125,28 +128,25 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
 	}
 
-	public boolean readyToZero() {
-		if (readyToZero(m_frontLeftModule) && readyToZero(m_frontRightModule) && readyToZero(m_backLeftModule) && readyToZero(m_backRightModule)) {
-			// Set status
+	public boolean isReadyToZero() {
+		if (isReadyToZero(m_frontLeftModule) && isReadyToZero(m_frontRightModule) && isReadyToZero(m_backLeftModule) && isReadyToZero(m_backRightModule)) {
 			return true;
 		}
 		return false;
 	}
 	
-	public boolean readyToZero(SwerveModule module) {
+	private boolean isReadyToZero(SwerveModule module) {
 		WPI_TalonFX steerMotor;
 		steerMotor = (WPI_TalonFX)(module.getSteerMotor());
 
 		double absoluteAngle = module.getSteerEncoder().getAbsoluteAngle();
 		((WPI_TalonFX)(module.getSteerMotor())).setSelectedSensorPosition(absoluteAngle / m_config.m_sensorPositionCoefficient);
-		// ((WPI_TalonFX)(module.getSteerMotor())).setSelectedSensorPosition(1.0);
 
-		// System.out.print("CANCoder: ");
-		// System.out.println(module.getSteerEncoder().getAbsoluteAngle() / m_config.m_sensorPositionCoefficient);
-		// System.out.print("Falcon: ");
-		// System.out.println(steerMotor.getSelectedSensorPosition());
+		return isEncoderSynced(steerMotor, module.getSteerEncoder());
+	}
 
-		return Math.abs(steerMotor.getSelectedSensorPosition() - module.getSteerEncoder().getAbsoluteAngle() / m_config.m_sensorPositionCoefficient) < 10;
+	private boolean isEncoderSynced(WPI_TalonFX steerMotor, AbsoluteEncoder steerEncoder) {
+		return Math.abs(steerMotor.getSelectedSensorPosition() - steerEncoder.getAbsoluteAngle() / m_config.m_sensorPositionCoefficient) < 10;
 	}
 
 	public void zero() {
@@ -164,6 +164,13 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		m_backRightModule.set(
 				state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
 				state.angle.getRadians());
+
+		m_isZeroed = (
+			(isEncoderSynced((WPI_TalonFX)m_frontLeftModule.getSteerMotor(), m_frontLeftModule.getSteerEncoder())) &&
+			(isEncoderSynced((WPI_TalonFX)m_frontRightModule.getSteerMotor(), m_frontRightModule.getSteerEncoder())) &&
+			(isEncoderSynced((WPI_TalonFX)m_backLeftModule.getSteerMotor(), m_backLeftModule.getSteerEncoder())) &&
+			(isEncoderSynced((WPI_TalonFX)m_backRightModule.getSteerMotor(), m_backRightModule.getSteerEncoder()))
+		);
 	}
 
 	public void zeroGyroscope() {

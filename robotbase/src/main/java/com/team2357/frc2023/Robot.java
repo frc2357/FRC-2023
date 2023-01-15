@@ -6,6 +6,7 @@ package com.team2357.frc2023;
 
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -38,7 +39,7 @@ public class Robot extends TimedRobot {
     double time = 0;
 
     while (time - startTime != 10000) {
-      if (SwerveDriveSubsystem.getInstance().readyToZero()) {
+      if (SwerveDriveSubsystem.getInstance().isReadyToZero()) {
         System.out.print("Swerve ready to zero in ");
         System.out.print((time - startTime)/1000);
         System.out.println(" seconds");
@@ -48,7 +49,7 @@ public class Robot extends TimedRobot {
       time = System.currentTimeMillis();
     }
 
-    System.out.println("Swerve wasn't able to zero in 10 seconds");
+		DriverStation.reportError("***************************************************\nSWERVE COULD NOT ZERO\n***************************************************", false);
   }
 
   /**
