@@ -12,10 +12,10 @@ public class AvailableTrajectories {
     }
 
     public static SequentialCommandGroup createFigure8Trajectory() {
-        return TrajectoryUtil.createTrajectoryPathCommand(true, "figure8");
+        return TrajectoryUtil.createTrajectoryPathCommand("figure8", true);
     }
 
     public static SequentialCommandGroup createLineTrajectory() {
-        return TrajectoryUtil.createTrajectoryPathCommand(true, "Line");
+        return TrajectoryUtil.createTrajectoryPathCommand("Line", true);
     }
 }
