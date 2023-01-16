@@ -10,8 +10,12 @@ public class WaitForZeroCommand extends CommandLoggerBase {
     private double m_startMillis;
     
     public WaitForZeroCommand() {
-        m_startMillis = System.currentTimeMillis();
         addRequirements(SwerveDriveSubsystem.getInstance());
+    }
+
+    @Override
+    public void initialize() {
+        m_startMillis = System.currentTimeMillis();
     }
 
     @Override
