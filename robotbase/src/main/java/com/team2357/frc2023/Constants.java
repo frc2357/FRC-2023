@@ -76,6 +76,7 @@ public final class Constants {
             return config;
         }
 
+        // CONFIGURE THE FOLLOWING ON EACH CANCODER
         // absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
         // magnetOffsetDegrees = Math.toDegrees(configuration.getOffset());
         // sensorDirection = false;
@@ -89,6 +90,10 @@ public final class Constants {
         public static final PIDController CHARGE_STATION_BALANCE_CONTROLLER = new PIDController(0.5, 0, 0);
 
         public static final double TICKS_PER_ROTATION = 2048.0;
+
+        public static final double WAIT_FOR_ZERO_TIME_MILLIS = 250;
+
+        public static final double ENCODER_SYNC_ACCURACY_RADIANS = 0.05;
     }
 
     public static final class CONTROLLER {

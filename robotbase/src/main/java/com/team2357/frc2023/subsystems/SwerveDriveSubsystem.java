@@ -4,6 +4,8 @@
 
 package com.team2357.frc2023.subsystems;
 
+import java.sql.Driver;
+
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.pathplanner.lib.PathPlanner;
@@ -12,6 +14,7 @@ import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import com.swervedrivespecialties.swervelib.AbsoluteEncoder;
 import com.swervedrivespecialties.swervelib.SwerveModule;
+import com.team2357.frc2023.Constants;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -147,7 +150,10 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	}
 
 	private boolean isEncoderSynced(WPI_TalonFX steerMotor, AbsoluteEncoder steerEncoder) {
-		return Math.abs(steerMotor.getSelectedSensorPosition() - steerEncoder.getAbsoluteAngle() / m_config.m_sensorPositionCoefficient) < 10;
+		double difference = Math.abs(steerMotor.getSelectedSensorPosition() * m_config.m_sensorPositionCoefficient - steerEncoder.getAbsoluteAngle());
+		System.out.println(difference);
+
+		return difference < Constants.DRIVE.ENCODER_SYNC_ACCURACY_RADIANS || difference < Constants.DRIVE.ENCODER_SYNC_ACCURACY_RADIANS + Math.PI || difference < Constants.DRIVE.ENCODER_SYNC_ACCURACY_RADIANS + 2 * Math.PI;
 	}
 
 	public void zero() {
@@ -165,7 +171,9 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		m_backRightModule.set(
 				state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
 				state.angle.getRadians());
+	}
 
+	public void checkEncodersSynced() {
 		m_isZeroed = (
 			(isEncoderSynced((WPI_TalonFX)m_frontLeftModule.getSteerMotor(), m_frontLeftModule.getSteerEncoder())) &&
 			(isEncoderSynced((WPI_TalonFX)m_frontRightModule.getSteerMotor(), m_frontRightModule.getSteerEncoder())) &&
@@ -206,9 +214,10 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	}
 
 	public void drive(ChassisSpeeds chassisSpeeds) {
-		// if (!m_isZeroed) {
-		// 	return;
-		// }
+		if (!m_isZeroed) {
+			DriverStation.reportError("Swerve is not zeroed", false);
+			return;
+		}
 
 		m_chassisSpeeds = chassisSpeeds;
 
