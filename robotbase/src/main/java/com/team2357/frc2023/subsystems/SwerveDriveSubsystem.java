@@ -129,6 +129,22 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
 	}
 
+	public PIDController getXController() {
+		return m_config.m_xController;
+	}
+
+	public PIDController getYController() {
+		return m_config.m_yController;
+	}
+
+	public PIDController getThetaController() {
+		return m_config.m_thetaController;
+	}
+
+	public SwerveDriveKinematics getKinematics() {
+		return m_kinematics;
+	}
+
 	public boolean isReadyToZero() {
 		if (isReadyToZero(m_frontLeftModule) && isReadyToZero(m_frontRightModule) && isReadyToZero(m_backLeftModule) && isReadyToZero(m_backRightModule)) {
 			return true;
