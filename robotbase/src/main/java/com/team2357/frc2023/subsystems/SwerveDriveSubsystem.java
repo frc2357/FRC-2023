@@ -6,8 +6,6 @@ package com.team2357.frc2023.subsystems;
 
 import org.littletonrobotics.junction.Logger;
 
-import org.littletonrobotics.junction.Logger;
-
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.pathplanner.lib.PathPlanner;
@@ -206,6 +204,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		return Rotation2d.fromDegrees(m_pigeon.getYaw());
 	}
 
+	
+
 	public Pose2d getPose() {
 		return m_odometry.getPoseMeters();
 	}
@@ -268,6 +268,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		m_backRightModule.set(
 				states[3].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
 				states[3].angle.getRadians());
+		Logger.getInstance().recordOutput("RoboRotation",getGyroscopeRotation().getRadians());
 		Logger.getInstance().recordOutput("Swerve States", states);
 	}
 
