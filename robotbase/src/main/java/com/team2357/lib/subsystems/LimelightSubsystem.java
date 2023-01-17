@@ -19,7 +19,7 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
 
   public static class Configuration {
 
-    public int m_humanPipelineIndex = 0;
+    public int m_humanPipelineIndex = 1;
 
     public int m_targetingPipelineIndex = 0;
 
