@@ -9,10 +9,16 @@ import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import com.team2357.frc2023.commands.WaitForZeroCommand;
+import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
+
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -31,6 +37,7 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void robotInit() {
+    
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     Logger.getInstance().recordMetadata("ProjectName", "MyProject"); // Set a metadata value
@@ -47,6 +54,22 @@ if (isReal()) {
 
 Logger.getInstance().start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
     m_robotContainer = new RobotContainer();
+
+    double startTime = System.currentTimeMillis();
+    double time = 0;
+
+    while (time - startTime != 10000) {
+      if (SwerveDriveSubsystem.getInstance().isReadyToZero()) {
+        System.out.print("Swerve ready to zero in ");
+        System.out.print((time - startTime)/1000);
+        System.out.println(" seconds");
+        return;
+      }
+
+      time = System.currentTimeMillis();
+    }
+
+		DriverStation.reportError("***************************************************\nSWERVE COULD NOT ZERO\n***************************************************", false);
   }
 
   /**
@@ -75,6 +98,9 @@ Logger.getInstance().start(); // Start logging! No more data receivers, replay s
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    SwerveDriveSubsystem.getInstance().zero();
+    CommandScheduler.getInstance().schedule(new WaitForZeroCommand());
+
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -89,6 +115,8 @@ Logger.getInstance().start(); // Start logging! No more data receivers, replay s
 
   @Override
   public void teleopInit() {
+    SwerveDriveSubsystem.getInstance().zero();
+    CommandScheduler.getInstance().schedule(new WaitForZeroCommand());
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove

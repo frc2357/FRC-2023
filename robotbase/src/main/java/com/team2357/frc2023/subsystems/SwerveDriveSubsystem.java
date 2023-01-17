@@ -6,12 +6,17 @@ package com.team2357.frc2023.subsystems;
 
 import org.littletonrobotics.junction.Logger;
 
+import org.littletonrobotics.junction.Logger;
+
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
+import com.swervedrivespecialties.swervelib.AbsoluteEncoder;
 import com.swervedrivespecialties.swervelib.SwerveModule;
+import com.team2357.frc2023.Constants;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -22,6 +27,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -29,6 +35,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SwerveDriveSubsystem extends SubsystemBase {
 	private static SwerveDriveSubsystem instance = null;
+
+	private boolean m_isZeroed;
 
 	public static SwerveDriveSubsystem getInstance() {
 		return instance;
@@ -86,6 +94,13 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		public PIDController m_xController;
 		public PIDController m_yController;
 		public PIDController m_thetaController;
+
+		/**
+		 * Conversion coefficient to go from degrees to Falcon500 sensor units
+		 * 
+		 * Formula: 2.0 * Math.PI / TICKS_PER_ROTATION * moduleConfiguration.getSteerReduction()
+		 */
+		public double m_sensorPositionCoefficient;
 	}
 
 	public SwerveDriveSubsystem(WPI_Pigeon2 pigeon, SwerveModule frontLeft, SwerveModule frontRight,
@@ -117,6 +132,70 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
 						m_frontRightModule.getPosition(),
 						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
+	}
+
+	public PIDController getXController() {
+		return m_config.m_xController;
+	}
+
+	public PIDController getYController() {
+		return m_config.m_yController;
+	}
+
+	public PIDController getThetaController() {
+		return m_config.m_thetaController;
+	}
+
+	public SwerveDriveKinematics getKinematics() {
+		return m_kinematics;
+	}
+
+	public boolean isReadyToZero() {
+		if (isReadyToZero(m_frontLeftModule) && isReadyToZero(m_frontRightModule) && isReadyToZero(m_backLeftModule) && isReadyToZero(m_backRightModule)) {
+			return true;
+		}
+		return false;
+	}
+	
+	private boolean isReadyToZero(SwerveModule module) {
+		WPI_TalonFX steerMotor;
+		steerMotor = (WPI_TalonFX)(module.getSteerMotor());
+
+		double absoluteAngle = module.getSteerEncoder().getAbsoluteAngle();
+		((WPI_TalonFX)(module.getSteerMotor())).setSelectedSensorPosition(absoluteAngle / m_config.m_sensorPositionCoefficient);
+
+		return isEncoderSynced(steerMotor, module.getSteerEncoder());
+	}
+
+	private boolean isEncoderSynced(WPI_TalonFX steerMotor, AbsoluteEncoder steerEncoder) {
+		double difference = Math.abs(steerMotor.getSelectedSensorPosition() * m_config.m_sensorPositionCoefficient - steerEncoder.getAbsoluteAngle());
+		return difference < Constants.DRIVE.ENCODER_SYNC_ACCURACY_RADIANS || difference < Constants.DRIVE.ENCODER_SYNC_ACCURACY_RADIANS + Math.PI || difference < Constants.DRIVE.ENCODER_SYNC_ACCURACY_RADIANS + 2 * Math.PI;
+	}
+
+	public void zero() {
+		SwerveModuleState state = new SwerveModuleState(0.0, Rotation2d.fromDegrees(0.0));
+
+		m_frontLeftModule.set(
+				state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
+				state.angle.getRadians());
+		m_frontRightModule.set(
+				state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
+				state.angle.getRadians());
+		m_backLeftModule.set(
+				state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
+				state.angle.getRadians());
+		m_backRightModule.set(
+				state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
+				state.angle.getRadians());
+	}
+
+	public void checkEncodersSynced() {
+		m_isZeroed = (
+			(isEncoderSynced((WPI_TalonFX)m_frontLeftModule.getSteerMotor(), m_frontLeftModule.getSteerEncoder())) &&
+			(isEncoderSynced((WPI_TalonFX)m_frontRightModule.getSteerMotor(), m_frontRightModule.getSteerEncoder())) &&
+			(isEncoderSynced((WPI_TalonFX)m_backLeftModule.getSteerMotor(), m_backLeftModule.getSteerEncoder())) &&
+			(isEncoderSynced((WPI_TalonFX)m_backRightModule.getSteerMotor(), m_backRightModule.getSteerEncoder()))
+		);
 	}
 
 	public void zeroGyroscope() {
@@ -151,6 +230,11 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	}
 
 	public void drive(ChassisSpeeds chassisSpeeds) {
+		if (!m_isZeroed) {
+			DriverStation.reportError("Swerve is not zeroed", false);
+			return;
+		}
+
 		m_chassisSpeeds = chassisSpeeds;
 
 		m_odometry.update(getGyroscopeRotation(),

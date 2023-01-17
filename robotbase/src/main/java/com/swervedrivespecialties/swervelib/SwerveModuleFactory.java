@@ -144,8 +144,13 @@ public class SwerveModuleFactory<DC, SC> {
                 steerAngle += 2.0 * Math.PI;
             }
 
+            difference = Math.abs(steerAngle - getSteerAngle());
+
             driveController.setReferenceVoltage(driveVoltage);
-            steerController.setReferenceAngle(steerAngle);
+
+            if (difference >= 0.01) {
+                steerController.setReferenceAngle(steerAngle);
+            }
         }
     }
 }
