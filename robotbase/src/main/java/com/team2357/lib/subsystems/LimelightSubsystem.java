@@ -21,7 +21,7 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
 
     public int m_humanPipelineIndex = 0;
 
-    public int m_targetingPipelineIndex = 0;
+    public int m_targetingPipelineIndex = 1;
 
     public boolean m_isLimelightPrimaryStream = true;
 
@@ -95,7 +95,6 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
   public void setHumanPipelineActive() {
     m_pipeline.setDouble(m_Configuration.m_humanPipelineIndex);
   }
-
   public boolean isTargetingPipelineActive() {
     return getPipeline() == m_Configuration.m_targetingPipelineIndex;
   }
@@ -103,7 +102,21 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
   public void setTargetingPipelineActive() {
     m_pipeline.setDouble(m_Configuration.m_targetingPipelineIndex);
   }
+/* these ones bellow could get the robot to do the different piplenes for each thing, but I dont have the time to do ti today.
+  public boolean isRetroReflectPipelineActive() {
+    return getPipeline() == m_Configuration.m_RetroReflectPipelineIndex;
+  }
 
+  public void setRetroReflectPipelineActive() {
+    m_pipeline.setDouble(m_Configuration.m_RetroReflectPipelineIndex);
+  }
+  public boolean isAprilTagPipelineActive() {
+    return getPipeline() == m_Configuration.m_AprilTagPipelineIndex;
+  }
+
+  public void setAprilTagPipelineActive() {
+    m_pipeline.setDouble(m_Configuration.m_AprilTagPipelineIndex);
+  }*/
   private int getPipeline() {
     double value = m_pipeline.getDouble(Double.NaN);
     return (int) Math.round(value);
