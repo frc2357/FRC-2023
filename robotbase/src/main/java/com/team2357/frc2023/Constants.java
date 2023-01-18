@@ -4,6 +4,7 @@
 
 package com.team2357.frc2023;
 
+import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 
@@ -72,17 +73,31 @@ public final class Constants {
 
             config.m_xController = new PIDController(.56122, 0, 0);
             config.m_yController = new PIDController(.56122, 0, 0);
-            config.m_thetaController = new ProfiledPIDController(2.15, 0, 0, new TrapezoidProfile.Constraints(config.m_maxAngularVelocityRadiansPerSecond, config.m_maxAngularAccelerationRadiansPerSecondSquared));
+            config.m_thetaController = new PIDController(2.15, 0, 0);
+
+            config.m_sensorPositionCoefficient = 2.0 * Math.PI / Constants.DRIVE.TICKS_PER_ROTATION * SdsModuleConfigurations.MK4I_L2.getSteerReduction();
 
             return config;
         }
 
-        public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(162.7);
-        public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(135.08);
-        public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(125);
-        public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(9.45);
+        // CONFIGURE THE FOLLOWING ON EACH CANCODER
+        // absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
+        // magnetOffsetDegrees = Math.toDegrees(configuration.getOffset());
+        // sensorDirection = false;
+        // initializationStrategy = bootToAbsValue;
 
+        public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(162.7);
+        public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(135.08); 
+        public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(125); 
+        public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(9.45);
+        
         public static final PIDController CHARGE_STATION_BALANCE_CONTROLLER = new PIDController(0.5, 0, 0);
+
+        public static final double TICKS_PER_ROTATION = 2048.0;
+
+        public static final double WAIT_FOR_ZERO_TIME_MILLIS = 250;
+
+        public static final double ENCODER_SYNC_ACCURACY_RADIANS = 0.05;
     }
 
     public static final class CONTROLLER {

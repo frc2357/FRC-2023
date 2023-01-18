@@ -8,6 +8,7 @@ import com.team2357.frc2023.commands.DefaultDriveCommand;
 import com.team2357.frc2023.controls.SwerveDriveControls;
 import com.team2357.frc2023.subsystems.SubsystemFactory;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
+import com.team2357.frc2023.util.AvailableTrajectories;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -42,6 +43,9 @@ public class RobotContainer {
         m_drivetrainSubsystem,
         new SwerveDriveControls(m_controller, Constants.CONTROLLER.DRIVE_CONTROLLER_DEADBAND)));
 
+    // Build trajectory paths
+    AvailableTrajectories.generateTrajectories();
+
     // Configure the button bindings
     configureButtonBindings();
   }
@@ -69,7 +73,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return m_drivetrainSubsystem.followPathCommand(true, "figure8");
+    return AvailableTrajectories.lineTrajectory;
   }
 
 }

@@ -11,6 +11,8 @@ public class DPadTrigger extends Trigger {
   DPadValue lastValue;
 
   public DPadTrigger(XboxController controller, DPadValue triggerValue) {
+
+    super(() -> false);
     this.triggerValue = triggerValue;
     this.controller = controller;
   }
