@@ -4,6 +4,7 @@
 
 package com.team2357.frc2023.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.pathplanner.lib.PathPlanner;
@@ -11,6 +12,7 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
 import com.swervedrivespecialties.swervelib.AbsoluteEncoder;
+import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
 
@@ -264,6 +266,38 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		m_backRightModule.set(
 				states[3].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
 				states[3].angle.getRadians());
+	}
+
+	private void driveModuleForwardMeters(SwerveModule module, double meters) {
+		double sensorUnits = meters / SdsModuleConfigurations.MK4I_L2.getWheelDiameter() / m_config.m_sensorPositionCoefficient / 2.0;
+		WPI_TalonFX driveMotor = (WPI_TalonFX)(module.getDriveMotor());
+		driveMotor.set(ControlMode.Position, driveMotor.getSelectedSensorPosition() + sensorUnits);
+	}
+
+	private void driveForwardMeters(double meters) {
+		driveModuleForwardMeters(m_frontLeftModule, meters);
+		driveModuleForwardMeters(m_frontRightModule, meters);
+		driveModuleForwardMeters(m_backLeftModule, meters);
+		driveModuleForwardMeters(m_backRightModule, meters);
+	}
+
+	public void balance() {
+		double angle, distance;
+		if (-15 <= getPitch() && getPitch() <= 15) {
+			angle = Constants.DRIVE.CHARGE_STATION_BALANCE_ANGLE_CONTROLLER.calculate(getPitch());
+			distance = Constants.DRIVE.CHARGE_STATION_DISTANCE_CONTROLLER.calculate(angle);
+			driveForwardMeters(distance);
+		}
+
+		if (-15 <= getRoll() && getRoll() <= 15) {
+			angle = Constants.DRIVE.CHARGE_STATION_BALANCE_ANGLE_CONTROLLER.calculate(getPitch());
+			distance = Constants.DRIVE.CHARGE_STATION_DISTANCE_CONTROLLER.calculate(angle);
+			driveForwardMeters(distance);
+		}
+	}
+
+	public boolean isBalanced() {
+		return (-2.5 <= getRoll() && getRoll() <= 2.5) && (-2.5 <= getPitch() && getPitch() <= 2.5);
 	}
 
 	@Override

@@ -91,7 +91,8 @@ public final class Constants {
         public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(125); 
         public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(9.45);
         
-        public static final PIDController CHARGE_STATION_BALANCE_CONTROLLER = new PIDController(0.5, 0, 0);
+        public static final PIDController CHARGE_STATION_BALANCE_ANGLE_CONTROLLER = new PIDController(0.5, 0, 0);
+        public static final PIDController CHARGE_STATION_DISTANCE_CONTROLLER = new PIDController(0.5, 0, 0);
 
         public static final double TICKS_PER_ROTATION = 2048.0;
 
