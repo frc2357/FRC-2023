@@ -271,7 +271,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 				Logger.getInstance().recordOutput("Swerve States", states);
 				Logger.getInstance().recordOutput("Robot Pose", m_odometry.getPoseMeters());
 	}
-
+//for Pose, 2 is rotation
 	// TODO Abstract this function out similair to 2022 code
 	// Pick back up here with path following constant placeholders
 	public SequentialCommandGroup followPathCommand(final boolean shouldResetOdometry, String trajectoryFileName) {
