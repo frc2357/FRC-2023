@@ -4,6 +4,8 @@
 
 package com.team2357.frc2023.subsystems;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.pathplanner.lib.PathPlanner;
@@ -238,9 +240,22 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 						m_frontRightModule.getPosition(),
 						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
 
-		SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
-		SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxVelocityMetersPerSecond);
+		
 
+		
+	}
+
+	@Override
+	public void periodic() {
+		SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
+
+		SmartDashboard.putNumber("Yaw", m_pigeon.getYaw());
+		SmartDashboard.putNumber("Pose X", m_odometry.getPoseMeters().getX());
+		SmartDashboard.putNumber("Pose Y", m_odometry.getPoseMeters().getY());
+		SmartDashboard.putNumber("Pose Angle", m_odometry.getPoseMeters().getRotation().getDegrees());
+	SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
+		SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxVelocityMetersPerSecond);
+		
 		m_frontLeftModule.set(
 				states[0].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
 				states[0].angle.getRadians());
@@ -253,16 +268,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		m_backRightModule.set(
 				states[3].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
 				states[3].angle.getRadians());
-	}
-
-	@Override
-	public void periodic() {
-		SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
-
-		SmartDashboard.putNumber("Yaw", m_pigeon.getYaw());
-		SmartDashboard.putNumber("Pose X", m_odometry.getPoseMeters().getX());
-		SmartDashboard.putNumber("Pose Y", m_odometry.getPoseMeters().getY());
-		SmartDashboard.putNumber("Pose Angle", m_odometry.getPoseMeters().getRotation().getDegrees());
+				Logger.getInstance().recordOutput("Swerve States", states);
+				Logger.getInstance().recordOutput("Robot Pose", m_odometry.getPoseMeters());
 	}
 
 	// TODO Abstract this function out similair to 2022 code
