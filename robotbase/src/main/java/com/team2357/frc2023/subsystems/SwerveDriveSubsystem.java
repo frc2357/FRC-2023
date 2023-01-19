@@ -204,6 +204,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		return Rotation2d.fromDegrees(m_pigeon.getYaw());
 	}
 
+	
+
 	public Pose2d getPose() {
 		return m_odometry.getPoseMeters();
 	}
@@ -241,6 +243,21 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
 
 		
+<<<<<<< HEAD
+=======
+	}
+
+	@Override
+	public void periodic() {
+		SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
+
+		SmartDashboard.putNumber("Yaw", m_pigeon.getYaw());
+		SmartDashboard.putNumber("Pose X", m_odometry.getPoseMeters().getX());
+		SmartDashboard.putNumber("Pose Y", m_odometry.getPoseMeters().getY());
+		SmartDashboard.putNumber("Pose Angle", m_odometry.getPoseMeters().getRotation().getDegrees());
+		SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
+		SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxVelocityMetersPerSecond);
+>>>>>>> 0e70186bf23aa6e7118b4dab95ebc431b00d30d1
 
 		
 	}
@@ -268,9 +285,16 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		m_backRightModule.set(
 				states[3].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
 				states[3].angle.getRadians());
+<<<<<<< HEAD
 				Logger.getInstance().recordOutput("Swerve States", states);
 				Logger.getInstance().recordOutput("Robot Pose", m_odometry.getPoseMeters());
 	}
+=======
+		Logger.getInstance().recordOutput("RoboRotation",getGyroscopeRotation().getRadians());
+		Logger.getInstance().recordOutput("Swerve States", states);
+	}
+
+>>>>>>> 0e70186bf23aa6e7118b4dab95ebc431b00d30d1
 	// TODO Abstract this function out similair to 2022 code
 	// Pick back up here with path following constant placeholders
 	public SequentialCommandGroup followPathCommand(final boolean shouldResetOdometry, String trajectoryFileName) {

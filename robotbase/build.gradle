@@ -1,11 +1,14 @@
 plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2023.2.1"
+    id "edu.wpi.first.GradleRIO" version "2023.2.1"
 }
 
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
-
+configurations.all {
+    exclude group: "edu.wpi.first.wpilibj"
+}
 def ROBOT_MAIN_CLASS = "com.team2357.frc2023.Main"
 repositories {
     maven {
