@@ -1,6 +1,7 @@
 package com.swervedrivespecialties.swervelib.rev;
 
 import com.revrobotics.*;
+import com.revrobotics.AbsoluteEncoder;
 import com.swervedrivespecialties.swervelib.*;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
 
