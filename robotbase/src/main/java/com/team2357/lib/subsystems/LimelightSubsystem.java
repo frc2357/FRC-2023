@@ -21,7 +21,7 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
 
     public int m_humanPipelineIndex = 2;
 
-    public int m_targetingPipelineIndex = 1;
+    public int m_targetingPipelineIndex = 0;
 
     public int m_aprilTagPipelineIndex = 1;
     public boolean m_isLimelightPrimaryStream = true;

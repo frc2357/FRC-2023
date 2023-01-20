@@ -105,16 +105,5 @@ public final class Constants {
         public static final double DRIVE_CONTROLLER_DEADBAND = 0.1;
         public static final double GUNNER_CONTROLLER_DEADBAND = 0.1;
     }
-
-    public static final class LOGGING {
-        // Locations for the swerve drive modules relative to the robot center.
-        public static final Translation2d m_frontLeftLocation = new Translation2d(0.301625, 0.314325);
-        public static final Translation2d m_frontRightLocation = new Translation2d(0.301625, -0.314325);
-        public static final Translation2d m_backLeftLocation = new Translation2d(-0.301625, 0.314325);
-        public static final Translation2d m_backRightLocation = new Translation2d(-0.301625, -0.314325);
-
-        // Creating my kinematics object using the module locations
-        public static final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
-                m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
-    }
+    
 }
