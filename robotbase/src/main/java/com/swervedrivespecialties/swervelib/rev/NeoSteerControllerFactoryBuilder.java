@@ -1,7 +1,6 @@
 package com.swervedrivespecialties.swervelib.rev;
 
 import com.revrobotics.*;
-import com.revrobotics.AbsoluteEncoder;
 import com.swervedrivespecialties.swervelib.*;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
 
@@ -59,12 +58,12 @@ public final class NeoSteerControllerFactoryBuilder {
         @Override
         public void addDashboardEntries(ShuffleboardContainer container, ControllerImplementation controller) {
             SteerControllerFactory.super.addDashboardEntries(container, controller);
-            container.addNumber("Absolute Encoder Angle", () -> Math.toDegrees(((com.swervedrivespecialties.swervelib.AbsoluteEncoder) controller.absoluteEncoder).getAbsoluteAngle()));
+            container.addNumber("Absolute Encoder Angle", () -> Math.toDegrees(controller.absoluteEncoder.getAbsoluteAngle()));
         }
 
         @Override
         public ControllerImplementation create(SteerConfiguration<T> steerConfiguration, String _canbus, ModuleConfiguration moduleConfiguration) {
-            com.swervedrivespecialties.swervelib.AbsoluteEncoder absoluteEncoder = encoderFactory.create(steerConfiguration.getEncoderConfiguration());
+            AbsoluteEncoder absoluteEncoder = encoderFactory.create(steerConfiguration.getEncoderConfiguration());
 
             CANSparkMax motor = new CANSparkMax(steerConfiguration.getMotorPort(), CANSparkMaxLowLevel.MotorType.kBrushless);
             checkNeoError(motor.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus0, 100), "Failed to set periodic status frame 0 rate");
@@ -110,11 +109,11 @@ public final class NeoSteerControllerFactoryBuilder {
 
         private double resetIteration = 0;
 
-        public ControllerImplementation(CANSparkMax motor, com.swervedrivespecialties.swervelib.AbsoluteEncoder absoluteEncoder2) {
+        public ControllerImplementation(CANSparkMax motor, AbsoluteEncoder absoluteEncoder) {
             this.motor = motor;
             this.controller = motor.getPIDController();
             this.motorEncoder = motor.getEncoder();
-            this.absoluteEncoder = (AbsoluteEncoder) absoluteEncoder2;
+            this.absoluteEncoder = absoluteEncoder;
         }
 
         @Override
@@ -123,8 +122,8 @@ public final class NeoSteerControllerFactoryBuilder {
         }
 
         @Override
-        public com.swervedrivespecialties.swervelib.AbsoluteEncoder getSteerEncoder() {
-            return (com.swervedrivespecialties.swervelib.AbsoluteEncoder) this.absoluteEncoder;
+        public AbsoluteEncoder getSteerEncoder() {
+            return this.absoluteEncoder;
         }
 
         @Override
@@ -142,7 +141,7 @@ public final class NeoSteerControllerFactoryBuilder {
             if (motorEncoder.getVelocity() < ENCODER_RESET_MAX_ANGULAR_VELOCITY) {
                 if (++resetIteration >= ENCODER_RESET_ITERATIONS) {
                     resetIteration = 0;
-                    double absoluteAngle = ((com.swervedrivespecialties.swervelib.AbsoluteEncoder) absoluteEncoder).getAbsoluteAngle();
+                    double absoluteAngle = absoluteEncoder.getAbsoluteAngle();
                     motorEncoder.setPosition(absoluteAngle);
                     currentAngleRadians = absoluteAngle;
                 }
