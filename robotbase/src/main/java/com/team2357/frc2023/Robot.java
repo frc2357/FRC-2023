@@ -38,9 +38,8 @@ public class Robot extends LoggedRobot {
   public void robotInit() {
     
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
-    // autonomous chooser on the dashboard.
-    // Logger.getInstance().recordMetadata("", "MyProject"); // Set a metadata value
-
+    // autonomous chooser on the dashboard.\
+    
     if (isReal()) {
         Logger.getInstance().addDataReceiver(new WPILOGWriter("home/lvuser/Logs")); // Log to a USB stick
         new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging

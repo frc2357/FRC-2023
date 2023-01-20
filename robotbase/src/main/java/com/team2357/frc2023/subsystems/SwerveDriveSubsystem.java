@@ -244,6 +244,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 			return;
 
 		}
+		m_chassisSpeeds = chassisSpeeds;
 		SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
 		SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxVelocityMetersPerSecond);
 
@@ -259,7 +260,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		m_backRightModule.set(
 				states[3].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
 				states[3].angle.getRadians());
-		m_chassisSpeeds = chassisSpeeds;
+		
 		Logger.getInstance().recordOutput("Swerve States", states);
 	}
 
