@@ -2,27 +2,29 @@
     "name": "FRC-2023",
     "description": "FRC 2357 Competition Code for 2023",
     "scripts": {
-      "format": "prettier --write **/*.java"
+        "format": "prettier --write **/*.java"
     },
     "repository": {
-      "type": "git",
-      "url": "git+https://github.com/frc2357/robotlib2357.git"
+        "type": "git",
+        "url": "git+https://github.com/frc2357/robotlib2357.git"
     },
     "keywords": [
-      "wpilib",
-      "java",
-      "first",
-      "frc"
+        "wpilib",
+        "java",
+        "first",
+        "frc"
     ],
     "author": "Ray-Pec Robotics \"System Meltdown\" FRC 2357",
     "license": "MIT",
     "bugs": {
-      "url": "https://github.com/frc2357/robotlib2357/issues"
+        "url": "https://github.com/frc2357/robotlib2357/issues"
     },
     "homepage": "https://github.com/frc2357/robotlib2357#readme",
     "devDependencies": {
-      "prettier": "^2.7.1",
-      "prettier-plugin-java": "^1.6.2"
+        "prettier": "^2.7.1",
+        "prettier-plugin-java": "^1.6.2"
+    },
+    "dependencies": {
+        "husky": "^8.0.3"
     }
-  }
-  
+}
