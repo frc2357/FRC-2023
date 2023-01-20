@@ -94,6 +94,9 @@ public final class Constants {
         public static final PIDController CHARGE_STATION_BALANCE_ANGLE_CONTROLLER = new PIDController(0.5, 0, 0);
         public static final PIDController CHARGE_STATION_DISTANCE_CONTROLLER = new PIDController(0.5, 0, 0);
 
+        public static final double BALANCE_LEVEL_DEGREES = 2.5;
+        public static final double BALANCE_FULL_TILT_DEGREES = 15;
+
         public static final double TICKS_PER_ROTATION = 2048.0;
 
         public static final double WAIT_FOR_ZERO_TIME_MILLIS = 250;

@@ -17,11 +17,13 @@ public class AutoBalanceCommand extends CommandLoggerBase {
 
     @Override
     public void execute() {
+        System.out.println("AutoBalanceCommand.execute");
         SwerveDriveSubsystem.getInstance().balance();
     }
 
     @Override
     public void end(boolean interrupted) {
+        System.out.println("AutoBalanceCommand.end");
         SwerveDriveSubsystem.getInstance().drive(new ChassisSpeeds(0, 0, 0));
     }
 

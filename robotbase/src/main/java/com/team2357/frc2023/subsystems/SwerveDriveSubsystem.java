@@ -17,7 +17,6 @@ import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -269,9 +268,11 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	}
 
 	private void driveModuleForwardMeters(SwerveModule module, double meters) {
-		double sensorUnits = meters / SdsModuleConfigurations.MK4I_L2.getWheelDiameter() / m_config.m_sensorPositionCoefficient / 2.0;
+		// double sensorUnits = meters / SdsModuleConfigurations.MK4I_L2.getWheelDiameter() / m_config.m_sensorPositionCoefficient / 2.0;
 		WPI_TalonFX driveMotor = (WPI_TalonFX)(module.getDriveMotor());
-		driveMotor.set(ControlMode.Position, driveMotor.getSelectedSensorPosition() + sensorUnits);
+		// System.out.println(sensorUnits);
+		// driveMotor.set(meters / m_config.m_maxVelocityMetersPerSecond);
+		System.out.println("speed: " + (meters / m_config.m_maxVelocityMetersPerSecond));
 	}
 
 	private void driveForwardMeters(double meters) {
@@ -282,22 +283,41 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	}
 
 	public void balance() {
-		double angle, distance;
-		if (-15 <= getPitch() && getPitch() <= 15) {
-			angle = Constants.DRIVE.CHARGE_STATION_BALANCE_ANGLE_CONTROLLER.calculate(getPitch());
-			distance = Constants.DRIVE.CHARGE_STATION_DISTANCE_CONTROLLER.calculate(angle);
-			driveForwardMeters(distance);
+		double angle, power, error;
+
+		angle = getRoll();
+		error = Constants.DRIVE.BALANCE_LEVEL_DEGREES - angle;
+
+		power = -Math.min(0.015 * error, 1);
+
+		if (Math.abs(power) > 0.4) {
+			power = Math.copySign(0.4, power);
 		}
 
-		if (-15 <= getRoll() && getRoll() <= 15) {
-			angle = Constants.DRIVE.CHARGE_STATION_BALANCE_ANGLE_CONTROLLER.calculate(getPitch());
-			distance = Constants.DRIVE.CHARGE_STATION_DISTANCE_CONTROLLER.calculate(angle);
-			driveForwardMeters(distance);
-		}
+		drive(0, power, 0);
+
+		System.out.println("Current angle: " + angle);
+		System.out.println("Error: " + error);
+		System.out.println("Drive power: " + power);
+
+		// if (-150 <= getPitch() && getPitch() <= 150) {
+		// 	angle = Constants.DRIVE.CHARGE_STATION_BALANCE_ANGLE_CONTROLLER.calculate(getPitch());
+		// 	distance = Constants.DRIVE.CHARGE_STATION_DISTANCE_CONTROLLER.calculate(angle);
+		// 	System.out.println("Distance: " + distance);
+		// 	driveForwardMeters(distance);
+		// }
+
+		// if (-150 <= getRoll() && getRoll() <= 150) {
+		// 	angle = Constants.DRIVE.CHARGE_STATION_BALANCE_ANGLE_CONTROLLER.calculate(getRoll());
+		// 	distance = Constants.DRIVE.CHARGE_STATION_DISTANCE_CONTROLLER.calculate(angle);
+		// 	System.out.println("Distance: " + distance);
+		// 	driveForwardMeters(distance);
+		// }
 	}
 
 	public boolean isBalanced() {
-		return (-2.5 <= getRoll() && getRoll() <= 2.5) && (-2.5 <= getPitch() && getPitch() <= 2.5);
+		// return (-2.5 <= getRoll() && getRoll() <= 2.5) && (-2.5 <= getPitch() && getPitch() <= 2.5);
+		return false;
 	}
 
 	@Override
