@@ -5,6 +5,8 @@
 package com.team2357.frc2023.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.pathplanner.lib.PathPlanner;
@@ -57,12 +59,14 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
 	public static class Configuration {
 		/**
-		 * The left-to-right distance between the drivetrain wheels (measured from center to center)
+		 * The left-to-right distance between the drivetrain wheels (measured from
+		 * center to center)
 		 */
 		public double m_trackwidthMeters;
 
 		/**
-		 * The front-to-back distance between the drivetrain wheels (measured from center to center)
+		 * The front-to-back distance between the drivetrain wheels (measured from
+		 * center to center)
 		 */
 		public double m_wheelbaseMeters;
 
@@ -80,10 +84,11 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		public double m_maxVelocityMetersPerSecond;
 
 		/**
-		 * The maximum angular velocity of the robot in radians per second 
+		 * The maximum angular velocity of the robot in radians per second
 		 * (how fast the robot can rotate in place)
 		 * 
-		 * Formula: m_maxVelocityMetersPerSecond / Math.hypot(m_trackwidthMeters / 2, m_wheelbaseMeters / 2)
+		 * Formula: m_maxVelocityMetersPerSecond / Math.hypot(m_trackwidthMeters / 2,
+		 * m_wheelbaseMeters / 2)
 		 */
 		//
 		public double m_maxAngularVelocityRadiansPerSecond;
@@ -98,7 +103,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		/**
 		 * Conversion coefficient to go from degrees to Falcon500 sensor units
 		 * 
-		 * Formula: 2.0 * Math.PI / TICKS_PER_ROTATION * moduleConfiguration.getSteerReduction()
+		 * Formula: 2.0 * Math.PI / TICKS_PER_ROTATION *
+		 * moduleConfiguration.getSteerReduction()
 		 */
 		public double m_sensorPositionCoefficient;
 	}
@@ -151,25 +157,30 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	}
 
 	public boolean isReadyToZero() {
-		if (isReadyToZero(m_frontLeftModule) && isReadyToZero(m_frontRightModule) && isReadyToZero(m_backLeftModule) && isReadyToZero(m_backRightModule)) {
+		if (isReadyToZero(m_frontLeftModule) && isReadyToZero(m_frontRightModule) && isReadyToZero(m_backLeftModule)
+				&& isReadyToZero(m_backRightModule)) {
 			return true;
 		}
 		return false;
 	}
-	
+
 	private boolean isReadyToZero(SwerveModule module) {
 		WPI_TalonFX steerMotor;
-		steerMotor = (WPI_TalonFX)(module.getSteerMotor());
+		steerMotor = (WPI_TalonFX) (module.getSteerMotor());
 
 		double absoluteAngle = module.getSteerEncoder().getAbsoluteAngle();
-		((WPI_TalonFX)(module.getSteerMotor())).setSelectedSensorPosition(absoluteAngle / m_config.m_sensorPositionCoefficient);
+		((WPI_TalonFX) (module.getSteerMotor()))
+				.setSelectedSensorPosition(absoluteAngle / m_config.m_sensorPositionCoefficient);
 
 		return isEncoderSynced(steerMotor, module.getSteerEncoder());
 	}
 
 	private boolean isEncoderSynced(WPI_TalonFX steerMotor, AbsoluteEncoder steerEncoder) {
-		double difference = Math.abs(steerMotor.getSelectedSensorPosition() * m_config.m_sensorPositionCoefficient - steerEncoder.getAbsoluteAngle());
-		return difference < Constants.DRIVE.ENCODER_SYNC_ACCURACY_RADIANS || difference < Constants.DRIVE.ENCODER_SYNC_ACCURACY_RADIANS + Math.PI || difference < Constants.DRIVE.ENCODER_SYNC_ACCURACY_RADIANS + 2 * Math.PI;
+		double difference = Math.abs(steerMotor.getSelectedSensorPosition() * m_config.m_sensorPositionCoefficient
+				- steerEncoder.getAbsoluteAngle());
+		return difference < Constants.DRIVE.ENCODER_SYNC_ACCURACY_RADIANS
+				|| difference < Constants.DRIVE.ENCODER_SYNC_ACCURACY_RADIANS + Math.PI
+				|| difference < Constants.DRIVE.ENCODER_SYNC_ACCURACY_RADIANS + 2 * Math.PI;
 	}
 
 	public void zero() {
@@ -190,12 +201,14 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	}
 
 	public void checkEncodersSynced() {
-		m_isZeroed = (
-			(isEncoderSynced((WPI_TalonFX)m_frontLeftModule.getSteerMotor(), m_frontLeftModule.getSteerEncoder())) &&
-			(isEncoderSynced((WPI_TalonFX)m_frontRightModule.getSteerMotor(), m_frontRightModule.getSteerEncoder())) &&
-			(isEncoderSynced((WPI_TalonFX)m_backLeftModule.getSteerMotor(), m_backLeftModule.getSteerEncoder())) &&
-			(isEncoderSynced((WPI_TalonFX)m_backRightModule.getSteerMotor(), m_backRightModule.getSteerEncoder()))
-		);
+		m_isZeroed = ((isEncoderSynced((WPI_TalonFX) m_frontLeftModule.getSteerMotor(),
+				m_frontLeftModule.getSteerEncoder())) &&
+				(isEncoderSynced((WPI_TalonFX) m_frontRightModule.getSteerMotor(),
+						m_frontRightModule.getSteerEncoder()))
+				&&
+				(isEncoderSynced((WPI_TalonFX) m_backLeftModule.getSteerMotor(), m_backLeftModule.getSteerEncoder())) &&
+				(isEncoderSynced((WPI_TalonFX) m_backRightModule.getSteerMotor(),
+						m_backRightModule.getSteerEncoder())));
 	}
 
 	public void zeroGyroscope() {
@@ -240,16 +253,11 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	public void drive(ChassisSpeeds chassisSpeeds) {
 		if (!m_isZeroed) {
 			DriverStation.reportError("Swerve is not zeroed", false);
+
 			return;
+
 		}
-
 		m_chassisSpeeds = chassisSpeeds;
-
-		m_odometry.update(getGyroscopeRotation(),
-				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
-						m_frontRightModule.getPosition(),
-						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
-
 		SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
 		SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxVelocityMetersPerSecond);
 
@@ -265,6 +273,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		m_backRightModule.set(
 				states[3].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
 				states[3].angle.getRadians());
+		
+		Logger.getInstance().recordOutput("Swerve States", states);
 	}
 
 	private void driveModuleForwardMeters(SwerveModule module, double meters) {
@@ -322,12 +332,19 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
 	@Override
 	public void periodic() {
+		m_odometry.update(getGyroscopeRotation(),
+				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
+						m_frontRightModule.getPosition(),
+						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
+
 		SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
 
 		SmartDashboard.putNumber("Yaw", m_pigeon.getYaw());
 		SmartDashboard.putNumber("Pose X", m_odometry.getPoseMeters().getX());
 		SmartDashboard.putNumber("Pose Y", m_odometry.getPoseMeters().getY());
 		SmartDashboard.putNumber("Pose Angle", m_odometry.getPoseMeters().getRotation().getDegrees());
+
+		Logger.getInstance().recordOutput("Robot Pose", m_odometry.getPoseMeters());
 	}
 
 	// TODO Abstract this function out similair to 2022 code

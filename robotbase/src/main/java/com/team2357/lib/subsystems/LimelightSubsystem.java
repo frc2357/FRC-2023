@@ -19,10 +19,11 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
 
   public static class Configuration {
 
-    public int m_humanPipelineIndex = 0;
+    public int m_humanPipelineIndex = 2;
 
     public int m_targetingPipelineIndex = 0;
 
+    public int m_aprilTagPipelineIndex = 1;
     public boolean m_isLimelightPrimaryStream = true;
 
     /** Angle of the Limelight axis from horizontal (degrees) */
@@ -79,8 +80,8 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
   public void setConfiguration(Configuration configuration) {
     m_Configuration = configuration;
 
-    //  setHumanPipelineActive();
-    setTargetingPipelineActive();
+    setHumanPipelineActive();
+    //setTargetingPipelineActive();
     setStream(configuration.m_isLimelightPrimaryStream);
   }
 
@@ -95,7 +96,6 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
   public void setHumanPipelineActive() {
     m_pipeline.setDouble(m_Configuration.m_humanPipelineIndex);
   }
-
   public boolean isTargetingPipelineActive() {
     return getPipeline() == m_Configuration.m_targetingPipelineIndex;
   }
@@ -103,7 +103,12 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
   public void setTargetingPipelineActive() {
     m_pipeline.setDouble(m_Configuration.m_targetingPipelineIndex);
   }
-
+  public boolean isAprilTagPipelineActive() {
+    return getPipeline() == m_Configuration.m_aprilTagPipelineIndex;
+  }
+  public void setAprilTagPipelineActive() {
+    m_pipeline.setDouble(m_Configuration.m_aprilTagPipelineIndex);
+  }
   private int getPipeline() {
     double value = m_pipeline.getDouble(Double.NaN);
     return (int) Math.round(value);
