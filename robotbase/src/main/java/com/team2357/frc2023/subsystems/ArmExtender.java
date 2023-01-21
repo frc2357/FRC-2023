@@ -1,10 +1,10 @@
-package com.team2357.frc2022.subsystems;
+package com.team2357.frc2023.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
 
-public class ArmExtend {
+public class ArmExtender {
     public static class Configuration
     {
         public double m_extendAxisMaxSpeed = 0;
@@ -36,7 +36,7 @@ public class ArmExtend {
     private CANSparkMax m_extenderMotor;
     private SparkMaxPIDController m_pidcontroller;
 
-    public ArmExtend(CANSparkMax extender,int currentlimit,double ramprate){
+    public ArmExtender(CANSparkMax extender,int currentlimit,double ramprate){
         m_extenderMotor = extender;
         m_extenderMotor.setSmartCurrentLimit(currentlimit);
         m_extenderMotor.setOpenLoopRampRate(ramprate);
