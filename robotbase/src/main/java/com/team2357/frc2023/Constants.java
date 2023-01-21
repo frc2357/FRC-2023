@@ -100,7 +100,7 @@ public final class Constants {
         public static final double BALANCE_FULL_TILT_DEGREES = 15;
         public static final double BACKWARDS_BALANCING_EXTRA_POWER_MULTIPLIER = 1.35;
         public static final double BALANCE_KP = 0.01;
-        public static final double BALANCE_MAX_POWER = 0.01;
+        public static final double BALANCE_MAX_POWER = 0.4;
 
         public static final double TICKS_PER_ROTATION = 2048.0;
 

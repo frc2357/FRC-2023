@@ -215,6 +215,10 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		m_pigeon.reset();
 	}
 
+	public double getYaw() {
+		return m_pigeon.getYaw();
+	}
+
 	public double getPitch() {
 		return m_pigeon.getPitch();
 	}
@@ -278,7 +282,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	}
 
 	public boolean isBalanced() {
-		return (-2.5 <= getRoll() && getRoll() <= 2.5) && (-2.5 <= getPitch() && getPitch() <= 2.5);
+		// return (-2.5 <= getRoll() && getRoll() <= 2.5) && (-2.5 <= getPitch() && getPitch() <= 2.5);
+		return false;
 	}
 
 	@Override
