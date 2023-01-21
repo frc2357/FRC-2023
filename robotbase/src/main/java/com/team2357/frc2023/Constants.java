@@ -5,6 +5,7 @@
 package com.team2357.frc2023;
 
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
+import com.team2357.frc2023.subsystems.IntakeSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -93,6 +94,14 @@ public final class Constants {
         public static final double WAIT_FOR_ZERO_TIME_MILLIS = 250;
 
         public static final double ENCODER_SYNC_ACCURACY_RADIANS = 0.05;
+    }
+
+    public static final class INTAKE {
+        public static IntakeSubsystem.Configuration GET_INTAKE_CONFIG() {
+            IntakeSubsystem.Configuration config = new IntakeSubsystem.Configuration();
+
+            return config;
+        }
     }
 
     public static final class CONTROLLER {
