@@ -3,8 +3,10 @@ package com.team2357.frc2023.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
+import com.team2357.lib.subsystems.ClosedLoopSubsystem;
+import com.team2357.lib.util.Utility;
 
-public class ArmExtendSubsystem {
+public class ArmExtendSubsystem extends ClosedLoopSubsystem{
     public static class Configuration
     {
         public double m_extendAxisMaxSpeed = 0;
@@ -31,10 +33,12 @@ public class ArmExtendSubsystem {
         public double m_extendMotorMinVel = 0;
         public double m_extendMotorMaxAcc = 0;
         public double m_extendMotorAllowedError = 0;
+        public double m_rotationMotorAllowedError = 0;
     }
     private Configuration m_config;
     private CANSparkMax m_extendMotor;
-    private SparkMaxPIDController m_pidcontroller;
+    private SparkMaxPIDController m_pidcontroller;    
+    private double m_targetRotations;
 
     public ArmExtendSubsystem(CANSparkMax extender,int currentlimit,double ramprate){
         m_extendMotor = extender;
@@ -70,6 +74,34 @@ public class ArmExtendSubsystem {
         pidController.setSmartMotionMinOutputVelocity(m_config.m_extendMotorMinVel, smartMotionSlot);
         pidController.setSmartMotionMaxAccel(m_config.m_extendMotorMaxAcc, smartMotionSlot);
         pidController.setSmartMotionAllowedClosedLoopError(m_config.m_extendMotorAllowedError, smartMotionSlot);
+    }
+
+    public void stopRotationMotors() {
+        setClosedLoopEnabled(false);
+        m_extendMotor.set(0);
+    }
+
+    public void resetEncoders() {
+        m_extendMotor.getEncoder().setPosition(0);
+    }
+
+    /**
+     * @return Is the Extender arm motor at the setpoint set by m_targetRotations
+     */
+    public boolean isExtenderRotatorAtRotations() {
+        double currentMotorRotations = m_extendMotor.getEncoder().getPosition();
+        return Utility.isWithinTolerance(currentMotorRotations, m_targetRotations,
+                m_config.m_rotationMotorAllowedError);
+    }
+    public double getExtenderMotorRotations() {
+        return m_extendMotor.getEncoder().getPosition();
+    }
+
+    @Override
+    public void periodic(){
+        if(isClosedLoopEnabled() && isExtenderRotatorAtRotations()){
+            setClosedLoopEnabled(false);
+        }
     }
 
 }
