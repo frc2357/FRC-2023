@@ -21,6 +21,7 @@ public class AutoBalanceCommand extends CommandLoggerBase {
     @Override
     public void execute() {
 
+        m_direction = (SwerveDriveSubsystem.getInstance().getYaw() % 360) + 180;
         m_direction = Math.copySign(1, m_direction);
 
         m_angle = SwerveDriveSubsystem.getInstance().getRoll();
@@ -32,11 +33,13 @@ public class AutoBalanceCommand extends CommandLoggerBase {
             m_power = Math.copySign(Constants.DRIVE.BALANCE_MAX_POWER, m_power);
         }
 
+        m_power *= m_direction;
         SwerveDriveSubsystem.getInstance().drive(m_power, 0, 0);
 
         System.out.println("Angle: " + m_angle);
         System.out.println("Error: " + m_error);
         System.out.println("Power: " + m_power);
+        System.out.println("Direction: " + m_direction);
 
 
     }
