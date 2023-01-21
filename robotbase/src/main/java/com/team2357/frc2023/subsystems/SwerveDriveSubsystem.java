@@ -277,59 +277,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		Logger.getInstance().recordOutput("Swerve States", states);
 	}
 
-	private void driveModuleForwardMeters(SwerveModule module, double meters) {
-		// double sensorUnits = meters / SdsModuleConfigurations.MK4I_L2.getWheelDiameter() / m_config.m_sensorPositionCoefficient / 2.0;
-		WPI_TalonFX driveMotor = (WPI_TalonFX)(module.getDriveMotor());
-		// System.out.println(sensorUnits);
-		// driveMotor.set(meters / m_config.m_maxVelocityMetersPerSecond);
-		System.out.println("speed: " + (meters / m_config.m_maxVelocityMetersPerSecond));
-	}
-
-	private void driveForwardMeters(double meters) {
-		driveModuleForwardMeters(m_frontLeftModule, meters);
-		driveModuleForwardMeters(m_frontRightModule, meters);
-		driveModuleForwardMeters(m_backLeftModule, meters);
-		driveModuleForwardMeters(m_backRightModule, meters);
-	}
-
-	public void balance() {
-		double angle, power, error;
-
-		angle = getPitch();
-		error = Constants.DRIVE.BALANCE_LEVEL_DEGREES - Math.abs(angle);
-
-		power = -Math.min(0.015 * error, 1);
-
-		if (Math.abs(power) > 0.4) {
-			power = Math.copySign(0.4, power);
-		}
-
-		// if (Math.abs(power) > 0.075) {
-		drive(power, 0, 0);
-		// }
-
-		System.out.println("Current angle: " + angle);
-		System.out.println("Error: " + error);
-		System.out.println("Drive power: " + power);
-
-		// if (-150 <= getPitch() && getPitch() <= 150) {
-		// 	angle = Constants.DRIVE.CHARGE_STATION_BALANCE_ANGLE_CONTROLLER.calculate(getPitch());
-		// 	distance = Constants.DRIVE.CHARGE_STATION_DISTANCE_CONTROLLER.calculate(angle);
-		// 	System.out.println("Distance: " + distance);
-		// 	driveForwardMeters(distance);
-		// }
-
-		// if (-150 <= getRoll() && getRoll() <= 150) {
-		// 	angle = Constants.DRIVE.CHARGE_STATION_BALANCE_ANGLE_CONTROLLER.calculate(getRoll());
-		// 	distance = Constants.DRIVE.CHARGE_STATION_DISTANCE_CONTROLLER.calculate(angle);
-		// 	System.out.println("Distance: " + distance);
-		// 	driveForwardMeters(distance);
-		// }
-	}
-
 	public boolean isBalanced() {
-		// return (-2.5 <= getRoll() && getRoll() <= 2.5) && (-2.5 <= getPitch() && getPitch() <= 2.5);
-		return false;
+		return (-2.5 <= getRoll() && getRoll() <= 2.5) && (-2.5 <= getPitch() && getPitch() <= 2.5);
 	}
 
 	@Override
