@@ -114,8 +114,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem{
     }
 
     /**
-     * 
-     * @return Is the climber at the setpoint set by {@Link setClimberRotations}
+     * @return Is the master arm motor at the setpoint set by m_targetRotations
      */
     public boolean isLeftClimberAtRotations() {
         double currentMotorRotations = m_masterRotationMotor.getEncoder().getPosition();
@@ -124,8 +123,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem{
     }
 
     /**
-     * 
-     * @return Is the climber at the setpoint set by {@Link setClimberRotations}
+     * @return Is the follower arm motor at the setpoint set by m_targetRotations
      */
     public boolean isRightClimberAtRotations() {
         double currentMotorRotations = m_followerRotationMotor.getEncoder().getPosition();
