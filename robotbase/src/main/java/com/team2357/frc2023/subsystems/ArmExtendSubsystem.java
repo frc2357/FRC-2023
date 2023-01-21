@@ -4,7 +4,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
 
-public class ArmExtender {
+public class ArmExtendSubsystem {
     public static class Configuration
     {
         public double m_extendAxisMaxSpeed = 0;
@@ -33,29 +33,29 @@ public class ArmExtender {
         public double m_extendMotorAllowedError = 0;
     }
     private Configuration m_config;
-    private CANSparkMax m_extenderMotor;
+    private CANSparkMax m_extendMotor;
     private SparkMaxPIDController m_pidcontroller;
 
-    public ArmExtender(CANSparkMax extender,int currentlimit,double ramprate){
-        m_extenderMotor = extender;
-        m_extenderMotor.setSmartCurrentLimit(currentlimit);
-        m_extenderMotor.setOpenLoopRampRate(ramprate);
+    public ArmExtendSubsystem(CANSparkMax extender,int currentlimit,double ramprate){
+        m_extendMotor = extender;
+        m_extendMotor.setSmartCurrentLimit(currentlimit);
+        m_extendMotor.setOpenLoopRampRate(ramprate);
     }
     public void configure(Configuration config) {
         m_config = config;
 
-        m_extenderMotor.setIdleMode(m_config.m_extendMotorIdleMode);
-        m_extenderMotor.setSmartCurrentLimit(m_config.m_extendMotorStallLimitAmps,m_config.m_extendMotorFreeLimitAmps);
+        m_extendMotor.setIdleMode(m_config.m_extendMotorIdleMode);
+        m_extendMotor.setSmartCurrentLimit(m_config.m_extendMotorStallLimitAmps,m_config.m_extendMotorFreeLimitAmps);
 
-        m_pidcontroller = m_extenderMotor.getPIDController();
-        configureClimberPID(m_pidcontroller);
+        m_pidcontroller = m_extendMotor.getPIDController();
+        configureExtenderPID(m_pidcontroller);
 
-        m_extenderMotor.setInverted(m_config.m_isInverted);
+        m_extendMotor.setInverted(m_config.m_isInverted);
     }
     public void extend(double sensorUnits) {
-        m_extenderMotor.set(sensorUnits);
+        m_extendMotor.set(sensorUnits);
     }
-    private void configureClimberPID(SparkMaxPIDController pidController) {
+    private void configureExtenderPID(SparkMaxPIDController pidController) {
         // set PID coefficients
         pidController.setP(m_config.m_extendMotorP);
         pidController.setI(m_config.m_extendMotorI);
