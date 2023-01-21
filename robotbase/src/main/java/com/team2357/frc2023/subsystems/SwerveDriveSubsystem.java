@@ -295,8 +295,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	public void balance() {
 		double angle, power, error;
 
-		angle = getRoll();
-		error = Constants.DRIVE.BALANCE_LEVEL_DEGREES - angle;
+		angle = getPitch();
+		error = Constants.DRIVE.BALANCE_LEVEL_DEGREES - Math.abs(angle);
 
 		power = -Math.min(0.015 * error, 1);
 
@@ -304,7 +304,9 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 			power = Math.copySign(0.4, power);
 		}
 
-		drive(0, power, 0);
+		// if (Math.abs(power) > 0.075) {
+		drive(power, 0, 0);
+		// }
 
 		System.out.println("Current angle: " + angle);
 		System.out.println("Error: " + error);

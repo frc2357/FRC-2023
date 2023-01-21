@@ -21,9 +21,9 @@ public class DefaultDriveCommand extends CommandBase {
     @Override
     public void execute() {
         m_drivetrainSubsystem.drive(
-                m_controls.getX(),
-                m_controls.getY(),
-                m_controls.getRotation());
+            m_controls.getY(),
+            m_controls.getX(),
+            m_controls.getRotation());
     }
 
     @Override
