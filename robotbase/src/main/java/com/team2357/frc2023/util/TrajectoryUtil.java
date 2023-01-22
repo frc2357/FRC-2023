@@ -17,22 +17,23 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 public class TrajectoryUtil {
 
-	public static SequentialCommandGroup createTrajectoryPathCommand(String trajectoryFileName, final boolean resetOdometry) {
-		final PathPlannerTrajectory trajectory = PathPlanner.loadPath(trajectoryFileName, SwerveDriveSubsystem.getInstance().getPathConstraints());
+	public static SequentialCommandGroup createTrajectoryPathCommand(String trajectoryFileName,
+			final boolean resetOdometry) {
+		final PathPlannerTrajectory trajectory = PathPlanner.loadPath(trajectoryFileName,
+				SwerveDriveSubsystem.getInstance().getPathConstraints());
 		return createDrivePathCommand(trajectory, resetOdometry);
 	}
 
-	public static SequentialCommandGroup CreateTwoPointTrajectoryPathCommand(Pose2d startPose, Pose2d endPose, final boolean resetOdometry) {
+	public static SequentialCommandGroup CreateTwoPointTrajectoryPathCommand(Pose2d startPose, Pose2d endPose,
+			final boolean resetOdometry) {
 		ArrayList<PathPoint> points = new ArrayList<PathPoint>();
 
 		PathPoint startPoint = new PathPoint(startPose.getTranslation(), startPose.getRotation(),
 				startPose.getRotation());
 		points.add(startPoint);
 
-		PathPoint endPoint = new PathPoint(endPose.getTranslation(), endPose.getRotation(), 
+		PathPoint endPoint = new PathPoint(endPose.getTranslation(), endPose.getRotation(),
 				endPose.getRotation());
-
-		points.add(startPoint);
 		points.add(endPoint);
 
 		PathPlannerTrajectory trajectory = PathPlanner.generatePath(
@@ -42,8 +43,8 @@ public class TrajectoryUtil {
 	}
 
 	public static SequentialCommandGroup createDrivePathCommand(
-		PathPlannerTrajectory trajectory, final boolean resetOdometry) {
-	
+			PathPlannerTrajectory trajectory, final boolean resetOdometry) {
+
 		SwerveDriveSubsystem swerveDrive = SwerveDriveSubsystem.getInstance();
 
 		SequentialCommandGroup pathCommand = new SequentialCommandGroup();
@@ -54,25 +55,25 @@ public class TrajectoryUtil {
 				PathPlannerState initialSample = (PathPlannerState) trajectory.sample(0);
 				Pose2d initialPose = new Pose2d(initialSample.poseMeters.getTranslation(),
 						initialSample.holonomicRotation);
-						swerveDrive.resetOdometry(initialPose);
+				swerveDrive.resetOdometry(initialPose);
 			}
 			swerveDrive.getXController().reset();
 			swerveDrive.getYController().reset();
-			}));
+		}));
 
 		pathCommand.addCommands(new PPSwerveControllerCommand(
-			trajectory,
-			() -> swerveDrive.getPose(),
-			swerveDrive.getKinematics(),
-			swerveDrive.getXController(),
-			swerveDrive.getYController(),
-			swerveDrive.getThetaController(),
-			(SwerveModuleState[] moduleStates) -> {
-				swerveDrive.drive(SwerveDriveSubsystem.getInstance().getKinematics().toChassisSpeeds(moduleStates));
-			}));
+				trajectory,
+				() -> swerveDrive.getPose(),
+				swerveDrive.getKinematics(),
+				swerveDrive.getXController(),
+				swerveDrive.getYController(),
+				swerveDrive.getThetaController(),
+				(SwerveModuleState[] moduleStates) -> {
+					swerveDrive.drive(SwerveDriveSubsystem.getInstance().getKinematics().toChassisSpeeds(moduleStates));
+				}));
 
 		pathCommand.addCommands(new InstantCommand(() -> swerveDrive.drive(new ChassisSpeeds())));
-	
+
 		return pathCommand;
 	}
 
@@ -80,16 +81,15 @@ public class TrajectoryUtil {
 	public static void samplePath(PathPlannerTrajectory trajectory) {
 		double Seconds = 0.0;
 		System.out.println("===== Begin Sampling path =====");
-		while(trajectory.getTotalTimeSeconds() > Seconds) {
-		PathPlannerState state = (PathPlannerState) trajectory.sample(Seconds);
-		System.out.println(
-		"time: " + Seconds
-		+ ", x: " + state.poseMeters.getX()
-		+ ", y: " + state.poseMeters.getY()
-		+ ", angle: " + state.poseMeters.getRotation().getDegrees()
-		+ ", holo: " + state.holonomicRotation.getDegrees()
-		);
-		Seconds += 0.25;
+		while (trajectory.getTotalTimeSeconds() > Seconds) {
+			PathPlannerState state = (PathPlannerState) trajectory.sample(Seconds);
+			System.out.println(
+					"time: " + Seconds
+							+ ", x: " + state.poseMeters.getX()
+							+ ", y: " + state.poseMeters.getY()
+							+ ", angle: " + state.poseMeters.getRotation().getDegrees()
+							+ ", holo: " + state.holonomicRotation.getDegrees());
+			Seconds += 0.1;
 		}
 		System.out.println("===== End Sampling Path =====");
 	}
