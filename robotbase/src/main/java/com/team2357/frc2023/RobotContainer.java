@@ -6,6 +6,7 @@ package com.team2357.frc2023;
 
 import com.team2357.frc2023.commands.DefaultDriveCommand;
 import com.team2357.frc2023.controls.SwerveDriveControls;
+import com.team2357.frc2023.shuffleboard.AutoCommandChooser;
 import com.team2357.frc2023.subsystems.SubsystemFactory;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.frc2023.util.AvailableTrajectories;
@@ -29,6 +30,8 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final SwerveDriveSubsystem m_drivetrainSubsystem;
 
+  private AutoCommandChooser m_autoCommandChooser;
+
   private final XboxController m_controller = new XboxController(0);
 
   /**
@@ -48,6 +51,16 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
+
+    //Configure Shuffleboard
+    configureShuffleboard();
+  }
+
+  /**
+   * This method should set up the shuffleboard
+   */
+  public void configureShuffleboard() {
+    m_autoCommandChooser = new AutoCommandChooser();
   }
 
   /**
@@ -72,8 +85,14 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An ExampleCommand will run in autonomous
-    return AvailableTrajectories.lineTrajectory;
+    int auto = -1;
+
+    switch(auto){
+      case 1: 
+        return AvailableTrajectories.lineTrajectory;
+      default:
+        return m_autoCommandChooser.generateCommand();
+    }
   }
 
 }
