@@ -257,9 +257,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	public void drive(ChassisSpeeds chassisSpeeds) {
 		if (!m_isZeroed) {
 			DriverStation.reportError("Swerve is not zeroed", false);
-
 			return;
-
 		}
 		m_chassisSpeeds = chassisSpeeds;
 		SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);

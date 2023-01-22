@@ -7,7 +7,8 @@ import com.team2357.lib.commands.CommandLoggerBase;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 public class AutoBalanceCommand extends CommandLoggerBase {
-    private double m_error, m_angle, m_power, m_direction;
+
+    private double m_error, m_angle, m_power, m_yaw, m_direction;
     
     public AutoBalanceCommand() {
         addRequirements(SwerveDriveSubsystem.getInstance());
@@ -21,10 +22,22 @@ public class AutoBalanceCommand extends CommandLoggerBase {
     @Override
     public void execute() {
 
-        m_direction = (SwerveDriveSubsystem.getInstance().getYaw() % 360) + 180;
-        m_direction = Math.copySign(1, m_direction);
+        m_yaw = (SwerveDriveSubsystem.getInstance().getYaw() % 360);
+        m_yaw += Math.copySign(m_yaw, -m_direction);
 
-        m_angle = SwerveDriveSubsystem.getInstance().getRoll();
+        if (-45 <= m_yaw && m_yaw < 45) {
+            m_direction = 1;
+            m_angle = SwerveDriveSubsystem.getInstance().getRoll();
+        } else if (45 <= m_yaw && m_yaw < 135) {
+            m_direction = 1;
+            m_angle = SwerveDriveSubsystem.getInstance().getPitch();
+        } else if (135 <= m_yaw && m_yaw < -135) {
+            m_direction = -1;
+            m_angle = SwerveDriveSubsystem.getInstance().getRoll();
+        } else if (-135 <= m_yaw && m_yaw < -45) {
+            m_direction = -1;
+            m_angle = SwerveDriveSubsystem.getInstance().getPitch();
+        }
 
         m_error = Math.copySign(Constants.DRIVE.BALANCE_LEVEL_DEGREES + Math.abs(m_angle), m_angle);
         m_power = Math.min(Constants.DRIVE.BALANCE_KP * m_error, 1);
@@ -34,6 +47,7 @@ public class AutoBalanceCommand extends CommandLoggerBase {
         }
 
         m_power *= m_direction;
+
         SwerveDriveSubsystem.getInstance().drive(m_power, 0, 0);
 
         System.out.println("Angle: " + m_angle);
