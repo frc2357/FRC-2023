@@ -51,6 +51,9 @@ public final class Constants {
         public static final int BACK_RIGHT_MODULE_DRIVE_MOTOR_ID = 17;
         public static final int BACK_RIGHT_MODULE_STEER_MOTOR_ID = 18;
         public static final int BACK_RIGHT_MODULE_STEER_ENCODER_ID = 22;
+
+        public static final int LEFT_INTAKE_MOTOR = 23;
+        public static final int RIGHT_INTAKE_MOTOR = 24;
     }
 
     public static final class DRIVE {
@@ -99,6 +102,12 @@ public final class Constants {
     public static final class INTAKE {
         public static IntakeSubsystem.Configuration GET_INTAKE_CONFIG() {
             IntakeSubsystem.Configuration config = new IntakeSubsystem.Configuration();
+
+            config.m_percentOutput = 0.5;
+
+            //TODO: Make sure these are correct
+            config.m_rightInverted = true;
+            config.m_leftInverted = false;
 
             return config;
         }
