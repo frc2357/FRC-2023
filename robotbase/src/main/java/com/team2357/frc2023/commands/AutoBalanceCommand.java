@@ -31,7 +31,7 @@ public class AutoBalanceCommand extends CommandLoggerBase {
         } else if (45 <= m_yaw && m_yaw < 135) {
             m_direction = 1;
             m_angle = SwerveDriveSubsystem.getInstance().getPitch();
-        } else if (135 <= m_yaw && m_yaw < -135) {
+        } else if ((135 <= m_yaw && m_yaw <= 180) || (m_yaw >= -180 && m_yaw < -135)) {
             m_direction = -1;
             m_angle = SwerveDriveSubsystem.getInstance().getRoll();
         } else if (-135 <= m_yaw && m_yaw < -45) {
@@ -40,11 +40,8 @@ public class AutoBalanceCommand extends CommandLoggerBase {
         }
 
         m_error = Math.copySign(Constants.DRIVE.BALANCE_LEVEL_DEGREES + Math.abs(m_angle), m_angle);
-        m_power = Math.min(Constants.DRIVE.BALANCE_KP * m_error, 1);
-
-        if (Math.abs(m_power) > Constants.DRIVE.BALANCE_MAX_POWER) {
-            m_power = Math.copySign(Constants.DRIVE.BALANCE_MAX_POWER, m_power);
-        }
+        m_power = Math.min(Math.abs(Constants.DRIVE.BALANCE_KP * m_error), Constants.DRIVE.BALANCE_MAX_POWER);
+        m_power = Math.copySign(m_power, m_error);
 
         m_power *= m_direction;
 
