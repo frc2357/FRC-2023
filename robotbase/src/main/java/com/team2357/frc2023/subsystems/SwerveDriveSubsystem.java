@@ -56,14 +56,10 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		/**
 		 * The left-to-right distance between the drivetrain wheels (measured from
 		 * center to center)
-		 * The left-to-right distance between the drivetrain wheels (measured from
-		 * center to center)
 		 */
 		public double m_trackwidthMeters;
 
 		/**
-		 * The front-to-back distance between the drivetrain wheels (measured from
-		 * center to center)
 		 * The front-to-back distance between the drivetrain wheels (measured from
 		 * center to center)
 		 */
@@ -84,15 +80,11 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
 		/**
 		 * The maximum angular velocity of the robot in radians per second
-		 * The maximum angular velocity of the robot in radians per second
 		 * (how fast the robot can rotate in place)
 		 * 
 		 * Formula: m_maxVelocityMetersPerSecond / Math.hypot(m_trackwidthMeters / 2,
 		 * m_wheelbaseMeters / 2)
-		 * Formula: m_maxVelocityMetersPerSecond / Math.hypot(m_trackwidthMeters / 2,
-		 * m_wheelbaseMeters / 2)
 		 */
-		//
 		public double m_maxAngularVelocityRadiansPerSecond;
 
 		public double m_trajectoryMaxVelocityMetersPerSecond;
