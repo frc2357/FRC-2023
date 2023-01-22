@@ -136,4 +136,4 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem{
 
     public double getFollowerMotorRotations() {
         return m_followerRotationMotor.getEncoder().getPosition();
-    }
+    }}
