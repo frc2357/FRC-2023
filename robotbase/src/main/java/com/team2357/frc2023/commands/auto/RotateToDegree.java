@@ -27,14 +27,16 @@ public class RotateToDegree extends CommandBase {
     @Override
     public void execute() {
         double newSpeed = m_pidController
-                .calculate(m_swerve.getGyroscopeRotation().getDegrees() * Constants.DRIVE.ROTATE_MAX_SPEED);
+                .calculate(m_swerve.getGyroscopeRotation().getDegrees());
+        newSpeed = Math.copySign(Math.min(Math.abs(newSpeed), Constants.DRIVE.ROTATE_MAX_SPEED), newSpeed);
         m_swerve.drive(0, 0, newSpeed);
+        System.out.println(newSpeed);
     }
 
     @Override
     public boolean isFinished() {
-        System.out.println(m_swerve.getGyroscopeRotation().getDegrees() % 360);
         System.out.println(m_targetDegrees);
+        System.out.println(m_swerve.getGyroscopeRotation().getDegrees() % 360);
         return Utility.isWithinTolerance(m_swerve.getGyroscopeRotation().getDegrees() % 360, m_targetDegrees, 2);
     }
 
