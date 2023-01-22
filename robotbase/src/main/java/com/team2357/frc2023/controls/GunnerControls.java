@@ -3,11 +3,10 @@ package com.team2357.frc2023.controls;
 import com.team2357.lib.triggers.AxisThresholdTrigger;
 import com.team2357.lib.util.Utility;
 import com.team2357.lib.util.XboxRaw;
+import com.team2357.frc2023.controls.AxisInterface;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -23,8 +22,6 @@ public class GunnerControls {
 
     // Triggers
     public AxisThresholdTrigger m_leftTrigger;
-    public AxisThresholdTrigger m_rightTriggerPrime;
-    public AxisThresholdTrigger m_rightTriggerShoot;
 
     // Buttons
     public JoystickButton m_leftStickButton;
@@ -55,8 +52,6 @@ public class GunnerControls {
         m_controller = controller;
 
         // Triggers
-        m_rightTriggerPrime = new AxisThresholdTrigger(controller, Axis.kRightTrigger, .1);
-        m_rightTriggerShoot = new AxisThresholdTrigger(controller, Axis.kRightTrigger, .6);
         m_leftTrigger = new AxisThresholdTrigger(controller, Axis.kLeftTrigger, .1);
 
         // Buttons
@@ -95,7 +90,7 @@ public class GunnerControls {
         };
 
         AxisInterface axisRightStickY = () -> {
-            return getRightYAxis();
+            return getRightYAxis(); 
         };
 
         Trigger noDPad = new Trigger(() -> m_upDPad.getAsBoolean() && m_rightDPad.getAsBoolean() && m_downDPad.getAsBoolean() && m_leftDPad.getAsBoolean()).negate();
