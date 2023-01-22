@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 public class SwerveDriveControls {
     private XboxController m_controller;
     private double m_deadband;
-
     private JoystickButton m_backButton;
     private JoystickButton m_leftTrigger;
     private JoystickButton m_leftBumper;
@@ -20,7 +19,6 @@ public class SwerveDriveControls {
     public SwerveDriveControls(XboxController controller, double deadband) {
         m_controller = controller;
         m_deadband = deadband;
-
         m_backButton = new JoystickButton(m_controller, XboxRaw.Back.value);
         m_leftTrigger = new JoystickButton(m_controller, XboxRaw.TriggerLeft.value);
         m_leftBumper = new JoystickButton(m_controller, XboxRaw.BumperLeft.value);
