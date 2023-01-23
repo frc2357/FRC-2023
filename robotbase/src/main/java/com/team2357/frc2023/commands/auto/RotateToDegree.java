@@ -46,7 +46,7 @@ public class RotateToDegree extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return Utility.isWithinTolerance(m_swerve.getGyroscopeRotation().getDegrees() % 360, m_targetDegrees, 2);
+        return Utility.isWithinTolerance(m_swerve.getGyroscopeRotation().getDegrees() % 360, m_targetDegrees, 1);
     }
 
     @Override
