@@ -10,33 +10,42 @@ public class RotateToDegree extends CommandBase {
 
     public SwerveDriveSubsystem m_swerve = SwerveDriveSubsystem.getInstance();
     public double m_targetDegrees;
+    public double m_currentAngle;
     public PIDController m_pidController;
 
     public RotateToDegree(double targetDegrees) {
         m_targetDegrees = targetDegrees;
         m_pidController = Constants.DRIVE.ROTATE_TO_TARGET_CONTROLLER;
+        m_pidController.enableContinuousInput(0, 360);
         addRequirements(m_swerve);
     }
 
     @Override
     public void initialize() {
         m_pidController.reset();
-        m_pidController.setSetpoint(m_targetDegrees);
+
+        double currentAngle = Math.abs(m_swerve.getGyroscopeRotation().getDegrees() % 360);
+        double distance = currentAngle-m_targetDegrees;
+        while (distance < -180) {
+            distance +=360;
+        }
+        while(distance >180){
+            distance-=360;
+        }
+        m_pidController.setSetpoint(m_swerve.getGyroscopeRotation().getDegrees()+distance);
     }
 
     @Override
     public void execute() {
-        double newSpeed = m_pidController
-                .calculate(m_swerve.getGyroscopeRotation().getDegrees());
-        newSpeed = Math.copySign(Math.min(Math.abs(newSpeed), Constants.DRIVE.ROTATE_MAX_SPEED), newSpeed);
+        double newSpeed = m_pidController.calculate(m_swerve.getGyroscopeRotation().getDegrees());
         m_swerve.drive(0, 0, newSpeed);
-        System.out.println(newSpeed);
+        System.out.println("Target angle: " + m_targetDegrees);
+        System.out.println("Current angle: " + Math.abs(m_swerve.getGyroscopeRotation().getDegrees() % 360));
+        System.out.println("New speed: " + newSpeed);
     }
 
     @Override
     public boolean isFinished() {
-        System.out.println(m_targetDegrees);
-        System.out.println(m_swerve.getGyroscopeRotation().getDegrees() % 360);
         return Utility.isWithinTolerance(m_swerve.getGyroscopeRotation().getDegrees() % 360, m_targetDegrees, 2);
     }
 
