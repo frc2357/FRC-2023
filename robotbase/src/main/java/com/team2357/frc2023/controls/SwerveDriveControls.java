@@ -4,7 +4,7 @@ import com.team2357.frc2023.commands.AutoBalanceCommand;
 import com.team2357.frc2023.commands.ReverseIntakeCommand;
 import com.team2357.frc2023.commands.RunIntakeCommand;
 import com.team2357.frc2023.subsystems.IntakeSubsystem;
-import com.team2357.frc2023.commands.auto.TranslateToAprilTag;
+import com.team2357.frc2023.commands.auto.TranslateToAprilTagCommand;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.lib.util.XboxRaw;
 import edu.wpi.first.wpilibj.XboxController;
@@ -27,12 +27,12 @@ public class SwerveDriveControls {
         m_backButton = new JoystickButton(m_controller, XboxRaw.Back.value);
         m_rightBumper = new JoystickButton(m_controller, XboxRaw.BumperRight.value);
         m_leftBumper = new JoystickButton(m_controller, XboxRaw.BumperLeft.value);
-
+        m_button = new JoystickButton(m_controller, XboxRaw.BumperRight.value);
         m_backButton.onTrue(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().zeroGyroscope()));
 
         m_rightBumper.whileTrue(new RunIntakeCommand());
         m_leftBumper.whileTrue(new ReverseIntakeCommand());
-        m_button.whileTrue(new TranslateToAprilTag());
+        m_button.whileTrue(new TranslateToAprilTagCommand());
     }
 
     public double getX() {

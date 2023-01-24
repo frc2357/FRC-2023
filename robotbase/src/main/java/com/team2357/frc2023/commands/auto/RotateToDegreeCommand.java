@@ -6,14 +6,14 @@ import com.team2357.frc2023.Constants;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class RotateToDegree extends CommandBase {
+public class RotateToDegreeCommand extends CommandBase {
 
     public SwerveDriveSubsystem m_swerve = SwerveDriveSubsystem.getInstance();
     public double m_targetDegrees;
     public double m_currentAngle;
     public PIDController m_pidController;
 
-    public RotateToDegree(double targetDegrees) {
+    public RotateToDegreeCommand(double targetDegrees) {
         m_targetDegrees = targetDegrees;
         m_pidController = Constants.DRIVE.ROTATE_TO_TARGET_CONTROLLER;
         m_pidController.enableContinuousInput(0, 360);

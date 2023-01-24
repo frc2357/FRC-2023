@@ -8,11 +8,11 @@ import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.lib.subsystems.LimelightSubsystem;
 import com.team2357.lib.util.Utility;
 
-public class TranslateToAprilTag extends CommandBase {
+public class TranslateToAprilTagCommand extends CommandBase {
     public PIDController m_pidController;
     public SwerveDriveSubsystem m_swerve = SwerveDriveSubsystem.getInstance();
     public LimelightSubsystem m_limeLight = LimelightSubsystem.getInstance();
-    public TranslateToAprilTag() {
+    public TranslateToAprilTagCommand() {
         m_pidController = Constants.DRIVE.TRANSLATE_TO_APRILTAG_CONTROLLER;
         addRequirements(m_swerve);
         addRequirements(m_limeLight);
