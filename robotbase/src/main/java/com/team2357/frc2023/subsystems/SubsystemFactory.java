@@ -4,6 +4,7 @@ import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
+import com.team2357.lib.subsystems.LimelightSubsystem;
 
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -73,6 +74,11 @@ public class SubsystemFactory {
     public IntakeSubsystem CreateIntakeSubsystem() {
         IntakeSubsystem subsystem = new IntakeSubsystem();
         subsystem.configure(Constants.INTAKE.GET_INTAKE_CONFIG());
+        return subsystem;
+    }
+
+    public LimelightSubsystem CreateLimelightSubsystem() {
+        LimelightSubsystem subsystem = new LimelightSubsystem();
         return subsystem;
     }
 }

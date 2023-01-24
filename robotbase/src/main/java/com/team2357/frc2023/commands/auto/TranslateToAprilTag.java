@@ -1,0 +1,42 @@
+package com.team2357.frc2023.commands.auto;
+
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+
+import com.team2357.frc2023.Constants;
+import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
+import com.team2357.lib.subsystems.LimelightSubsystem;
+import com.team2357.lib.util.Utility;
+
+public class TranslateToAprilTag extends CommandBase {
+    public PIDController m_pidController;
+    public SwerveDriveSubsystem m_swerve = SwerveDriveSubsystem.getInstance();
+    public LimelightSubsystem m_limeLight = LimelightSubsystem.getInstance();
+    public TranslateToAprilTag() {
+        m_pidController = Constants.DRIVE.TRANSLATE_TO_APRILTAG_CONTROLLER;
+        addRequirements(m_swerve);
+        addRequirements(m_limeLight);
+    }
+    @Override
+    public void initialize() {
+        m_limeLight.setAprilTagPipelineActive();
+        m_pidController.reset();
+        m_pidController.setSetpoint(m_limeLight.getTX());
+    }
+
+    @Override
+    public void execute() {
+        double newSpeed = m_pidController.calculate(m_limeLight.getTX());
+        m_swerve.drive(newSpeed, 0, 0);
+    }
+
+    @Override
+    public boolean isFinished() {
+        return Utility.isWithinTolerance(m_limeLight.getTX(), 0, 1);
+    }
+
+    @Override
+    public void end(boolean isInterrupted) {
+        m_swerve.drive(0, 0, 0);
+    }
+}

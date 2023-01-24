@@ -4,6 +4,7 @@ import com.team2357.frc2023.commands.AutoBalanceCommand;
 import com.team2357.frc2023.commands.ReverseIntakeCommand;
 import com.team2357.frc2023.commands.RunIntakeCommand;
 import com.team2357.frc2023.subsystems.IntakeSubsystem;
+import com.team2357.frc2023.commands.auto.TranslateToAprilTag;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.lib.util.XboxRaw;
 import edu.wpi.first.wpilibj.XboxController;
@@ -19,6 +20,7 @@ public class SwerveDriveControls {
 
     public static boolean isFlipped;
 
+    private JoystickButton m_button;
     public SwerveDriveControls(XboxController controller, double deadband) {
         m_controller = controller;
         m_deadband = deadband;
@@ -30,6 +32,7 @@ public class SwerveDriveControls {
 
         m_rightBumper.whileTrue(new RunIntakeCommand());
         m_leftBumper.whileTrue(new ReverseIntakeCommand());
+        m_button.whileTrue(new TranslateToAprilTag());
     }
 
     public double getX() {

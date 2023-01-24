@@ -45,6 +45,7 @@ public class RobotContainer {
     m_intakeSubsystem = subsystemFactory.CreateIntakeSubsystem();
     m_drivetrainSubsystem = subsystemFactory.CreateSwerveDriveSubsystem();
 
+    subsystemFactory.CreateLimelightSubsystem();
     m_drivetrainSubsystem.setDefaultCommand(new DefaultDriveCommand(
         m_drivetrainSubsystem,
         new SwerveDriveControls(m_controller, Constants.CONTROLLER.DRIVE_CONTROLLER_DEADBAND)));
@@ -55,7 +56,7 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
 
-    //Configure Shuffleboard
+    // Configure Shuffleboard
     configureShuffleboard();
   }
 
@@ -90,8 +91,8 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     int auto = -1;
 
-    switch(auto){
-      case 1: 
+    switch (auto) {
+      case 1:
         return AvailableTrajectories.lineTrajectory;
       default:
         return m_autoCommandChooser.generateCommand();
