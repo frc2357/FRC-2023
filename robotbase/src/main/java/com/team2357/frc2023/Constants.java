@@ -100,6 +100,11 @@ public final class Constants {
         public static final double WAIT_FOR_ZERO_TIME_MILLIS = 250;
 
         public static final double ENCODER_SYNC_ACCURACY_RADIANS = 0.05;
+
+        public static final PIDController ROTATE_TO_TARGET_CONTROLLER = new PIDController(0.009, 0, 0);
+
+
+        public static final double ROTATE_MAX_SPEED = .45;
     }
 
     public static final class INTAKE {

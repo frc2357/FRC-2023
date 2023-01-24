@@ -11,8 +11,9 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import com.team2357.frc2023.commands.WaitForZeroCommand;
+import com.team2357.frc2023.commands.auto.RotateToDegree;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
-
+import com.team2357.frc2023.commands.auto.*;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
