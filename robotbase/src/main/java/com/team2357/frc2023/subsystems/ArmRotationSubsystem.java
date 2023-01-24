@@ -40,7 +40,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem{
     private Configuration m_config;
     private CANSparkMax m_masterRotationMotor;
     private CANSparkMax m_followerRotationMotor;
-    private SparkMaxPIDController m_PidController;    
+    private SparkMaxPIDController m_pidController;    
     private double m_targetRotations;
 
     ArmRotationSubsystem(CANSparkMax masterRotationMotor, CANSparkMax followerRotationMotor) {
@@ -55,8 +55,8 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem{
         configureRotationMotor(m_masterRotationMotor);
         configureRotationMotor(m_followerRotationMotor);
 
-        m_PidController = m_masterRotationMotor.getPIDController();
-        configureRotationPID(m_PidController);
+        m_pidController = m_masterRotationMotor.getPIDController();
+        configureRotationPID(m_pidController);
 
         m_masterRotationMotor.setInverted(!m_config.m_isFollowerInverted);
         m_followerRotationMotor.follow(m_masterRotationMotor,m_config.m_isFollowerInverted);
@@ -109,14 +109,14 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem{
         m_masterRotationMotor.getEncoder().setPosition(0);
         m_followerRotationMotor.getEncoder().setPosition(0);
     }
-    public boolean isClimberAtRotations() {
-        return isLeftClimberAtRotations() && isRightClimberAtRotations();
+    public boolean isRotatorAtRotations() {
+        return  isMasterRotatorAtRotations()&& isFollowerRotatorAtRotations();
     }
 
     /**
      * @return Is the master arm motor at the setpoint set by m_targetRotations
      */
-    public boolean isLeftClimberAtRotations() {
+    public boolean isMasterRotatorAtRotations() {
         double currentMotorRotations = m_masterRotationMotor.getEncoder().getPosition();
         return Utility.isWithinTolerance(currentMotorRotations, m_targetRotations,
                 m_config.m_rotationMotorAllowedError);
@@ -125,7 +125,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem{
     /**
      * @return Is the follower arm motor at the setpoint set by m_targetRotations
      */
-    public boolean isRightClimberAtRotations() {
+    public boolean isFollowerRotatorAtRotations() {
         double currentMotorRotations = m_followerRotationMotor.getEncoder().getPosition();
         return Utility.isWithinTolerance(currentMotorRotations, m_targetRotations,
                 m_config.m_rotationMotorAllowedError);
@@ -136,4 +136,12 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem{
 
     public double getFollowerMotorRotations() {
         return m_followerRotationMotor.getEncoder().getPosition();
-    }}
+    }
+
+    @Override
+    public void periodic() {
+        if (isClosedLoopEnabled() && isRotatorAtRotations()) {
+            setClosedLoopEnabled(false);
+        }
+    }
+}
