@@ -114,7 +114,9 @@ public final class Constants {
 
         public static final double ROTATE_MAX_SPEED = .45;
 
-        public static final PIDController TRANSLATE_TO_APRILTAG_CONTROLLER = new PIDController(0.009, 0, 0);
+        public static final PIDController TRANSLATE_TO_APRILTAG_CONTROLLER = new PIDController(0.7, 0, 0);
+
+        public static final double TRANSLATE_TO_APRILTAG_MAXSPEED = 0.1;
     }
 
     public static final class INTAKE {

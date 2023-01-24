@@ -1,5 +1,6 @@
 package com.team2357.frc2023.commands.auto;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
@@ -21,18 +22,20 @@ public class TranslateToAprilTagCommand extends CommandBase {
     public void initialize() {
         m_limeLight.setAprilTagPipelineActive();
         m_pidController.reset();
-        m_pidController.setSetpoint(m_limeLight.getTX());
+        m_pidController.setSetpoint(0);
     }
 
     @Override
     public void execute() {
         double newSpeed = m_pidController.calculate(m_limeLight.getTX());
-        m_swerve.drive(newSpeed, 0, 0);
+            newSpeed = MathUtil.clamp(newSpeed, Constants.DRIVE.TRANSLATE_TO_APRILTAG_MAXSPEED*-1,Constants.DRIVE.TRANSLATE_TO_APRILTAG_MAXSPEED);
+            newSpeed = newSpeed*-1;
+        m_swerve.drive(0, newSpeed, 0);
     }
 
     @Override
     public boolean isFinished() {
-        return Utility.isWithinTolerance(m_limeLight.getTX(), 0, 1);
+        return Utility.isWithinTolerance(m_limeLight.getTX(), 0, 0.4);
     }
 
     @Override
