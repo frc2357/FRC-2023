@@ -25,14 +25,14 @@ public class RotateToDegree extends CommandBase {
         m_pidController.reset();
 
         double currentAngle = Math.abs(m_swerve.getGyroscopeRotation().getDegrees() % 360);
-        double distance = currentAngle-m_targetDegrees;
+        double distance = currentAngle - m_targetDegrees;
         while (distance < -180) {
-            distance +=360;
+            distance += 360;
         }
-        while(distance >180){
-            distance-=360;
+        while (distance > 180) {
+            distance -= 360;
         }
-        m_pidController.setSetpoint(m_swerve.getGyroscopeRotation().getDegrees()+distance);
+        m_pidController.setSetpoint(m_swerve.getGyroscopeRotation().getDegrees() + distance);
     }
 
     @Override
