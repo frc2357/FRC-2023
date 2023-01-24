@@ -39,9 +39,6 @@ public class RotateToDegree extends CommandBase {
     public void execute() {
         double newSpeed = m_pidController.calculate(m_swerve.getGyroscopeRotation().getDegrees());
         m_swerve.drive(0, 0, newSpeed);
-        System.out.println("Target angle: " + m_targetDegrees);
-        System.out.println("Current angle: " + Math.abs(m_swerve.getGyroscopeRotation().getDegrees() % 360));
-        System.out.println("New speed: " + newSpeed);
     }
 
     @Override
