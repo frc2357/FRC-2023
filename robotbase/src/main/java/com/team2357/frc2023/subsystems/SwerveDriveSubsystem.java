@@ -279,9 +279,33 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		Logger.getInstance().recordOutput("Swerve States", states);
 	}
 
-	public boolean isBalanced() {
-		// return (-2.5 <= getRoll() && getRoll() <= 2.5) && (-2.5 <= getPitch() && getPitch() <= 2.5);
-		return false;
+	public void balance() {
+		double yaw, direction, angle, error, power;
+		angle = 0; direction = 0;
+
+		yaw = Math.abs(getYaw() % 360);
+
+		if ((0 <= yaw && yaw < 45) || (315 <= yaw && yaw <= 360)) {
+            direction = 1;
+            angle = getRoll();
+        } else if (45 <= yaw && yaw < 135) {
+            direction = 1;
+            angle = getPitch();
+        } else if (135 <= yaw && yaw < 225) {
+            direction = -1;
+            angle = getRoll();
+        } else if (225 <= yaw && yaw < 315) {
+            direction = -1;
+            angle = getPitch();
+        }
+
+		error = Math.copySign(Constants.DRIVE.BALANCE_LEVEL_DEGREES + Math.abs(angle), angle);
+        power = Math.min(Math.abs(Constants.DRIVE.BALANCE_KP * error), Constants.DRIVE.BALANCE_MAX_POWER);
+        power = Math.copySign(power, error);
+
+        power *= direction;
+		
+        drive(power, 0, 0);
 	}
 
 	@Override
