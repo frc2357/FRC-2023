@@ -10,6 +10,7 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import com.team2357.frc2023.commands.OrientControllerInputsCommand;
 import com.team2357.frc2023.commands.WaitForZeroCommand;
 import com.team2357.frc2023.commands.auto.RotateToDegree;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
@@ -117,6 +118,7 @@ public class Robot extends LoggedRobot {
   public void teleopInit() {
     SwerveDriveSubsystem.getInstance().zero();
     CommandScheduler.getInstance().schedule(new WaitForZeroCommand());
+    CommandScheduler.getInstance().schedule(new OrientControllerInputsCommand());
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
