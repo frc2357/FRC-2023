@@ -299,6 +299,10 @@ public class SwerveDriveSubsystem extends SubsystemBase {
             angle = getPitch();
         }
 
+		if (angle > Constants.DRIVE.BALANCE_FULL_TILT_DEGREES) {
+			return;
+		}
+
 		error = Math.copySign(Constants.DRIVE.BALANCE_LEVEL_DEGREES + Math.abs(angle), angle);
         power = Math.min(Math.abs(Constants.DRIVE.BALANCE_KP * error), Constants.DRIVE.BALANCE_MAX_POWER);
         power = Math.copySign(power, error);
