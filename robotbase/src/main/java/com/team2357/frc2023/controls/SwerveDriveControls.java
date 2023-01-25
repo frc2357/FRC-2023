@@ -26,8 +26,8 @@ public class SwerveDriveControls {
 
         m_backButton.onTrue(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().zeroGyroscope()));
 
-        // m_leftTrigger.onTrue(new RunIntakeCommand());
-        // m_leftBumper.onTrue(new ReverseIntakeCommand());
+        m_leftTrigger.onTrue(new RunIntakeCommand());
+        m_leftBumper.onTrue(new ReverseIntakeCommand());
     }
 
     public double getX() {
