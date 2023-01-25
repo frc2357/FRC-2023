@@ -4,15 +4,11 @@
 
 package com.team2357.frc2023;
 
-import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
+import com.team2357.frc2023.subsystems.IntakeSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -55,6 +51,9 @@ public final class Constants {
         public static final int BACK_RIGHT_MODULE_DRIVE_MOTOR_ID = 17;
         public static final int BACK_RIGHT_MODULE_STEER_MOTOR_ID = 18;
         public static final int BACK_RIGHT_MODULE_STEER_ENCODER_ID = 22;
+
+        public static final int LEFT_INTAKE_MOTOR = 23;
+        public static final int RIGHT_INTAKE_MOTOR = 24;
     }
 
     public static final class DRIVE {
@@ -73,6 +72,9 @@ public final class Constants {
                     Math.hypot(config.m_trackwidthMeters / 2.0, config.m_wheelbaseMeters / 2.0);
             config.m_maxAngularAccelerationRadiansPerSecondSquared = config.m_maxAngularVelocityRadiansPerSecond / 3.0;
 
+            config.m_trajectoryMaxVelocityMetersPerSecond = 2;
+            config.m_trajectoryMaxAccelerationMetersPerSecond = 3;
+            
             config.m_xController = new PIDController(.56122, 0, 0);
             config.m_yController = new PIDController(.56122, 0, 0);
             config.m_thetaController = new PIDController(2.15, 0, 0);
@@ -107,6 +109,25 @@ public final class Constants {
         public static final double WAIT_FOR_ZERO_TIME_MILLIS = 250;
 
         public static final double ENCODER_SYNC_ACCURACY_RADIANS = 0.05;
+
+        public static final PIDController ROTATE_TO_TARGET_CONTROLLER = new PIDController(0.009, 0, 0);
+
+
+        public static final double ROTATE_MAX_SPEED = .45;
+    }
+
+    public static final class INTAKE {
+        public static IntakeSubsystem.Configuration GET_INTAKE_CONFIG() {
+            IntakeSubsystem.Configuration config = new IntakeSubsystem.Configuration();
+
+            config.m_percentOutput = 0.5;
+
+            //TODO: Make sure these are correct
+            config.m_rightInverted = true;
+            config.m_leftInverted = false;
+
+            return config;
+        }
     }
 
     public static final class CONTROLLER {

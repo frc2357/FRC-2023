@@ -32,10 +32,9 @@ public class Utility {
    * @param pid     PID values to set
    */
   public static void configTalonPID(
-    WPI_TalonSRX talon,
-    int slotIdx,
-    PIDValues pid
-  ) {
+      WPI_TalonSRX talon,
+      int slotIdx,
+      PIDValues pid) {
     talon.config_kP(slotIdx, pid.kp);
     talon.config_kI(slotIdx, pid.ki);
     talon.config_kD(slotIdx, pid.kd);
@@ -57,5 +56,9 @@ public class Utility {
       return 0.0;
     }
     return input;
+  }
+
+  public static boolean isWithinTolerance(double currentValue, double targetValue, double tolerance) {
+    return Math.abs(currentValue - targetValue) <= tolerance;
   }
 }

@@ -1,10 +1,10 @@
 package com.team2357.frc2023.controls;
 
 import com.team2357.frc2023.commands.AutoBalanceCommand;
+import com.team2357.frc2023.commands.ReverseIntakeCommand;
+import com.team2357.frc2023.commands.RunIntakeCommand;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.lib.util.XboxRaw;
-
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -12,19 +12,26 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 public class SwerveDriveControls {
     private XboxController m_controller;
     private double m_deadband;
-
     private JoystickButton m_backButton;
     private JoystickButton m_aButton;
+    private JoystickButton m_leftTrigger;
+    private JoystickButton m_leftBumper;
 
     public SwerveDriveControls(XboxController controller, double deadband) {
         m_controller = controller;
         m_deadband = deadband;
-
         m_backButton = new JoystickButton(m_controller, XboxRaw.Back.value);
         m_aButton = new JoystickButton(m_controller, XboxRaw.A.value);
 
         m_backButton.onTrue(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().zeroGyroscope()));
         m_aButton.whileTrue(new AutoBalanceCommand());
+        m_leftTrigger = new JoystickButton(m_controller, XboxRaw.TriggerLeft.value);
+        m_leftBumper = new JoystickButton(m_controller, XboxRaw.BumperLeft.value);
+
+        m_backButton.onTrue(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().zeroGyroscope()));
+
+        m_leftTrigger.onTrue(new RunIntakeCommand());
+        m_leftBumper.onTrue(new ReverseIntakeCommand());
     }
 
     public double getX() {
