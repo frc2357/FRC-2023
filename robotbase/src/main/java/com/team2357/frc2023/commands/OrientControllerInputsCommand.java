@@ -16,11 +16,7 @@ public class OrientControllerInputsCommand extends CommandBase {
     public void initialize() {
         Utils.m_alliance = DriverStation.getAlliance();
 
-        if (Utils.m_alliance == DriverStation.Alliance.Red) {
-            SwerveDriveControls.isFlipped = true;
-        } else {
-            SwerveDriveControls.isFlipped = false;
-        }
+        SwerveDriveControls.isFlipped = Utils.m_alliance == DriverStation.Alliance.Red;
     }
 
 }

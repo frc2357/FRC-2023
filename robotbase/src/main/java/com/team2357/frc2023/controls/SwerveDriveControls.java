@@ -63,9 +63,6 @@ public class SwerveDriveControls {
     public double modifyAxis(double value) {
         value = deadband(value, m_deadband);
         value = Math.copySign(value * value, value);
-        if (isFlipped) {
-            return -value;
-        }
         return value;
     }
 }
