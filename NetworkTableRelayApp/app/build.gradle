@@ -14,6 +14,7 @@ plugins {
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
+    maven { url "https://frcmaven.wpi.edu/artifactory/development/" }
 }
 
 dependencies {
@@ -22,11 +23,23 @@ dependencies {
 
     // This dependency is used by the application.
     implementation 'com.google.guava:guava:30.1.1-jre'
+
+    // Add ntcore-java
+    implementation "edu.wpi.first.ntcore:ntcore-java:2023.2.1-8-g5f1a025"
+
+    // Add wpiutil-java
+    implementation "edu.wpi.first.wpiutil:wpiutil-java:2023.2.1-8-g5f1a025"
+
+    // Add ntcore-jni for runtime. We are adding all supported platforms
+    // so that our application will work on all supported platforms.
+    implementation "edu.wpi.first.ntcore:ntcore-jni:2023.2.1-8-g5f1a025:windowsx86-64"
+    implementation "edu.wpi.first.ntcore:ntcore-jni:2023.2.1-8-g5f1a025:linuxx86-64"
+    implementation "edu.wpi.first.ntcore:ntcore-jni:2023.2.1-8-g5f1a025:osxuniversal"
 }
 
 application {
     // Define the main class for the application.
-    mainClass = 'buttonboardapp.App'
+    mainClass = 'networkTableRelayApp.App'
 }
 
 tasks.named('test') {
