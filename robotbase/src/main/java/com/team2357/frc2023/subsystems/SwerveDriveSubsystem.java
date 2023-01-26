@@ -9,10 +9,7 @@ import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
-import com.pathplanner.lib.commands.PPSwerveControllerCommand;
+import com.pathplanner.lib.PathConstraints;
 import com.swervedrivespecialties.swervelib.AbsoluteEncoder;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.swervedrivespecialties.swervelib.SwerveModule;
@@ -29,8 +26,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SwerveDriveSubsystem extends SubsystemBase {
@@ -56,6 +51,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	private Configuration m_config;
 
 	private SwerveDriveOdometry m_odometry;
+
+	private PathConstraints m_pathConstraints;
 
 	public static class Configuration {
 		/**
@@ -90,11 +87,13 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		 * Formula: m_maxVelocityMetersPerSecond / Math.hypot(m_trackwidthMeters / 2,
 		 * m_wheelbaseMeters / 2)
 		 */
-		//
 		public double m_maxAngularVelocityRadiansPerSecond;
 
 		public double m_maxAngularAccelerationRadiansPerSecondSquared;
 
+		public double m_trajectoryMaxVelocityMetersPerSecond;
+
+		public double m_trajectoryMaxAccelerationMetersPerSecond;
 
 		public PIDController m_xController;
 		public PIDController m_yController;
@@ -138,6 +137,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
 						m_frontRightModule.getPosition(),
 						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
+
+		m_pathConstraints = new PathConstraints(m_config.m_trajectoryMaxVelocityMetersPerSecond, m_config.m_trajectoryMaxAccelerationMetersPerSecond);
 	}
 
 	public PIDController getXController() {
@@ -154,6 +155,10 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
 	public SwerveDriveKinematics getKinematics() {
 		return m_kinematics;
+	}
+
+	public PathConstraints getPathConstraints() {
+		return m_pathConstraints;
 	}
 
 	public boolean isReadyToZero() {
@@ -318,7 +323,6 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
 						m_frontRightModule.getPosition(),
 						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
-
 		SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
 
 		SmartDashboard.putNumber("Yaw", m_pigeon.getYaw());
@@ -328,47 +332,4 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
 		Logger.getInstance().recordOutput("Robot Pose", m_odometry.getPoseMeters());
 	}
-
-	// TODO Abstract this function out similair to 2022 code
-	// Pick back up here with path following constant placeholders
-	public SequentialCommandGroup followPathCommand(final boolean shouldResetOdometry, String trajectoryFileName) {
-
-		// final Trajectory trajectory = generateTrajectory(waypoints);
-		final PathPlannerTrajectory trajectory = PathPlanner.loadPath(trajectoryFileName, 2, 3);
-		// double Seconds = 0.0;
-		// System.out.println("===== Begin Sampling path =====");
-		// while(trajectory.getTotalTimeSeconds() > Seconds) {
-		// PathPlannerState state = (PathPlannerState) trajectory.sample(Seconds);
-		// System.out.println(
-		// "time: " + Seconds
-		// + ", x: " + state.poseMeters.getX()
-		// + ", y: " + state.poseMeters.getY()
-		// + ", angle: " + state.poseMeters.getRotation().getDegrees()
-		// + ", holo: " + state.holonomicRotation.getDegrees()
-		// );
-		// Seconds += 0.25;
-		// }
-		// System.out.println("===== End Sampling Path =====");
-		return new InstantCommand(() -> {
-			if (shouldResetOdometry) {
-				PathPlannerState initialSample = (PathPlannerState) trajectory.sample(0);
-				Pose2d initialPose = new Pose2d(initialSample.poseMeters.getTranslation(),
-						initialSample.holonomicRotation);
-				resetOdometry(initialPose);
-			}
-			m_config.m_xController.reset();
-			m_config.m_yController.reset();
-		}).andThen(new PPSwerveControllerCommand(
-				trajectory,
-				() -> getPose(),
-				m_kinematics,
-				m_config.m_xController,
-				m_config.m_yController,
-				m_config.m_thetaController,
-				(SwerveModuleState[] moduleStates) -> {
-					drive(m_kinematics.toChassisSpeeds(moduleStates));
-				},
-				this)).andThen(() -> drive(new ChassisSpeeds()), this);
-	}
-
 }
