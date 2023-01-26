@@ -48,7 +48,7 @@ public class RobotContainer {
         m_drivetrainSubsystem,
         new SwerveDriveControls(m_controller, Constants.CONTROLLER.DRIVE_CONTROLLER_DEADBAND)));
 
-    m_intakeSubsystem = subsystemFactory.CreateIntakeSubsystem();
+    // m_intakeSubsystem = subsystemFactory.CreateIntakeSubsystem();
 
     // Build trajectory paths
     AvailableTrajectories.generateTrajectories();
