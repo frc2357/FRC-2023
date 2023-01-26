@@ -14,7 +14,7 @@ public class AxisThresholdTriggerTest {
   public void testGetReturnsTrueWhenHeld() {
     XboxController controller = mock(XboxController.class);
 
-    when(controller.getRightTriggerAxis()).thenReturn(1.0);
+    when(controller.getRawAxis(Axis.kRightTrigger.value)).thenReturn(1.0);
 
     AxisThresholdTrigger trigger = new AxisThresholdTrigger(
       controller,
@@ -59,7 +59,7 @@ public class AxisThresholdTriggerTest {
   public void testGetReturnsTrueWhenJustAboveThreshold() {
     XboxController controller = mock(XboxController.class);
 
-    when(controller.getRightTriggerAxis()).thenReturn(0.251);
+    when(controller.getRawAxis(Axis.kRightTrigger.value)).thenReturn(0.251);
 
     AxisThresholdTrigger trigger = new AxisThresholdTrigger(
       controller,
