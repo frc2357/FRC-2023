@@ -21,11 +21,14 @@ public class AutoBalanceCommand extends CommandLoggerBase {
 
     @Override
     public void execute() {
-
         SwerveDriveSubsystem.getInstance().balance();
-
     }
 
+    @Override
+    public boolean isFinished() {
+        return false;
+    }
+    
     @Override
     public void end(boolean interrupted) {
         SwerveDriveSubsystem.getInstance().drive(new ChassisSpeeds(0, 0, 0));
