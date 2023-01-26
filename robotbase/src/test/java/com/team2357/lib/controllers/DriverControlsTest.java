@@ -1,17 +1,19 @@
 package com.team2357.lib.controllers;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import edu.wpi.first.wpilibj.XboxController;
-import org.junit.Before;
-import org.junit.Test;
 
 public class DriverControlsTest {
 
   private XboxController controller;
 
-  @Before
+  @BeforeEach
   public void setup() {
     controller = mock(XboxController.class);
   }

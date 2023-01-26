@@ -3,8 +3,9 @@ package com.team2357.log.outputs;
 import static org.mockito.Mockito.verify;
 
 import java.io.PrintStream;
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 public class PrintStreamLogWriterTest {
@@ -17,21 +18,21 @@ public class PrintStreamLogWriterTest {
   public void testNanosToTime() {
     var writer = new PrintStreamLogWriter("prefix", null);
 
-    Assert.assertEquals("00:00.042", writer.nanosToTime(42 * MS));
-    Assert.assertEquals("00:22.000", writer.nanosToTime(22 * SECOND));
-    Assert.assertEquals("01:18.000", writer.nanosToTime(78 * SECOND));
-    Assert.assertEquals("13:00.000", writer.nanosToTime(13 * MINUTE));
-    Assert.assertEquals("84:00.000", writer.nanosToTime(84 * MINUTE));
-    Assert.assertEquals("122:00.000", writer.nanosToTime(122 * MINUTE));
-    Assert.assertEquals(
+    Assertions.assertEquals("00:00.042", writer.nanosToTime(42 * MS));
+    Assertions.assertEquals("00:22.000", writer.nanosToTime(22 * SECOND));
+    Assertions.assertEquals("01:18.000", writer.nanosToTime(78 * SECOND));
+    Assertions.assertEquals("13:00.000", writer.nanosToTime(13 * MINUTE));
+    Assertions.assertEquals("84:00.000", writer.nanosToTime(84 * MINUTE));
+    Assertions.assertEquals("122:00.000", writer.nanosToTime(122 * MINUTE));
+    Assertions.assertEquals(
       "02:30.500",
       writer.nanosToTime((2 * MINUTE) + (30 * SECOND) + (500 * MS))
     );
-    Assert.assertEquals(
+    Assertions.assertEquals(
       "23:12.988",
       writer.nanosToTime((23 * MINUTE) + (12 * SECOND) + (988 * MS))
     );
-    Assert.assertEquals("00:00.000", writer.nanosToTime(-2 * SECOND));
+    Assertions.assertEquals("00:00.000", writer.nanosToTime(-2 * SECOND));
   }
 
   @Test

@@ -3,19 +3,20 @@ package com.team2357.log;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Map;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
 import com.team2357.log.outputs.LogOutput;
 import com.team2357.log.topics.LogTopic;
 import com.team2357.log.topics.LogTopicRegistry;
 import com.team2357.log.topics.LogTopicRegistryTest;
-import java.util.Map;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.mockito.Mockito;
 
 public class LogSessionTest {
 
-  @Ignore
+  // @Ignore
   public static class TestTopic extends LogTopic {
 
     public TestTopic(final String name, final LogTopicRegistry registry) {
@@ -36,13 +37,13 @@ public class LogSessionTest {
       startNanos
     );
 
-    Assert.assertEquals(1L, session.timeSinceStartNanos(1000000001L));
-    Assert.assertEquals(3000000L, session.timeSinceStartNanos(1003000000L));
-    Assert.assertEquals(8000000000L, session.timeSinceStartNanos(9000000000L));
-    Assert.assertEquals(2000000000L, session.timeSinceStartNanos(stopNanos));
+    Assertions.assertEquals(1L, session.timeSinceStartNanos(1000000001L));
+    Assertions.assertEquals(3000000L, session.timeSinceStartNanos(1003000000L));
+    Assertions.assertEquals(8000000000L, session.timeSinceStartNanos(9000000000L));
+    Assertions.assertEquals(2000000000L, session.timeSinceStartNanos(stopNanos));
 
-    Assert.assertTrue(session.stop(stopNanos));
-    Assert.assertFalse(session.stop(stopNanos));
+    Assertions.assertTrue(session.stop(stopNanos));
+    Assertions.assertFalse(session.stop(stopNanos));
   }
 
   @Test

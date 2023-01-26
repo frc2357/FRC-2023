@@ -2,8 +2,7 @@ package com.team2357.log.outputs;
 
 import static org.mockito.Mockito.verify;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 public class ThreadLogOutputTest {
@@ -81,12 +80,12 @@ public class ThreadLogOutputTest {
     verify(writer).onEntry("test-topic", "test-value", valueNanos - startNanos);
   }
 
-  @Ignore
+  // @Ignore
   public long convertToRelativeNanos(long nanos) {
     return nanos - m_initNanos;
   }
 
-  @Ignore
+  // @Ignore
   private class TestLogOutput extends ThreadLogOutput {
 
     private TestLogOutput(LogWriter writer) {

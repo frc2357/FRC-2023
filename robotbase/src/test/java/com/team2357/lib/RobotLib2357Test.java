@@ -1,12 +1,12 @@
 package com.team2357.lib;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class RobotLib2357Test {
 
   @Test
   public void testBuild() {
-    Assert.assertEquals(true, true);
+    Assertions.assertEquals(true, true);
   }
 }

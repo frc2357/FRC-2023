@@ -1,8 +1,8 @@
 package com.team2357.lib.util;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class UtilityTest {
 
@@ -62,6 +62,6 @@ public class UtilityTest {
 
   @Test
   public void testDeadbandReturnsInputWhenABSOfNegativeInputIsLessThanDeadband() {
-    assertEquals(Utility.deadband(-1.0, 0.5), -1.0, -0.9);
+    assertEquals(Utility.deadband(-1.0, 0.5), -1.0, 0.9);
   }
 }

@@ -2,8 +2,7 @@ package com.team2357.log.outputs;
 
 import static org.mockito.Mockito.verify;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 public class SimpleLogOutputTest {
@@ -73,7 +72,7 @@ public class SimpleLogOutputTest {
     verify(writer).onEntry("test-topic", "test-value", 1500000000L);
   }
 
-  @Ignore
+  // @Ignore
   public long convertToRelativeNanos(long nanos) {
     return nanos - initNanos;
   }

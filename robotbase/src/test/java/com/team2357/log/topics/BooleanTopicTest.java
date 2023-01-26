@@ -1,9 +1,10 @@
 package com.team2357.log.topics;
 
-import com.team2357.log.outputs.LogOutput;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
+
+import com.team2357.log.outputs.LogOutput;
 
 public class BooleanTopicTest {
 

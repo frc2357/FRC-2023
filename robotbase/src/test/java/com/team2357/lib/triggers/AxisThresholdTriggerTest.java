@@ -1,11 +1,12 @@
 package com.team2357.lib.triggers;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import org.junit.jupiter.api.Test;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
-import org.junit.Test;
 
 public class AxisThresholdTriggerTest {
 
@@ -21,7 +22,7 @@ public class AxisThresholdTriggerTest {
       .25
     );
 
-    assertEquals(trigger.get(), true);
+    assertEquals(trigger.getAsBoolean(), true);
   }
 
   @Test
@@ -36,7 +37,7 @@ public class AxisThresholdTriggerTest {
       .25
     );
 
-    assertEquals(trigger.get(), false);
+    assertEquals(trigger.getAsBoolean(), false);
   }
 
   @Test
@@ -51,7 +52,7 @@ public class AxisThresholdTriggerTest {
       .25
     );
 
-    assertEquals(trigger.get(), false);
+    assertEquals(trigger.getAsBoolean(), false);
   }
 
   @Test
@@ -66,7 +67,7 @@ public class AxisThresholdTriggerTest {
       .25
     );
 
-    assertEquals(trigger.get(), true);
+    assertEquals(trigger.getAsBoolean(), true);
   }
 
   @Test
@@ -81,6 +82,6 @@ public class AxisThresholdTriggerTest {
       .25
     );
 
-    assertEquals(trigger.get(), false);
+    assertEquals(trigger.getAsBoolean(), false);
   }
 }

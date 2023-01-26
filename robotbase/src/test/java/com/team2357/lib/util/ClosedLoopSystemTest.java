@@ -1,16 +1,15 @@
 package com.team2357.lib.util;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ClosedLoopSystemTest {
 
   private m_testClosedLoopSystem m_testClosedLoop;
 
-  @Before
+  @BeforeEach
   public void setup() {
     m_testClosedLoop = new m_testClosedLoopSystem();
   }
@@ -34,7 +33,7 @@ public class ClosedLoopSystemTest {
     assertEquals(m_testClosedLoop.isClosedLoopEnabled(), true);
   }
 
-  @Ignore
+  // @Ignore
   public static class m_testClosedLoopSystem implements ClosedLoopSystem {
 
     private boolean closedLoopEnabled = true;

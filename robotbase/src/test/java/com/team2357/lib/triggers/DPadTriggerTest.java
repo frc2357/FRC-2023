@@ -1,11 +1,13 @@
 package com.team2357.lib.triggers;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import org.junit.jupiter.api.Test;
 
 import com.team2357.lib.util.DPadValue;
+
 import edu.wpi.first.wpilibj.XboxController;
-import org.junit.Test;
 
 public class DPadTriggerTest {
 
@@ -18,7 +20,7 @@ public class DPadTriggerTest {
 
     DPadTrigger Dpad = new DPadTrigger(controller, triggerValue);
 
-    assertEquals(Dpad.get(), true);
+    assertEquals(Dpad.getAsBoolean(), true);
   }
 
   @Test
@@ -30,6 +32,6 @@ public class DPadTriggerTest {
 
     DPadTrigger Dpad = new DPadTrigger(controller, triggerValue);
 
-    assertEquals(Dpad.get(), false);
+    assertEquals(Dpad.getAsBoolean(), false);
   }
 }
