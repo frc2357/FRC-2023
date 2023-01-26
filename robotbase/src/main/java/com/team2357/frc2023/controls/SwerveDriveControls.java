@@ -15,6 +15,8 @@ public class SwerveDriveControls {
     private JoystickButton m_leftTrigger;
     private JoystickButton m_leftBumper;
 
+    public static boolean isFlipped;
+
     public SwerveDriveControls(XboxController controller, double deadband) {
         m_controller = controller;
         m_deadband = deadband;
@@ -24,15 +26,21 @@ public class SwerveDriveControls {
 
         m_backButton.onTrue(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().zeroGyroscope()));
 
-        m_leftTrigger.onTrue(new RunIntakeCommand());
-        m_leftBumper.onTrue(new ReverseIntakeCommand());
+        // m_leftTrigger.onTrue(new RunIntakeCommand());
+        // m_leftBumper.onTrue(new ReverseIntakeCommand());
     }
 
     public double getX() {
+        if (isFlipped) {
+            return modifyAxis(m_controller.getLeftX());
+        }
         return -modifyAxis(m_controller.getLeftX());
     }
 
     public double getY() {
+        if (isFlipped) {
+            return modifyAxis(m_controller.getLeftY());
+        }
         return -modifyAxis(m_controller.getLeftY());
     }
 

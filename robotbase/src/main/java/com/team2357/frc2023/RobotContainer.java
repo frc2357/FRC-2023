@@ -7,6 +7,7 @@ package com.team2357.frc2023;
 import com.team2357.frc2023.commands.DefaultDriveCommand;
 import com.team2357.frc2023.controls.SwerveDriveControls;
 import com.team2357.frc2023.shuffleboard.AutoCommandChooser;
+import com.team2357.frc2023.subsystems.IntakeSubsystem;
 import com.team2357.frc2023.subsystems.SubsystemFactory;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.frc2023.util.AvailableTrajectories;
@@ -29,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final SwerveDriveSubsystem m_drivetrainSubsystem;
+  // private final IntakeSubsystem m_intakeSubsystem;
 
   private AutoCommandChooser m_autoCommandChooser;
 
@@ -45,6 +47,8 @@ public class RobotContainer {
     m_drivetrainSubsystem.setDefaultCommand(new DefaultDriveCommand(
         m_drivetrainSubsystem,
         new SwerveDriveControls(m_controller, Constants.CONTROLLER.DRIVE_CONTROLLER_DEADBAND)));
+
+    // m_intakeSubsystem = subsystemFactory.CreateIntakeSubsystem();
 
     // Build trajectory paths
     AvailableTrajectories.generateTrajectories();
