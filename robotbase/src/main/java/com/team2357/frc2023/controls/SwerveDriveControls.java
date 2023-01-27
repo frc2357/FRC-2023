@@ -5,11 +5,16 @@ import com.team2357.frc2023.commands.ReverseIntakeCommand;
 import com.team2357.frc2023.commands.RunIntakeCommand;
 import com.team2357.frc2023.subsystems.IntakeSubsystem;
 import com.team2357.frc2023.commands.auto.TranslateToAprilTagCommand;
+import com.team2357.frc2023.commands.auto.TranslateToTargetYCommand;
+import com.team2357.frc2023.commands.auto.TranslateToTargetXCommand;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
+import com.team2357.lib.triggers.AxisThresholdTrigger;
 import com.team2357.lib.util.XboxRaw;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class SwerveDriveControls {
     private XboxController m_controller;
@@ -21,6 +26,7 @@ public class SwerveDriveControls {
     public static boolean isFlipped;
 
     private JoystickButton m_button;
+    private Trigger m_button2;
     public SwerveDriveControls(XboxController controller, double deadband) {
         m_controller = controller;
         m_deadband = deadband;
@@ -28,12 +34,14 @@ public class SwerveDriveControls {
         m_rightBumper = new JoystickButton(m_controller, XboxRaw.BumperRight.value);
         m_leftBumper = new JoystickButton(m_controller, XboxRaw.BumperLeft.value);
         m_button = new JoystickButton(m_controller, XboxRaw.BumperRight.value);
-        m_backButton.onTrue(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().zeroGyroscope()));
+        m_backButton.whileTrue(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().zeroGyroscope()));
+        m_button2 = new AxisThresholdTrigger(controller, Axis.kRightTrigger, 0.2);
+        m_button2.whileTrue(new TranslateToTargetXCommand());
 
         m_rightBumper.whileTrue(new RunIntakeCommand());
         m_leftBumper.whileTrue(new ReverseIntakeCommand());
         m_button.whileTrue(new TranslateToAprilTagCommand());
-    }
+        }
 
     public double getX() {
         if (isFlipped) {
