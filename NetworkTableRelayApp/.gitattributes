@@ -1,6 +1,8 @@
-#
-# https://help.github.com/articles/dealing-with-line-endings/
-#
-# These are explicitly windows files and should use crlf
-*.bat           text eol=crlf
-
+*.gradle text eol=lf
+*.yml text eol=lf
+*.sh text eol=lf
+*.md text eol=lf
+*.xml text eol=lf
+*.fxml text eol=lf
+*.css text eol=lf
+Dockerfile text eol=lf
