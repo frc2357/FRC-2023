@@ -67,8 +67,10 @@ public final class Constants {
             config.m_maxVelocityMetersPerSecond = 6380.0 / 60.0 *
                     SdsModuleConfigurations.MK4I_L2.getDriveReduction() *
                     SdsModuleConfigurations.MK4I_L2.getWheelDiameter() * Math.PI;
+
             config.m_maxAngularVelocityRadiansPerSecond = config.m_maxVelocityMetersPerSecond /
                     Math.hypot(config.m_trackwidthMeters / 2.0, config.m_wheelbaseMeters / 2.0);
+            config.m_maxAngularAccelerationRadiansPerSecondSquared = config.m_maxAngularVelocityRadiansPerSecond / 3.0;
 
             config.m_trajectoryMaxVelocityMetersPerSecond = 2;
             config.m_trajectoryMaxAccelerationMetersPerSecond = 3;
@@ -93,7 +95,14 @@ public final class Constants {
         public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(125); 
         public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(9.45);
         
-        public static final PIDController CHARGE_STATION_BALANCE_CONTROLLER = new PIDController(0.5, 0, 0);
+        public static final PIDController CHARGE_STATION_BALANCE_ANGLE_CONTROLLER = new PIDController(0.5, 0, 0);
+        public static final PIDController CHARGE_STATION_DISTANCE_CONTROLLER = new PIDController(0.5, 0, 0);
+
+        public static final double BALANCE_LEVEL_DEGREES = 2.5;
+        public static final double BALANCE_FULL_TILT_DEGREES = 15;
+        public static final double BACKWARDS_BALANCING_EXTRA_POWER_MULTIPLIER = 1.35;
+        public static final double BALANCE_KP = 0.01;
+        public static final double BALANCE_MAX_POWER = 0.4;
 
         public static final double TICKS_PER_ROTATION = 2048.0;
 
@@ -128,5 +137,6 @@ public final class Constants {
         public static final double DRIVE_CONTROLLER_DEADBAND = 0.1;
         public static final double GUNNER_CONTROLLER_DEADBAND = 0.1;
     }
+
     
 }
