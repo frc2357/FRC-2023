@@ -4,12 +4,14 @@
 
 package com.team2357.frc2023.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.pathplanner.lib.PathConstraints;
 import com.swervedrivespecialties.swervelib.AbsoluteEncoder;
+import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
 
@@ -86,6 +88,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		 * m_wheelbaseMeters / 2)
 		 */
 		public double m_maxAngularVelocityRadiansPerSecond;
+
+		public double m_maxAngularAccelerationRadiansPerSecondSquared;
 
 		public double m_trajectoryMaxVelocityMetersPerSecond;
 
@@ -216,6 +220,18 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		m_pigeon.reset();
 	}
 
+	public double getYaw() {
+		return m_pigeon.getYaw();
+	}
+
+	public double getPitch() {
+		return m_pigeon.getPitch();
+	}
+
+	public double getRoll() {
+		return m_pigeon.getRoll();
+	}
+
 	public Rotation2d getGyroscopeRotation() {
 		return Rotation2d.fromDegrees(m_pigeon.getYaw());
 	}
@@ -246,9 +262,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	public void drive(ChassisSpeeds chassisSpeeds) {
 		if (!m_isZeroed) {
 			DriverStation.reportError("Swerve is not zeroed", false);
-
 			return;
-
 		}
 		m_chassisSpeeds = chassisSpeeds;
 		SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
@@ -268,6 +282,39 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 				states[3].angle.getRadians());
 		
 		Logger.getInstance().recordOutput("Swerve States", states);
+	}
+
+	public void balance() {
+		double yaw, direction, angle, error, power;
+		angle = 0; direction = 0;
+
+		yaw = Math.abs(getYaw() % 360);
+
+		if ((0 <= yaw && yaw < 45) || (315 <= yaw && yaw <= 360)) {
+            direction = 1;
+            angle = getRoll();
+        } else if (45 <= yaw && yaw < 135) {
+            direction = 1;
+            angle = getPitch();
+        } else if (135 <= yaw && yaw < 225) {
+            direction = -1;
+            angle = getRoll();
+        } else if (225 <= yaw && yaw < 315) {
+            direction = -1;
+            angle = getPitch();
+        }
+
+		if (angle > Constants.DRIVE.BALANCE_FULL_TILT_DEGREES) {
+			return;
+		}
+
+		error = Math.copySign(Constants.DRIVE.BALANCE_LEVEL_DEGREES + Math.abs(angle), angle);
+        power = Math.min(Math.abs(Constants.DRIVE.BALANCE_KP * error), Constants.DRIVE.BALANCE_MAX_POWER);
+        power = Math.copySign(power, error);
+
+        power *= direction;
+		
+        drive(power, 0, 0);
 	}
 
 	@Override

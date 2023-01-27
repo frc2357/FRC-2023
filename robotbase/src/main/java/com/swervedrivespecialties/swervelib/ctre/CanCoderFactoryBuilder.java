@@ -57,7 +57,8 @@ public class CanCoderFactoryBuilder {
             ErrorCode code = encoder.getLastError();
 
             for (int i = 0; i < ATTEMPTS; i++) {
-                if (code == ErrorCode.OK) break;
+                if (code == ErrorCode.OK)
+                    break;
                 try {
                     Thread.sleep(10);
                 } catch (InterruptedException e) {
@@ -66,7 +67,8 @@ public class CanCoderFactoryBuilder {
                 code = encoder.getLastError();
             }
 
-            CtreUtils.checkCtreError(code, "Failed to retrieve CANcoder "+encoder.getDeviceID()+" absolute position after "+ATTEMPTS+" tries");
+            CtreUtils.checkCtreError(code, "Failed to retrieve CANcoder " + encoder.getDeviceID()
+                    + " absolute position after " + ATTEMPTS + " tries");
 
             angle %= 2.0 * Math.PI;
             if (angle < 0.0) {
