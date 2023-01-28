@@ -6,6 +6,7 @@ import com.team2357.frc2023.commands.RunIntakeCommand;
 import com.team2357.frc2023.subsystems.IntakeSubsystem;
 import com.team2357.frc2023.commands.auto.TranslateToAprilTagCommand;
 import com.team2357.frc2023.commands.auto.TranslateToTargetYCommand;
+import com.team2357.frc2023.commands.auto.RotateToDegreeCommand;
 import com.team2357.frc2023.commands.auto.TranslateToTargetXCommand;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.lib.triggers.AxisThresholdTrigger;
@@ -13,6 +14,7 @@ import com.team2357.lib.util.XboxRaw;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -41,7 +43,7 @@ public class SwerveDriveControls {
         m_rightBumper.whileTrue(new RunIntakeCommand());
         m_leftBumper.whileTrue(new ReverseIntakeCommand());
         m_button.whileTrue(new TranslateToAprilTagCommand());
-        }
+    }
 
     public double getX() {
         if (isFlipped) {
