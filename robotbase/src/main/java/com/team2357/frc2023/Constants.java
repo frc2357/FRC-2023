@@ -9,6 +9,10 @@ import com.team2357.frc2023.subsystems.IntakeSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.wpilibj2.command.ProfiledPIDCommand;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -110,17 +114,18 @@ public final class Constants {
 
         public static final double ENCODER_SYNC_ACCURACY_RADIANS = 0.05;
 
-        public static final PIDController ROTATE_TO_TARGET_CONTROLLER = new PIDController(0.009, 0, 0);
+        public static final Constraints ROTATE_TO_TARGET_CONSTRAINTS = new Constraints(0.93, 0.5);
 
-        public static final double ROTATE_MAX_SPEED = .45;
+        public static final PIDController ROTATE_TO_TARGET_CONTROLLER = new PIDController(0.014, 0, 0);
+        
+        public static final Constraints TRANSLATE_TO_APRILTAG_Y_CONSTRAINTS = new Constraints(0.1,0.25);
 
-        public static final PIDController TRANSLATE_TO_APRILTAG_Y_CONTROLLER = new PIDController(0.2, 0, 0);
+        public static final ProfiledPIDController TRANSLATE_TO_APRILTAG_Y_CONTROLLER = new ProfiledPIDController(0.143, 0, 0,TRANSLATE_TO_APRILTAG_Y_CONSTRAINTS);
 
-        public static final double TRANSLATE_TO_APRILTAG_Y_MAXSPEED = 0.1;
+        public static final Constraints TRANSLATE_TO_APRILTAG_X_CONSTRAINTS = new Constraints(0.15,0.25);
 
-        public static final PIDController TRANSLATE_TO_APRILTAG_X_CONTROLLER = new PIDController(0.2, 0, 0);
+        public static final ProfiledPIDController TRANSLATE_TO_APRILTAG_X_CONTROLLER = new ProfiledPIDController(0.2, 0, 0, TRANSLATE_TO_APRILTAG_X_CONSTRAINTS);
 
-        public static final double TRANSLATE_TO_APRILTAG_X_MAXSPEED = 0.25;
     }
 
     public static final class INTAKE {

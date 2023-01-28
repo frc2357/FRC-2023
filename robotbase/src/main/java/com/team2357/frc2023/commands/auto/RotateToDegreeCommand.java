@@ -10,13 +10,12 @@ public class RotateToDegreeCommand extends CommandBase {
 
     public SwerveDriveSubsystem m_swerve = SwerveDriveSubsystem.getInstance();
     public double m_targetDegrees;
-    public double m_currentAngle;
     public PIDController m_pidController;
 
     public RotateToDegreeCommand(double targetDegrees) {
         m_targetDegrees = targetDegrees;
         m_pidController = Constants.DRIVE.ROTATE_TO_TARGET_CONTROLLER;
-        m_pidController.enableContinuousInput(0, 360);
+        //m_pidController.enableContinuousInput(0, 360);
         addRequirements(m_swerve);
     }
 
@@ -24,8 +23,11 @@ public class RotateToDegreeCommand extends CommandBase {
     public void initialize() {
         m_pidController.reset();
 
-        double currentAngle = Math.abs(m_swerve.getGyroscopeRotation().getDegrees() % 360);
-        double distance = currentAngle - m_targetDegrees;
+        double currentAngle = m_swerve.getGyroscopeRotation().getDegrees() % 360;
+        while (currentAngle < 0) {
+            currentAngle += 360;
+        }
+        double distance = m_targetDegrees-currentAngle;
         while (distance < -180) {
             distance += 360;
         }
