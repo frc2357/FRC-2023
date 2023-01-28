@@ -18,7 +18,8 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public static class Configuration {
-        public double m_percentOutput;
+        public double m_runPercentOutput;
+        public double m_reversePercentOutput;
 
         public double m_rampRate;
 
@@ -50,11 +51,11 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public void runIntake(boolean reverse) {
         if (reverse) {
-            m_rightMotor.set(-m_config.m_percentOutput);
-            m_leftMotor.set(-m_config.m_percentOutput);
+            m_rightMotor.set(m_config.m_reversePercentOutput);
+            m_leftMotor.set(m_config.m_reversePercentOutput);
         } else {
-            m_rightMotor.set(m_config.m_percentOutput);
-            m_leftMotor.set(m_config.m_percentOutput);
+            m_rightMotor.set(m_config.m_runPercentOutput);
+            m_leftMotor.set(m_config.m_runPercentOutput);
         }
     }
 
