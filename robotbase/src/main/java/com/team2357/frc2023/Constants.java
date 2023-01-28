@@ -120,11 +120,12 @@ public final class Constants {
         public static IntakeSubsystem.Configuration GET_INTAKE_CONFIG() {
             IntakeSubsystem.Configuration config = new IntakeSubsystem.Configuration();
 
-            config.m_percentOutput = 0.5;
+            config.m_runPercentOutput = 0.4;
+            config.m_reversePercentOutput = -0.7;
 
             //TODO: Make sure these are correct
-            config.m_rightInverted = true;
-            config.m_leftInverted = false;
+            config.m_rightInverted = false;
+            config.m_leftInverted = true;
 
             return config;
         }
