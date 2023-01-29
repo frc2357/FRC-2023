@@ -3,7 +3,6 @@ package com.team2357.frc2023.commands.auto;
 import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.lib.subsystems.LimelightSubsystem;
-import com.team2357.lib.util.Utility;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -15,6 +14,8 @@ public class TranslateToTargetYCommand extends CommandBase {
 
     public TranslateToTargetYCommand() {
         m_pidController = Constants.DRIVE.TRANSLATE_TO_APRILTAG_Y_CONTROLLER;
+        m_pidController.setTolerance(0.5);
+
         addRequirements(m_swerve, m_limeLight);
     }
 
@@ -33,7 +34,7 @@ public class TranslateToTargetYCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return Utility.isWithinTolerance(m_limeLight.getTX(), 0, 0.4);
+        return m_pidController.atSetpoint();
     }
 
     @Override
