@@ -7,6 +7,7 @@ package com.team2357.frc2023.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.pathplanner.lib.PathConstraints;
@@ -317,6 +318,27 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         drive(power, 0, 0);
 	}
 
+	public void enableOpenLoopRamp(){
+		WPI_TalonFX motor = (WPI_TalonFX) m_backRightModule.getDriveMotor();
+		motor.configOpenloopRamp(1);
+		motor = (WPI_TalonFX) m_backLeftModule.getDriveMotor();
+		motor.configOpenloopRamp(1);
+		motor = (WPI_TalonFX) m_frontLeftModule.getDriveMotor();
+		motor.configOpenloopRamp(1);
+		motor = (WPI_TalonFX) m_frontRightModule.getDriveMotor();
+		motor.configOpenloopRamp(1);
+	}
+	
+	public void disableOpenLoopRamp(){
+		WPI_TalonFX motor = (WPI_TalonFX) m_backRightModule.getDriveMotor();
+		motor.configOpenloopRamp(0);
+		motor = (WPI_TalonFX) m_backLeftModule.getDriveMotor();
+		motor.configOpenloopRamp(0);
+		motor = (WPI_TalonFX) m_frontLeftModule.getDriveMotor();
+		motor.configOpenloopRamp(0);
+		motor = (WPI_TalonFX) m_frontRightModule.getDriveMotor();
+		motor.configOpenloopRamp(0);
+	}
 	@Override
 	public void periodic() {
 		m_odometry.update(getGyroscopeRotation(),

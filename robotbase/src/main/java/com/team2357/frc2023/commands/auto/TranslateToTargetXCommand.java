@@ -1,36 +1,37 @@
 package com.team2357.frc2023.commands.auto;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.wpilibj2.command.CommandBase;
-
 import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.lib.subsystems.LimelightSubsystem;
 import com.team2357.lib.util.Utility;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+
 public class TranslateToTargetXCommand extends CommandBase {
-    public ProfiledPIDController m_pidController;
+    public PIDController m_pidController;
     public SwerveDriveSubsystem m_swerve = SwerveDriveSubsystem.getInstance();
     public LimelightSubsystem m_limeLight = LimelightSubsystem.getInstance();
+
     public TranslateToTargetXCommand() {
         m_pidController = Constants.DRIVE.TRANSLATE_TO_APRILTAG_X_CONTROLLER;
         addRequirements(m_swerve);
         addRequirements(m_limeLight);
     }
+
     @Override
     public void initialize() {
-        m_limeLight.setAprilTagPipelineActive();
-        m_pidController.reset(m_limeLight.getTY());
-        m_pidController.setGoal(-15);
+        m_pidController.reset();
+        m_pidController.setSetpoint(-15);
+        m_swerve.enableOpenLoopRamp();
     }
 
     @Override
     public void execute() {
         double newSpeed = m_pidController.calculate(m_limeLight.getTY());
-            newSpeed = newSpeed*-1;
-        m_swerve.drive(newSpeed,0 , 0);
+        newSpeed = newSpeed * Constants.DRIVE.TRANSLATE_TO_TARGET_X_MAXSPEED;
+        newSpeed = newSpeed*-1;
+        m_swerve.drive(newSpeed, 0, 0);
     }
 
     @Override
@@ -40,6 +41,7 @@ public class TranslateToTargetXCommand extends CommandBase {
 
     @Override
     public void end(boolean isInterrupted) {
+        m_swerve.disableOpenLoopRamp();
         m_swerve.drive(0, 0, 0);
     }
 }

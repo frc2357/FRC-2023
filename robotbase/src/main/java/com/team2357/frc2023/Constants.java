@@ -114,17 +114,17 @@ public final class Constants {
 
         public static final double ENCODER_SYNC_ACCURACY_RADIANS = 0.05;
 
-        public static final Constraints ROTATE_TO_TARGET_CONSTRAINTS = new Constraints(0.93, 0.5);
-
         public static final PIDController ROTATE_TO_TARGET_CONTROLLER = new PIDController(0.014, 0, 0);
         
-        public static final Constraints TRANSLATE_TO_APRILTAG_Y_CONSTRAINTS = new Constraints(0.1,0.25);
+        public static final double ROTATE_TO_TARGET_MAXSPEED = 0.93;
+        
+        public static final PIDController TRANSLATE_TO_APRILTAG_Y_CONTROLLER = new PIDController(0.12, 0, 0);
 
-        public static final ProfiledPIDController TRANSLATE_TO_APRILTAG_Y_CONTROLLER = new ProfiledPIDController(0.143, 0, 0,TRANSLATE_TO_APRILTAG_Y_CONSTRAINTS);
+        public static final double TRANSLATE_TO_TARGET_X_MAXSPEED = 0.1;
 
-        public static final Constraints TRANSLATE_TO_APRILTAG_X_CONSTRAINTS = new Constraints(0.15,0.25);
+        public static final PIDController TRANSLATE_TO_APRILTAG_X_CONTROLLER = new PIDController(0.3, 0, 0);
 
-        public static final ProfiledPIDController TRANSLATE_TO_APRILTAG_X_CONTROLLER = new ProfiledPIDController(0.2, 0, 0, TRANSLATE_TO_APRILTAG_X_CONSTRAINTS);
+        public static final double TRANSLATE_TO_TARGET_Y_MAXSPEED = 0.2;
 
     }
 
