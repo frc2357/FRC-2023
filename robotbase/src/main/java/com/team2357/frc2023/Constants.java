@@ -85,6 +85,7 @@ public final class Constants {
             config.m_translateYController = new PIDController(0.012, 0, 0);
             config.m_sensorPositionCoefficient = 2.0 * Math.PI / Constants.DRIVE.TICKS_PER_ROTATION
                     * SdsModuleConfigurations.MK4I_L2.getSteerReduction();
+            config.m_openLoopRamp = 1;
             
             return config;
         }

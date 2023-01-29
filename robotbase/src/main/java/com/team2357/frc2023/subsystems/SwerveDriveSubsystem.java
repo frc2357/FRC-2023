@@ -60,6 +60,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	private PIDController m_translateXController;
 	private PIDController m_translateYController;
 
+	private double m_openLoopRamp;
+
 	public static class Configuration {
 		/**
 		 * The left-to-right distance between the drivetrain wheels (measured from
@@ -101,12 +103,17 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 		public double m_trajectoryMaxAccelerationMetersPerSecond;
 
-		public double m_rotateTargetMaxSpeed;
 
+		/**
+		 * These are the maximum speeds that the targeting methods should achieve
+		 */
 		public double m_translateXMaxSpeed;
 
 		public double m_translateYMaxSpeed;
 
+		/**
+		 * These are the tolerances for the targeting methods
+		 */
 		public double m_translateXTolerance;
 
 		public double m_translateYTolerance;
@@ -124,6 +131,11 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		 * moduleConfiguration.getSteerReduction()
 		 */
 		public double m_sensorPositionCoefficient;
+
+		/**
+		 * The speed that the motors should ramp up at when the enableOpenLoopRamp() function is used
+		 */
+		public double m_openLoopRamp;
 	}
 
 	public SwerveDriveSubsystem(WPI_Pigeon2 pigeon, SwerveModule frontLeft, SwerveModule frontRight,
@@ -340,13 +352,13 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	public void enableOpenLoopRamp(){
 		WPI_TalonFX motor = (WPI_TalonFX) m_backRightModule.getDriveMotor();
-		motor.configOpenloopRamp(1);
+		motor.configOpenloopRamp(m_openLoopRamp);
 		motor = (WPI_TalonFX) m_backLeftModule.getDriveMotor();
-		motor.configOpenloopRamp(1);
+		motor.configOpenloopRamp(m_openLoopRamp);
 		motor = (WPI_TalonFX) m_frontLeftModule.getDriveMotor();
-		motor.configOpenloopRamp(1);
+		motor.configOpenloopRamp(m_openLoopRamp);
 		motor = (WPI_TalonFX) m_frontRightModule.getDriveMotor();
-		motor.configOpenloopRamp(1);
+		motor.configOpenloopRamp(m_openLoopRamp);
 	}
 
 	public void disableOpenLoopRamp() {
