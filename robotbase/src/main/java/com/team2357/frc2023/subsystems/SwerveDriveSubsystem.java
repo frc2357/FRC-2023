@@ -60,10 +60,13 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	private PIDController m_translateXController;
 	private PIDController m_translateYController;
 
-
 	private double m_translateXMaxSpeed;
 
 	private double m_translateYMaxSpeed;
+
+	private double m_translateXTolerance;
+
+	private double m_translateYTolerance;
 
 	public static class Configuration {
 		/**
@@ -111,6 +114,10 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		public double m_translateXMaxSpeed;
 
 		public double m_translateYMaxSpeed;
+
+		public double m_translateXTolerance;
+
+		public double m_translateYTolerance;
 
 		public PIDController m_xController;
 		public PIDController m_yController;
@@ -163,6 +170,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		m_translateYController = m_config.m_translateYController;
 		m_translateXMaxSpeed = m_config.m_translateXMaxSpeed;
 		m_translateYMaxSpeed = m_config.m_translateYMaxSpeed;
+		m_translateXTolerance = m_config.m_translateXTolerance;
+		m_translateYTolerance = m_config.m_translateYTolerance;
 	}
 
 	public PIDController getXController() {
@@ -388,10 +397,10 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	public void trackTarget() {
 		m_translateXController.reset();
 		m_translateXController.setSetpoint(-15);
-		m_translateXController.setTolerance(0.4);
+		m_translateXController.setTolerance(m_translateXTolerance);
 		m_translateYController.reset();
 		m_translateYController.setSetpoint(0);
-		m_translateYController.setTolerance(0.4);
+		m_translateYController.setTolerance(m_translateYTolerance);
 		enableOpenLoopRamp();
 	}
 
@@ -411,13 +420,15 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 			return;
 		}
 
-		drive(calculateX(),calculateY(),0);
+		drive(calculateX(), calculateY(), 0);
 	}
-	public void stopTracking(){
+
+	public void stopTracking() {
 		disableOpenLoopRamp();
-		drive(0,0,0);
+		drive(0, 0, 0);
 		setClosedLoopEnabled(false);
 	}
+
 	@Override
 	public void periodic() {
 		m_odometry.update(getGyroscopeRotation(),
