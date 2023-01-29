@@ -8,6 +8,7 @@ import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.team2357.frc2023.subsystems.ClawSubsystem;
 import com.team2357.frc2023.subsystems.IntakeSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
+import com.team2357.frc2023.subsystems.WristSubsystem;
 
 import edu.wpi.first.math.controller.PIDController;
 
@@ -60,6 +61,9 @@ public final class Constants {
     }
 
     public static final class PH_ID {
+        public static final int WRIST_SOLENOID_FORWARD_CHANNEL = 0;
+        public static final int WRIST_SOLENOID_REVERSE_CHANNEL = 0;
+        
         public static final int CLAW_SOLENOID_FORWARD_CHANNEL = 0;
         public static final int CLAW_SOLENOID_REVERSE_CHANNEL = 0;
     }
@@ -139,6 +143,17 @@ public final class Constants {
         }
     }
 
+    public static final class WRIST {
+        public static WristSubsystem.Configuration GET_WRIST_CONFIG() {
+            WristSubsystem.Configuration config = new WristSubsystem.Configuration();
+
+            config.m_extendMilliseconds = 1000;
+            config.m_contractMilliseconds = 1000;
+
+            return config;
+        }
+    }
+    
     public static final class CLAW {
         public static ClawSubsystem.Configuration GET_CLAW_CONFIG() {
             ClawSubsystem.Configuration config = new ClawSubsystem.Configuration();

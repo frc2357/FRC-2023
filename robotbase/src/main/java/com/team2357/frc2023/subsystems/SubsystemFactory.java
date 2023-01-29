@@ -78,6 +78,15 @@ public class SubsystemFactory {
         return subsystem;
     }
 
+    public WristSubsystem CreateWristSubsystem() {
+        DoubleSolenoid wristSolenoid = new DoubleSolenoid(Constants.CAN_ID.PNEUMATICS_HUB_ID,
+                PneumaticsModuleType.REVPH, Constants.PH_ID.WRIST_SOLENOID_FORWARD_CHANNEL,
+                Constants.PH_ID.WRIST_SOLENOID_REVERSE_CHANNEL);
+        WristSubsystem subsystem = new WristSubsystem(wristSolenoid);
+        subsystem.configure(Constants.WRIST.GET_WRIST_CONFIG());
+        return subsystem;
+    }
+
     public ClawSubsystem CreateClawSubsystem() {
         DoubleSolenoid clawSolenoid = new DoubleSolenoid(Constants.CAN_ID.PNEUMATICS_HUB_ID,
                 PneumaticsModuleType.REVPH, Constants.PH_ID.CLAW_SOLENOID_FORWARD_CHANNEL,
