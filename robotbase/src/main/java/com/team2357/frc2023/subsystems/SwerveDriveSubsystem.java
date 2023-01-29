@@ -63,6 +63,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
 	public NetworkTable m_limelightTable;
 	public IntegerArrayTopic m_limelightInfo;
+	private IntegerArraySubscriber m_limelightSubscriber;
 
 	public static class Configuration {
 		/**
@@ -127,11 +128,9 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		m_backLeftModule = backLeft;
 		m_backRightModule = backRight;
 
-
-
 		m_limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
 		m_limelightInfo = m_limelightTable.getIntegerArrayTopic("botpose");
-
+		m_limelightSubscriber = m_limelightInfo.subscribe(null,PubSubOption.keepDuplicates(true));
 
 		instance = this;
 	}
@@ -301,8 +300,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	}
 
 	public void setOdemetryFromApriltag(){
-		IntegerArraySubscriber sub = m_limelightInfo.subscribe(null,PubSubOption.keepDuplicates(true));
-		long[] vals = sub.get();
+		long[] vals = m_limelightSubscriber.get();
 		Translation2d t2d = new Translation2d(vals[0], vals[1]);
 		Rotation2d r2d = new Rotation2d(getYaw());
 		Pose2d p2d = new Pose2d(t2d, r2d);
@@ -344,10 +342,13 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		m_odometry.update(getGyroscopeRotation(),
-				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
-						m_frontRightModule.getPosition(),
-						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
+		// m_odometry.update(getGyroscopeRotation(),
+		// 		new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
+		// 				m_frontRightModule.getPosition(),
+		// 				m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
+		setOdemetryFromApriltag();
+		System.out.println(m_odometry.getPoseMeters());
+
 		SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
 
 		SmartDashboard.putNumber("Yaw", m_pigeon.getYaw());
