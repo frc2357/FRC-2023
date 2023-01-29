@@ -130,7 +130,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
 
 		m_limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
-		m_limelightInfo = m_limelightTable.getIntegerArrayTopic("botpose")
+		m_limelightInfo = m_limelightTable.getIntegerArrayTopic("botpose");
 
 
 		instance = this;
@@ -305,7 +305,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		long[] vals = sub.get();
 		Translation2d t2d = new Translation2d(vals[0], vals[1]);
 		Rotation2d r2d = new Rotation2d(getYaw());
-		Pose2d p2d = new Pose2d(t2d, r2d);\
+		Pose2d p2d = new Pose2d(t2d, r2d);
 		resetOdometry(p2d);
 	}
 
