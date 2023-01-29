@@ -11,6 +11,7 @@ import com.team2357.frc2023.subsystems.IntakeSubsystem;
 import com.team2357.frc2023.subsystems.SubsystemFactory;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.frc2023.util.AvailableTrajectories;
+import com.team2357.frc2023.util.AvailableTrajectoryCommands;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -62,6 +63,7 @@ public class RobotContainer {
 
     // Build trajectory paths
     AvailableTrajectories.generateTrajectories();
+    AvailableTrajectoryCommands.generateTrajectories();
 
     // Configure the button bindings
     configureButtonBindings();

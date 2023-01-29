@@ -183,9 +183,10 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	private boolean isEncoderSynced(WPI_TalonFX steerMotor, AbsoluteEncoder steerEncoder) {
 		double difference = Math.abs(steerMotor.getSelectedSensorPosition() * m_config.m_sensorPositionCoefficient
 				- steerEncoder.getAbsoluteAngle());
+		difference %= Math.PI;
+		System.out.println(difference);
 		return difference < Constants.DRIVE.ENCODER_SYNC_ACCURACY_RADIANS
-				|| difference < Constants.DRIVE.ENCODER_SYNC_ACCURACY_RADIANS + Math.PI
-				|| difference < Constants.DRIVE.ENCODER_SYNC_ACCURACY_RADIANS + 2 * Math.PI;
+				|| Math.abs(difference - Math.PI) < Constants.DRIVE.ENCODER_SYNC_ACCURACY_RADIANS;
 	}
 
 	public void zero() {
