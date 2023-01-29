@@ -16,9 +16,7 @@ byte colPins[COLS] = {11, 10, 9, 8}; //connect to the column pinouts of the keyp
 //initialize an instance of class NewKeypad
 Adafruit_Keypad customKeypad = Adafruit_Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
-const int JoyMax = 32767;  // int16_t max
-const double angle_precision = (2 * PI) / (5000  / 4);  // 4 because 250 Hz update rate
-double angle = 340.0;
+const int JoyMax = 32767;
 void setup() {
   XInput.begin();
   customKeypad.begin();
@@ -34,18 +32,9 @@ void loop() {
     if(e.bit.EVENT == KEY_JUST_PRESSED){
       axis_x = (e.bit.COL/10)*JoyMax;
       axis_y = (e.bit.ROW/10)*JoyMax;
+  XInput.setJoystick(JOY_RIGHT, axis_x, axis_y);
     }
     else if(e.bit.EVENT == KEY_JUST_RELEASED) XInput.setJoystick(JOY_RIGHT, 0, 0);
   }
-  angle+=0.01;
-  if(angle>=360) angle == 0;
-  /*angle += angle_precision;
-  if (angle >= 360) {
-    angle -= 360;
-  }*/
-  XInput.press(BUTTON_A);
-  delay(1000);
-  XInput.release(BUTTON_A);
-  XInput.setJoystick(JOY_RIGHT, axis_x, axis_y);
   
 }
