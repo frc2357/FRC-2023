@@ -12,6 +12,7 @@ public class TranslateToTargetCommand extends CommandBase {
     @Override
     public void initialize() {
         SwerveDriveSubsystem.getInstance().trackTarget();
+        SwerveDriveSubsystem.getInstance().setClosedLoopEnabled(true);
     }
 
     @Override

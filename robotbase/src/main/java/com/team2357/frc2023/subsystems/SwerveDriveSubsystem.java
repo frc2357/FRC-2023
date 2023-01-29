@@ -60,14 +60,6 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	private PIDController m_translateXController;
 	private PIDController m_translateYController;
 
-	private double m_translateXMaxSpeed;
-
-	private double m_translateYMaxSpeed;
-
-	private double m_translateXTolerance;
-
-	private double m_translateYTolerance;
-
 	public static class Configuration {
 		/**
 		 * The left-to-right distance between the drivetrain wheels (measured from
@@ -168,10 +160,6 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 				m_config.m_trajectoryMaxAccelerationMetersPerSecond);
 		m_translateXController = m_config.m_translateXController;
 		m_translateYController = m_config.m_translateYController;
-		m_translateXMaxSpeed = m_config.m_translateXMaxSpeed;
-		m_translateYMaxSpeed = m_config.m_translateYMaxSpeed;
-		m_translateXTolerance = m_config.m_translateXTolerance;
-		m_translateYTolerance = m_config.m_translateYTolerance;
 	}
 
 	public PIDController getXController() {
@@ -380,14 +368,14 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		if (isTracking()) {
 			return m_translateXController.atSetpoint();
 		}
-		return false;
+		return true;
 	}
 
 	public boolean isAtYTarget() {
 		if (isTracking()) {
 			return m_translateYController.atSetpoint();
 		}
-		return false;
+		return true;
 	}
 
 	public boolean isAtTarget() {
@@ -395,21 +383,22 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	public void trackTarget() {
+		m_isTracking = true;
 		m_translateXController.reset();
 		m_translateXController.setSetpoint(-15);
-		m_translateXController.setTolerance(m_translateXTolerance);
+		m_translateXController.setTolerance(m_config.m_translateXTolerance);
 		m_translateYController.reset();
 		m_translateYController.setSetpoint(0);
-		m_translateYController.setTolerance(m_translateYTolerance);
+		m_translateYController.setTolerance(m_config.m_translateYTolerance);
 		enableOpenLoopRamp();
 	}
 
 	public double calculateX() {
-		return m_translateXController.calculate(LimelightSubsystem.getInstance().getTY()) * -m_translateXMaxSpeed;
+		return m_translateXController.calculate(LimelightSubsystem.getInstance().getTY()) * -m_config.m_translateXMaxSpeed;
 	}
 
 	public double calculateY() {
-		return m_translateYController.calculate(LimelightSubsystem.getInstance().getTX()) * m_translateYMaxSpeed;
+		return m_translateYController.calculate(LimelightSubsystem.getInstance().getTX()) * m_config.m_translateYMaxSpeed;
 	}
 
 	public void trackingPeriodic() {
@@ -427,6 +416,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		disableOpenLoopRamp();
 		drive(0, 0, 0);
 		setClosedLoopEnabled(false);
+		m_isTracking = false;
 	}
 
 	@Override
