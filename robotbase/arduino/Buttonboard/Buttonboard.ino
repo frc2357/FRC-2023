@@ -1,14 +1,13 @@
 #include <XInput.h>
 #include "Adafruit_Keypad.h"
 
-const byte ROWS = 4; // rows
-const byte COLS = 4; // columns
+const byte ROWS = 3; // rows
+const byte COLS = 9; // columns
 //define the symbols on the buttons of the keypads
 char keys[ROWS][COLS] = {
-  {'1','2','3','4'},
-  {'5','6','7','8'},
-  {'9','0','A','B'},
-  {'C','D','E','F'}
+  {'1','2','3','4','5','6','7','8','9'},
+  {'0','A','B','C','D','E','F','G','H'},
+  {'I','J','K','L','M','N','O','P','Q'},
 };
 byte rowPins[ROWS] = {5, 4, 3, 2}; //connect to the row pinouts of the keypad
 byte colPins[COLS] = {11, 10, 9, 8}; //connect to the column pinouts of the keypad
