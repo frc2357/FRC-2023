@@ -7,6 +7,7 @@ package com.team2357.frc2023;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.team2357.frc2023.subsystems.IntakeSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
+import com.team2357.frc2023.subsystems.WristSubsystem;
 
 import edu.wpi.first.math.controller.PIDController;
 
@@ -34,6 +35,8 @@ public final class Constants {
          */
         public static final String DRIVE_CANBUS = "CANivore";
 
+        public static final int PNEUMATICS_HUB_ID = 2;
+
         public static final int PIGEON_ID = 5;
 
         public static final int FRONT_LEFT_MODULE_DRIVE_MOTOR_ID = 11;
@@ -54,6 +57,11 @@ public final class Constants {
 
         public static final int LEFT_INTAKE_MOTOR = 23;
         public static final int RIGHT_INTAKE_MOTOR = 24;
+    }
+
+    public static final class PH_ID {
+        public static final int WRIST_SOLENOID_FORWARD_CHANNEL = 0;
+        public static final int WRIST_SOLENOID_REVERSE_CHANNEL = 0;
     }
 
     public static final class DRIVE {
@@ -131,6 +139,17 @@ public final class Constants {
         }
     }
 
+    public static final class WRIST {
+        public static WristSubsystem.Configuration GET_WRIST_CONFIG() {
+            WristSubsystem.Configuration config = new WristSubsystem.Configuration();
+
+            config.m_extendMilliseconds = 1000;
+            config.m_contractMilliseconds = 1000;
+
+            return config;
+        }
+    }
+
     public static final class CONTROLLER {
         public static final int DRIVE_CONTROLLER_PORT = 0;
         public static final int GUNNER_CONTROLLER_PORT = 1;
@@ -139,5 +158,4 @@ public final class Constants {
         public static final double GUNNER_CONTROLLER_DEADBAND = 0.1;
     }
 
-    
 }
