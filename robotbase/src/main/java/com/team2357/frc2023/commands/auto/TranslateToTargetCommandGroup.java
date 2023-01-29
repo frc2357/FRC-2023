@@ -16,22 +16,10 @@ public class TranslateToTargetCommandGroup extends SequentialCommandGroup {
         // Rotate to a heading of 0
         this.addCommands(new RotateToDegreeCommand(0));
 
-        // Enable open loop ramping for acceleration
-        this.addCommands(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().enableOpenLoopRamp()));
-
         // Wait to prevent inaccuracy
         this.addCommands(new WaitCommand(0.1));
 
-        // Translate along the y axis
-        this.addCommands(new TranslateToTargetYCommand());
-
-        // Wait to prevent inaccuracy
-        this.addCommands(new WaitCommand(0.1));
-
-        // Translate along the x axis
-        this.addCommands(new TranslateToTargetXCommand());
-
-        // Disable open loop ramping for normal control
-        this.addCommands(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().disableOpenLoopRamp()));
+        // Translate to the target in the X and Y axis
+        this.addCommands(new TranslateToTargetCommand());
     }
 }

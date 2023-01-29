@@ -13,8 +13,8 @@ public class TranslateToTargetXCommand extends CommandBase {
     public LimelightSubsystem m_limeLight = LimelightSubsystem.getInstance();
 
     public TranslateToTargetXCommand() {
-        m_pidController = Constants.DRIVE.TRANSLATE_TO_APRILTAG_X_CONTROLLER;
-        m_pidController.setTolerance(0.5);
+        m_pidController = Constants.DRIVE.GET_SWERVE_DRIVE_CONFIG().m_translateXController;
+        m_pidController.setTolerance(0.4);
 
         addRequirements(m_swerve, m_limeLight);
     }
@@ -28,7 +28,7 @@ public class TranslateToTargetXCommand extends CommandBase {
     @Override
     public void execute() {
         double newSpeed = m_pidController.calculate(m_limeLight.getTY());
-        newSpeed = newSpeed * Constants.DRIVE.TRANSLATE_TO_TARGET_X_MAXSPEED;
+        newSpeed = newSpeed * Constants.DRIVE.GET_SWERVE_DRIVE_CONFIG().m_translateXMaxSpeed;
         newSpeed = newSpeed * -1;
         m_swerve.drive(newSpeed, 0, 0);
     }

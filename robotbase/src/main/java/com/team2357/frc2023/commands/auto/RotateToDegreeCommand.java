@@ -15,7 +15,7 @@ public class RotateToDegreeCommand extends CommandBase {
 
     public RotateToDegreeCommand(double targetDegrees) {
         m_targetDegrees = targetDegrees;
-        m_pidController = Constants.DRIVE.ROTATE_TO_TARGET_CONTROLLER;
+        m_pidController = Constants.DRIVE.GET_SWERVE_DRIVE_CONFIG().m_rotateTargetController;
 
         addRequirements(m_swerve);
     }
@@ -44,7 +44,7 @@ public class RotateToDegreeCommand extends CommandBase {
     public void execute() {
         double newSpeed = m_pidController.calculate(m_swerve.getGyroscopeRotation().getDegrees());
         
-        newSpeed = newSpeed * Constants.DRIVE.ROTATE_TO_TARGET_MAXSPEED;
+        newSpeed = newSpeed * Constants.DRIVE.GET_SWERVE_DRIVE_CONFIG().m_rotateTargetMaxSpeed;
 
         m_swerve.drive(0, 0, newSpeed);
     }

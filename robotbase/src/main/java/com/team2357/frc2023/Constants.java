@@ -78,12 +78,17 @@ public final class Constants {
 
             config.m_trajectoryMaxVelocityMetersPerSecond = 2;
             config.m_trajectoryMaxAccelerationMetersPerSecond = 3;
-            
+            config.m_rotateTargetMaxSpeed = 0.91;
+            config.m_translateXMaxSpeed = 0.1;
+            config.m_translateYMaxSpeed = 0.11;
             config.m_xController = new PIDController(.56122, 0, 0);
             config.m_yController = new PIDController(.56122, 0, 0);
             config.m_thetaController = new PIDController(2.15, 0, 0);
-
-            config.m_sensorPositionCoefficient = 2.0 * Math.PI / Constants.DRIVE.TICKS_PER_ROTATION * SdsModuleConfigurations.MK4I_L2.getSteerReduction();
+            config.m_rotateTargetController = new PIDController(0.012, 0, 0);
+            config.m_translateXController = new PIDController(0.5, 0, 0);
+            config.m_translateYController = new PIDController(0.012, 0, 0);
+            config.m_sensorPositionCoefficient = 2.0 * Math.PI / Constants.DRIVE.TICKS_PER_ROTATION
+                    * SdsModuleConfigurations.MK4I_L2.getSteerReduction();
 
             return config;
         }
@@ -95,8 +100,8 @@ public final class Constants {
         // initializationStrategy = bootToAbsValue;
 
         public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(162.7);
-        public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(135.08); 
-        public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(125); 
+        public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(135.08);
+        public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(125);
         public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(9.45);
         
         public static final PIDController CHARGE_STATION_BALANCE_ANGLE_CONTROLLER = new PIDController(0.5, 0, 0);
@@ -114,18 +119,6 @@ public final class Constants {
 
         public static final double ENCODER_SYNC_ACCURACY_RADIANS = 0.05;
 
-        public static final PIDController ROTATE_TO_TARGET_CONTROLLER = new PIDController(0.014, 0, 0);
-        
-        public static final double ROTATE_TO_TARGET_MAXSPEED = 0.93;
-        
-        public static final PIDController TRANSLATE_TO_APRILTAG_Y_CONTROLLER = new PIDController(0.12, 0, 0);
-
-        public static final double TRANSLATE_TO_TARGET_X_MAXSPEED = 0.1;
-
-        public static final PIDController TRANSLATE_TO_APRILTAG_X_CONTROLLER = new PIDController(0.3, 0, 0);
-
-        public static final double TRANSLATE_TO_TARGET_Y_MAXSPEED = 0.2;
-
     }
 
     public static final class INTAKE {
@@ -135,9 +128,9 @@ public final class Constants {
             config.m_runPercentOutput = 0.4;
             config.m_reversePercentOutput = -0.7;
 
-            //TODO: Make sure these are correct
-            config.m_rightInverted = false;
-            config.m_leftInverted = true;
+            // TODO: Make sure these are correct
+            config.m_rightInverted = true;
+            config.m_leftInverted = false;
 
             return config;
         }

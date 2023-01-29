@@ -15,6 +15,10 @@ import com.swervedrivespecialties.swervelib.AbsoluteEncoder;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
+import com.team2357.lib.subsystems.ClosedLoopSubsystem;
+import com.team2357.lib.subsystems.LimelightSubsystem;
+import com.team2357.lib.util.Utility;
+import com.team2357.log.lib.Utils;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -29,7 +33,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class SwerveDriveSubsystem extends SubsystemBase {
+public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	private static SwerveDriveSubsystem instance = null;
 
 	private boolean m_isZeroed;
@@ -54,6 +58,18 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	private SwerveDriveOdometry m_odometry;
 
 	private PathConstraints m_pathConstraints;
+
+	private boolean m_isTracking;
+
+	private PIDController m_rotateTargetController;
+	private PIDController m_translateXController;
+	private PIDController m_translateYController;
+
+	private double m_rotateTargetMaxSpeed;
+
+	private double m_translateXMaxSpeed;
+
+	private double m_translateYMaxSpeed;
 
 	public static class Configuration {
 		/**
@@ -96,10 +112,18 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
 		public double m_trajectoryMaxAccelerationMetersPerSecond;
 
+		public double m_rotateTargetMaxSpeed;
+
+		public double m_translateXMaxSpeed;
+
+		public double m_translateYMaxSpeed;
+
 		public PIDController m_xController;
 		public PIDController m_yController;
 		public PIDController m_thetaController;
-
+		public PIDController m_rotateTargetController;
+		public PIDController m_translateXController;
+		public PIDController m_translateYController;
 		/**
 		 * Conversion coefficient to go from degrees to Falcon500 sensor units
 		 * 
@@ -139,7 +163,12 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 						m_frontRightModule.getPosition(),
 						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
 
-		m_pathConstraints = new PathConstraints(m_config.m_trajectoryMaxVelocityMetersPerSecond, m_config.m_trajectoryMaxAccelerationMetersPerSecond);
+		m_pathConstraints = new PathConstraints(m_config.m_trajectoryMaxVelocityMetersPerSecond,
+				m_config.m_trajectoryMaxAccelerationMetersPerSecond);
+		m_translateXController = m_config.m_translateXController;
+		m_translateYController = m_config.m_translateYController;
+		m_translateXMaxSpeed = m_config.m_translateXMaxSpeed;
+		m_translateYMaxSpeed = m_config.m_translateYMaxSpeed;
 	}
 
 	public PIDController getXController() {
@@ -281,7 +310,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		m_backRightModule.set(
 				states[3].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
 				states[3].angle.getRadians());
-		
+
 		Logger.getInstance().recordOutput("Swerve States", states);
 	}
 
@@ -328,8 +357,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		motor = (WPI_TalonFX) m_frontRightModule.getDriveMotor();
 		motor.configOpenloopRamp(1);
 	}
-	
-	public void disableOpenLoopRamp(){
+
+	public void disableOpenLoopRamp() {
 		WPI_TalonFX motor = (WPI_TalonFX) m_backRightModule.getDriveMotor();
 		motor.configOpenloopRamp(0);
 		motor = (WPI_TalonFX) m_backLeftModule.getDriveMotor();
@@ -338,6 +367,62 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		motor.configOpenloopRamp(0);
 		motor = (WPI_TalonFX) m_frontRightModule.getDriveMotor();
 		motor.configOpenloopRamp(0);
+	}
+
+	public boolean isTracking() {
+		return m_isTracking;
+	}
+
+	public boolean isAtXTarget() {
+		if (isTracking()) {
+			return m_translateXController.atSetpoint();
+		}
+		return false;
+	}
+
+	public boolean isAtYTarget() {
+		if (isTracking()) {
+			return m_translateYController.atSetpoint();
+		}
+		return false;
+	}
+
+	public boolean isAtTarget() {
+		return isAtXTarget() && isAtYTarget();
+	}
+
+	public void trackTarget() {
+		m_translateXController.reset();
+		m_translateXController.setSetpoint(-15);
+		m_translateXController.setTolerance(0.4);
+		m_translateYController.reset();
+		m_translateYController.setSetpoint(0);
+		m_translateYController.setTolerance(0.4);
+		enableOpenLoopRamp();
+	}
+
+	public double calculateX() {
+		return m_translateXController.calculate(LimelightSubsystem.getInstance().getTY()) * -m_translateXMaxSpeed;
+	}
+
+	public double calculateY() {
+		return m_translateYController.calculate(LimelightSubsystem.getInstance().getTX()) * m_translateYMaxSpeed;
+	}
+
+	public void trackingPeriodic() {
+		LimelightSubsystem limelight = LimelightSubsystem.getInstance();
+
+		if (limelight.validTargetExists()) {
+			setClosedLoopEnabled(false);
+			return;
+		}
+
+		drive(calculateX(),calculateY(),0);
+	}
+	public void stopTracking(){
+		disableOpenLoopRamp();
+		drive(0,0,0);
+		setClosedLoopEnabled(false);
 	}
 	@Override
 	public void periodic() {
@@ -353,5 +438,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		SmartDashboard.putNumber("Pose Angle", m_odometry.getPoseMeters().getRotation().getDegrees());
 
 		Logger.getInstance().recordOutput("Robot Pose", m_odometry.getPoseMeters());
+		if (isClosedLoopEnabled()) {
+			trackingPeriodic();
+		}
 	}
 }

@@ -13,8 +13,8 @@ public class TranslateToTargetYCommand extends CommandBase {
     public LimelightSubsystem m_limeLight = LimelightSubsystem.getInstance();
 
     public TranslateToTargetYCommand() {
-        m_pidController = Constants.DRIVE.TRANSLATE_TO_APRILTAG_Y_CONTROLLER;
-        m_pidController.setTolerance(0.5);
+        m_pidController = Constants.DRIVE.GET_SWERVE_DRIVE_CONFIG().m_translateYController;
+        m_pidController.setTolerance(0.4);
 
         addRequirements(m_swerve, m_limeLight);
     }
@@ -28,13 +28,13 @@ public class TranslateToTargetYCommand extends CommandBase {
     @Override
     public void execute() {
         double newSpeed = m_pidController.calculate(m_limeLight.getTX());
-        newSpeed = newSpeed * Constants.DRIVE.TRANSLATE_TO_TARGET_Y_MAXSPEED;
+        newSpeed = newSpeed * Constants.DRIVE.GET_SWERVE_DRIVE_CONFIG().m_translateYMaxSpeed;
         m_swerve.drive(0, newSpeed, 0);
     }
 
     @Override
     public boolean isFinished() {
-        return m_pidController.atSetpoint();
+        return m_pidController.atSetpoint() && (0 < m_limeLight.getTV());
     }
 
     @Override
