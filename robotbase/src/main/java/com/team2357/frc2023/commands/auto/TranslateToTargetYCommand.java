@@ -6,8 +6,6 @@ import com.team2357.lib.subsystems.LimelightSubsystem;
 import com.team2357.lib.util.Utility;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class TranslateToTargetYCommand extends CommandBase {
@@ -17,15 +15,13 @@ public class TranslateToTargetYCommand extends CommandBase {
 
     public TranslateToTargetYCommand() {
         m_pidController = Constants.DRIVE.TRANSLATE_TO_APRILTAG_Y_CONTROLLER;
-        addRequirements(m_swerve);
-        addRequirements(m_limeLight);
+        addRequirements(m_swerve, m_limeLight);
     }
 
     @Override
     public void initialize() {
         m_pidController.reset();
         m_pidController.setSetpoint(0);
-        m_swerve.enableOpenLoopRamp();
     }
 
     @Override
@@ -42,7 +38,6 @@ public class TranslateToTargetYCommand extends CommandBase {
 
     @Override
     public void end(boolean isInterrupted) {
-        m_swerve.disableOpenLoopRamp();
         m_swerve.drive(0, 0, 0);
     }
 }
