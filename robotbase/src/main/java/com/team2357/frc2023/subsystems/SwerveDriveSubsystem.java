@@ -7,7 +7,6 @@ package com.team2357.frc2023.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import org.littletonrobotics.junction.Logger;
 
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.pathplanner.lib.PathConstraints;
@@ -17,8 +16,6 @@ import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 import com.team2357.lib.subsystems.LimelightSubsystem;
-import com.team2357.lib.util.Utility;
-import com.team2357.log.lib.Utils;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -31,7 +28,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	private static SwerveDriveSubsystem instance = null;
@@ -61,11 +57,9 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	private boolean m_isTracking;
 
-	private PIDController m_rotateTargetController;
 	private PIDController m_translateXController;
 	private PIDController m_translateYController;
 
-	private double m_rotateTargetMaxSpeed;
 
 	private double m_translateXMaxSpeed;
 

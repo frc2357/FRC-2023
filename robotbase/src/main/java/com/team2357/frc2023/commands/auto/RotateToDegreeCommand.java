@@ -2,7 +2,6 @@ package com.team2357.frc2023.commands.auto;
 
 import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
-import com.team2357.lib.util.Utility;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -15,7 +14,7 @@ public class RotateToDegreeCommand extends CommandBase {
 
     public RotateToDegreeCommand(double targetDegrees) {
         m_targetDegrees = targetDegrees;
-        m_pidController = Constants.DRIVE.GET_SWERVE_DRIVE_CONFIG().m_rotateTargetController;
+        m_pidController = Constants.DRIVE.ROTATE_TO_TARGET_CONTROLLER;
 
         addRequirements(m_swerve);
     }
@@ -38,20 +37,21 @@ public class RotateToDegreeCommand extends CommandBase {
         }
 
         m_pidController.setSetpoint(m_swerve.getGyroscopeRotation().getDegrees() + distance);
+        m_pidController.setTolerance(0.8);
     }
 
     @Override
     public void execute() {
         double newSpeed = m_pidController.calculate(m_swerve.getGyroscopeRotation().getDegrees());
-        
-        newSpeed = newSpeed * Constants.DRIVE.GET_SWERVE_DRIVE_CONFIG().m_rotateTargetMaxSpeed;
+
+        newSpeed = newSpeed * Constants.DRIVE.ROTATE_MAXSPEED;
 
         m_swerve.drive(0, 0, newSpeed);
     }
 
     @Override
     public boolean isFinished() {
-        return Utility.isWithinTolerance(m_swerve.getGyroscopeRotation().getDegrees() % 360, m_targetDegrees, 1);
+        return m_pidController.atSetpoint();
     }
 
     @Override

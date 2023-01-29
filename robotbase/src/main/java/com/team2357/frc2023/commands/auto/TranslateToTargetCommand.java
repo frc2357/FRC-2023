@@ -4,20 +4,23 @@ import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class TranslateToTargetCommand extends CommandBase{
-    public TranslateToTargetCommand(){
+public class TranslateToTargetCommand extends CommandBase {
+    public TranslateToTargetCommand() {
         addRequirements(SwerveDriveSubsystem.getInstance());
     }
+
     @Override
-    public void initialize(){
+    public void initialize() {
         SwerveDriveSubsystem.getInstance().trackTarget();
     }
+
     @Override
-    public boolean isFinished(){
+    public boolean isFinished() {
         return SwerveDriveSubsystem.getInstance().isAtTarget();
     }
+
     @Override
-    public void end(boolean isInterrupted){
+    public void end(boolean isInterrupted) {
         SwerveDriveSubsystem.getInstance().stopTracking();
     }
 }

@@ -9,10 +9,6 @@ import com.team2357.frc2023.subsystems.IntakeSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.wpilibj2.command.ProfiledPIDCommand;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -78,13 +74,11 @@ public final class Constants {
 
             config.m_trajectoryMaxVelocityMetersPerSecond = 2;
             config.m_trajectoryMaxAccelerationMetersPerSecond = 3;
-            config.m_rotateTargetMaxSpeed = 0.91;
             config.m_translateXMaxSpeed = 0.1;
             config.m_translateYMaxSpeed = 0.11;
             config.m_xController = new PIDController(.56122, 0, 0);
             config.m_yController = new PIDController(.56122, 0, 0);
             config.m_thetaController = new PIDController(2.15, 0, 0);
-            config.m_rotateTargetController = new PIDController(0.012, 0, 0);
             config.m_translateXController = new PIDController(0.5, 0, 0);
             config.m_translateYController = new PIDController(0.012, 0, 0);
             config.m_sensorPositionCoefficient = 2.0 * Math.PI / Constants.DRIVE.TICKS_PER_ROTATION
@@ -119,6 +113,9 @@ public final class Constants {
 
         public static final double ENCODER_SYNC_ACCURACY_RADIANS = 0.05;
 
+        public static final PIDController ROTATE_TO_TARGET_CONTROLLER = new PIDController(0.012, 0, 0);
+
+        public static final double ROTATE_MAXSPEED = 0.91;
     }
 
     public static final class INTAKE {
