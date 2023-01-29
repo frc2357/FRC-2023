@@ -32,7 +32,7 @@ void loop() {
     if(e.bit.EVENT == KEY_JUST_PRESSED){
       axis_x = (e.bit.COL/10)*JoyMax;
       axis_y = (e.bit.ROW/10)*JoyMax;
-  XInput.setJoystick(JOY_RIGHT, axis_x, axis_y);
+      XInput.setJoystick(JOY_RIGHT, axis_x, axis_y);
     }
     else if(e.bit.EVENT == KEY_JUST_RELEASED) XInput.setJoystick(JOY_RIGHT, 0, 0);
   }
