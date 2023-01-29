@@ -1,5 +1,8 @@
 package com.team2357.frc2023.shuffleboard;
 
+import com.team2357.frc2023.commands.auto.blue.grid3.BlueGridThreeTwoConeAutoCommand;
+import com.team2357.frc2023.util.TrajectoryUtil;
+
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -12,7 +15,7 @@ public class AutoCommandChooser {
 
     private enum automodes{
         NONE,
-        FIGURE8;
+        BLUE_GRID_THREE_TWO_CONE_AUTO;
     }
 
     private class AutoActionChooser {
@@ -40,6 +43,8 @@ public class AutoCommandChooser {
 
         public Command getActionCommand() {
             switch (m_chooser.getSelected()) {
+                case BLUE_GRID_THREE_TWO_CONE_AUTO:
+                    return new BlueGridThreeTwoConeAutoCommand();
                 default:
                     System.out.println("ACTION: NONE");
                     return new WaitCommand(0);
