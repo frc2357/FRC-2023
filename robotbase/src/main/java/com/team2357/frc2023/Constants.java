@@ -5,6 +5,7 @@
 package com.team2357.frc2023;
 
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
+import com.team2357.frc2023.subsystems.ClawSubsystem;
 import com.team2357.frc2023.subsystems.IntakeSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.frc2023.subsystems.WristSubsystem;
@@ -62,6 +63,9 @@ public final class Constants {
     public static final class PH_ID {
         public static final int WRIST_SOLENOID_FORWARD_CHANNEL = 0;
         public static final int WRIST_SOLENOID_REVERSE_CHANNEL = 0;
+        
+        public static final int CLAW_SOLENOID_FORWARD_CHANNEL = 0;
+        public static final int CLAW_SOLENOID_REVERSE_CHANNEL = 0;
     }
 
     public static final class DRIVE {
@@ -149,6 +153,17 @@ public final class Constants {
             return config;
         }
     }
+    
+    public static final class CLAW {
+        public static ClawSubsystem.Configuration GET_CLAW_CONFIG() {
+            ClawSubsystem.Configuration config = new ClawSubsystem.Configuration();
+
+            config.m_openMilliseconds = 500;
+            config.m_closeMilliseconds = 500;
+
+            return config;
+        }
+    }
 
     public static final class CONTROLLER {
         public static final int DRIVE_CONTROLLER_PORT = 0;
@@ -158,4 +173,9 @@ public final class Constants {
         public static final double GUNNER_CONTROLLER_DEADBAND = 0.1;
     }
 
+    public static final class COMPRESSOR {
+        public static final int MIN_PRESSURE_PSI = 90;
+        public static final int MAX_PRESSURE_PSI = 120;
+    }
+    
 }
