@@ -1,22 +1,16 @@
 package com.team2357.frc2023.controls;
 
-import com.team2357.frc2023.commands.AutoBalanceCommand;
 import com.team2357.frc2023.commands.ReverseIntakeCommand;
 import com.team2357.frc2023.commands.RunIntakeCommand;
-import com.team2357.frc2023.subsystems.IntakeSubsystem;
-import com.team2357.frc2023.commands.auto.TranslateToAprilTagCommand;
-import com.team2357.frc2023.commands.auto.TranslateToTargetYCommand;
-import com.team2357.frc2023.commands.auto.RotateToDegreeCommand;
 import com.team2357.frc2023.commands.auto.TranslateToTargetCommand;
 import com.team2357.frc2023.commands.auto.TranslateToTargetCommandGroup;
-import com.team2357.frc2023.commands.auto.TranslateToTargetXCommand;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.lib.triggers.AxisThresholdTrigger;
 import com.team2357.lib.util.XboxRaw;
+
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
