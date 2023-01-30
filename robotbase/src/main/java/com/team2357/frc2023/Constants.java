@@ -74,10 +74,10 @@ public final class Constants {
 
             config.m_trajectoryMaxVelocityMetersPerSecond = 2;
             config.m_trajectoryMaxAccelerationMetersPerSecond = 3;
-            config.m_translateXMaxSpeed = 0.25;
-            config.m_translateYMaxSpeed = 0.25;
-            config.m_translateXTolerance = 0.4;
-            config.m_translateYTolerance = 0.4;
+            config.m_translateXMaxSpeedPercent = 0.25;
+            config.m_translateMaxSpeedPercent = 0.25;
+            config.m_translateXToleranceMeters = 0.4;
+            config.m_translateYToleranceMeters = 0.4;
             config.m_xController = new PIDController(.56122, 0, 0);
             config.m_yController = new PIDController(.56122, 0, 0);
             config.m_thetaController = new PIDController(2.15, 0, 0);
@@ -85,7 +85,7 @@ public final class Constants {
             config.m_translateYController = new PIDController(0.5, 0, 0);
             config.m_sensorPositionCoefficient = 2.0 * Math.PI / Constants.DRIVE.TICKS_PER_ROTATION
                     * SdsModuleConfigurations.MK4I_L2.getSteerReduction();
-            config.m_openLoopRamp = 1;
+            config.m_openLoopRampRateSeconds = 1;
             
             return config;
         }
