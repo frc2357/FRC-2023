@@ -29,22 +29,23 @@ public class SwerveDriveControls {
 
     public static boolean isFlipped;
 
-    private JoystickButton m_button;
-    private Trigger m_button2;
+    private Trigger m_rightTrigger;
     public SwerveDriveControls(XboxController controller, double deadband) {
         m_controller = controller;
         m_deadband = deadband;
         m_backButton = new JoystickButton(m_controller, XboxRaw.Back.value);
         m_rightBumper = new JoystickButton(m_controller, XboxRaw.BumperRight.value);
         m_leftBumper = new JoystickButton(m_controller, XboxRaw.BumperLeft.value);
-        m_button = new JoystickButton(m_controller, XboxRaw.BumperRight.value);
-        m_backButton.whileTrue(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().zeroGyroscope()));
-        m_button2 = new AxisThresholdTrigger(controller, Axis.kRightTrigger, 0.2);
-        m_button2.whileTrue(new TranslateToTargetXCommand());
+        m_rightBumper = new JoystickButton(m_controller, XboxRaw.BumperRight.value);
 
+        m_rightTrigger = new AxisThresholdTrigger(controller, Axis.kRightTrigger, 0.2);
+
+        m_backButton.whileTrue(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().zeroGyroscope()));
+       
         m_rightBumper.whileTrue(new RunIntakeCommand());
         m_leftBumper.whileTrue(new ReverseIntakeCommand());
-        m_button.whileTrue(new TranslateToAprilTagCommand());
+        m_rightTrigger.whileTrue(new TranslateToTargetCommand());
+        m_rightBumper.whileTrue(new TranslateToTargetCommandGroup());
     }
 
     public double getX() {

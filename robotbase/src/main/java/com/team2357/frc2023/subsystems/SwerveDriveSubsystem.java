@@ -101,9 +101,9 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 		public double m_trajectoryMaxAccelerationMetersPerSecond;
 
-
 		/**
-		 * These are the maximum speeds that the targeting methods should achieve in percent output
+		 * These are the maximum speeds that the targeting methods should achieve in
+		 * percent output
 		 */
 		public double m_translateXMaxSpeedPercent;
 
@@ -393,46 +393,62 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	public boolean isAtTarget() {
-		//System.out.println(isAtXTarget() && isAtYTarget());
-		return isAtXTarget() && isAtYTarget();
+		// System.out.println(isAtXTarget() && isAtYTarget());
+		//return isAtXTarget();
+		return isAtYTarget();
+		// return isAtXTarget() && isAtYTarget();
 	}
 
 	public void trackTarget() {
 		System.out.println("track target");
 		m_isTracking = true;
-		m_translateXController.reset();
-		m_translateXController.setSetpoint(-10);
-		m_translateXController.setTolerance(m_config.m_translateXToleranceMeters);
-		m_translateYController.reset();
-		m_translateYController.setSetpoint(0);
-		m_translateYController.setTolerance(m_config.m_translateYToleranceMeters);
+		//trackXTarget();
+		trackYTarget();
 		enableOpenLoopRamp();
 	}
 
+	public void trackXTarget() {
+		m_translateXController.reset();
+		m_translateXController.setSetpoint(-10);
+		m_translateXController.setTolerance(m_config.m_translateXToleranceMeters);
+	}
+
+	public void trackYTarget() {
+		m_translateYController.reset();
+		m_translateYController.setSetpoint(0);
+		m_translateYController.setTolerance(m_config.m_translateYToleranceMeters);
+	}
+
 	public double calculateX() {
-		return (m_translateXController.calculate(LimelightSubsystem.getInstance().getTY()) * m_config.m_translateXMaxSpeedPercent)*-1;
+		return (m_translateXController.calculate(LimelightSubsystem.getInstance().getTY())
+				* m_config.m_translateXMaxSpeedPercent) * -1;
 	}
 
 	public double calculateY() {
-		return m_translateYController.calculate(LimelightSubsystem.getInstance().getTX()) * m_config.m_translateMaxSpeedPercent;
+		return m_translateYController.calculate(LimelightSubsystem.getInstance().getTX())
+				* m_config.m_translateMaxSpeedPercent;
 	}
 
 	public void trackingPeriodic() {
 		LimelightSubsystem limelight = LimelightSubsystem.getInstance();
-		//System.out.println(m_translateXController.getSetpoint());
-		//System.out.println("TY "+limelight.getTY());
+		// System.out.println(m_translateXController.getSetpoint());
+		// System.out.println("TY "+limelight.getTY());
 		if (!limelight.validTargetExists()) {
 			setClosedLoopEnabled(false);
 			return;
 		}
 		System.out.println(isTracking());
+
 		drive(0, calculateY(), 0);
+		//drive(calculateX(), 0, 0);
+		//drive(calculateX(), calculateY(), 0);
 	}
 
 	public void stopTracking() {
 		setClosedLoopEnabled(false);
-		System.out.println("falsing thing");
 		m_isTracking = false;
+
+		System.out.println("falsing thing");
 		disableOpenLoopRamp();
 		drive(0, 0, 0);
 	}
@@ -443,15 +459,17 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
 						m_frontRightModule.getPosition(),
 						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
-		SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
 
-		SmartDashboard.putNumber("Yaw", m_pigeon.getYaw());
-		SmartDashboard.putNumber("Pose X", m_odometry.getPoseMeters().getX());
-		SmartDashboard.putNumber("Pose Y", m_odometry.getPoseMeters().getY());
-		SmartDashboard.putNumber("Pose Angle", m_odometry.getPoseMeters().getRotation().getDegrees());
+		// SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
+
+		// SmartDashboard.putNumber("Yaw", m_pigeon.getYaw());
+		// SmartDashboard.putNumber("Pose X", m_odometry.getPoseMeters().getX());
+		// SmartDashboard.putNumber("Pose Y", m_odometry.getPoseMeters().getY());
+		// SmartDashboard.putNumber("Pose Angle", m_odometry.getPoseMeters().getRotation().getDegrees());
 
 		Logger.getInstance().recordOutput("Robot Pose", m_odometry.getPoseMeters());
-		if (isClosedLoopEnabled()&& isTracking()) {
+
+		if (isClosedLoopEnabled() && isTracking()) {
 			System.out.println("tracking periodic");
 			trackingPeriodic();
 		}
