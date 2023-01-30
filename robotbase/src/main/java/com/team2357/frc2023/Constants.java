@@ -89,7 +89,7 @@ public final class Constants {
             config.m_translateYToleranceMeters = 0.4;
 
             config.m_translateXController = new PIDController(0.5, 0, 0);
-            config.m_translateYController = new PIDController(0.5, 0, 0);
+            config.m_translateYController = new PIDController(0.05, 0, 0);
 
             config.m_openLoopRampRateSeconds = 1;
 

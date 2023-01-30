@@ -470,7 +470,6 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		Logger.getInstance().recordOutput("Robot Pose", m_odometry.getPoseMeters());
 
 		if (isClosedLoopEnabled() && isTracking()) {
-			System.out.println("tracking periodic");
 			trackingPeriodic();
 		}
 	}
