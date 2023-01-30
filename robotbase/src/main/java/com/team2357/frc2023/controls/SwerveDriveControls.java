@@ -7,6 +7,7 @@ import com.team2357.frc2023.subsystems.IntakeSubsystem;
 import com.team2357.frc2023.commands.auto.TranslateToAprilTagCommand;
 import com.team2357.frc2023.commands.auto.TranslateToTargetYCommand;
 import com.team2357.frc2023.commands.auto.RotateToDegreeCommand;
+import com.team2357.frc2023.commands.auto.TranslateToTargetCommand;
 import com.team2357.frc2023.commands.auto.TranslateToTargetCommandGroup;
 import com.team2357.frc2023.commands.auto.TranslateToTargetXCommand;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;

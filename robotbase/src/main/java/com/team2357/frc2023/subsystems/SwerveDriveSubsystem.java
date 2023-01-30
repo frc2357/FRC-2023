@@ -55,7 +55,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	private PathConstraints m_pathConstraints;
 
-	private boolean m_isTracking;
+	private boolean m_isTracking = false;
 
 	private PIDController m_translateXController;
 	private PIDController m_translateYController;
@@ -391,13 +391,15 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	public boolean isAtTarget() {
+		//System.out.println(isAtXTarget() && isAtYTarget());
 		return isAtXTarget() && isAtYTarget();
 	}
 
 	public void trackTarget() {
+		System.out.println("track target");
 		m_isTracking = true;
 		m_translateXController.reset();
-		m_translateXController.setSetpoint(-15);
+		m_translateXController.setSetpoint(-10);
 		m_translateXController.setTolerance(m_config.m_translateXTolerance);
 		m_translateYController.reset();
 		m_translateYController.setSetpoint(0);
@@ -406,7 +408,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	public double calculateX() {
-		return m_translateXController.calculate(LimelightSubsystem.getInstance().getTY()) * -m_config.m_translateXMaxSpeed;
+		return (m_translateXController.calculate(LimelightSubsystem.getInstance().getTY()) * m_config.m_translateXMaxSpeed)*-1;
 	}
 
 	public double calculateY() {
@@ -415,20 +417,22 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	public void trackingPeriodic() {
 		LimelightSubsystem limelight = LimelightSubsystem.getInstance();
-
-		if (limelight.validTargetExists()) {
+		//System.out.println(m_translateXController.getSetpoint());
+		//System.out.println("TY "+limelight.getTY());
+		if (!limelight.validTargetExists()) {
 			setClosedLoopEnabled(false);
 			return;
 		}
-
-		drive(calculateX(), calculateY(), 0);
+		System.out.println(isTracking());
+		drive(0, calculateY(), 0);
 	}
 
 	public void stopTracking() {
+		setClosedLoopEnabled(false);
+		System.out.println("falsing thing");
+		m_isTracking = false;
 		disableOpenLoopRamp();
 		drive(0, 0, 0);
-		setClosedLoopEnabled(false);
-		m_isTracking = false;
 	}
 
 	@Override
@@ -445,7 +449,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		SmartDashboard.putNumber("Pose Angle", m_odometry.getPoseMeters().getRotation().getDegrees());
 
 		Logger.getInstance().recordOutput("Robot Pose", m_odometry.getPoseMeters());
-		if (isClosedLoopEnabled()) {
+		if (isClosedLoopEnabled()&& isTracking()) {
+			System.out.println("tracking periodic");
 			trackingPeriodic();
 		}
 	}
