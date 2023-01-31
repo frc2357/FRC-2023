@@ -4,14 +4,12 @@
 
 package com.team2357.frc2023.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.pathplanner.lib.PathConstraints;
 import com.swervedrivespecialties.swervelib.AbsoluteEncoder;
-import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
 
@@ -24,6 +22,11 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.DoubleArraySubscriber;
+import edu.wpi.first.networktables.DoubleArrayTopic;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.PubSubOption;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -53,6 +56,10 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	private SwerveDriveOdometry m_odometry;
 
 	private PathConstraints m_pathConstraints;
+
+	public NetworkTable m_limelightTable;
+	public DoubleArrayTopic m_limelightInfo;
+	private DoubleArraySubscriber m_limelightSubscriber;
 
 	public static class Configuration {
 		/**
@@ -117,6 +124,10 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		m_backLeftModule = backLeft;
 		m_backRightModule = backRight;
 
+		m_limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
+		m_limelightInfo = m_limelightTable.getDoubleArrayTopic("botpose");
+		m_limelightSubscriber = m_limelightInfo.subscribe(null, PubSubOption.keepDuplicates(true));
+
 		instance = this;
 	}
 
@@ -138,7 +149,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 						m_frontRightModule.getPosition(),
 						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
 
-		m_pathConstraints = new PathConstraints(m_config.m_trajectoryMaxVelocityMetersPerSecond, m_config.m_trajectoryMaxAccelerationMetersPerSecond);
+		m_pathConstraints = new PathConstraints(m_config.m_trajectoryMaxVelocityMetersPerSecond,
+				m_config.m_trajectoryMaxAccelerationMetersPerSecond);
 	}
 
 	public PIDController getXController() {
@@ -281,49 +293,64 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		m_backRightModule.set(
 				states[3].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
 				states[3].angle.getRadians());
-		
+
 		Logger.getInstance().recordOutput("Swerve States", states);
+	}
+
+	public void setOdemetryFromApriltag() {
+		double[] vals = m_limelightSubscriber.get();
+		if (vals.length >= 2) {
+			Translation2d t2d = new Translation2d(vals[0], vals[1]);
+			Rotation2d r2d = new Rotation2d(getYaw());
+			Pose2d p2d = new Pose2d(t2d, r2d);
+			resetOdometry(p2d);
+		} else {
+			DriverStation.reportError("No AprilTag target", false);
+		}
 	}
 
 	public void balance() {
 		double yaw, direction, angle, error, power;
-		angle = 0; direction = 0;
+		angle = 0;
+		direction = 0;
 
 		yaw = Math.abs(getYaw() % 360);
 
 		if ((0 <= yaw && yaw < 45) || (315 <= yaw && yaw <= 360)) {
-            direction = 1;
-            angle = getRoll();
-        } else if (45 <= yaw && yaw < 135) {
-            direction = 1;
-            angle = getPitch();
-        } else if (135 <= yaw && yaw < 225) {
-            direction = -1;
-            angle = getRoll();
-        } else if (225 <= yaw && yaw < 315) {
-            direction = -1;
-            angle = getPitch();
-        }
+			direction = 1;
+			angle = getRoll();
+		} else if (45 <= yaw && yaw < 135) {
+			direction = 1;
+			angle = getPitch();
+		} else if (135 <= yaw && yaw < 225) {
+			direction = -1;
+			angle = getRoll();
+		} else if (225 <= yaw && yaw < 315) {
+			direction = -1;
+			angle = getPitch();
+		}
 
 		if (angle > Constants.DRIVE.BALANCE_FULL_TILT_DEGREES) {
 			return;
 		}
 
 		error = Math.copySign(Constants.DRIVE.BALANCE_LEVEL_DEGREES + Math.abs(angle), angle);
-        power = Math.min(Math.abs(Constants.DRIVE.BALANCE_KP * error), Constants.DRIVE.BALANCE_MAX_POWER);
-        power = Math.copySign(power, error);
+		power = Math.min(Math.abs(Constants.DRIVE.BALANCE_KP * error), Constants.DRIVE.BALANCE_MAX_POWER);
+		power = Math.copySign(power, error);
 
-        power *= direction;
-		
-        drive(power, 0, 0);
+		power *= direction;
+
+		drive(power, 0, 0);
 	}
 
 	@Override
 	public void periodic() {
-		m_odometry.update(getGyroscopeRotation(),
-				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
-						m_frontRightModule.getPosition(),
-						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
+		// m_odometry.update(getGyroscopeRotation(),
+		// new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
+		// m_frontRightModule.getPosition(),
+		// m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
+		setOdemetryFromApriltag();
+
 		SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
 
 		SmartDashboard.putNumber("Yaw", m_pigeon.getYaw());
