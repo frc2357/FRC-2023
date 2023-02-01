@@ -171,6 +171,10 @@ public final class Constants {
 
         public static final double DRIVE_CONTROLLER_DEADBAND = 0.1;
         public static final double GUNNER_CONTROLLER_DEADBAND = 0.1;
+
+        public static final int BUTTON_BOARD_NUM_ROWS = 3;
+        public static final int BUTTON_BOARD_NUM_COLS = 9;
+        public static final double BUTTON_BOARD_JOYSTICK_MAX_VALUE = 32767;
     }
 
     public static final class COMPRESSOR {
