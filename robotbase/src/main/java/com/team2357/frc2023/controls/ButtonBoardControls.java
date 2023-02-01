@@ -37,7 +37,7 @@ public class ButtonBoardControls {
     }
 
     private int analogToIndex(double value) {
-        value /= Constants.CONTROLLER.BUTTON_BOARD_JOYSTICK_MAX_VALUE;
+        value = (value + 1)/2;
         value *= 10;
         return (int) value;
     }
