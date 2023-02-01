@@ -7,13 +7,13 @@ import com.team2357.frc2023.Constants;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class IntakeSubsystem extends SubsystemBase {
-    public static IntakeSubsystem instance = null;
+public class IntakeRollerSubsystem extends SubsystemBase {
+    public static IntakeRollerSubsystem instance = null;
 
     private CANSparkMax m_rightMotor;
     private CANSparkMax m_leftMotor;
 
-    public static IntakeSubsystem getInstance() {
+    public static IntakeRollerSubsystem getInstance() {
         return instance;
     }
 
@@ -29,7 +29,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public Configuration m_config;
 
-    public IntakeSubsystem() {
+    public IntakeRollerSubsystem() {
         m_rightMotor = new CANSparkMax(Constants.CAN_ID.RIGHT_INTAKE_MOTOR, MotorType.kBrushless);
         m_leftMotor = new CANSparkMax(Constants.CAN_ID.LEFT_INTAKE_MOTOR, MotorType.kBrushless);
 
