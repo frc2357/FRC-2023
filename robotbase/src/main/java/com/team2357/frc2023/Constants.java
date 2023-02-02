@@ -122,9 +122,9 @@ public final class Constants {
 
         public static final double ENCODER_SYNC_ACCURACY_RADIANS = 0.05;
 
-        public static final PIDController ROTATE_TO_TARGET_CONTROLLER = new PIDController(0.012, 0, 0);
+        public static final PIDController ROTATE_TO_TARGET_CONTROLLER = new PIDController(0.1, 0, 0);
 
-        public static final double ROTATE_MAXSPEED = 0.91;
+        public static final double ROTATE_MAXSPEED_METERS_PER_SECOND = 0.91;
     }
 
     public static final class INTAKE {
