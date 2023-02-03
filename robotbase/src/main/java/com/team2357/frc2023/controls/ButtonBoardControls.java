@@ -13,7 +13,7 @@ public class ButtonBoardControls {
 
     private int m_xValue, m_yValue;
 
-    public boolean m_keys[][] = new boolean[Constants.CONTROLLER.BUTTON_BOARD_NUM_ROWS][Constants.CONTROLLER.BUTTON_BOARD_NUM_COLS];
+    private int m_key;
 
     public ButtonBoardControls(XboxController controller) {
         m_controller = controller;
@@ -29,21 +29,24 @@ public class ButtonBoardControls {
     }
 
     private void updateKeys() {
-        m_xValue = analogToIndex(m_controller.getRightX());
-        m_yValue = analogToIndex(m_controller.getRightY());
+        m_yValue = m_xValue = 0;
+        for (int i = -1;i < 1;i += 1) {
+            if (m_controller.getRightY() > i) {
+                m_yValue++;
+            }
+        }
+        for (double i = -1;i < 1;i += .25) {
+            if (m_controller.getRightX() > i) {
+                m_xValue++;
+            }
+        }
 
-        clearKeys();
-        m_keys[m_yValue][m_xValue] = true;
+        m_key = m_yValue * 9 + m_xValue;
     }
 
-    private int analogToIndex(double value) {
-        value = (value + 1)/2;
-        value *= 10;
-        return (int) value;
-    }
-
-    private void clearKeys() {
-        m_keys = new boolean[Constants.CONTROLLER.BUTTON_BOARD_NUM_ROWS][Constants.CONTROLLER.BUTTON_BOARD_NUM_COLS];
+    public int getKey() {
+        updateKeys();
+        return m_key;
     }
 
 }
