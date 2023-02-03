@@ -88,6 +88,9 @@ public final class Constants {
             config.m_translateXToleranceMeters = 0.05;
             config.m_translateYToleranceMeters = 0.05;
 
+            config.m_translateXSetpoint = -9;
+            config.m_translateYSetpoint = 0;
+
             config.m_translateXController = new PIDController(0.5, 0, 0);
             config.m_translateYController = new PIDController(0.05, 0, 0);
 

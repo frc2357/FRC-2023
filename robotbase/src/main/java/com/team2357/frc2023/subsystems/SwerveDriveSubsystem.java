@@ -116,6 +116,11 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 		public double m_translateYToleranceMeters;
 
+		/**
+		 * These are the setpoints for the PID's that the translate commands use
+		 */
+		public double m_translateXSetpoint;
+		public double m_translateYSetpoint;
 		/*
 		 * Open loop ramp rate for auto targeting
 		 * In seconds from neutral to full throttle
@@ -409,13 +414,13 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	public void trackXTarget() {
 		m_translateXController.reset();
-		m_translateXController.setSetpoint(-10);
+		m_translateXController.setSetpoint(m_config.m_translateXSetpoint);
 		m_translateXController.setTolerance(m_config.m_translateXToleranceMeters);
 	}
 
 	public void trackYTarget() {
 		m_translateYController.reset();
-		m_translateYController.setSetpoint(0);
+		m_translateYController.setSetpoint(m_config.m_translateYSetpoint);
 		m_translateYController.setTolerance(m_config.m_translateYToleranceMeters);
 	}
 
