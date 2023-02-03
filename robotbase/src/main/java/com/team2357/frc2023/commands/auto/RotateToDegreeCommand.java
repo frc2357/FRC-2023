@@ -3,6 +3,7 @@ package com.team2357.frc2023.commands.auto;
 import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -45,7 +46,7 @@ public class RotateToDegreeCommand extends CommandBase {
     public void execute() {
         double newSpeed = m_pidController.calculate(m_swerve.getGyroscopeRotation().getDegrees());
 
-        newSpeed = newSpeed * Constants.DRIVE.ROTATE_MAXSPEED_METERS_PER_SECOND;
+        newSpeed = MathUtil.clamp(newSpeed, Constants.DRIVE.ROTATE_MAXSPEED_METERS_PER_SECOND*-1, Constants.DRIVE.ROTATE_MAXSPEED_METERS_PER_SECOND*-1);
         m_swerve.drive(new ChassisSpeeds(0, 0, newSpeed));
     }
 

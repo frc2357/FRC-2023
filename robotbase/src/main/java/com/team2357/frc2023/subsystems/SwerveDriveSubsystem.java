@@ -17,6 +17,7 @@ import com.team2357.frc2023.Constants;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 import com.team2357.lib.subsystems.LimelightSubsystem;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -425,13 +426,16 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	public double calculateX() {
-		return (m_translateXController.calculate(LimelightSubsystem.getInstance().getTY())
-				* m_config.m_translateXMaxSpeedMeters) * -1;
+		double output = m_translateXController.calculate(LimelightSubsystem.getInstance().getTY());
+		output = output * -1; // Invert output
+		output = MathUtil.clamp(output, m_config.m_translateXMaxSpeedMeters*-1, m_config.m_translateXMaxSpeedMeters);
+		return output;
 	}
 
 	public double calculateY() {
-		return m_translateYController.calculate(LimelightSubsystem.getInstance().getTX())
-				* m_config.m_translateMaxSpeedMeters;
+		double output = m_translateYController.calculate(LimelightSubsystem.getInstance().getTX());
+		output = MathUtil.clamp(output, m_config.m_translateMaxSpeedMeters*-1, m_config.m_translateMaxSpeedMeters);
+		return output;
 	}
 
 	public void trackingPeriodic() {
