@@ -82,11 +82,11 @@ public final class Constants {
             config.m_sensorPositionCoefficient = 2.0 * Math.PI / Constants.DRIVE.TICKS_PER_ROTATION
                     * SdsModuleConfigurations.MK4I_L2.getSteerReduction();
 
-            config.m_translateXMaxSpeedPercent = 0.25;
-            config.m_translateMaxSpeedPercent = 0.25;
+            config.m_translateXMaxSpeedMeters = 0.25;
+            config.m_translateMaxSpeedMeters = 0.25;
 
-            config.m_translateXToleranceMeters = 0.4;
-            config.m_translateYToleranceMeters = 0.4;
+            config.m_translateXToleranceMeters = 0.05;
+            config.m_translateYToleranceMeters = 0.05;
 
             config.m_translateXController = new PIDController(0.5, 0, 0);
             config.m_translateYController = new PIDController(0.05, 0, 0);

@@ -38,7 +38,7 @@ public class RotateToDegreeCommand extends CommandBase {
         }
 
         m_pidController.setSetpoint(m_swerve.getGyroscopeRotation().getDegrees() + distance);
-        m_pidController.setTolerance(0.4);
+        m_pidController.setTolerance(0.045);
     }
 
     @Override
