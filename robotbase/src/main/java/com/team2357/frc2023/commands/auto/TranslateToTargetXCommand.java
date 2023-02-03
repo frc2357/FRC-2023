@@ -28,7 +28,7 @@ public class TranslateToTargetXCommand extends CommandBase {
     @Override
     public void execute() {
         double newSpeed = m_pidController.calculate(m_limeLight.getTY());
-        newSpeed = newSpeed * Constants.DRIVE.GET_SWERVE_DRIVE_CONFIG().m_translateXMaxSpeedPercent;
+        newSpeed = newSpeed * Constants.DRIVE.GET_SWERVE_DRIVE_CONFIG().m_translateXMaxSpeedMeters;
         newSpeed = newSpeed * -1;
         m_swerve.drive(newSpeed, 0, 0);
     }

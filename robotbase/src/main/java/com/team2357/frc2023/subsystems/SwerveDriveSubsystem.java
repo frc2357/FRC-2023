@@ -105,9 +105,9 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		 * These are the maximum speeds that the targeting methods should achieve in
 		 * percent output
 		 */
-		public double m_translateXMaxSpeedPercent;
+		public double m_translateXMaxSpeedMeters;
 
-		public double m_translateMaxSpeedPercent;
+		public double m_translateMaxSpeedMeters;
 
 		/**
 		 * These are the tolerances for the targeting methods in percent output
@@ -421,12 +421,12 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	public double calculateX() {
 		return (m_translateXController.calculate(LimelightSubsystem.getInstance().getTY())
-				* m_config.m_translateXMaxSpeedPercent) * -1;
+				* m_config.m_translateXMaxSpeedMeters) * -1;
 	}
 
 	public double calculateY() {
 		return m_translateYController.calculate(LimelightSubsystem.getInstance().getTX())
-				* m_config.m_translateMaxSpeedPercent;
+				* m_config.m_translateMaxSpeedMeters;
 	}
 
 	public void trackingPeriodic() {
@@ -439,9 +439,9 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		}
 		System.out.println(isTracking());
 
-		drive(0, calculateY(), 0);
-		//drive(calculateX(), 0, 0);
-		//drive(calculateX(), calculateY(), 0);
+		drive(new ChassisSpeeds(0, calculateY(), 0));
+		//drive(new ChassisSpeeds(calculateX(), 0, 0));
+		//drive(new ChassisSpeeds(calculateX(), calculateY(), 0));
 	}
 
 	public void stopTracking() {
