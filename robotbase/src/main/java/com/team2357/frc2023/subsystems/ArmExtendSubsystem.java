@@ -7,6 +7,11 @@ import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 import com.team2357.lib.util.Utility;
 
 public class ArmExtendSubsystem extends ClosedLoopSubsystem{
+    private static ArmExtendSubsystem instance = null;
+
+    public static ArmExtendSubsystem getInstance() {
+        return instance;
+    }
     public static class Configuration
     {
         public double m_extendAxisMaxSpeed = 0;
@@ -44,6 +49,7 @@ public class ArmExtendSubsystem extends ClosedLoopSubsystem{
         m_extendMotor = extender;
         m_extendMotor.setSmartCurrentLimit(currentlimit);
         m_extendMotor.setOpenLoopRampRate(ramprate);
+        instance = this;
     }
     public void configure(Configuration config) {
         m_config = config;
