@@ -152,6 +152,7 @@ public final class Constants {
 
             config.m_rampRate = 1;
             config.m_currentLimit = 30;
+            config.m_rollerAxisMaxSpeed = 1;
 
             // TODO: Make sure these are correct
             config.m_rightInverted = false;
