@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import static com.team2357.frc2023.Constants.*;
 
 import com.team2357.frc2023.commands.human.panic.ArmExtenderCommand;
+import com.team2357.frc2023.commands.human.panic.ArmRotationCommand;
 import com.team2357.frc2023.commands.human.panic.WristToggleCommand;
 
 /**
@@ -117,6 +118,7 @@ public class GunnerControls {
         Trigger yButton = m_yButton.and(noDPad);
         Trigger xButton = m_xButton.and(noDPad);
 
+        upDPadOnly.whileTrue(new ArmRotationCommand(axisRightStickY));
         leftDPadOnly.whileTrue(new ArmExtenderCommand(axisRightStickY));
         aButton.onTrue(new WristToggleCommand());
     }
