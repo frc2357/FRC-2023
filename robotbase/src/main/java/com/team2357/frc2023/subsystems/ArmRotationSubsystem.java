@@ -5,6 +5,8 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.SparkMaxPIDController;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 import com.team2357.lib.util.Utility;
+import com.team2357.frc2023.Constants;
+import com.team2357.frc2023.Constants.ARM_ROTATION;
 public class ArmRotationSubsystem extends ClosedLoopSubsystem{
     private static ArmRotationSubsystem instance = null;
 
@@ -13,29 +15,30 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem{
     }
 
     public static class Configuration {
-        public double m_rotationAxisMaxSpeed = 0;
+        public double m_rotationAxisMaxSpeed;
 
-        public IdleMode m_rotationMotorIdleMode = IdleMode.kBrake;
+        public IdleMode m_rotationMotorIdleMode;
 
-        public int m_rotationMotorStallLimitAmps = 0;
-        public int m_rotationMotorFreeLimitAmps = 0;
+        public int m_rotationMotorStallLimitAmps;
+        public int m_rotationMotorFreeLimitAmps;
 
-        public boolean m_isFollowerInverted = false;
+        public boolean m_isFollowerInverted;
 
         // smart motion config
-        public double m_rotationMotorP = 0;
-        public double m_rotationMotorI = 0;
-        public double m_rotationMotorD = 0;
-        public double m_rotationMotorIZone = 0;
-        public double m_rotationMotorFF = 0;
-        public double m_rotationMotorMaxOutput = 0;
-        public double m_rotationMotorMinOutput = 0;
-        public double m_rotationMotorMaxRPM = 0;
-        public double m_rotationMotorMaxVel = 0;
-        public double m_rotationMotorMinVel = 0;
-        public double m_rotationMotorMaxAcc = 0;
-        public double m_rotationMotorAllowedError = 0;
-        public double m_maxSpeedPercent = 0.4;
+        public double m_rotationMotorP;
+        public double m_rotationMotorI;
+        public double m_rotationMotorD;
+        public double m_rotationMotorIZone;
+        public double m_rotationMotorFF;
+        public double m_rotationMotorMaxOutput;
+        public double m_rotationMotorMinOutput;
+        public double m_rotationMotorMaxRPM;
+        public double m_rotationMotorMaxVel;
+        public double m_rotationMotorMinVel;
+        public double m_rotationMotorMaxAcc;
+        public double m_rotationMotorAllowedError;
+        public double m_maxSpeedPercent;
+        public int m_smartMotionSlot;
     }
 
     private Configuration m_config;
@@ -45,6 +48,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem{
     private double m_targetRotations;
 
     public ArmRotationSubsystem(CANSparkMax masterRotationMotor, CANSparkMax followerRotationMotor) {
+        m_config = Constants.ARM_ROTATION.GET_ROTATION_CONFIG();
         instance = this;
         m_masterRotationMotor = masterRotationMotor;
         m_followerRotationMotor = followerRotationMotor;
@@ -79,11 +83,10 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem{
         pidController.setOutputRange(m_config.m_rotationMotorMinOutput, m_config.m_rotationMotorMinOutput);
 
         // Configure smart motion
-        int smartMotionSlot = 0;
-        pidController.setSmartMotionMaxVelocity(m_config.m_rotationMotorMaxVel, smartMotionSlot);
-        pidController.setSmartMotionMinOutputVelocity(m_config.m_rotationMotorMinVel, smartMotionSlot);
-        pidController.setSmartMotionMaxAccel(m_config.m_rotationMotorMaxAcc, smartMotionSlot);
-        pidController.setSmartMotionAllowedClosedLoopError(m_config.m_rotationMotorAllowedError, smartMotionSlot);
+        pidController.setSmartMotionMaxVelocity(m_config.m_rotationMotorMaxVel, m_config.m_smartMotionSlot);
+        pidController.setSmartMotionMinOutputVelocity(m_config.m_rotationMotorMinVel, m_config.m_smartMotionSlot);
+        pidController.setSmartMotionMaxAccel(m_config.m_rotationMotorMaxAcc, m_config.m_smartMotionSlot);
+        pidController.setSmartMotionAllowedClosedLoopError(m_config.m_rotationMotorAllowedError, m_config.m_smartMotionSlot);
     }
 
     public void rotate(double sensorUnits){

@@ -1,25 +1,25 @@
 package com.team2357.frc2023.commands.human.panic;
 
 import com.team2357.frc2023.controls.AxisInterface;
-import com.team2357.frc2023.subsystems.ArmExtendSubsystem;
+import com.team2357.frc2023.subsystems.ArmExtensionSubsystem;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class ArmExtenderCommand extends CommandBase {
     AxisInterface m_axis;
 
     public ArmExtenderCommand(AxisInterface axis) {
-        addRequirements(ArmExtendSubsystem.getInstance());
+        addRequirements(ArmExtensionSubsystem.getInstance());
         m_axis = axis;
     }
 
     @Override
     public void execute() {
         double axisValue = m_axis.getValue();
-        ArmExtendSubsystem.getInstance().extend(axisValue);
+        ArmExtensionSubsystem.getInstance().extend(axisValue);
     }
 
     @Override
     public void end(boolean interrupted) {
-        ArmExtendSubsystem.getInstance().stopExtensionMotors();
+        ArmExtensionSubsystem.getInstance().stopExtensionMotors();
     }
 }
