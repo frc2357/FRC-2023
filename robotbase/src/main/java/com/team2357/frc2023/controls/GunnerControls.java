@@ -93,17 +93,17 @@ public class GunnerControls {
         };
 
         AxisInterface axisRightStickY = () -> {
-            return getRightYAxis(); 
+            return getRightYAxis();
         };
 
-        Trigger noDPad = new Trigger(() -> m_upDPad.getAsBoolean() && m_rightDPad.getAsBoolean() && m_downDPad.getAsBoolean() && m_leftDPad.getAsBoolean()).negate();
+        Trigger noDPad = new Trigger(() -> m_upDPad.getAsBoolean() && m_rightDPad.getAsBoolean()
+                && m_downDPad.getAsBoolean() && m_leftDPad.getAsBoolean()).negate();
 
         Trigger noLetterButtons = m_aButton.and(m_bButton).and(m_xButton).and(m_yButton).negate();
-        
+
         Trigger upDPadOnly = m_upDPad.and(noLetterButtons);
         Trigger downDPadOnly = m_downDPad.and(noLetterButtons);
         Trigger leftDPadOnly = m_leftDPad.and(noLetterButtons);
-        leftDPadOnly.whileTrue(new ArmExtenderCommand(axisRightStickY));
         Trigger rightDPadOnly = m_rightDPad.and(noLetterButtons);
 
         Trigger upDPadAndX = m_upDPad.and(m_xButton);
@@ -113,9 +113,11 @@ public class GunnerControls {
         Trigger downDPadAndA = m_downDPad.and(m_aButton);
 
         Trigger aButton = m_aButton.and(noDPad);
-        aButton.onTrue(new WristToggleCommand());
         Trigger bButton = m_bButton.and(noDPad);
         Trigger yButton = m_yButton.and(noDPad);
         Trigger xButton = m_xButton.and(noDPad);
+
+        leftDPadOnly.whileTrue(new ArmExtenderCommand(axisRightStickY));
+        aButton.onTrue(new WristToggleCommand());
     }
 }
