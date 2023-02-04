@@ -1,11 +1,11 @@
-package com.team2357.frc2023.commands;
+package com.team2357.frc2023.commands.human.panicMode;
 
 import com.team2357.frc2023.subsystems.WristSubsystem;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class PanicModeWristCommand extends CommandBase {
-    public PanicModeWristCommand() {
+public class WristToggleCommand extends CommandBase {
+    public WristToggleCommand() {
         addRequirements(WristSubsystem.getInstance());
     }
 

@@ -1,15 +1,15 @@
-package com.team2357.frc2023.commands;
+package com.team2357.frc2023.commands.human.panicMode;
 
 import com.team2357.frc2023.controls.AxisInterface;
 import com.team2357.frc2023.subsystems.ArmExtendSubsystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class PanicModeArmExtenderCommand extends CommandBase {
+public class ArmExtenderCommand extends CommandBase {
     XboxController controller;
     AxisInterface m_axis;
 
-    public PanicModeArmExtenderCommand(AxisInterface axis) {
+    public ArmExtenderCommand(AxisInterface axis) {
         addRequirements(ArmExtendSubsystem.getInstance());
         m_axis = axis;
     }

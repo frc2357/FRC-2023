@@ -12,8 +12,8 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import static com.team2357.frc2023.Constants.*;
 
-import com.team2357.frc2023.commands.PanicModeArmExtenderCommand;
-import com.team2357.frc2023.commands.PanicModeWristCommand;
+import com.team2357.frc2023.commands.human.panicMode.ArmExtenderCommand;
+import com.team2357.frc2023.commands.human.panicMode.WristToggleCommand;
 
 /**
  * These are the controls for the gunner.
@@ -103,7 +103,7 @@ public class GunnerControls {
         Trigger upDPadOnly = m_upDPad.and(noLetterButtons);
         Trigger downDPadOnly = m_downDPad.and(noLetterButtons);
         Trigger leftDPadOnly = m_leftDPad.and(noLetterButtons);
-        leftDPadOnly.whileTrue(new PanicModeArmExtenderCommand(axisRightStickY));
+        leftDPadOnly.whileTrue(new ArmExtenderCommand(axisRightStickY));
         Trigger rightDPadOnly = m_rightDPad.and(noLetterButtons);
 
         Trigger upDPadAndX = m_upDPad.and(m_xButton);
@@ -113,7 +113,7 @@ public class GunnerControls {
         Trigger downDPadAndA = m_downDPad.and(m_aButton);
 
         Trigger aButton = m_aButton.and(noDPad);
-        aButton.onTrue(new PanicModeWristCommand());
+        aButton.onTrue(new WristToggleCommand());
         Trigger bButton = m_bButton.and(noDPad);
         Trigger yButton = m_yButton.and(noDPad);
         Trigger xButton = m_xButton.and(noDPad);
