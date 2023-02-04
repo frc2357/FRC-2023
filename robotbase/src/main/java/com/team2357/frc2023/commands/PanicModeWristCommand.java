@@ -10,7 +10,7 @@ public class PanicModeWristCommand extends CommandBase {
     }
 
     @Override
-    public void execute() {
+    public void initialize() {
         if (WristSubsystem.getInstance().isExtended() || WristSubsystem.getInstance().isExtending()) {
             WristSubsystem.getInstance().contract();
         } else {
