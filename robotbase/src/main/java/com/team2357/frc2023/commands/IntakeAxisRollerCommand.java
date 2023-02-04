@@ -7,8 +7,8 @@ import com.team2357.lib.commands.CommandLoggerBase;
 public class IntakeAxisRollerCommand extends CommandLoggerBase {
     private AxisInterface m_axis;
 
-    public IntakeAxisRollerCommand(AxisInterface axi){
-        m_axis = axi;
+    public IntakeAxisRollerCommand(AxisInterface axis){
+        m_axis = axis;
         addRequirements(IntakeRollerSubsystem.getInstance());
     }
 
