@@ -6,14 +6,14 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 import com.team2357.lib.util.Utility;
 
-public class ArmExtendSubsystem extends ClosedLoopSubsystem{
+public class ArmExtendSubsystem extends ClosedLoopSubsystem {
     private static ArmExtendSubsystem instance = null;
 
     public static ArmExtendSubsystem getInstance() {
         return instance;
     }
-    public static class Configuration
-    {
+
+    public static class Configuration {
         public double m_extendAxisMaxSpeed = 0;
 
         public IdleMode m_extendMotorIdleMode = IdleMode.kBrake;
@@ -40,31 +40,35 @@ public class ArmExtendSubsystem extends ClosedLoopSubsystem{
         public double m_extendMotorAllowedError = 0;
         public double m_rotationMotorAllowedError = 0;
     }
+
     private Configuration m_config;
     private CANSparkMax m_extendMotor;
-    private SparkMaxPIDController m_pidcontroller;    
+    private SparkMaxPIDController m_pidcontroller;
     private double m_targetRotations;
 
-    public ArmExtendSubsystem(CANSparkMax extender,int currentlimit,double ramprate){
+    public ArmExtendSubsystem(CANSparkMax extender, int currentlimit, double ramprate) {
         m_extendMotor = extender;
         m_extendMotor.setSmartCurrentLimit(currentlimit);
         m_extendMotor.setOpenLoopRampRate(ramprate);
         instance = this;
     }
+
     public void configure(Configuration config) {
         m_config = config;
 
         m_extendMotor.setIdleMode(m_config.m_extendMotorIdleMode);
-        m_extendMotor.setSmartCurrentLimit(m_config.m_extendMotorStallLimitAmps,m_config.m_extendMotorFreeLimitAmps);
+        m_extendMotor.setSmartCurrentLimit(m_config.m_extendMotorStallLimitAmps, m_config.m_extendMotorFreeLimitAmps);
 
         m_pidcontroller = m_extendMotor.getPIDController();
         configureExtenderPID(m_pidcontroller);
 
         m_extendMotor.setInverted(m_config.m_isInverted);
     }
+
     public void extend(double sensorUnits) {
         m_extendMotor.set(sensorUnits);
     }
+
     private void configureExtenderPID(SparkMaxPIDController pidController) {
         // set PID coefficients
         pidController.setP(m_config.m_extendMotorP);
@@ -99,13 +103,14 @@ public class ArmExtendSubsystem extends ClosedLoopSubsystem{
         return Utility.isWithinTolerance(currentMotorRotations, m_targetRotations,
                 m_config.m_rotationMotorAllowedError);
     }
+
     public double getExtenderMotorRotations() {
         return m_extendMotor.getEncoder().getPosition();
     }
 
     @Override
-    public void periodic(){
-        if(isClosedLoopEnabled() && isExtenderRotatorAtRotations()){
+    public void periodic() {
+        if (isClosedLoopEnabled() && isExtenderRotatorAtRotations()) {
             setClosedLoopEnabled(false);
         }
     }
