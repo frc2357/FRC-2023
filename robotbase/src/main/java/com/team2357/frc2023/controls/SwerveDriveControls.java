@@ -3,7 +3,7 @@ package com.team2357.frc2023.controls;
 import com.team2357.frc2023.commands.AutoBalanceCommand;
 import com.team2357.frc2023.commands.ReverseIntakeCommand;
 import com.team2357.frc2023.commands.RunIntakeCommand;
-import com.team2357.frc2023.subsystems.IntakeSubsystem;
+import com.team2357.frc2023.subsystems.IntakeRollerSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.lib.util.XboxRaw;
 import edu.wpi.first.wpilibj.XboxController;

@@ -6,7 +6,8 @@ package com.team2357.frc2023;
 
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.team2357.frc2023.subsystems.ClawSubsystem;
-import com.team2357.frc2023.subsystems.IntakeSubsystem;
+import com.team2357.frc2023.subsystems.IntakeArmSubsystem;
+import com.team2357.frc2023.subsystems.IntakeRollerSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.frc2023.subsystems.WristSubsystem;
 
@@ -66,6 +67,9 @@ public final class Constants {
         
         public static final int CLAW_SOLENOID_FORWARD_CHANNEL = 0;
         public static final int CLAW_SOLENOID_REVERSE_CHANNEL = 0;
+
+        public static final int INTAKE_SOLENOID_FORWARD_CHANNEL = 0;
+        public static final int INTAKE_SOLENOID_REVERSE_CHANNEL = 0;
     }
 
     public static final class DRIVE {
@@ -128,9 +132,9 @@ public final class Constants {
         public static final double ROTATE_MAX_SPEED = .45;
     }
 
-    public static final class INTAKE {
-        public static IntakeSubsystem.Configuration GET_INTAKE_CONFIG() {
-            IntakeSubsystem.Configuration config = new IntakeSubsystem.Configuration();
+    public static final class INTAKE_ROLLER {
+        public static IntakeRollerSubsystem.Configuration GET_INTAKE_CONFIG() {
+            IntakeRollerSubsystem.Configuration config = new IntakeRollerSubsystem.Configuration();
 
             config.m_runPercentOutput = 0.4;
             config.m_reversePercentOutput = -0.7;
@@ -139,6 +143,17 @@ public final class Constants {
             config.m_rightInverted = false;
             config.m_leftInverted = true;
 
+            return config;
+        }
+    }
+
+    public static final class INTAKE_ARM {
+        public static IntakeArmSubsystem.Configuration GET_INTAKE_ARM_CONFIG() {
+            IntakeArmSubsystem.Configuration config = new IntakeArmSubsystem.Configuration();
+
+            config.m_deployMilliseconds = 1000;
+            config.m_stowMilliseconds = 1000;
+    
             return config;
         }
     }
@@ -171,6 +186,10 @@ public final class Constants {
 
         public static final double DRIVE_CONTROLLER_DEADBAND = 0.1;
         public static final double GUNNER_CONTROLLER_DEADBAND = 0.1;
+
+        public static final int BUTTON_BOARD_NUM_ROWS = 3;
+        public static final int BUTTON_BOARD_NUM_COLS = 9;
+        public static final double BUTTON_BOARD_JOYSTICK_MAX_VALUE = 32767;
     }
 
     public static final class COMPRESSOR {
