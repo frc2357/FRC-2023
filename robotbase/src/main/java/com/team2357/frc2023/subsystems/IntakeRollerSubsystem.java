@@ -63,6 +63,12 @@ public class IntakeRollerSubsystem extends SubsystemBase {
         }
     }
 
+    public void setAxisRollerSpeed(double axisSpeed) {
+        double motorSpeed = (-axisSpeed) * m_config.m_rollerAxisMaxSpeed;
+        m_masterIntakeTalon.set(ControlMode.PercentOutput, motorSpeed);
+        m_startupTime = System.currentTimeMillis() + m_config.m_rollerSpeedUpMillis;
+    }
+
     public void stopIntake() {
         m_rightMotor.set(0.0);
         m_leftMotor.set(0.0);
