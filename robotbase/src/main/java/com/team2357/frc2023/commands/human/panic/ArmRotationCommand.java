@@ -12,12 +12,14 @@ public class ArmRotationCommand extends CommandBase {
         addRequirements(ArmRotationSubsystem.getInstance());
         m_axis = axis;
     }
+
     @Override
-    public void execute(){
+    public void execute() {
         ArmRotationSubsystem.getInstance().rotate(m_axis.getValue());
     }
+
     @Override
-    public void end(boolean interrupted){
+    public void end(boolean interrupted) {
         ArmRotationSubsystem.getInstance().stopRotationMotors();
     }
 }
