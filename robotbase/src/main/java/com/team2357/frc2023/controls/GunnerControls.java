@@ -12,8 +12,8 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import static com.team2357.frc2023.Constants.*;
 
-import com.team2357.frc2023.commands.human.panicMode.ArmExtenderCommand;
-import com.team2357.frc2023.commands.human.panicMode.WristToggleCommand;
+import com.team2357.frc2023.commands.human.panic.ArmExtenderCommand;
+import com.team2357.frc2023.commands.human.panic.WristToggleCommand;
 
 /**
  * These are the controls for the gunner.

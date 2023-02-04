@@ -1,4 +1,4 @@
-package com.team2357.frc2023.commands.human.panicMode;
+package com.team2357.frc2023.commands.human.panic;
 
 import com.team2357.frc2023.controls.AxisInterface;
 import com.team2357.frc2023.subsystems.ArmExtendSubsystem;
