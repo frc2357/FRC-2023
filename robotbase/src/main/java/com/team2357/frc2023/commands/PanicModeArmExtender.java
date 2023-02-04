@@ -16,7 +16,7 @@ public class PanicModeArmExtender extends CommandBase{
     public void execute(){
         ArmExtendSubsystem.getInstance().extend(controller.getRightY());
         if(controller.getAButtonPressed()){
-            if(WristSubsystem.getInstance().isExtended()){
+            if(WristSubsystem.getInstance().isExtended()|| WristSubsystem.getInstance().isExtending()){
                 WristSubsystem.getInstance().contract();
             }
             else{
