@@ -12,6 +12,8 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import static com.team2357.frc2023.Constants.*;
 
+import com.team2357.frc2023.commands.PanicModeArmExtender;
+
 /**
  * These are the controls for the gunner.
  * 
@@ -100,6 +102,7 @@ public class GunnerControls {
         Trigger upDPadOnly = m_upDPad.and(noLetterButtons);
         Trigger downDPadOnly = m_downDPad.and(noLetterButtons);
         Trigger leftDPadOnly = m_leftDPad.and(noLetterButtons);
+        leftDPadOnly.whileTrue(new PanicModeArmExtender(m_controller));
         Trigger rightDPadOnly = m_rightDPad.and(noLetterButtons);
 
         Trigger upDPadAndX = m_upDPad.and(m_xButton);

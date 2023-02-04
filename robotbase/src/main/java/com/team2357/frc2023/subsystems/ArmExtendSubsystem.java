@@ -82,7 +82,7 @@ public class ArmExtendSubsystem extends ClosedLoopSubsystem{
         pidController.setSmartMotionAllowedClosedLoopError(m_config.m_extendMotorAllowedError, smartMotionSlot);
     }
 
-    public void stopRotationMotors() {
+    public void stopExtensionMotors() {
         setClosedLoopEnabled(false);
         m_extendMotor.set(0);
     }
