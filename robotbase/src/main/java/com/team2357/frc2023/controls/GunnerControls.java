@@ -12,6 +12,9 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import static com.team2357.frc2023.Constants.*;
 
+import com.team2357.frc2023.commands.human.panic.ArmExtenderCommand;
+import com.team2357.frc2023.commands.human.panic.WristToggleCommand;
+
 /**
  * These are the controls for the gunner.
  * 
@@ -90,13 +93,14 @@ public class GunnerControls {
         };
 
         AxisInterface axisRightStickY = () -> {
-            return getRightYAxis(); 
+            return getRightYAxis();
         };
 
-        Trigger noDPad = new Trigger(() -> m_upDPad.getAsBoolean() && m_rightDPad.getAsBoolean() && m_downDPad.getAsBoolean() && m_leftDPad.getAsBoolean()).negate();
+        Trigger noDPad = new Trigger(() -> m_upDPad.getAsBoolean() && m_rightDPad.getAsBoolean()
+                && m_downDPad.getAsBoolean() && m_leftDPad.getAsBoolean()).negate();
 
         Trigger noLetterButtons = m_aButton.and(m_bButton).and(m_xButton).and(m_yButton).negate();
-        
+
         Trigger upDPadOnly = m_upDPad.and(noLetterButtons);
         Trigger downDPadOnly = m_downDPad.and(noLetterButtons);
         Trigger leftDPadOnly = m_leftDPad.and(noLetterButtons);
@@ -112,5 +116,8 @@ public class GunnerControls {
         Trigger bButton = m_bButton.and(noDPad);
         Trigger yButton = m_yButton.and(noDPad);
         Trigger xButton = m_xButton.and(noDPad);
+
+        leftDPadOnly.whileTrue(new ArmExtenderCommand(axisRightStickY));
+        aButton.onTrue(new WristToggleCommand());
     }
 }
