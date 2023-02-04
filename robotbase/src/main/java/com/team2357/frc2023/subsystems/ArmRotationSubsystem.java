@@ -35,6 +35,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem{
         public double m_rotationMotorMinVel = 0;
         public double m_rotationMotorMaxAcc = 0;
         public double m_rotationMotorAllowedError = 0;
+        public double m_maxSpeedPercent = 0.4;
     }
 
     private Configuration m_config;
@@ -86,7 +87,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem{
     }
 
     public void rotate(double sensorUnits){
-        m_masterRotationMotor.set(sensorUnits);
+        m_masterRotationMotor.set(sensorUnits*m_config.m_maxSpeedPercent);
     }
 
     public void setRotationAxisSpeed(double axisSpeed) {

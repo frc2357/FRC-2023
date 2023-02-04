@@ -39,6 +39,7 @@ public class ArmExtendSubsystem extends ClosedLoopSubsystem {
         public double m_extendMotorMaxAcc = 0;
         public double m_extendMotorAllowedError = 0;
         public double m_rotationMotorAllowedError = 0;
+        public double m_maxSpeedPercent = 0.4;
     }
 
     private Configuration m_config;
@@ -66,7 +67,7 @@ public class ArmExtendSubsystem extends ClosedLoopSubsystem {
     }
 
     public void extend(double sensorUnits) {
-        m_extendMotor.set(sensorUnits);
+        m_extendMotor.set(sensorUnits*m_config.m_maxSpeedPercent);
     }
 
     private void configureExtenderPID(SparkMaxPIDController pidController) {
