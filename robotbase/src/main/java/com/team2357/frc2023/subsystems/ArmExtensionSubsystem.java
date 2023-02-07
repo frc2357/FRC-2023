@@ -57,7 +57,7 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
     }
 
     public void configure(Configuration config) {
-        m_config = Constants.ARM_EXTENSION.GET_EXTENSION_CONFIG();
+        m_config = config;
 
         m_extendMotor.setIdleMode(m_config.m_extendMotorIdleMode);
         m_extendMotor.setSmartCurrentLimit(m_config.m_extendMotorStallLimitAmps, m_config.m_extendMotorFreeLimitAmps);

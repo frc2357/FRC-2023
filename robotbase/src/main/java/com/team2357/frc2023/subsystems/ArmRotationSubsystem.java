@@ -47,7 +47,6 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem{
     private double m_targetRotations;
 
     public ArmRotationSubsystem(CANSparkMax masterRotationMotor, CANSparkMax followerRotationMotor) {
-        m_config = Constants.ARM_ROTATION.GET_ROTATION_CONFIG();
         instance = this;
         m_masterRotationMotor = masterRotationMotor;
         m_followerRotationMotor = followerRotationMotor;
