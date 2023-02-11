@@ -106,4 +106,8 @@ public class SubsystemFactory {
                 subsystem.configure(Constants.INTAKE_ARM.GET_INTAKE_ARM_CONFIG());
                 return subsystem;
         }
+        public LimelightSubsystem CreateLimelightSubsystem(){
+                LimelightSubsystem subsystem = new LimelightSubsystem();
+                return subsystem;
+        }
 }

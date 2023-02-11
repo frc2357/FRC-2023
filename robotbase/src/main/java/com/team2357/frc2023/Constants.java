@@ -194,39 +194,6 @@ public final class Constants {
         }
     }
 
-    public static final class INTAKE_ARM {
-        public static IntakeArmSubsystem.Configuration GET_INTAKE_ARM_CONFIG() {
-            IntakeArmSubsystem.Configuration config = new IntakeArmSubsystem.Configuration();
-
-            config.m_deployMilliseconds = 1000;
-            config.m_stowMilliseconds = 1000;
-    
-            return config;
-        }
-    }
-
-    public static final class WRIST {
-        public static WristSubsystem.Configuration GET_WRIST_CONFIG() {
-            WristSubsystem.Configuration config = new WristSubsystem.Configuration();
-
-            config.m_extendMilliseconds = 1000;
-            config.m_contractMilliseconds = 1000;
-
-            return config;
-        }
-    }
-    
-    public static final class CLAW {
-        public static ClawSubsystem.Configuration GET_CLAW_CONFIG() {
-            ClawSubsystem.Configuration config = new ClawSubsystem.Configuration();
-
-            config.m_openMilliseconds = 500;
-            config.m_closeMilliseconds = 500;
-
-            return config;
-        }
-    }
-
     public static final class CONTROLLER {
         public static final int DRIVE_CONTROLLER_PORT = 0;
         public static final int GUNNER_CONTROLLER_PORT = 1;
