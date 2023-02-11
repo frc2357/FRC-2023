@@ -345,11 +345,11 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		// m_odometry.update(getGyroscopeRotation(),
-		// new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
-		// m_frontRightModule.getPosition(),
-		// m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
-		setOdemetryFromApriltag();
+	    m_odometry.update(getGyroscopeRotation(),
+		 new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
+		 m_frontRightModule.getPosition(),
+		 m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
+		//setOdemetryFromApriltag();
 
 		SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
 
