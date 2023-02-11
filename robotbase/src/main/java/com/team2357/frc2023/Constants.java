@@ -6,6 +6,7 @@ package com.team2357.frc2023;
 
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.team2357.frc2023.subsystems.ClawSubsystem;
+import com.team2357.frc2023.subsystems.ElevatorSubsystem;
 import com.team2357.frc2023.subsystems.IntakeArmSubsystem;
 import com.team2357.frc2023.subsystems.IntakeRollerSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
@@ -59,6 +60,9 @@ public final class Constants {
 
         public static final int LEFT_INTAKE_MOTOR = 23;
         public static final int RIGHT_INTAKE_MOTOR = 24;
+
+        public static final int LEFT_ELEVATOR_MOTOR = 0;
+        public static final int RIGHT_ELEVATOR_MOTOR = 0;
     }
 
     public static final class PH_ID {
@@ -164,6 +168,14 @@ public final class Constants {
 
             config.m_extendMilliseconds = 1000;
             config.m_contractMilliseconds = 1000;
+
+            return config;
+        }
+    }
+
+    public static final class ELEVATOR {
+        public static ElevatorSubsystem.Configuration GET_ELEVATOR_CONFIG() {
+            ElevatorSubsystem.Configuration config = new ElevatorSubsystem.Configuration();
 
             return config;
         }
