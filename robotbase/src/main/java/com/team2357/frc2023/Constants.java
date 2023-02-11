@@ -4,6 +4,7 @@
 
 package com.team2357.frc2023;
 
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.team2357.frc2023.subsystems.ClawSubsystem;
 import com.team2357.frc2023.subsystems.ElevatorSubsystem;
@@ -179,6 +180,15 @@ public final class Constants {
     public static final class ELEVATOR {
         public static ElevatorSubsystem.Configuration GET_ELEVATOR_CONFIG() {
             ElevatorSubsystem.Configuration config = new ElevatorSubsystem.Configuration();
+
+            config.m_elevatorAxisMaxSpeed = 1;
+
+            config.m_elevatorMotorIdleMode = IdleMode.kBrake;
+            config.m_elevatorMotorStallLimitAmps = 30;
+            config.m_elevatorMotorFreeLimitAmps = 30;
+            config.m_elevatorGrippedAmps = 20;
+
+            //TODO: Figure out smart motion constants
 
             return config;
         }
