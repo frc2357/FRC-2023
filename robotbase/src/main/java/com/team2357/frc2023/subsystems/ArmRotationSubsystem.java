@@ -5,7 +5,6 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.SparkMaxPIDController;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 import com.team2357.lib.util.Utility;
-import com.team2357.frc2023.Constants;
 public class ArmRotationSubsystem extends ClosedLoopSubsystem{
     private static ArmRotationSubsystem instance = null;
 
