@@ -22,6 +22,7 @@ public class IntakeRollerSubsystem extends SubsystemBase {
         public double m_reversePercentOutput;
 
         public double m_rampRate;
+        public int m_currentLimit;
 
         public boolean m_rightInverted;
         public boolean m_leftInverted;
@@ -44,6 +45,9 @@ public class IntakeRollerSubsystem extends SubsystemBase {
 
         m_rightMotor.setOpenLoopRampRate(m_config.m_rampRate);
         m_leftMotor.setOpenLoopRampRate(m_config.m_rampRate);
+
+        m_rightMotor.setSmartCurrentLimit(m_config.m_currentLimit);
+        m_leftMotor.setSmartCurrentLimit(m_config.m_currentLimit);
 
         m_rightMotor.setInverted(m_config.m_rightInverted);
         m_leftMotor.setInverted(m_config.m_leftInverted);

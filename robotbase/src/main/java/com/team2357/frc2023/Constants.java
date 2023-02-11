@@ -4,8 +4,10 @@
 
 package com.team2357.frc2023;
 
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.team2357.frc2023.subsystems.ClawSubsystem;
+import com.team2357.frc2023.subsystems.ElevatorSubsystem;
 import com.team2357.frc2023.subsystems.IntakeArmSubsystem;
 import com.team2357.frc2023.subsystems.IntakeRollerSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
@@ -59,6 +61,9 @@ public final class Constants {
 
         public static final int LEFT_INTAKE_MOTOR = 23;
         public static final int RIGHT_INTAKE_MOTOR = 24;
+
+        public static final int LEFT_ELEVATOR_MOTOR = 29;
+        public static final int RIGHT_ELEVATOR_MOTOR = 30;
     }
 
     public static final class PH_ID {
@@ -136,8 +141,11 @@ public final class Constants {
         public static IntakeRollerSubsystem.Configuration GET_INTAKE_CONFIG() {
             IntakeRollerSubsystem.Configuration config = new IntakeRollerSubsystem.Configuration();
 
-            config.m_runPercentOutput = 0.4;
-            config.m_reversePercentOutput = -0.7;
+            config.m_runPercentOutput = 0.5;
+            config.m_reversePercentOutput = -0.3;
+
+            config.m_rampRate = 1;
+            config.m_currentLimit = 30;
 
             //TODO: Make sure these are correct
             config.m_rightInverted = false;
@@ -164,6 +172,22 @@ public final class Constants {
 
             config.m_extendMilliseconds = 1000;
             config.m_contractMilliseconds = 1000;
+
+            return config;
+        }
+    }
+
+    public static final class ELEVATOR {
+        public static ElevatorSubsystem.Configuration GET_ELEVATOR_CONFIG() {
+            ElevatorSubsystem.Configuration config = new ElevatorSubsystem.Configuration();
+
+            config.m_elevatorAxisMaxSpeed = 1;
+
+            config.m_elevatorMotorIdleMode = IdleMode.kBrake;
+            config.m_elevatorMotorStallLimitAmps = 30;
+            config.m_elevatorMotorFreeLimitAmps = 30;
+
+            //TODO: Figure out smart motion constants
 
             return config;
         }
