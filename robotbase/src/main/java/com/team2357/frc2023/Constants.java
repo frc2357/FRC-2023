@@ -38,7 +38,7 @@ public final class Constants {
          * 
          * Use name of Canivore device to use Canivore
          */
-        public static final String DRIVE_CANBUS = "CANivore";
+        public static final String DRIVE_CANBUS = "rio";
 
         public static final int PNEUMATICS_HUB_ID = 2;
 
@@ -69,21 +69,21 @@ public final class Constants {
 
     public static final class PH_ID {
         public static final int WRIST_SOLENOID_FORWARD_CHANNEL = 0;
-        public static final int WRIST_SOLENOID_REVERSE_CHANNEL = 0;
+        public static final int WRIST_SOLENOID_REVERSE_CHANNEL = 1;
+        
+        public static final int CLAW_SOLENOID_FORWARD_CHANNEL = 2;
+        public static final int CLAW_SOLENOID_REVERSE_CHANNEL = 3;
 
-        public static final int CLAW_SOLENOID_FORWARD_CHANNEL = 0;
-        public static final int CLAW_SOLENOID_REVERSE_CHANNEL = 0;
-
-        public static final int INTAKE_SOLENOID_FORWARD_CHANNEL = 0;
-        public static final int INTAKE_SOLENOID_REVERSE_CHANNEL = 0;
+        public static final int INTAKE_SOLENOID_FORWARD_CHANNEL = 4;
+        public static final int INTAKE_SOLENOID_REVERSE_CHANNEL = 5;
     }
 
     public static final class DRIVE {
         public static SwerveDriveSubsystem.Configuration GET_SWERVE_DRIVE_CONFIG() {
             SwerveDriveSubsystem.Configuration config = new SwerveDriveSubsystem.Configuration();
 
-            config.m_trackwidthMeters = .60325;
-            config.m_wheelbaseMeters = .62865;
+            config.m_trackwidthMeters = 0.50165;
+            config.m_wheelbaseMeters = 0.55245;
 
             config.m_maxVoltage = 10.0;
             config.m_maxVelocityMetersPerSecond = 6380.0 / 60.0 *
@@ -113,11 +113,11 @@ public final class Constants {
         // sensorDirection = false;
         // initializationStrategy = bootToAbsValue;
 
-        public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(162.7);
-        public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(135.08);
-        public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(125);
-        public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(9.45);
-
+        public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(0.0);
+        public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(0.0); 
+        public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(0.0); 
+        public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(0.0);
+        
         public static final PIDController CHARGE_STATION_BALANCE_ANGLE_CONTROLLER = new PIDController(0.5, 0, 0);
         public static final PIDController CHARGE_STATION_DISTANCE_CONTROLLER = new PIDController(0.5, 0, 0);
 
