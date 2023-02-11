@@ -186,7 +186,6 @@ public final class Constants {
             config.m_elevatorMotorIdleMode = IdleMode.kBrake;
             config.m_elevatorMotorStallLimitAmps = 30;
             config.m_elevatorMotorFreeLimitAmps = 30;
-            config.m_elevatorGrippedAmps = 20;
 
             //TODO: Figure out smart motion constants
 

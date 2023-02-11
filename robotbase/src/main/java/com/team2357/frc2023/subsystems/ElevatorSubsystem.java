@@ -24,8 +24,6 @@ public class ElevatorSubsystem extends ClosedLoopSubsystem {
 
         public boolean m_isInverted = false;
 
-        public int m_elevatorGrippedAmps = 0;
-
         // smart motion config
         public double m_elevatorMotorP = 0;
         public double m_elevatorMotorI = 0;
@@ -102,11 +100,6 @@ public class ElevatorSubsystem extends ClosedLoopSubsystem {
     public boolean isMotorAtRotations(CANSparkMax motor) {
         return Utility.isWithinTolerance(motor.getEncoder().getPosition(), m_targetRotations,
                 m_config.m_elevatorMotorAllowedError);
-    }
-
-    public boolean isElevatorGripped() {
-        return (m_rightMotor.getOutputCurrent() > m_config.m_elevatorGrippedAmps)
-                && (m_leftMotor.getOutputCurrent() > m_config.m_elevatorGrippedAmps);
     }
 
     public void setElevatorAxisSpeed(double axisSpeed) {
