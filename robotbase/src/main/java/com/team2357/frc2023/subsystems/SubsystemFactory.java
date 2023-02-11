@@ -6,6 +6,8 @@ import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
 import com.team2357.lib.subsystems.LimelightSubsystem;
 
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -71,14 +73,37 @@ public class SubsystemFactory {
                 return subsystem;
         }
 
-    public IntakeSubsystem CreateIntakeSubsystem() {
-        IntakeSubsystem subsystem = new IntakeSubsystem();
-        subsystem.configure(Constants.INTAKE.GET_INTAKE_CONFIG());
-        return subsystem;
-    }
+        public IntakeRollerSubsystem CreateIntakeRollerSubsystem() {
+                IntakeRollerSubsystem subsystem = new IntakeRollerSubsystem();
+                subsystem.configure(Constants.INTAKE_ROLLER.GET_INTAKE_CONFIG());
+                return subsystem;
+        }
 
-    public LimelightSubsystem CreateLimelightSubsystem() {
-        LimelightSubsystem subsystem = new LimelightSubsystem();
-        return subsystem;
-    }
+        public WristSubsystem CreateWristSubsystem() {
+                DoubleSolenoid wristSolenoid = new DoubleSolenoid(Constants.CAN_ID.PNEUMATICS_HUB_ID,
+                                PneumaticsModuleType.REVPH, Constants.PH_ID.WRIST_SOLENOID_FORWARD_CHANNEL,
+                                Constants.PH_ID.WRIST_SOLENOID_REVERSE_CHANNEL);
+                WristSubsystem subsystem = new WristSubsystem(wristSolenoid);
+                subsystem.configure(Constants.WRIST.GET_WRIST_CONFIG());
+                return subsystem;
+        }
+
+        public ClawSubsystem CreateClawSubsystem() {
+                DoubleSolenoid clawSolenoid = new DoubleSolenoid(Constants.CAN_ID.PNEUMATICS_HUB_ID,
+                                PneumaticsModuleType.REVPH, Constants.PH_ID.CLAW_SOLENOID_FORWARD_CHANNEL,
+                                Constants.PH_ID.CLAW_SOLENOID_REVERSE_CHANNEL);
+
+                ClawSubsystem subsystem = new ClawSubsystem(clawSolenoid);
+                subsystem.configure(Constants.CLAW.GET_CLAW_CONFIG());
+                return subsystem;
+        }
+
+        public IntakeArmSubsystem CreateIntakeArmSubsystem() {
+                DoubleSolenoid intakeSolenoid = new DoubleSolenoid(Constants.CAN_ID.PNEUMATICS_HUB_ID,
+                                PneumaticsModuleType.REVPH, Constants.PH_ID.INTAKE_SOLENOID_FORWARD_CHANNEL,
+                                Constants.PH_ID.INTAKE_SOLENOID_REVERSE_CHANNEL);
+                IntakeArmSubsystem subsystem = new IntakeArmSubsystem(intakeSolenoid);
+                subsystem.configure(Constants.INTAKE_ARM.GET_INTAKE_ARM_CONFIG());
+                return subsystem;
+        }
 }

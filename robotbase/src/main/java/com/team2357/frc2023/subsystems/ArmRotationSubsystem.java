@@ -43,7 +43,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem{
     private SparkMaxPIDController m_pidController;    
     private double m_targetRotations;
 
-    ArmRotationSubsystem(CANSparkMax masterRotationMotor, CANSparkMax followerRotationMotor) {
+    public ArmRotationSubsystem(CANSparkMax masterRotationMotor, CANSparkMax followerRotationMotor) {
         instance = this;
         m_masterRotationMotor = masterRotationMotor;
         m_followerRotationMotor = followerRotationMotor;

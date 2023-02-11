@@ -7,12 +7,15 @@ package com.team2357.frc2023;
 import com.team2357.frc2023.commands.DefaultDriveCommand;
 import com.team2357.frc2023.controls.SwerveDriveControls;
 import com.team2357.frc2023.shuffleboard.AutoCommandChooser;
-import com.team2357.frc2023.subsystems.IntakeSubsystem;
+import com.team2357.frc2023.subsystems.IntakeRollerSubsystem;
 import com.team2357.frc2023.subsystems.SubsystemFactory;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.frc2023.util.AvailableTrajectories;
+import com.team2357.frc2023.util.AvailableTrajectoryCommands;
 
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -30,7 +33,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final SwerveDriveSubsystem m_drivetrainSubsystem;
-  private final IntakeSubsystem m_intakeSubsystem;
+  private final Compressor m_compressor;
 
   private AutoCommandChooser m_autoCommandChooser;
 
@@ -40,9 +43,14 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-    SubsystemFactory subsystemFactory = new SubsystemFactory();
 
-    m_intakeSubsystem = subsystemFactory.CreateIntakeSubsystem();
+    // Create subsystems
+    SubsystemFactory subsystemFactory = new SubsystemFactory();
+    subsystemFactory.CreateIntakeRollerSubsystem();
+    subsystemFactory.CreateIntakeArmSubsystem();
+    subsystemFactory.CreateClawSubsystem();
+    subsystemFactory.CreateWristSubsystem();
+
     m_drivetrainSubsystem = subsystemFactory.CreateSwerveDriveSubsystem();
 
     subsystemFactory.CreateLimelightSubsystem();
@@ -50,8 +58,14 @@ public class RobotContainer {
         m_drivetrainSubsystem,
         new SwerveDriveControls(m_controller, Constants.CONTROLLER.DRIVE_CONTROLLER_DEADBAND)));
 
+    // Setup compressor
+    m_compressor = new Compressor(Constants.CAN_ID.PNEUMATICS_HUB_ID, PneumaticsModuleType.REVPH);
+    m_compressor.enableAnalog(Constants.COMPRESSOR.MIN_PRESSURE_PSI, Constants.COMPRESSOR.MAX_PRESSURE_PSI);
+
+
     // Build trajectory paths
     AvailableTrajectories.generateTrajectories();
+    AvailableTrajectoryCommands.generateTrajectories();
 
     // Configure the button bindings
     configureButtonBindings();

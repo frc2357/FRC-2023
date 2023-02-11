@@ -5,8 +5,11 @@
 package com.team2357.frc2023;
 
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
-import com.team2357.frc2023.subsystems.IntakeSubsystem;
+import com.team2357.frc2023.subsystems.ClawSubsystem;
+import com.team2357.frc2023.subsystems.IntakeArmSubsystem;
+import com.team2357.frc2023.subsystems.IntakeRollerSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
+import com.team2357.frc2023.subsystems.WristSubsystem;
 
 import edu.wpi.first.math.controller.PIDController;
 
@@ -32,7 +35,9 @@ public final class Constants {
          * 
          * Use name of Canivore device to use Canivore
          */
-        public static final String DRIVE_CANBUS = "CANivore";
+        public static final String DRIVE_CANBUS = "rio";
+
+        public static final int PNEUMATICS_HUB_ID = 2;
 
         public static final int PIGEON_ID = 5;
 
@@ -56,12 +61,23 @@ public final class Constants {
         public static final int RIGHT_INTAKE_MOTOR = 24;
     }
 
+    public static final class PH_ID {
+        public static final int WRIST_SOLENOID_FORWARD_CHANNEL = 0;
+        public static final int WRIST_SOLENOID_REVERSE_CHANNEL = 1;
+        
+        public static final int CLAW_SOLENOID_FORWARD_CHANNEL = 2;
+        public static final int CLAW_SOLENOID_REVERSE_CHANNEL = 3;
+
+        public static final int INTAKE_SOLENOID_FORWARD_CHANNEL = 4;
+        public static final int INTAKE_SOLENOID_REVERSE_CHANNEL = 5;
+    }
+
     public static final class DRIVE {
         public static SwerveDriveSubsystem.Configuration GET_SWERVE_DRIVE_CONFIG() {
             SwerveDriveSubsystem.Configuration config = new SwerveDriveSubsystem.Configuration();
 
-            config.m_trackwidthMeters = .60325;
-            config.m_wheelbaseMeters = .62865;
+            config.m_trackwidthMeters = 0.50165;
+            config.m_wheelbaseMeters = 0.55245;
 
             config.m_maxVoltage = 10.0;
             config.m_maxVelocityMetersPerSecond = 6380.0 / 60.0 *
@@ -105,10 +121,10 @@ public final class Constants {
         // sensorDirection = false;
         // initializationStrategy = bootToAbsValue;
 
-        public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(162.7);
-        public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(135.08);
-        public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(125);
-        public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(9.45);
+        public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(0.0);
+        public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(0.0); 
+        public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(0.0); 
+        public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(0.0);
         
         public static final PIDController CHARGE_STATION_BALANCE_ANGLE_CONTROLLER = new PIDController(0.5, 0, 0);
         public static final PIDController CHARGE_STATION_DISTANCE_CONTROLLER = new PIDController(0.5, 0, 0);
@@ -130,9 +146,9 @@ public final class Constants {
         public static final double ROTATE_MAXSPEED_METERS_PER_SECOND = 0.91;
     }
 
-    public static final class INTAKE {
-        public static IntakeSubsystem.Configuration GET_INTAKE_CONFIG() {
-            IntakeSubsystem.Configuration config = new IntakeSubsystem.Configuration();
+    public static final class INTAKE_ROLLER {
+        public static IntakeRollerSubsystem.Configuration GET_INTAKE_CONFIG() {
+            IntakeRollerSubsystem.Configuration config = new IntakeRollerSubsystem.Configuration();
 
             config.m_runPercentOutput = 0.4;
             config.m_reversePercentOutput = -0.7;
@@ -145,13 +161,87 @@ public final class Constants {
         }
     }
 
+    public static final class INTAKE_ARM {
+        public static IntakeArmSubsystem.Configuration GET_INTAKE_ARM_CONFIG() {
+            IntakeArmSubsystem.Configuration config = new IntakeArmSubsystem.Configuration();
+
+            config.m_deployMilliseconds = 1000;
+            config.m_stowMilliseconds = 1000;
+    
+            return config;
+        }
+    }
+
+    public static final class WRIST {
+        public static WristSubsystem.Configuration GET_WRIST_CONFIG() {
+            WristSubsystem.Configuration config = new WristSubsystem.Configuration();
+
+            config.m_extendMilliseconds = 1000;
+            config.m_contractMilliseconds = 1000;
+
+            return config;
+        }
+    }
+    
+    public static final class CLAW {
+        public static ClawSubsystem.Configuration GET_CLAW_CONFIG() {
+            ClawSubsystem.Configuration config = new ClawSubsystem.Configuration();
+
+            config.m_openMilliseconds = 500;
+            config.m_closeMilliseconds = 500;
+
+            return config;
+        }
+    }
+
+    public static final class INTAKE_ARM {
+        public static IntakeArmSubsystem.Configuration GET_INTAKE_ARM_CONFIG() {
+            IntakeArmSubsystem.Configuration config = new IntakeArmSubsystem.Configuration();
+
+            config.m_deployMilliseconds = 1000;
+            config.m_stowMilliseconds = 1000;
+    
+            return config;
+        }
+    }
+
+    public static final class WRIST {
+        public static WristSubsystem.Configuration GET_WRIST_CONFIG() {
+            WristSubsystem.Configuration config = new WristSubsystem.Configuration();
+
+            config.m_extendMilliseconds = 1000;
+            config.m_contractMilliseconds = 1000;
+
+            return config;
+        }
+    }
+    
+    public static final class CLAW {
+        public static ClawSubsystem.Configuration GET_CLAW_CONFIG() {
+            ClawSubsystem.Configuration config = new ClawSubsystem.Configuration();
+
+            config.m_openMilliseconds = 500;
+            config.m_closeMilliseconds = 500;
+
+            return config;
+        }
+    }
+
     public static final class CONTROLLER {
         public static final int DRIVE_CONTROLLER_PORT = 0;
         public static final int GUNNER_CONTROLLER_PORT = 1;
 
         public static final double DRIVE_CONTROLLER_DEADBAND = 0.1;
         public static final double GUNNER_CONTROLLER_DEADBAND = 0.1;
+
+        public static final int BUTTON_BOARD_NUM_ROWS = 3;
+        public static final int BUTTON_BOARD_NUM_COLS = 9;
+        public static final double BUTTON_BOARD_JOYSTICK_MAX_VALUE = 32767;
     }
 
+    public static final class COMPRESSOR {
+        public static final int MIN_PRESSURE_PSI = 90;
+        public static final int MAX_PRESSURE_PSI = 120;
+    }
     
 }
