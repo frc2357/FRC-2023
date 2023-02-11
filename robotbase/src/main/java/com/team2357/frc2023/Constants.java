@@ -140,8 +140,11 @@ public final class Constants {
         public static IntakeRollerSubsystem.Configuration GET_INTAKE_CONFIG() {
             IntakeRollerSubsystem.Configuration config = new IntakeRollerSubsystem.Configuration();
 
-            config.m_runPercentOutput = 0.4;
-            config.m_reversePercentOutput = -0.7;
+            config.m_runPercentOutput = 0.5;
+            config.m_reversePercentOutput = -0.3;
+
+            config.m_rampRate = 1;
+            config.m_currentLimit = 30;
 
             //TODO: Make sure these are correct
             config.m_rightInverted = false;
