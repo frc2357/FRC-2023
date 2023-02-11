@@ -62,8 +62,8 @@ public final class Constants {
         public static final int LEFT_INTAKE_MOTOR = 23;
         public static final int RIGHT_INTAKE_MOTOR = 24;
 
-        public static final int LEFT_ELEVATOR_MOTOR = 0;
-        public static final int RIGHT_ELEVATOR_MOTOR = 0;
+        public static final int LEFT_ELEVATOR_MOTOR = 29;
+        public static final int RIGHT_ELEVATOR_MOTOR = 30;
     }
 
     public static final class PH_ID {
