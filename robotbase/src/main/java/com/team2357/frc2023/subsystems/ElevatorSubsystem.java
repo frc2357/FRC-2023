@@ -7,7 +7,7 @@ import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 import com.team2357.lib.util.Utility;
 
 public class ElevatorSubsystem extends ClosedLoopSubsystem {
-    
+
     private static ElevatorSubsystem m_instance;
 
     public static ElevatorSubsystem getInstance() {
@@ -15,30 +15,30 @@ public class ElevatorSubsystem extends ClosedLoopSubsystem {
     }
 
     public static class Configuration {
-        public double m_extendAxisMaxSpeed = 0;
+        public double m_elevatorAxisMaxSpeed = 0;
 
-        public IdleMode m_extendMotorIdleMode = IdleMode.kBrake;
+        public IdleMode m_elevatorMotorIdleMode = IdleMode.kBrake;
 
-        public int m_extendMotorStallLimitAmps = 0;
-        public int m_extendMotorFreeLimitAmps = 0;
+        public int m_elevatorMotorStallLimitAmps = 0;
+        public int m_elevatorMotorFreeLimitAmps = 0;
 
         public boolean m_isInverted = false;
 
-        public int m_extendGrippedAmps = 0;
+        public int m_elevatorGrippedAmps = 0;
 
         // smart motion config
-        public double m_extendMotorP = 0;
-        public double m_extendMotorI = 0;
-        public double m_extendMotorD = 0;
-        public double m_extendMotorIZone = 0;
-        public double m_extendMotorFF = 0;
-        public double m_extendMotorMaxOutput = 0;
-        public double m_extendMotorMinOutput = 0;
-        public double m_extendMotorMaxRPM = 0;
-        public double m_extendMotorMaxVel = 0;
-        public double m_extendMotorMinVel = 0;
-        public double m_extendMotorMaxAcc = 0;
-        public double m_extendMotorAllowedError = 0;
+        public double m_elevatorMotorP = 0;
+        public double m_elevatorMotorI = 0;
+        public double m_elevatorMotorD = 0;
+        public double m_elevatorMotorIZone = 0;
+        public double m_elevatorMotorFF = 0;
+        public double m_elevatorMotorMaxOutput = 0;
+        public double m_elevatorMotorMinOutput = 0;
+        public double m_elevatorMotorMaxRPM = 0;
+        public double m_elevatorMotorMaxVel = 0;
+        public double m_elevatorMotorMinVel = 0;
+        public double m_elevatorMotorMaxAcc = 0;
+        public double m_elevatorMotorAllowedError = 0;
         public int m_smartMotionSlot = 0;
     }
 
@@ -60,31 +60,32 @@ public class ElevatorSubsystem extends ClosedLoopSubsystem {
     public void configure(Configuration config) {
         m_config = config;
 
-        m_rightMotor.setIdleMode(m_config.m_extendMotorIdleMode);
-        m_leftMotor.setIdleMode(m_config.m_extendMotorIdleMode);
+        m_rightMotor.setIdleMode(m_config.m_elevatorMotorIdleMode);
+        m_leftMotor.setIdleMode(m_config.m_elevatorMotorIdleMode);
 
         m_rightPidController = m_rightMotor.getPIDController();
         m_leftPidController = m_leftMotor.getPIDController();
-        configureExtenderPID(m_rightPidController);
-        configureExtenderPID(m_leftPidController);
+        configureelevatorerPID(m_rightPidController);
+        configureelevatorerPID(m_leftPidController);
 
         m_rightMotor.setInverted(m_config.m_isInverted);
         m_leftMotor.setInverted(m_config.m_isInverted);
     }
 
-    private void configureExtenderPID(SparkMaxPIDController pidController) {
-        pidController.setP(m_config.m_extendMotorP);
-        pidController.setI(m_config.m_extendMotorI);
-        pidController.setD(m_config.m_extendMotorD);
-        pidController.setIZone(m_config.m_extendMotorIZone);
-        pidController.setFF(m_config.m_extendMotorFF);
-        pidController.setOutputRange(m_config.m_extendMotorMinOutput, m_config.m_extendMotorMaxOutput);
+    private void configureelevatorerPID(SparkMaxPIDController pidController) {
+        pidController.setP(m_config.m_elevatorMotorP);
+        pidController.setI(m_config.m_elevatorMotorI);
+        pidController.setD(m_config.m_elevatorMotorD);
+        pidController.setIZone(m_config.m_elevatorMotorIZone);
+        pidController.setFF(m_config.m_elevatorMotorFF);
+        pidController.setOutputRange(m_config.m_elevatorMotorMinOutput, m_config.m_elevatorMotorMaxOutput);
 
         // Smart motion
-        pidController.setSmartMotionMaxVelocity(m_config.m_extendMotorMaxVel, m_config.m_smartMotionSlot);
-        pidController.setSmartMotionMinOutputVelocity(m_config.m_extendMotorMinVel, m_config.m_smartMotionSlot);
-        pidController.setSmartMotionMaxAccel(m_config.m_extendMotorMaxAcc, m_config.m_smartMotionSlot);
-        pidController.setSmartMotionAllowedClosedLoopError(m_config.m_extendMotorAllowedError, m_config.m_smartMotionSlot);
+        pidController.setSmartMotionMaxVelocity(m_config.m_elevatorMotorMaxVel, m_config.m_smartMotionSlot);
+        pidController.setSmartMotionMinOutputVelocity(m_config.m_elevatorMotorMinVel, m_config.m_smartMotionSlot);
+        pidController.setSmartMotionMaxAccel(m_config.m_elevatorMotorMaxAcc, m_config.m_smartMotionSlot);
+        pidController.setSmartMotionAllowedClosedLoopError(m_config.m_elevatorMotorAllowedError,
+                m_config.m_smartMotionSlot);
     }
 
     public void setElevatorRotations(double rotations) {
@@ -94,9 +95,27 @@ public class ElevatorSubsystem extends ClosedLoopSubsystem {
         m_leftPidController.setReference(m_targetRotations, CANSparkMax.ControlType.kSmartMotion);
     }
 
-    public void extend(double sensorUnits) {
-        m_rightMotor.set(sensorUnits);
-        m_leftMotor.set(sensorUnits);
+    public boolean isElevatorAtRotations() {
+        return isMotorAtRotations(m_rightMotor) && isMotorAtRotations(m_leftMotor);
+    }
+
+    public boolean isMotorAtRotations(CANSparkMax motor) {
+        return Utility.isWithinTolerance(motor.getEncoder().getPosition(), m_targetRotations,
+                m_config.m_elevatorMotorAllowedError);
+    }
+
+    public boolean isElevatorGripped() {
+        return (m_rightMotor.getOutputCurrent() > m_config.m_elevatorGrippedAmps)
+                && (m_leftMotor.getOutputCurrent() > m_config.m_elevatorGrippedAmps);
+    }
+
+    public void setElevatorAxisSpeed(double axisSpeed) {
+        setClosedLoopEnabled(false);
+
+        double motorSpeed = (-axisSpeed) * m_config.m_elevatorAxisMaxSpeed;
+
+        m_rightMotor.set(motorSpeed);
+        m_leftMotor.set(motorSpeed);
     }
 
     public void stopExtensionMotors() {
@@ -110,19 +129,19 @@ public class ElevatorSubsystem extends ClosedLoopSubsystem {
         m_leftMotor.getEncoder().setPosition(0);
     }
 
-    public boolean isExtenderRotatorAtRotations() {
-        double rightMotorRotations = m_rightMotor.getEncoder().getPosition();
-        double leftMotorRotations = m_leftMotor.getEncoder().getPosition();
+    public double getLeftMotorRotations() {
+        return m_leftMotor.getEncoder().getPosition();
+    }
 
-        return Utility.isWithinTolerance(leftMotorRotations, rightMotorRotations, leftMotorRotations)
+    public double getRightMotorRotations() {
+        return m_rightMotor.getEncoder().getPosition();
     }
 
     @Override
     public void periodic() {
-        if (isClosedLoopEnabled() && isExtenderRotatorAtRotations()) {
+        if (isClosedLoopEnabled() && isElevatorAtRotations()) {
             setClosedLoopEnabled(false);
         }
     }
-
 
 }
