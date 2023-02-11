@@ -1,6 +1,8 @@
 package com.team2357.frc2023.subsystems;
 
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
@@ -103,6 +105,13 @@ public class SubsystemFactory {
                                 Constants.PH_ID.INTAKE_SOLENOID_REVERSE_CHANNEL);
                 IntakeArmSubsystem subsystem = new IntakeArmSubsystem(intakeSolenoid);
                 subsystem.configure(Constants.INTAKE_ARM.GET_INTAKE_ARM_CONFIG());
+                return subsystem;
+        }
+        public ArmRotationSubsystem CreateArmRotationSubsystem(){
+                CANSparkMax masterMotor = new CANSparkMax(Constants.CAN_ID.MASTER_ROTATION_MOTOR, MotorType.kBrushless);
+                CANSparkMax followMotor = new CANSparkMax(Constants.CAN_ID.FOLLOWER_ROTATION_MOTOR, MotorType.kBrushless);
+                ArmRotationSubsystem subsystem = new ArmRotationSubsystem(masterMotor, followMotor);
+                subsystem.configure(Constants.ARM_ROTATION.GET_ROTATION_CONFIG());
                 return subsystem;
         }
 }
