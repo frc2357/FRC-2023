@@ -63,14 +63,14 @@ public class ElevatorSubsystem extends ClosedLoopSubsystem {
 
         m_rightPidController = m_rightMotor.getPIDController();
         m_leftPidController = m_leftMotor.getPIDController();
-        configureelevatorerPID(m_rightPidController);
-        configureelevatorerPID(m_leftPidController);
+        configureElevatorerPID(m_rightPidController);
+        configureElevatorerPID(m_leftPidController);
 
         m_rightMotor.setInverted(m_config.m_isInverted);
         m_leftMotor.setInverted(m_config.m_isInverted);
     }
 
-    private void configureelevatorerPID(SparkMaxPIDController pidController) {
+    private void configureElevatorerPID(SparkMaxPIDController pidController) {
         pidController.setP(m_config.m_elevatorMotorP);
         pidController.setI(m_config.m_elevatorMotorI);
         pidController.setD(m_config.m_elevatorMotorD);
