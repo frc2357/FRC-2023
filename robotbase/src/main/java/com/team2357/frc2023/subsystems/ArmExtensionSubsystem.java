@@ -41,6 +41,8 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
         public double m_rotationMotorAllowedError;
         public double m_maxSpeedPercent;
         public int m_smartMotionSlot;
+
+        public int m_extendMotorRampRate;
     }
 
     private Configuration m_config;
@@ -48,10 +50,8 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
     private SparkMaxPIDController m_pidcontroller;
     private double m_targetRotations;
 
-    public ArmExtensionSubsystem(CANSparkMax extender, int currentlimit, double ramprate) {
+    public ArmExtensionSubsystem(CANSparkMax extender) {
         m_extendMotor = extender;
-        m_extendMotor.setSmartCurrentLimit(currentlimit);
-        m_extendMotor.setOpenLoopRampRate(ramprate);
         instance = this;
     }
 
@@ -64,6 +64,8 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
         configureExtenderPID(m_pidcontroller);
 
         m_extendMotor.setInverted(m_config.m_isInverted);
+        m_extendMotor.setOpenLoopRampRate(m_config.m_extendMotorRampRate);
+
     }
 
     public void extend(double sensorUnits) {

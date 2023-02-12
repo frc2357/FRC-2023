@@ -7,6 +7,7 @@ import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
 
+import edu.wpi.first.math.controller.ControlAffinePlantInversionFeedforward;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
@@ -112,6 +113,12 @@ public class SubsystemFactory {
                 CANSparkMax followMotor = new CANSparkMax(Constants.CAN_ID.FOLLOWER_ROTATION_MOTOR, MotorType.kBrushless);
                 ArmRotationSubsystem subsystem = new ArmRotationSubsystem(masterMotor, followMotor);
                 subsystem.configure(Constants.ARM_ROTATION.GET_ROTATION_CONFIG());
+                return subsystem;
+        }
+        public ArmExtensionSubsystem CreateArmExtensionSubsystem(){
+                CANSparkMax extender = new CANSparkMax(Constants.CAN_ID.ARM_EXTENSION_MOTOR, MotorType.kBrushless);
+                ArmExtensionSubsystem subsystem = new ArmExtensionSubsystem(extender);
+                subsystem.configure(Constants.ARM_EXTENSION.GET_EXTENSION_CONFIG());
                 return subsystem;
         }
 }

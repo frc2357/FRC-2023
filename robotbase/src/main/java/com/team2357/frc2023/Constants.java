@@ -65,6 +65,8 @@ public final class Constants {
 
         public static final int MASTER_ROTATION_MOTOR = 25;
         public static final int FOLLOWER_ROTATION_MOTOR = 26;
+
+        public static final int ARM_EXTENSION_MOTOR = 27;
     }
 
     public static final class PH_ID {
@@ -200,6 +202,8 @@ public final class Constants {
             config.m_isInverted = false;
 
             config.m_extendGrippedAmps = 0;
+
+            config.m_extendMotorRampRate = 0;
 
             // smart motion config
             config.m_extendMotorP = 0;
