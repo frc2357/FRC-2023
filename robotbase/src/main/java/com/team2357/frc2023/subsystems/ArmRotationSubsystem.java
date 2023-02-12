@@ -86,8 +86,32 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem{
         pidController.setSmartMotionAllowedClosedLoopError(m_config.m_rotationMotorAllowedError, m_config.m_smartMotionSlot);
     }
 
-    public void rotate(double sensorUnits){
-        m_masterRotationMotor.set(sensorUnits*m_config.m_maxSpeedPercent);
+    public void setRotatorRotations(double rotations) {
+        setClosedLoopEnabled(true);
+        m_targetRotations = rotations;
+        m_pidController.setReference(m_targetRotations, CANSparkMax.ControlType.kSmartMotion);
+    }
+
+    public boolean isRotatorAtRotations() {
+        return  isMasterRotatorAtRotations()&& isFollowerRotatorAtRotations();
+    }
+
+    /**
+     * @return Is the master arm motor at the setpoint set by m_targetRotations
+     */
+    public boolean isMasterRotatorAtRotations() {
+        double currentMotorRotations = m_masterRotationMotor.getEncoder().getPosition();
+        return Utility.isWithinTolerance(currentMotorRotations, m_targetRotations,
+                m_config.m_rotationMotorAllowedError);
+    }
+
+    /**
+     * @return Is the follower arm motor at the setpoint set by m_targetRotations
+     */
+    public boolean isFollowerRotatorAtRotations() {
+        double currentMotorRotations = m_followerRotationMotor.getEncoder().getPosition();
+        return Utility.isWithinTolerance(currentMotorRotations, m_targetRotations,
+                m_config.m_rotationMotorAllowedError);
     }
 
     public void setRotationAxisSpeed(double axisSpeed) {
@@ -110,27 +134,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem{
         m_masterRotationMotor.getEncoder().setPosition(0);
         m_followerRotationMotor.getEncoder().setPosition(0);
     }
-    public boolean isRotatorAtRotations() {
-        return  isMasterRotatorAtRotations()&& isFollowerRotatorAtRotations();
-    }
-
-    /**
-     * @return Is the master arm motor at the setpoint set by m_targetRotations
-     */
-    public boolean isMasterRotatorAtRotations() {
-        double currentMotorRotations = m_masterRotationMotor.getEncoder().getPosition();
-        return Utility.isWithinTolerance(currentMotorRotations, m_targetRotations,
-                m_config.m_rotationMotorAllowedError);
-    }
-
-    /**
-     * @return Is the follower arm motor at the setpoint set by m_targetRotations
-     */
-    public boolean isFollowerRotatorAtRotations() {
-        double currentMotorRotations = m_followerRotationMotor.getEncoder().getPosition();
-        return Utility.isWithinTolerance(currentMotorRotations, m_targetRotations,
-                m_config.m_rotationMotorAllowedError);
-    }
+    
     public double getMasterMotorRotations() {
         return m_masterRotationMotor.getEncoder().getPosition();
     }

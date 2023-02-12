@@ -32,6 +32,9 @@ public class CanCoderFactoryBuilder {
             config.initializationStrategy = configuration.getInitStrategy();
 
             WPI_CANCoder encoder = new WPI_CANCoder(configuration.getId(), configuration.getCanbus());
+            
+            encoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 20);
+            encoder.setStatusFramePeriod(CANCoderStatusFrame.VbatAndFaults, 20);
             // CtreUtils.checkCtreError(encoder.configAllSettings(config, 250), "Failed to configure CANCoder");
             CtreUtils.checkCtreError(encoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, periodMilliseconds, 250), "Failed to configure CANCoder update rate");
 
