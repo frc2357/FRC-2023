@@ -2,7 +2,6 @@ package com.team2357.frc2023.commands.scoring;
 
 import com.team2357.frc2023.subsystems.ElevatorSubsystem;
 
-import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class ExtendElevatorToPositionCommand extends CommandBase {

@@ -43,7 +43,7 @@ public class ArmExtendSubsystem extends ClosedLoopSubsystem {
 
     private Configuration m_config;
     private CANSparkMax m_extendMotor;
-    private SparkMaxPIDController m_pidcontroller;
+    private SparkMaxPIDController m_pidController;
     private double m_targetRotations;
 
     public ArmExtendSubsystem(CANSparkMax extender, int currentlimit, double ramprate) {
@@ -59,8 +59,8 @@ public class ArmExtendSubsystem extends ClosedLoopSubsystem {
         m_extendMotor.setIdleMode(m_config.m_extendMotorIdleMode);
         m_extendMotor.setSmartCurrentLimit(m_config.m_extendMotorStallLimitAmps, m_config.m_extendMotorFreeLimitAmps);
 
-        m_pidcontroller = m_extendMotor.getPIDController();
-        configureExtenderPID(m_pidcontroller);
+        m_pidController = m_extendMotor.getPIDController();
+        configureExtenderPID(m_pidController);
 
         m_extendMotor.setInverted(m_config.m_isInverted);
     }
@@ -86,15 +86,12 @@ public class ArmExtendSubsystem extends ClosedLoopSubsystem {
         pidController.setSmartMotionAllowedClosedLoopError(m_config.m_extendMotorAllowedError, smartMotionSlot);
     }
 
-    public void stopExtensionMotors() {
-        setClosedLoopEnabled(false);
-        m_extendMotor.set(0);
+    public void setExtenderRotations(double rotations) {
+        setClosedLoopEnabled(true);
+        m_targetRotations = rotations;
+        m_pidController.setReference(m_targetRotations, CANSparkMax.ControlType.kSmartMotion);
     }
-
-    public void resetEncoders() {
-        m_extendMotor.getEncoder().setPosition(0);
-    }
-
+    
     /**
      * @return Is the Extender arm motor at the setpoint set by m_targetRotations
      */
@@ -102,6 +99,23 @@ public class ArmExtendSubsystem extends ClosedLoopSubsystem {
         double currentMotorRotations = m_extendMotor.getEncoder().getPosition();
         return Utility.isWithinTolerance(currentMotorRotations, m_targetRotations,
                 m_config.m_rotationMotorAllowedError);
+    }
+
+    public void setExtenderAxisSpeed(double axisSpeed) {
+        setClosedLoopEnabled(false);
+
+        double motorSpeed = (-axisSpeed) * m_config.m_extendAxisMaxSpeed;
+
+        m_extendMotor.set(motorSpeed);
+    }
+
+    public void stopExtensionMotors() {
+        setClosedLoopEnabled(false);
+        m_extendMotor.set(0);
+    }
+
+    public void resetEncoders() {
+        m_extendMotor.getEncoder().setPosition(0);
     }
 
     public double getExtenderMotorRotations() {

@@ -2,18 +2,17 @@ package com.team2357.frc2023.commands.scoring;
 
 import com.team2357.frc2023.subsystems.WristSubsystem;
 
-import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class ContractWristCommand extends CommandBase {
+public class RetractWristCommand extends CommandBase {
     
-    public ContractWristCommand() {
+    public RetractWristCommand() {
         addRequirements(WristSubsystem.getInstance());
     }
 
     @Override
     public void initialize() {
-        WristSubsystem.getInstance().contract();
+        WristSubsystem.getInstance().retract();
     }
 
     @Override

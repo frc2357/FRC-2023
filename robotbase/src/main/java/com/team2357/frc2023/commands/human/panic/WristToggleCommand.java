@@ -12,7 +12,7 @@ public class WristToggleCommand extends CommandBase {
     @Override
     public void initialize() {
         if (WristSubsystem.getInstance().isExtended() || WristSubsystem.getInstance().isExtending()) {
-            WristSubsystem.getInstance().contract();
+            WristSubsystem.getInstance().retract();
         } else {
             WristSubsystem.getInstance().extend();
         }

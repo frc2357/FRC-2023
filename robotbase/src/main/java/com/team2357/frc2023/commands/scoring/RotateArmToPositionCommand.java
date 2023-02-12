@@ -2,7 +2,6 @@ package com.team2357.frc2023.commands.scoring;
 
 import com.team2357.frc2023.subsystems.ArmRotationSubsystem;
 
-import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class RotateArmToPositionCommand extends CommandBase {
@@ -15,8 +14,7 @@ public class RotateArmToPositionCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        //TODO: Fix ArmRotationSubsystem
-        // ArmRotationSubsystem.getInstance().
+        ArmRotationSubsystem.getInstance().setRotationAxisSpeed(m_rotations);
     }
 
     @Override
