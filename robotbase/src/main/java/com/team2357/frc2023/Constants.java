@@ -37,7 +37,7 @@ public final class Constants {
          * 
          * Use name of Canivore device to use Canivore
          */
-        public static final String DRIVE_CANBUS = "rio";
+        public static final String DRIVE_CANBUS = "CANivore";
 
         public static final int PNEUMATICS_HUB_ID = 2;
 
