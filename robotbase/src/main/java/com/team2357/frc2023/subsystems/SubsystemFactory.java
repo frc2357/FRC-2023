@@ -119,7 +119,8 @@ public class SubsystemFactory {
                 CANSparkMax extender = new CANSparkMax(Constants.CAN_ID.ARM_EXTENSION_MOTOR, MotorType.kBrushless);
                 ArmExtensionSubsystem subsystem = new ArmExtensionSubsystem(extender);
                 subsystem.configure(Constants.ARM_EXTENSION.GET_EXTENSION_CONFIG());
-
+                return subsystem;
+        }
         public ElevatorSubsystem createElevatorSubsystem() {
                 CANSparkMax rightMotor = new CANSparkMax(Constants.CAN_ID.RIGHT_ELEVATOR_MOTOR, MotorType.kBrushless);
                 CANSparkMax leftMotor = new CANSparkMax(Constants.CAN_ID.LEFT_ELEVATOR_MOTOR, MotorType.kBrushless);
