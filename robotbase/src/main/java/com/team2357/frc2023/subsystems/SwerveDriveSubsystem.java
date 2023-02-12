@@ -240,7 +240,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	}
 
 	public double getYaw() {
-		return m_pigeon.getYaw();
+		return -m_pigeon.getYaw();
 	}
 
 	public double getPitch() {
@@ -252,7 +252,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	}
 
 	public Rotation2d getGyroscopeRotation() {
-		return Rotation2d.fromDegrees(m_pigeon.getYaw());
+		return Rotation2d.fromDegrees(getYaw());
 	}
 
 	public Pose2d getPose() {
@@ -290,6 +290,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
 		SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxVelocityMetersPerSecond);
 
+
 		m_frontLeftModule.set(
 				states[0].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
 				states[0].angle.getRadians());
@@ -302,6 +303,10 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		m_backRightModule.set(
 				states[3].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
 				states[3].angle.getRadians());
+
+		System.out.println("Current angle: " + Math.toDegrees(m_frontLeftModule.getSteerAngle()));
+		System.out.println("Desired angle: " + states[0].angle.getDegrees());
+		System.out.println("break");
 
 		Logger.getInstance().recordOutput("Swerve States", states);
 	}

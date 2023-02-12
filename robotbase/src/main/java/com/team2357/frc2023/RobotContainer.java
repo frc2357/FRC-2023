@@ -107,7 +107,7 @@ public class RobotContainer {
     int auto = 1;
 
     switch(auto){
-      case 1: 
+      case -1: 
       System.out.println("Correct path");
         return AvailableTrajectories.lineTrajectory;
       default:
