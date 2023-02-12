@@ -171,7 +171,7 @@ public final class Constants {
             WristSubsystem.Configuration config = new WristSubsystem.Configuration();
 
             config.m_extendMilliseconds = 1000;
-            config.m_contractMilliseconds = 1000;
+            config.m_retractMilliseconds = 1000;
 
             return config;
         }
