@@ -67,11 +67,9 @@ public final class Constants {
     }
 
     public static final class PH_ID {
-        public static final int WRIST_SOLENOID_FORWARD_CHANNEL = 0;
-        public static final int WRIST_SOLENOID_REVERSE_CHANNEL = 1;
+        public static final int WRIST_SOLENOID_CHANNEL = 0;
         
-        public static final int CLAW_SOLENOID_FORWARD_CHANNEL = 2;
-        public static final int CLAW_SOLENOID_REVERSE_CHANNEL = 3;
+        public static final int CLAW_SOLENOID_CHANNEL = 2;
 
         public static final int INTAKE_SOLENOID_FORWARD_CHANNEL = 4;
         public static final int INTAKE_SOLENOID_REVERSE_CHANNEL = 5;
