@@ -16,6 +16,6 @@ public class OpenClawCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return true;
+        return ClawSubsystem.getInstance().isOpen();
     }
 }

@@ -17,7 +17,7 @@ public class RetractWristCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return true;
+        return WristSubsystem.getInstance().isRetracted();
     }
 
 }

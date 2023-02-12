@@ -17,7 +17,7 @@ public class ExtendWristCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return true;
+        return WristSubsystem.getInstance().isExtended();
     }
 
 }
