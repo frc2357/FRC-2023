@@ -141,6 +141,7 @@ public final class Constants {
         public static final PIDController ROTATE_TO_TARGET_CONTROLLER = new PIDController(0.009, 0, 0);
 
         public static final double ROTATE_MAX_SPEED = .45;
+        public static final double SYNC_ENCODER_LIMIT_MS = 10000;
     }
 
     public static final class INTAKE_ROLLER {

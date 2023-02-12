@@ -70,7 +70,7 @@ public class TrajectoryUtil {
 				swerveDrive.getThetaController(),
 				(SwerveModuleState[] moduleStates) -> {
 					swerveDrive.drive(SwerveDriveSubsystem.getInstance().getKinematics().toChassisSpeeds(moduleStates));
-				}));
+				}, false));
 
 		pathCommand.addCommands(new InstantCommand(() -> swerveDrive.drive(new ChassisSpeeds())));
 
