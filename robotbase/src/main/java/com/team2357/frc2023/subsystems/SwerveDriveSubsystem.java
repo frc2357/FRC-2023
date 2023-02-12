@@ -274,7 +274,9 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
 	public void drive(ChassisSpeeds chassisSpeeds) {
 		if (!m_areEncodersSynced) {
-			DriverStation.reportError("Swerve is not zeroed", false);
+			DriverStation.reportError("Swerve is not synced", false);
+			syncEncoders();
+			checkEncodersSynced();
 			return;
 		}
 		m_chassisSpeeds = chassisSpeeds;
