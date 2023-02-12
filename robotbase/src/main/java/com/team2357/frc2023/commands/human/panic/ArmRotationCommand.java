@@ -15,7 +15,7 @@ public class ArmRotationCommand extends CommandBase {
 
     @Override
     public void execute() {
-        ArmRotationSubsystem.getInstance().rotate(m_axis.getValue());
+        ArmRotationSubsystem.getInstance().setRotatorRotations(0);
     }
 
     @Override
