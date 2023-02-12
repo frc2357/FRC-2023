@@ -91,8 +91,7 @@ public class Robot extends LoggedRobot {
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
-      SequentialCommandGroup autoGroup = new SequentialCommandGroup(new ZeroDriveCommand(), m_autonomousCommand);
-      autoGroup.schedule();
+      m_autonomousCommand.schedule();
     }
   }
 
