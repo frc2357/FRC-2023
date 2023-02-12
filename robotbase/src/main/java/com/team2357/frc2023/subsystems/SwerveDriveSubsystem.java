@@ -118,7 +118,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	public SwerveDriveSubsystem(WPI_Pigeon2 pigeon, SwerveModule frontLeft, SwerveModule frontRight,
 			SwerveModule backLeft, SwerveModule backRight) {
 		m_pigeon = pigeon;
-
+		
 		m_frontLeftModule = frontLeft;
 		m_frontRightModule = frontRight;
 		m_backLeftModule = backLeft;
@@ -133,6 +133,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
 	public void configure(Configuration config) {
 		m_config = config;
+
+		m_pigeon.configFactoryDefault();
 
 		m_kinematics = new SwerveDriveKinematics(
 				new Translation2d(m_config.m_trackwidthMeters / 2.0,

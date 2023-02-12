@@ -59,7 +59,6 @@ public class TrajectoryUtil {
 			}
 			swerveDrive.getXController().reset();
 			swerveDrive.getYController().reset();
-			System.out.println("Running instant command for auto");
 		}));
 
 		pathCommand.addCommands(new PPSwerveControllerCommand(
