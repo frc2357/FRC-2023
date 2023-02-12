@@ -233,6 +233,10 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		m_pigeon.reset();
 	}
 
+	public void setGyroScope(double degrees) {
+		m_pigeon.setYaw(degrees);
+	}
+
 	public double getYaw() {
 		return m_pigeon.getYaw();
 	}
@@ -254,6 +258,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	}
 
 	public void resetOdometry(Pose2d pose) {
+		setGyroScope(pose.getRotation().getDegrees());
 		m_odometry.resetPosition(
 				pose.getRotation(),
 				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
