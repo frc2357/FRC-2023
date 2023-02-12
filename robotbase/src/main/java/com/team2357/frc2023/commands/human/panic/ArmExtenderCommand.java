@@ -15,7 +15,7 @@ public class ArmExtenderCommand extends CommandBase {
     @Override
     public void execute() {
         double axisValue = m_axis.getValue();
-        ArmExtensionSubsystem.getInstance().extend(axisValue);
+        ArmExtensionSubsystem.getInstance().manualExtend(axisValue);
     }
 
     @Override

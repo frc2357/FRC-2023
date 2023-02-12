@@ -13,7 +13,7 @@ public class ExtendArmToPositionCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        ArmExtensionSubsystem.getInstance().extend(m_rotations);
+        ArmExtensionSubsystem.getInstance().setExtenderRotations(m_rotations);
     }
 
     @Override

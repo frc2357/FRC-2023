@@ -122,6 +122,10 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem{
         m_masterRotationMotor.set(motorSpeed);
         m_followerRotationMotor.set(motorSpeed);
     }
+    //Method for the panic mode to rotate the arms
+    public void manualRotate(double sensorUnits) {
+        m_masterRotationMotor.set(sensorUnits*m_config.m_maxSpeedPercent);
+    }
 
     // Method to stop the motors
     public void stopRotationMotors() {

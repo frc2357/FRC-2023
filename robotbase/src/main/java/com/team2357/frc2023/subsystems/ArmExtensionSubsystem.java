@@ -67,8 +67,8 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
         m_extendMotor.setOpenLoopRampRate(m_config.m_extendMotorRampRate);
 
     }
-
-    public void extend(double sensorUnits) {
+    //Mehtod for the panic mode to extend the arms
+    public void manualExtend(double sensorUnits) {
         m_extendMotor.set(sensorUnits*m_config.m_maxSpeedPercent);
     }
 
@@ -97,6 +97,11 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
         m_extendMotor.getEncoder().setPosition(0);
     }
 
+    public void setExtenderRotations(double rotations) {
+        setClosedLoopEnabled(true);
+        m_targetRotations = rotations;
+        m_pidcontroller.setReference(m_targetRotations, CANSparkMax.ControlType.kSmartMotion);
+    }
     /**
      * @return Is the Extender arm motor at the setpoint set by m_targetRotations
      */
