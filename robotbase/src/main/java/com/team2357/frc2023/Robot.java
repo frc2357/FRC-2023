@@ -16,6 +16,8 @@ import com.team2357.frc2023.commands.ZeroDriveCommand;
 import com.team2357.frc2023.commands.auto.RotateToDegree;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.frc2023.commands.auto.*;
+
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
@@ -121,11 +123,16 @@ public class Robot extends LoggedRobot {
   public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
+
+    SwerveDriveSubsystem.getInstance().zeroGyroscope();
+    SwerveDriveSubsystem.getInstance().drive(ChassisSpeeds.fromFieldRelativeSpeeds(0.3, 0.0, 0.0, SwerveDriveSubsystem.getInstance().getGyroscopeRotation()));
   }
 
   /** This function is called periodically during test mode. */
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+    SwerveDriveSubsystem.getInstance().printEncoderVals();
+  }
 
   /** This function is called once when the robot is first started up. */
   @Override

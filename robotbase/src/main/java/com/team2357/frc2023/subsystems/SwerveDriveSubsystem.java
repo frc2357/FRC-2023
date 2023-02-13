@@ -240,7 +240,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	}
 
 	public double getYaw() {
-		return -m_pigeon.getYaw();
+		return m_pigeon.getYaw();
 	}
 
 	public double getPitch() {
@@ -303,10 +303,6 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		m_backRightModule.set(
 				states[3].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
 				states[3].angle.getRadians());
-
-		System.out.println("Current angle: " + Math.toDegrees(m_frontLeftModule.getSteerAngle()));
-		System.out.println("Desired angle: " + states[0].angle.getDegrees());
-		System.out.println("break");
 
 		Logger.getInstance().recordOutput("Swerve States", states);
 	}
@@ -373,5 +369,14 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		SmartDashboard.putNumber("Pose Angle", m_odometry.getPoseMeters().getRotation().getDegrees());
 
 		Logger.getInstance().recordOutput("Robot Pose", m_odometry.getPoseMeters());
+	}
+
+	public void printEncoderVals() {
+		SmartDashboard.putNumber("front left encoder count", ((WPI_TalonFX) (m_frontLeftModule.getDriveMotor())).getSelectedSensorPosition(0));
+	
+		SmartDashboard.putNumber("front right encoder count", ((WPI_TalonFX) (m_frontRightModule.getDriveMotor())).getSelectedSensorPosition(0));
+		SmartDashboard.putNumber("back left module encoder count", ((WPI_TalonFX) (m_backLeftModule.getDriveMotor())).getSelectedSensorPosition(0));
+		SmartDashboard.putNumber("back right module encoder count", ((WPI_TalonFX) (m_backRightModule.getDriveMotor())).getSelectedSensorPosition(0));
+
 	}
 }
