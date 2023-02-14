@@ -244,6 +244,9 @@ public final class Constants {
             config.m_smartMotionSlot = 0;
             return config;
         }
+
+        public static final double RETRACTED_ROTATIONS = 0;
+        public static final double INTAKE_HANDOFF_ROTATIONS = 0;
     }
 
     public static final class ARM_ROTATION {
@@ -299,6 +302,8 @@ public final class Constants {
 
             return config;
         }
+
+        public static final double INTAKE_HANDOFF_ROTATIONS = 0;
     }
 
     public static final class CONTROLLER {
