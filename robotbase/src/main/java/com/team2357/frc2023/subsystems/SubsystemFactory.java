@@ -109,10 +109,10 @@ public class SubsystemFactory {
         }
 
         public ElevatorSubsystem createElevatorSubsystem() {
-                CANSparkMax rightMotor = new CANSparkMax(Constants.CAN_ID.RIGHT_ELEVATOR_MOTOR, MotorType.kBrushless);
-                CANSparkMax leftMotor = new CANSparkMax(Constants.CAN_ID.LEFT_ELEVATOR_MOTOR, MotorType.kBrushless);
+                CANSparkMax masterMotor = new CANSparkMax(Constants.CAN_ID.MASTER_ELEVATOR_MOTOR, MotorType.kBrushless);
+                CANSparkMax followerMotor = new CANSparkMax(Constants.CAN_ID.FOLLOWER_ELEVATOR_MOTOR, MotorType.kBrushless);
 
-                ElevatorSubsystem subsystem = new ElevatorSubsystem(rightMotor, leftMotor);
+                ElevatorSubsystem subsystem = new ElevatorSubsystem(masterMotor, followerMotor);
                 subsystem.configure(Constants.ELEVATOR.GET_ELEVATOR_CONFIG());
                 return subsystem;
         }

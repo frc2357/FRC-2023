@@ -5,7 +5,8 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.SparkMaxPIDController;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 import com.team2357.lib.util.Utility;
-public class ArmRotationSubsystem extends ClosedLoopSubsystem{
+
+public class ArmRotationSubsystem extends ClosedLoopSubsystem {
     private static ArmRotationSubsystem instance = null;
 
     public static ArmRotationSubsystem getInstance() {
@@ -40,7 +41,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem{
     private Configuration m_config;
     private CANSparkMax m_masterRotationMotor;
     private CANSparkMax m_followerRotationMotor;
-    private SparkMaxPIDController m_pidController;    
+    private SparkMaxPIDController m_pidController;
     private double m_targetRotations;
 
     public ArmRotationSubsystem(CANSparkMax masterRotationMotor, CANSparkMax followerRotationMotor) {
@@ -59,7 +60,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem{
         configureRotationPID(m_pidController);
 
         m_masterRotationMotor.setInverted(!m_config.m_isFollowerInverted);
-        m_followerRotationMotor.follow(m_masterRotationMotor,m_config.m_isFollowerInverted);
+        m_followerRotationMotor.follow(m_masterRotationMotor, m_config.m_isFollowerInverted);
     }
 
     private void configureRotationMotor(CANSparkMax motor) {
@@ -92,25 +93,13 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem{
     }
 
     public boolean isRotatorAtRotations() {
-        return  isMasterRotatorAtRotations()&& isFollowerRotatorAtRotations();
+        return isMotorAtRotations(m_masterRotationMotor) && isMotorAtRotations(m_followerRotationMotor);
     }
 
-    /**
-     * @return Is the master arm motor at the setpoint set by m_targetRotations
-     */
-    public boolean isMasterRotatorAtRotations() {
-        double currentMotorRotations = m_masterRotationMotor.getEncoder().getPosition();
-        return Utility.isWithinTolerance(currentMotorRotations, m_targetRotations,
+    public boolean isMotorAtRotations(CANSparkMax motor) {
+        return Utility.isWithinTolerance(motor.getEncoder().getPosition(), m_targetRotations,
                 m_config.m_rotationMotorAllowedError);
-    }
 
-    /**
-     * @return Is the follower arm motor at the setpoint set by m_targetRotations
-     */
-    public boolean isFollowerRotatorAtRotations() {
-        double currentMotorRotations = m_followerRotationMotor.getEncoder().getPosition();
-        return Utility.isWithinTolerance(currentMotorRotations, m_targetRotations,
-                m_config.m_rotationMotorAllowedError);
     }
 
     public void setRotationAxisSpeed(double axisSpeed) {
@@ -119,21 +108,18 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem{
         double motorSpeed = (-axisSpeed) * m_config.m_rotationAxisMaxSpeed;
 
         m_masterRotationMotor.set(motorSpeed);
-        m_followerRotationMotor.set(motorSpeed);
     }
 
     // Method to stop the motors
     public void stopRotationMotors() {
         setClosedLoopEnabled(false);
         m_masterRotationMotor.set(0);
-        m_followerRotationMotor.set(0);
     }
 
     public void resetEncoders() {
         m_masterRotationMotor.getEncoder().setPosition(0);
-        m_followerRotationMotor.getEncoder().setPosition(0);
     }
-    
+
     public double getMasterMotorRotations() {
         return m_masterRotationMotor.getEncoder().getPosition();
     }
