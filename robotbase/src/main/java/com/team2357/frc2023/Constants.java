@@ -6,6 +6,8 @@ package com.team2357.frc2023;
 
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
+import com.team2357.frc2023.subsystems.ArmExtensionSubsystem;
+import com.team2357.frc2023.subsystems.ArmRotationSubsystem;
 import com.team2357.frc2023.subsystems.ClawSubsystem;
 import com.team2357.frc2023.subsystems.ElevatorSubsystem;
 import com.team2357.frc2023.subsystems.IntakeArmSubsystem;
@@ -62,11 +64,17 @@ public final class Constants {
         public static final int LEFT_INTAKE_MOTOR = 23;
         public static final int RIGHT_INTAKE_MOTOR = 24;
 
-        public static final int FOLLOWER_ELEVATOR_MOTOR = 29;
-        public static final int MASTER_ELEVATOR_MOTOR = 30;
+        public static final int LEFT_ELEVATOR_MOTOR = 29;
+        public static final int RIGHT_ELEVATOR_MOTOR = 30;
+
+        public static final int MASTER_ROTATION_MOTOR = 25;
+        public static final int FOLLOWER_ROTATION_MOTOR = 26;
+
+        public static final int ARM_EXTENSION_MOTOR = 27;
     }
 
     public static final class PH_ID {
+
         public static final int WRIST_SOLENOID_CHANNEL = 0;
         
         public static final int CLAW_SOLENOID_CHANNEL = 2;
@@ -93,12 +101,13 @@ public final class Constants {
 
             config.m_trajectoryMaxVelocityMetersPerSecond = 2;
             config.m_trajectoryMaxAccelerationMetersPerSecond = 3;
-            
+
             config.m_xController = new PIDController(.56122, 0, 0);
             config.m_yController = new PIDController(.56122, 0, 0);
             config.m_thetaController = new PIDController(2.15, 0, 0);
 
-            config.m_sensorPositionCoefficient = 2.0 * Math.PI / Constants.DRIVE.TICKS_PER_ROTATION * SdsModuleConfigurations.MK4I_L2.getSteerReduction();
+            config.m_sensorPositionCoefficient = 2.0 * Math.PI / Constants.DRIVE.TICKS_PER_ROTATION
+                    * SdsModuleConfigurations.MK4I_L2.getSteerReduction();
 
             return config;
         }
@@ -131,7 +140,6 @@ public final class Constants {
 
         public static final PIDController ROTATE_TO_TARGET_CONTROLLER = new PIDController(0.009, 0, 0);
 
-
         public static final double ROTATE_MAX_SPEED = .45;
     }
 
@@ -145,7 +153,7 @@ public final class Constants {
             config.m_rampRate = 1;
             config.m_currentLimit = 30;
 
-            //TODO: Make sure these are correct
+            // TODO: Make sure these are correct
             config.m_rightInverted = false;
             config.m_leftInverted = true;
 
@@ -159,7 +167,7 @@ public final class Constants {
 
             config.m_deployMilliseconds = 1000;
             config.m_stowMilliseconds = 1000;
-    
+
             return config;
         }
     }
@@ -190,13 +198,104 @@ public final class Constants {
             return config;
         }
     }
-    
+
     public static final class CLAW {
         public static ClawSubsystem.Configuration GET_CLAW_CONFIG() {
             ClawSubsystem.Configuration config = new ClawSubsystem.Configuration();
 
             config.m_openMilliseconds = 500;
             config.m_closeMilliseconds = 500;
+
+            return config;
+        }
+    }
+
+    public static final class ARM_EXTENSION {
+        public static ArmExtensionSubsystem.Configuration GET_EXTENSION_CONFIG() {
+            ArmExtensionSubsystem.Configuration config = new ArmExtensionSubsystem.Configuration();
+            config.m_extendAxisMaxSpeed = 0;
+
+            config.m_extendMotorIdleMode = IdleMode.kBrake;
+
+            config.m_extendMotorStallLimitAmps = 0;
+            config.m_extendMotorFreeLimitAmps = 0;
+
+            config.m_isInverted = false;
+
+            config.m_extendGrippedAmps = 0;
+
+            config.m_extendMotorRampRate = 0;
+
+            // smart motion config
+            config.m_extendMotorP = 0;
+            config.m_extendMotorI = 0;
+            config.m_extendMotorD = 0;
+            config.m_extendMotorIZone = 0;
+            config.m_extendMotorFF = 0;
+            config.m_extendMotorMaxOutput = 0;
+            config.m_extendMotorMinOutput = 0;
+            config.m_extendMotorMaxRPM = 0;
+            config.m_extendMotorMaxVel = 0;
+            config.m_extendMotorMinVel = 0;
+            config.m_extendMotorMaxAcc = 0;
+            config.m_extendMotorAllowedError = 0;
+            config.m_rotationMotorAllowedError = 0;
+            config.m_maxSpeedPercent = 0.4;
+            config.m_smartMotionSlot = 0;
+            return config;
+        }
+    }
+
+    public static final class ARM_ROTATION {
+        public static ArmRotationSubsystem.Configuration GET_ROTATION_CONFIG() {
+            ArmRotationSubsystem.Configuration config = new ArmRotationSubsystem.Configuration();
+            config.m_rotationAxisMaxSpeed = 0;
+
+            config.m_rotationMotorIdleMode = IdleMode.kBrake;
+
+            config.m_rotationMotorStallLimitAmps = 0;
+            config.m_rotationMotorFreeLimitAmps = 0;
+
+            config.m_isFollowerInverted = false;
+
+            // smart motion config
+            config.m_rotationMotorP = 0;
+            config.m_rotationMotorI = 0;
+            config.m_rotationMotorD = 0;
+            config.m_rotationMotorIZone = 0;
+            config.m_rotationMotorFF = 0;
+            config.m_rotationMotorMaxOutput = 0;
+            config.m_rotationMotorMinOutput = 0;
+            config.m_rotationMotorMaxRPM = 0;
+            config.m_rotationMotorMaxVel = 0;
+            config.m_rotationMotorMinVel = 0;
+            config.m_rotationMotorMaxAcc = 0;
+            config.m_rotationMotorAllowedError = 0;
+            config.m_maxSpeedPercent = 0.4;
+            config.m_rotationAxisMaxSpeed = 0;
+
+            config.m_rotationMotorIdleMode = IdleMode.kBrake;
+
+            config.m_rotationMotorStallLimitAmps = 0;
+            config.m_rotationMotorFreeLimitAmps = 0;
+
+            config.m_isFollowerInverted = false;
+
+            // smart motion config
+            config.m_rotationMotorP = 0;
+            config.m_rotationMotorI = 0;
+            config.m_rotationMotorD = 0;
+            config.m_rotationMotorIZone = 0;
+            config.m_rotationMotorFF = 0;
+            config.m_rotationMotorMaxOutput = 0;
+            config.m_rotationMotorMinOutput = 0;
+            config.m_rotationMotorMaxRPM = 0;
+            config.m_rotationMotorMaxVel = 0;
+            config.m_rotationMotorMinVel = 0;
+            config.m_rotationMotorMaxAcc = 0;
+            config.m_rotationMotorAllowedError = 0;
+            config.m_maxSpeedPercent = 0.4;
+            config.m_smartMotionSlot = 0;
 
             return config;
         }
@@ -218,5 +317,5 @@ public final class Constants {
         public static final int MIN_PRESSURE_PSI = 90;
         public static final int MAX_PRESSURE_PSI = 120;
     }
-    
+
 }

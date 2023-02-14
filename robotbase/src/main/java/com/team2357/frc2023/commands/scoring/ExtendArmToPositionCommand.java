@@ -1,7 +1,6 @@
 package com.team2357.frc2023.commands.scoring;
 
-import com.team2357.frc2023.subsystems.ArmExtendSubsystem;
-
+import com.team2357.frc2023.subsystems.ArmExtensionSubsystem;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class ExtendArmToPositionCommand extends CommandBase {
@@ -9,22 +8,22 @@ public class ExtendArmToPositionCommand extends CommandBase {
 
     public ExtendArmToPositionCommand(double rotations) {
         m_rotations = rotations;
-        addRequirements(ArmExtendSubsystem.getInstance());
+        addRequirements(ArmExtensionSubsystem.getInstance());
     }
 
     @Override
     public void initialize() {
-        ArmExtendSubsystem.getInstance().setExtenderRotations(m_rotations);
+        ArmExtensionSubsystem.getInstance().setExtenderRotations(m_rotations);
     }
 
     @Override
     public void end(boolean interrupted) {
-        ArmExtendSubsystem.getInstance().stopExtensionMotors();
+        ArmExtensionSubsystem.getInstance().stopExtensionMotors();
     }
 
     @Override
     public boolean isFinished() {
-        return ArmExtendSubsystem.getInstance().isExtenderRotatorAtRotations();
+        return ArmExtensionSubsystem.getInstance().isExtenderRotatorAtRotations();
     }
 
 }
