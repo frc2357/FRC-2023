@@ -74,8 +74,6 @@ public final class Constants {
     }
 
     public static final class PH_ID {
-        public static final int FOLLOWER_ELEVATOR_MOTOR = 29;
-        public static final int MASTER_ELEVATOR_MOTOR = 30;
 
         public static final int WRIST_SOLENOID_CHANNEL = 0;
         
