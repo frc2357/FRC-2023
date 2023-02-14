@@ -13,17 +13,13 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import com.team2357.frc2023.commands.OrientControllerInputsCommand;
 import com.team2357.frc2023.commands.SyncDriveEncodersCommand;
 import com.team2357.frc2023.commands.ZeroDriveCommand;
-import com.team2357.frc2023.commands.auto.RotateToDegree;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
-import com.team2357.frc2023.commands.auto.*;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -103,7 +99,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopInit() {
-    SwerveDriveSubsystem.getInstance().zero();
+
     CommandScheduler.getInstance().schedule(new ZeroDriveCommand());
     CommandScheduler.getInstance().schedule(new OrientControllerInputsCommand());
     // This makes sure that the autonomous stops running when
