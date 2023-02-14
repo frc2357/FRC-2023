@@ -64,22 +64,14 @@ public final class Constants {
         public static final int LEFT_INTAKE_MOTOR = 23;
         public static final int RIGHT_INTAKE_MOTOR = 24;
 
-        public static final int LEFT_ELEVATOR_MOTOR = 29;
-        public static final int RIGHT_ELEVATOR_MOTOR = 30;
-
-        public static final int MASTER_ROTATION_MOTOR = 25;
-        public static final int FOLLOWER_ROTATION_MOTOR = 26;
-
-        public static final int ARM_EXTENSION_MOTOR = 27;
+        public static final int FOLLOWER_ELEVATOR_MOTOR = 29;
+        public static final int MASTER_ELEVATOR_MOTOR = 30;
     }
 
     public static final class PH_ID {
-        public static final int WRIST_SOLENOID_FORWARD_CHANNEL = 0;
-
-        public static final int WRIST_SOLENOID_REVERSE_CHANNEL = 1;
+        public static final int WRIST_SOLENOID_CHANNEL = 0;
         
-        public static final int CLAW_SOLENOID_FORWARD_CHANNEL = 2;
-        public static final int CLAW_SOLENOID_REVERSE_CHANNEL = 3;
+        public static final int CLAW_SOLENOID_CHANNEL = 2;
 
         public static final int INTAKE_SOLENOID_FORWARD_CHANNEL = 4;
         public static final int INTAKE_SOLENOID_REVERSE_CHANNEL = 5;

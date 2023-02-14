@@ -9,6 +9,7 @@ import com.team2357.frc2023.Constants;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -81,18 +82,16 @@ public class SubsystemFactory {
         }
 
         public WristSubsystem CreateWristSubsystem() {
-                DoubleSolenoid wristSolenoid = new DoubleSolenoid(Constants.CAN_ID.PNEUMATICS_HUB_ID,
-                                PneumaticsModuleType.REVPH, Constants.PH_ID.WRIST_SOLENOID_FORWARD_CHANNEL,
-                                Constants.PH_ID.WRIST_SOLENOID_REVERSE_CHANNEL);
+                Solenoid wristSolenoid = new Solenoid(Constants.CAN_ID.PNEUMATICS_HUB_ID,
+                                PneumaticsModuleType.REVPH, Constants.PH_ID.WRIST_SOLENOID_CHANNEL);
                 WristSubsystem subsystem = new WristSubsystem(wristSolenoid);
                 subsystem.configure(Constants.WRIST.GET_WRIST_CONFIG());
                 return subsystem;
         }
 
         public ClawSubsystem CreateClawSubsystem() {
-                DoubleSolenoid clawSolenoid = new DoubleSolenoid(Constants.CAN_ID.PNEUMATICS_HUB_ID,
-                                PneumaticsModuleType.REVPH, Constants.PH_ID.CLAW_SOLENOID_FORWARD_CHANNEL,
-                                Constants.PH_ID.CLAW_SOLENOID_REVERSE_CHANNEL);
+                Solenoid clawSolenoid = new Solenoid(Constants.CAN_ID.PNEUMATICS_HUB_ID,
+                                PneumaticsModuleType.REVPH, Constants.PH_ID.CLAW_SOLENOID_CHANNEL);
 
                 ClawSubsystem subsystem = new ClawSubsystem(clawSolenoid);
                 subsystem.configure(Constants.CLAW.GET_CLAW_CONFIG());
@@ -121,10 +120,10 @@ public class SubsystemFactory {
                 return subsystem;
         }
         public ElevatorSubsystem createElevatorSubsystem() {
-                CANSparkMax rightMotor = new CANSparkMax(Constants.CAN_ID.RIGHT_ELEVATOR_MOTOR, MotorType.kBrushless);
-                CANSparkMax leftMotor = new CANSparkMax(Constants.CAN_ID.LEFT_ELEVATOR_MOTOR, MotorType.kBrushless);
+                CANSparkMax masterMotor = new CANSparkMax(Constants.CAN_ID.MASTER_ELEVATOR_MOTOR, MotorType.kBrushless);
+                CANSparkMax followerMotor = new CANSparkMax(Constants.CAN_ID.FOLLOWER_ELEVATOR_MOTOR, MotorType.kBrushless);
 
-                ElevatorSubsystem subsystem = new ElevatorSubsystem(rightMotor, leftMotor);
+                ElevatorSubsystem subsystem = new ElevatorSubsystem(masterMotor, followerMotor);
                 subsystem.configure(Constants.ELEVATOR.GET_ELEVATOR_CONFIG());
                 return subsystem;
         }

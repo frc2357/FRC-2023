@@ -23,6 +23,7 @@ public class ElevatorSubsystem extends ClosedLoopSubsystem {
         public int m_elevatorMotorFreeLimitAmps = 0;
 
         public boolean m_isInverted = false;
+        public boolean m_isFollowerInverted = false;
 
         // smart motion config
         public double m_elevatorMotorP = 0;
@@ -41,16 +42,15 @@ public class ElevatorSubsystem extends ClosedLoopSubsystem {
     }
 
     private Configuration m_config;
-    private CANSparkMax m_rightMotor;
-    private CANSparkMax m_leftMotor;
-    private SparkMaxPIDController m_rightPidController;
-    private SparkMaxPIDController m_leftPidController;
+    private CANSparkMax m_masterMotor;
+    private CANSparkMax m_followerMotor;
+    private SparkMaxPIDController m_pidController;
 
     private double m_targetRotations;
 
-    public ElevatorSubsystem(CANSparkMax rightMotor, CANSparkMax leftMotor) {
-        m_rightMotor = rightMotor;
-        m_leftMotor = leftMotor;
+    public ElevatorSubsystem(CANSparkMax masterMotor, CANSparkMax followerMotor) {
+        m_masterMotor = masterMotor;
+        m_followerMotor = followerMotor;
 
         m_instance = this;
     }
@@ -58,16 +58,19 @@ public class ElevatorSubsystem extends ClosedLoopSubsystem {
     public void configure(Configuration config) {
         m_config = config;
 
-        m_rightMotor.setIdleMode(m_config.m_elevatorMotorIdleMode);
-        m_leftMotor.setIdleMode(m_config.m_elevatorMotorIdleMode);
+        configureElevatorMotor(m_masterMotor);
+        configureElevatorMotor(m_followerMotor);
 
-        m_rightPidController = m_rightMotor.getPIDController();
-        m_leftPidController = m_leftMotor.getPIDController();
-        configureElevatorPID(m_rightPidController);
-        configureElevatorPID(m_leftPidController);
+        m_pidController = m_masterMotor.getPIDController();
+        configureElevatorPID(m_pidController);
 
-        m_rightMotor.setInverted(m_config.m_isInverted);
-        m_leftMotor.setInverted(m_config.m_isInverted);
+        m_masterMotor.setInverted(m_config.m_isInverted);
+        m_followerMotor.follow(m_masterMotor, m_config.m_isFollowerInverted);
+    }
+
+    public void configureElevatorMotor(CANSparkMax motor) {
+        motor.setIdleMode(m_config.m_elevatorMotorIdleMode);
+        motor.setSmartCurrentLimit(m_config.m_elevatorMotorStallLimitAmps, m_config.m_elevatorMotorFreeLimitAmps);
     }
 
     private void configureElevatorPID(SparkMaxPIDController pidController) {
@@ -89,12 +92,11 @@ public class ElevatorSubsystem extends ClosedLoopSubsystem {
     public void setElevatorRotations(double rotations) {
         setClosedLoopEnabled(true);
         m_targetRotations = rotations;
-        m_rightPidController.setReference(m_targetRotations, CANSparkMax.ControlType.kSmartMotion);
-        m_leftPidController.setReference(m_targetRotations, CANSparkMax.ControlType.kSmartMotion);
+        m_pidController.setReference(m_targetRotations, CANSparkMax.ControlType.kSmartMotion);
     }
 
     public boolean isElevatorAtRotations() {
-        return isMotorAtRotations(m_rightMotor) && isMotorAtRotations(m_leftMotor);
+        return isMotorAtRotations(m_masterMotor) && isMotorAtRotations(m_followerMotor);
     }
 
     public boolean isMotorAtRotations(CANSparkMax motor) {
@@ -107,27 +109,24 @@ public class ElevatorSubsystem extends ClosedLoopSubsystem {
 
         double motorSpeed = (-axisSpeed) * m_config.m_elevatorAxisMaxSpeed;
 
-        m_rightMotor.set(motorSpeed);
-        m_leftMotor.set(motorSpeed);
+        m_masterMotor.set(motorSpeed);
     }
 
     public void stopExtensionMotors() {
         setClosedLoopEnabled(false);
-        m_rightMotor.set(0);
-        m_leftMotor.set(0);
+        m_masterMotor.set(0);
     }
 
     public void resetEncoders() {
-        m_rightMotor.getEncoder().setPosition(0);
-        m_leftMotor.getEncoder().setPosition(0);
+        m_masterMotor.getEncoder().setPosition(0);
     }
 
-    public double getLeftMotorRotations() {
-        return m_leftMotor.getEncoder().getPosition();
+    public double getMasterMotorRotations() {
+        return m_masterMotor.getEncoder().getPosition();
     }
 
-    public double getRightMotorRotations() {
-        return m_rightMotor.getEncoder().getPosition();
+    public double getFollowerMotorRotations() {
+        return m_followerMotor.getEncoder().getPosition();
     }
 
     @Override
