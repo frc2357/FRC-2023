@@ -10,11 +10,15 @@ public class ClawToggleCommand extends CommandBase{
     }
     @Override
     public void initialize(){
-        if(ClawSubsystem.getInstance().isClosed()){
+        if(ClawSubsystem.getInstance().isClosed()|| ClawSubsystem.getInstance().isClosing()){
             ClawSubsystem.getInstance().open();
         }
         else{
             ClawSubsystem.getInstance().close();
         }
+    }
+    @Override
+    public boolean isFinished(){
+        return ClawSubsystem.getInstance().isOpen() || ClawSubsystem.getInstance().isClosed();
     }
 }
