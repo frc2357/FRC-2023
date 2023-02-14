@@ -17,4 +17,8 @@ public class WristToggleCommand extends CommandBase {
             WristSubsystem.getInstance().extend();
         }
     }
+    @Override
+    public boolean isFinished(){
+        return WristSubsystem.getInstance().isRetracted() || WristSubsystem.getInstance().isExtended();
+    }
 }
