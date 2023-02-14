@@ -24,11 +24,5 @@ public class IntakeHandoffCommand extends SequentialCommandGroup {
         // Grab the game piece
         addCommands(new ExtendArmToPositionCommand(Constants.ARM_EXTENSION.INTAKE_HANDOFF_ROTATIONS));
         addCommands(new CloseClawCommand());
-
-        // Pull game piece away from intake
-        addCommands(new ParallelCommandGroup(
-            new ExtendArmToPositionCommand(Constants.ARM_EXTENSION.RETRACTED_ROTATIONS),
-            new ReverseIntakeCommand()
-        ));
     }
 }
