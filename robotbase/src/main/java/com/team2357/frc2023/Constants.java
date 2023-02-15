@@ -101,7 +101,6 @@ public final class Constants {
 
             config.m_trajectoryMaxVelocityMetersPerSecond = 2;
             config.m_trajectoryMaxAccelerationMetersPerSecond = 3;
-
             config.m_xController = new PIDController(.56122, 0, 0);
             config.m_yController = new PIDController(.56122, 0, 0);
             config.m_thetaController = new PIDController(2.15, 0, 0);
@@ -118,10 +117,10 @@ public final class Constants {
         // sensorDirection = false;
         // initializationStrategy = bootToAbsValue;
 
-        public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(0.0);
-        public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(0.0); 
-        public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(0.0); 
-        public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(0.0);
+        public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(8.79+180);
+        public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(314.38-180); 
+        public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(306.3-180); 
+        public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(163.04+180);
         
         public static final PIDController CHARGE_STATION_BALANCE_ANGLE_CONTROLLER = new PIDController(0.5, 0, 0);
         public static final PIDController CHARGE_STATION_DISTANCE_CONTROLLER = new PIDController(0.5, 0, 0);
@@ -141,6 +140,7 @@ public final class Constants {
         public static final PIDController ROTATE_TO_TARGET_CONTROLLER = new PIDController(0.009, 0, 0);
 
         public static final double ROTATE_MAX_SPEED = .45;
+        public static final double SYNC_ENCODER_LIMIT_MS = 10000;
     }
 
     public static final class INTAKE_ROLLER {
