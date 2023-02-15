@@ -288,11 +288,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	}
 
 	public void setOdemetryFromApriltag() {
-		double[] vals = LimelightSubsystem.getInstance().getLimelightPoseInfo();
-		if (vals.length >= 2) {
-			Translation2d t2d = new Translation2d(vals[0], vals[1]);
-			Rotation2d r2d = new Rotation2d(getYaw());
-			Pose2d p2d = new Pose2d(t2d, r2d);
+		if (LimelightSubsystem.getInstance().validTargetExists()) {
+			Pose2d p2d = LimelightSubsystem.getInstance().getLimelightPose2d();
 			resetOdometry(p2d);
 		} else {
 			DriverStation.reportError("No AprilTag target", false);

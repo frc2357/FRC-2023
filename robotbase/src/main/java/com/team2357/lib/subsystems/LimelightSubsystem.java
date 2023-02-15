@@ -7,6 +7,11 @@
 
 package com.team2357.lib.subsystems;
 
+import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.DoubleArrayTopic;
 import edu.wpi.first.networktables.NetworkTable;
@@ -245,8 +250,11 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
 
     return distance;
   }
-  public double[] getLimelightPoseInfo(){
-    return m_limelightPoseInfoSub.get();
+  public Pose2d getLimelightPose2d(){
+    double[] values = m_limelightPoseInfoSub.get();
+    Translation2d t2d = new Translation2d(values[0],values[1]);
+    Rotation2d r2d = new Rotation2d(SwerveDriveSubsystem.getInstance().getYaw());
+    return new Pose2d(t2d, r2d);
   }
   /*
   @Override
