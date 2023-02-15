@@ -45,20 +45,20 @@ public class SwerveDriveControls {
 
     public double getX() {
         if (isFlipped) {
-            return -modifyAxis(m_controller.getLeftX());
+            return modifyAxis(m_controller.getLeftX());
         }
-        return modifyAxis(m_controller.getLeftX());
+        return -modifyAxis(m_controller.getLeftX());
     }
 
     public double getY() {
         if (isFlipped) {
-            return -modifyAxis(m_controller.getLeftY());
+            return modifyAxis(m_controller.getLeftY());
         }
-        return modifyAxis(m_controller.getLeftY());
+        return -modifyAxis(m_controller.getLeftY());
     }
 
     public double getRotation() {
-        return modifyAxis(m_controller.getRightX());
+        return -modifyAxis(m_controller.getRightX());
     }
 
     public double deadband(double value, double deadband) {

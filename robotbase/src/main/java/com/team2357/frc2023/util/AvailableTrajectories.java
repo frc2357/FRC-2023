@@ -20,7 +20,7 @@ public class AvailableTrajectories {
     }
 
     public static SequentialCommandGroup createLineTrajectory() {
-        return TrajectoryUtil.createTrajectoryPathCommand("Line", true);
+        return TrajectoryUtil.createTrajectoryPathCommand("Normal line", true);
     }
 
     public static SequentialCommandGroup createExampleTwoPointTrajectory() {

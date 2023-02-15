@@ -1,5 +1,6 @@
 package com.team2357.frc2023.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -20,6 +21,8 @@ public class IntakeRollerSubsystem extends SubsystemBase {
     public static class Configuration {
         public double m_runPercentOutput;
         public double m_reversePercentOutput;
+
+        public double m_rollerAxisMaxSpeed;
 
         public double m_rampRate;
         public int m_currentLimit;
@@ -61,6 +64,12 @@ public class IntakeRollerSubsystem extends SubsystemBase {
             m_rightMotor.set(m_config.m_runPercentOutput);
             m_leftMotor.set(m_config.m_runPercentOutput);
         }
+    }
+
+    public void setAxisRollerSpeed(double axisSpeed) {
+        double motorSpeed = (-axisSpeed) * m_config.m_rollerAxisMaxSpeed;
+        m_leftMotor.set(motorSpeed);
+        m_rightMotor.set(motorSpeed);
     }
 
     public void stopIntake() {
