@@ -8,6 +8,10 @@
 #   From https://github.com/churrobots/vision2023/blob/main/app.py
 #   Modified to use robotbpy_apriltag Detector instead of pupil_apriltags
 #   Also see https://gist.github.com/lobrien/5d5e1b38e5fd64062c43ac752b74889c
+#
+#   https://docs.opencv.org/4.7.0/d9/d0c/group__calib3d.html
+#   projectPoints https://docs.opencv.org/4.7.0/d9/d0c/group__calib3d.html#ga1019495a2c8d1743ed5cc23fa0daff8c
+#   calibrateCamera
 
 import cv2
 import robotpy_apriltag
@@ -16,6 +20,8 @@ import time
 import math
 from robotpy_apriltag import AprilTagFieldLayout
 import math
+import numpy as np
+from calibration_from_opencv import CameraCalibration as cal
 
 
 # more research needed here
@@ -101,13 +107,17 @@ def get_apriltag_detector_and_estimator(frame_size):
     #From https://github.com/AprilRobotics/apriltag/wiki/AprilTag-User-Guide#python
     #fx, fy: The camera's focal length (in pixels). For most cameras fx and fy will be equal or nearly so.
     #cx, cy: The camera's focal center (in pixels). For most cameras this will be approximately the same as the image center.
+    # these values come from the cameramatrix when doing calibration in opencv
+    #  | Fx  0  Cx |
+    #  |  0  Fy Cy |
+    #  |  0  0  1  |
     estimator = robotpy_apriltag.AprilTagPoseEstimator(
     robotpy_apriltag.AprilTagPoseEstimator.Config(
-            6.0/39.37, # 6" tags for FRC.  Unless this means corner to corner?
-            500, 
-            500, 
-            frame_size[1] / 2.0, 
-            frame_size[0] / 2.0
+            6.0/39.37, # 6" tags for FRC2023, 39.37 inches/meter
+            1028.90904278, #  (Fx)
+            1028.49276415, #  (Fy)
+            638.57001085,  #  (Cx) should be roughly 1/2 the img width
+            337.36382032,  #  (Cy) should be roughly 1/2 the img height
         )
     )
     return detector, estimator
@@ -177,6 +187,49 @@ def draw_tag(frame, result):
     frame = draw_tagpose(frame, pose, tag)
     return frame
 
+###  Draw a Cube
+def draw_cube(frame, result):
+    axis = .05*np.float32([[  0,  0,  0], 
+                       [  0,  1,  0], 
+                       [  1,  1,  0], 
+                       [  1,  0,  0],
+                       [  0,  0,- 1],
+                       [  0,  1, -1],
+                       [  1,  1, -1],
+                       [  1,  0, -1] ])    
+    tag_id, pose, center, tag = result
+    print(tag_id)
+    print(cal.mtx)
+    print(cal.dst)
+    tvec = np.array(pose.translation())
+    rvec = pose.rotation().getQuaternion().toRotationVector()
+    print(tvec)
+    print(rvec)
+    imgpts, jac = cv2.projectPoints(axis, rvec, tvec, cal.mtx, cal.dst)
+    print(imgpts)
+    imgpts = np.int32(imgpts).reshape(-1,2)
+    # draw ground floor in green
+    #frame = cv2.drawContours(frame, [imgpts[:4]],-1,(0,255,0),-3)
+    # draw pillars in blue color
+    for i,j in zip(range(4),range(4,8)):
+        frame = cv2.line(frame, tuple(imgpts[i]), tuple(imgpts[j]),(255),3)
+    # draw top layer in red color
+    frame = cv2.drawContours(frame, [imgpts[4:]],-1,(0,0,255),3)
+    return frame
+
+#https://docs.opencv.org/4.x/d7/d53/tutorial_py_pose.html
+#def draw_cube(img, imgpts):
+#    # project 3D points to image plane
+#    imgpts, jac = cv2.projectPoints(axis, rvecs, tvecs, mtx, dist)    
+#    imgpts = np.int32(imgpts).reshape(-1,2)
+#    # draw pillars in blue color
+#    for i,j in zip(range(4),range(4,8)):
+#        img = cv2.line(img, tuple(imgpts[i]), tuple(imgpts[j]),(255),3)
+#    # draw top layer in red color
+#    img = cv2.drawContours(img, [imgpts[4:]],-1,(0,0,255),3)
+#    return img
+
+
 # This function is called once for every frame captured by the Webcam. For testing, it can simply
 # be passed a frame capture loaded from a file. (See commented-out alternative `if __name__ == main:` at bottom of file)
 def detect_and_process_apriltag(frame, detector, estimator):
@@ -190,8 +243,8 @@ def detect_and_process_apriltag(frame, detector, estimator):
     results = [ process_apriltag(estimator, tag) for tag in filter_tags ]
     # Note that results will be empty if no apriltag is detected
     for result in results:
-        
         frame = draw_tag(frame, result)
+        frame = draw_cube(frame, result)
     for tag in filter_tags:
         frame = draw_tagframe(frame, tag)
     return frame
