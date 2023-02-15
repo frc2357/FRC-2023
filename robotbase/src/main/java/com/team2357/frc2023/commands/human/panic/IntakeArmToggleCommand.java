@@ -17,6 +17,7 @@ public class IntakeArmToggleCommand extends CommandBase{
             m_arm.stow();
         }else{
             m_arm.deploy();
+            ]\]dfcx gb[ bopQWJAIOVNVCKL'
         }
     }
     @Override
