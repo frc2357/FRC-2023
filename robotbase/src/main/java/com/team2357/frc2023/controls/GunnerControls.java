@@ -14,7 +14,11 @@ import static com.team2357.frc2023.Constants.*;
 
 import com.team2357.frc2023.commands.human.panic.ArmExtenderCommand;
 import com.team2357.frc2023.commands.human.panic.ArmRotationCommand;
+import com.team2357.frc2023.commands.human.panic.ClawToggleCommand;
+import com.team2357.frc2023.commands.human.panic.IntakeArmToggleCommand;
+import com.team2357.frc2023.commands.human.panic.IntakeAxisRollerCommand;
 import com.team2357.frc2023.commands.human.panic.WristToggleCommand;
+
 
 /**
  * These are the controls for the gunner.
@@ -106,15 +110,27 @@ public class GunnerControls {
         Trigger downDPadOnly = m_downDPad.and(noLetterButtons);
         Trigger leftDPadOnly = m_leftDPad.and(noLetterButtons);
         Trigger rightDPadOnly = m_rightDPad.and(noLetterButtons);
+        
+        Trigger upDPadAndA = m_upDPad.and(m_aButton);
 
         Trigger upDPadAndX = m_upDPad.and(m_xButton);
         Trigger upDPadAndY = m_upDPad.and(m_yButton);
         Trigger upDPadAndB = m_upDPad.and(m_bButton);
-
-        Trigger upDPadAndA = m_upDPad.and(m_aButton);
+        
         Trigger downDPadAndA = m_downDPad.and(m_aButton);
+        Trigger downDPadAndX = m_downDPad.and(m_xButton);
+        Trigger downDPadAndY = m_downDPad.and(m_yButton);
+        Trigger downDPadAndB = m_downDPad.and(m_bButton);
+
         Trigger leftDPadAndA = m_leftDPad.and(m_aButton);
+        Trigger leftDPadAndX = m_leftDPad.and(m_xButton);
+        Trigger leftDPadAndY = m_leftDPad.and(m_yButton);
+        Trigger leftDPadAndB = m_leftDPad.and(m_bButton);
+
         Trigger rightDPadAndA = m_rightDPad.and(m_aButton);
+        Trigger rightDPadAndX = m_rightDPad.and(m_xButton);
+        Trigger rightDPadAndY = m_rightDPad.and(m_yButton);
+        Trigger rightDPadAndB = m_rightDPad.and(m_bButton);
 
         Trigger aButton = m_aButton.and(noDPad);
         Trigger bButton = m_bButton.and(noDPad);
@@ -124,5 +140,8 @@ public class GunnerControls {
         upDPadOnly.whileTrue(new ArmRotationCommand(axisRightStickY));
         leftDPadOnly.whileTrue(new ArmExtenderCommand(axisRightStickY));
         leftDPadAndA.onTrue(new WristToggleCommand());
+        leftDPadAndB.onTrue(new ClawToggleCommand());
+        rightDPadOnly.whileTrue(new IntakeAxisRollerCommand(axisRightStickY));
+        rightDPadAndA.onTrue(new IntakeArmToggleCommand());
     }
 }
