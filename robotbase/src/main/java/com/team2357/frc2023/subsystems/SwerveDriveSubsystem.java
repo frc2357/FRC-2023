@@ -12,6 +12,7 @@ import com.pathplanner.lib.PathConstraints;
 import com.swervedrivespecialties.swervelib.AbsoluteEncoder;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
+import com.team2357.lib.subsystems.LimelightSubsystem;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -57,9 +58,6 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
 	private PathConstraints m_pathConstraints;
 
-	public NetworkTable m_limelightTable;
-	public DoubleArrayTopic m_limelightInfo;
-	private DoubleArraySubscriber m_limelightSubscriber;
 
 	public static class Configuration {
 		/**
@@ -124,9 +122,6 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		m_backLeftModule = backLeft;
 		m_backRightModule = backRight;
 
-		m_limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
-		m_limelightInfo = m_limelightTable.getDoubleArrayTopic("botpose");
-		m_limelightSubscriber = m_limelightInfo.subscribe(null, PubSubOption.keepDuplicates(true));
 
 		instance = this;
 	}
@@ -298,7 +293,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	}
 
 	public void setOdemetryFromApriltag() {
-		double[] vals = m_limelightSubscriber.get();
+		double[] vals = LimelightSubsystem.getInstance().getLimelightOdometry();
 		if (vals.length >= 2) {
 			Translation2d t2d = new Translation2d(vals[0], vals[1]);
 			Rotation2d r2d = new Rotation2d(getYaw());
