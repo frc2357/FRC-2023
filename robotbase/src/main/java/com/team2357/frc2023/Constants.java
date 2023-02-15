@@ -160,6 +160,8 @@ public final class Constants {
 
             return config;
         }
+
+        public static final double AUTO_SCORE_LOW_REVERSE_TIME = 1;
     }
 
     public static final class INTAKE_ARM {
@@ -245,6 +247,14 @@ public final class Constants {
             config.m_smartMotionSlot = 0;
             return config;
         }
+
+        public static final double RETRACTED_ROTATIONS = 0;
+        public static final double INTAKE_HANDOFF_ROTATIONS = 0;
+
+        public static final double AUTO_SCORE_MID_ROTATIONS = 0;
+        public static final double AUTO_SCORE_HIGH_ROTATIONS = 0;
+
+        public static final double AUTO_SCORE_LOW_RETRACT_WAIT_TIME = 1;
     }
 
     public static final class ARM_ROTATION {
@@ -300,6 +310,12 @@ public final class Constants {
 
             return config;
         }
+
+        public static final double RETRACTED_ROTATIONS = 0;
+        public static final double INTAKE_HANDOFF_ROTATIONS = 0;
+
+        public static final double AUTO_SCORE_MID_ROTATIONS = 0;
+        public static final double AUTO_SCORE_HIGH_ROTATIONS = 0;
     }
 
     public static final class CONTROLLER {
