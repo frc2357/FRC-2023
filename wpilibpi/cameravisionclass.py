@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
 
-# Copyright (c) FIRST and other WPILib contributors.
-# Open Source Software; you can modify and/or share it under the terms of
-# the WPILib BSD license file in the root directory of this project.
-
 import json
 import time
 import sys
 import cv2
 import numpy as np
+# need numpy, robotpy, opencv installed to run
 
 from cscore import CameraServer, VideoSource, UsbCamera, MjpegServer
 from ntcore import NetworkTableInstance, EventFlags
@@ -18,6 +15,10 @@ CHECKERBOARD = (7,10)
 class CameraConfig: pass
 
 def list_cameras():
+    """
+    Helper function.  Will list all USB cameras in system.
+    Can be used to generate json config file for use in CameraVision class
+    """
     cams = []
     for c in UsbCamera.enumerateUsbCameras():
         cams.append(UsbCamera(c.name,c.path))

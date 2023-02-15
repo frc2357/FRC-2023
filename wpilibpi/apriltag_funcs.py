@@ -198,13 +198,12 @@ def draw_cube(frame, result):
                        [  1,  1, -1],
                        [  1,  0, -1] ])    
     tag_id, pose, center, tag = result
-    print(tag_id)
-    print(cal.mtx)
-    print(cal.dst)
     tvec = np.array(pose.translation())
     rvec = pose.rotation().getQuaternion().toRotationVector()
     print(tvec)
     print(rvec)
+    #TODO: This is working but cubes seem to always be shifted in XYZ space
+    #TODO: Check this, might be fixed -- updated cal info into AprilTags detector
     imgpts, jac = cv2.projectPoints(axis, rvec, tvec, cal.mtx, cal.dst)
     print(imgpts)
     imgpts = np.int32(imgpts).reshape(-1,2)
