@@ -3,11 +3,8 @@ package com.team2357.frc2023.commands;
 import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.commands.scoring.CloseClawCommand;
 import com.team2357.frc2023.commands.scoring.ExtendArmToPositionCommand;
-import com.team2357.frc2023.commands.scoring.ExtendWristCommand;
-import com.team2357.frc2023.commands.scoring.OpenClawCommand;
 import com.team2357.frc2023.commands.scoring.RotateArmToPositionCommand;
 
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 public class IntakeHandoffCommand extends SequentialCommandGroup {
