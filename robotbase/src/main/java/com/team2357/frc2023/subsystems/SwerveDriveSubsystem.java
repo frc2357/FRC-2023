@@ -28,6 +28,8 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.PubSubOption;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -60,6 +62,9 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	public NetworkTable m_limelightTable;
 	public DoubleArrayTopic m_limelightInfo;
 	private DoubleArraySubscriber m_limelightSubscriber;
+
+	private MotorControllerGroup m_rightControllerGroup, m_leftControllerGroup;
+	private DifferentialDrive m_differentialDrive;
 
 	public static class Configuration {
 		/**
@@ -151,6 +156,18 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
 		m_pathConstraints = new PathConstraints(m_config.m_trajectoryMaxVelocityMetersPerSecond,
 				m_config.m_trajectoryMaxAccelerationMetersPerSecond);
+
+		// Differential dirve
+		m_leftControllerGroup = new MotorControllerGroup(
+			new WPI_TalonFX(Constants.CAN_ID.FRONT_LEFT_MODULE_DRIVE_MOTOR_ID),
+			new WPI_TalonFX[]{new WPI_TalonFX(Constants.CAN_ID.BACK_LEFT_MODULE_DRIVE_MOTOR_ID)}
+		);
+		m_rightControllerGroup = new MotorControllerGroup(
+			new WPI_TalonFX(Constants.CAN_ID.FRONT_RIGHT_MODULE_DRIVE_MOTOR_ID),
+			new WPI_TalonFX[]{new WPI_TalonFX(Constants.CAN_ID.BACK_RIGHT_MODULE_DRIVE_MOTOR_ID)}
+		);
+
+		m_differentialDrive = new DifferentialDrive(m_leftControllerGroup, m_rightControllerGroup);
 	}
 
 	public PIDController getXController() {
@@ -297,6 +314,12 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		Logger.getInstance().recordOutput("Swerve States", states);
 	}
 
+	public void differentialDrive(double speedProportion, double turnProportion) {
+		double leftProportion = speedProportion - turnProportion;
+		double rightProportion = speedProportion - turnProportion;
+		m_differentialDrive.tankDrive(leftProportion, rightProportion);
+	}
+
 	public void setOdemetryFromApriltag() {
 		double[] vals = m_limelightSubscriber.get();
 		if (vals.length >= 2) {
@@ -345,11 +368,11 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-	    m_odometry.update(getGyroscopeRotation(),
-		 new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
-		 m_frontRightModule.getPosition(),
-		 m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
-		//setOdemetryFromApriltag();
+		m_odometry.update(getGyroscopeRotation(),
+				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
+						m_frontRightModule.getPosition(),
+						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
+		// setOdemetryFromApriltag();
 
 		SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
 
