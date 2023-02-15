@@ -37,6 +37,9 @@ public class SwerveDriveControls {
 
         m_aButton.onTrue(new InstantCommand(() -> {
             m_isDifferentialDrive = !m_isDifferentialDrive;
+            if (m_isDifferentialDrive) {
+                SwerveDriveSubsystem.getInstance().zeroDifferentialDrive();
+            }
         }));
     }
 

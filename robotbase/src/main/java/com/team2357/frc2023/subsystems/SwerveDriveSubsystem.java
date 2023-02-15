@@ -320,6 +320,18 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		m_differentialDrive.tankDrive(leftProportion, rightProportion);
 	}
 
+	public void zeroDifferentialDrive() {
+		WPI_TalonFX motor;
+
+		SwerveModuleState state = new SwerveModuleState(0.0, Rotation2d.fromDegrees(0.0));
+		double desiredAngle = state.angle.getRadians() / m_config.m_sensorPositionCoefficient;
+
+		for (SwerveModule module : new SwerveModule[]{m_frontLeftModule, m_frontRightModule, m_backLeftModule, m_backRightModule}) {
+			motor = (WPI_TalonFX)module.getSteerMotor();
+			motor.setSelectedSensorPosition(desiredAngle);
+		}
+    }
+
 	public void setOdemetryFromApriltag() {
 		double[] vals = m_limelightSubscriber.get();
 		if (vals.length >= 2) {
@@ -383,4 +395,6 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
 		Logger.getInstance().recordOutput("Robot Pose", m_odometry.getPoseMeters());
 	}
+
+    
 }
