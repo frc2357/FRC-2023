@@ -5,7 +5,8 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.SparkMaxPIDController;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 import com.team2357.lib.util.Utility;
-public class ArmRotationSubsystem extends ClosedLoopSubsystem{
+
+public class ArmRotationSubsystem extends ClosedLoopSubsystem {
     private static ArmRotationSubsystem instance = null;
 
     public static ArmRotationSubsystem getInstance() {
@@ -13,34 +14,36 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem{
     }
 
     public static class Configuration {
-        public double m_rotationAxisMaxSpeed = 0;
+        public double m_rotationAxisMaxSpeed;
 
-        public IdleMode m_rotationMotorIdleMode = IdleMode.kBrake;
+        public IdleMode m_rotationMotorIdleMode;
 
-        public int m_rotationMotorStallLimitAmps = 0;
-        public int m_rotationMotorFreeLimitAmps = 0;
+        public int m_rotationMotorStallLimitAmps;
+        public int m_rotationMotorFreeLimitAmps;
 
-        public boolean m_isFollowerInverted = false;
+        public boolean m_isFollowerInverted;
 
         // smart motion config
-        public double m_rotationMotorP = 0;
-        public double m_rotationMotorI = 0;
-        public double m_rotationMotorD = 0;
-        public double m_rotationMotorIZone = 0;
-        public double m_rotationMotorFF = 0;
-        public double m_rotationMotorMaxOutput = 0;
-        public double m_rotationMotorMinOutput = 0;
-        public double m_rotationMotorMaxRPM = 0;
-        public double m_rotationMotorMaxVel = 0;
-        public double m_rotationMotorMinVel = 0;
-        public double m_rotationMotorMaxAcc = 0;
-        public double m_rotationMotorAllowedError = 0;
+        public double m_rotationMotorP;
+        public double m_rotationMotorI;
+        public double m_rotationMotorD;
+        public double m_rotationMotorIZone;
+        public double m_rotationMotorFF;
+        public double m_rotationMotorMaxOutput;
+        public double m_rotationMotorMinOutput;
+        public double m_rotationMotorMaxRPM;
+        public double m_rotationMotorMaxVel;
+        public double m_rotationMotorMinVel;
+        public double m_rotationMotorMaxAcc;
+        public double m_rotationMotorAllowedError;
+        public double m_maxSpeedPercent;
+        public int m_smartMotionSlot;
     }
 
     private Configuration m_config;
     private CANSparkMax m_masterRotationMotor;
     private CANSparkMax m_followerRotationMotor;
-    private SparkMaxPIDController m_pidController;    
+    private SparkMaxPIDController m_pidController;
     private double m_targetRotations;
 
     public ArmRotationSubsystem(CANSparkMax masterRotationMotor, CANSparkMax followerRotationMotor) {
@@ -59,7 +62,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem{
         configureRotationPID(m_pidController);
 
         m_masterRotationMotor.setInverted(!m_config.m_isFollowerInverted);
-        m_followerRotationMotor.follow(m_masterRotationMotor,m_config.m_isFollowerInverted);
+        m_followerRotationMotor.follow(m_masterRotationMotor, m_config.m_isFollowerInverted);
     }
 
     private void configureRotationMotor(CANSparkMax motor) {
@@ -78,15 +81,26 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem{
         pidController.setOutputRange(m_config.m_rotationMotorMinOutput, m_config.m_rotationMotorMinOutput);
 
         // Configure smart motion
-        int smartMotionSlot = 0;
-        pidController.setSmartMotionMaxVelocity(m_config.m_rotationMotorMaxVel, smartMotionSlot);
-        pidController.setSmartMotionMinOutputVelocity(m_config.m_rotationMotorMinVel, smartMotionSlot);
-        pidController.setSmartMotionMaxAccel(m_config.m_rotationMotorMaxAcc, smartMotionSlot);
-        pidController.setSmartMotionAllowedClosedLoopError(m_config.m_rotationMotorAllowedError, smartMotionSlot);
+        pidController.setSmartMotionMaxVelocity(m_config.m_rotationMotorMaxVel, m_config.m_smartMotionSlot);
+        pidController.setSmartMotionMinOutputVelocity(m_config.m_rotationMotorMinVel, m_config.m_smartMotionSlot);
+        pidController.setSmartMotionMaxAccel(m_config.m_rotationMotorMaxAcc, m_config.m_smartMotionSlot);
+        pidController.setSmartMotionAllowedClosedLoopError(m_config.m_rotationMotorAllowedError, m_config.m_smartMotionSlot);
     }
 
-    public void rotate(double sensorUnits){
-        m_masterRotationMotor.set(sensorUnits);
+    public void setRotatorRotations(double rotations) {
+        setClosedLoopEnabled(true);
+        m_targetRotations = rotations;
+        m_pidController.setReference(m_targetRotations, CANSparkMax.ControlType.kSmartMotion);
+    }
+
+    public boolean isRotatorAtRotations() {
+        return isMotorAtRotations(m_masterRotationMotor) && isMotorAtRotations(m_followerRotationMotor);
+    }
+
+    public boolean isMotorAtRotations(CANSparkMax motor) {
+        return Utility.isWithinTolerance(motor.getEncoder().getPosition(), m_targetRotations,
+                m_config.m_rotationMotorAllowedError);
+
     }
 
     public void setRotationAxisSpeed(double axisSpeed) {
@@ -95,41 +109,22 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem{
         double motorSpeed = (-axisSpeed) * m_config.m_rotationAxisMaxSpeed;
 
         m_masterRotationMotor.set(motorSpeed);
-        m_followerRotationMotor.set(motorSpeed);
+    }
+    //Method for the panic mode to rotate the arms
+    public void manualRotate(double sensorUnits) {
+        m_masterRotationMotor.set(sensorUnits*m_config.m_maxSpeedPercent);
     }
 
     // Method to stop the motors
     public void stopRotationMotors() {
         setClosedLoopEnabled(false);
         m_masterRotationMotor.set(0);
-        m_followerRotationMotor.set(0);
     }
 
     public void resetEncoders() {
         m_masterRotationMotor.getEncoder().setPosition(0);
-        m_followerRotationMotor.getEncoder().setPosition(0);
-    }
-    public boolean isRotatorAtRotations() {
-        return  isMasterRotatorAtRotations()&& isFollowerRotatorAtRotations();
     }
 
-    /**
-     * @return Is the master arm motor at the setpoint set by m_targetRotations
-     */
-    public boolean isMasterRotatorAtRotations() {
-        double currentMotorRotations = m_masterRotationMotor.getEncoder().getPosition();
-        return Utility.isWithinTolerance(currentMotorRotations, m_targetRotations,
-                m_config.m_rotationMotorAllowedError);
-    }
-
-    /**
-     * @return Is the follower arm motor at the setpoint set by m_targetRotations
-     */
-    public boolean isFollowerRotatorAtRotations() {
-        double currentMotorRotations = m_followerRotationMotor.getEncoder().getPosition();
-        return Utility.isWithinTolerance(currentMotorRotations, m_targetRotations,
-                m_config.m_rotationMotorAllowedError);
-    }
     public double getMasterMotorRotations() {
         return m_masterRotationMotor.getEncoder().getPosition();
     }

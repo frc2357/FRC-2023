@@ -12,7 +12,10 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import static com.team2357.frc2023.Constants.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.team2357.frc2023.commands.human.panic.ArmExtenderCommand;
+import com.team2357.frc2023.commands.human.panic.ArmRotationCommand;
+import com.team2357.frc2023.commands.human.panic.ClawToggleCommand;
 import com.team2357.frc2023.commands.human.panic.WristToggleCommand;
 
 /**
@@ -100,24 +103,39 @@ public class GunnerControls {
                 && m_downDPad.getAsBoolean() && m_leftDPad.getAsBoolean()).negate();
 
         Trigger noLetterButtons = m_aButton.and(m_bButton).and(m_xButton).and(m_yButton).negate();
-
         Trigger upDPadOnly = m_upDPad.and(noLetterButtons);
         Trigger downDPadOnly = m_downDPad.and(noLetterButtons);
         Trigger leftDPadOnly = m_leftDPad.and(noLetterButtons);
         Trigger rightDPadOnly = m_rightDPad.and(noLetterButtons);
-
+        
+        Trigger upDPadAndA = m_upDPad.and(m_aButton);
         Trigger upDPadAndX = m_upDPad.and(m_xButton);
         Trigger upDPadAndY = m_upDPad.and(m_yButton);
         Trigger upDPadAndB = m_upDPad.and(m_bButton);
-
+        
         Trigger downDPadAndA = m_downDPad.and(m_aButton);
+        Trigger downDPadAndX = m_downDPad.and(m_xButton);
+        Trigger downDPadAndY = m_downDPad.and(m_yButton);
+        Trigger downDPadAndB = m_downDPad.and(m_bButton);
+
+        Trigger leftDPadAndA = m_leftDPad.and(m_aButton);
+        Trigger leftDPadAndX = m_leftDPad.and(m_xButton);
+        Trigger leftDPadAndY = m_leftDPad.and(m_yButton);
+        Trigger leftDPadAndB = m_leftDPad.and(m_bButton);
+
+        Trigger rightDPadAndA = m_rightDPad.and(m_aButton);
+        Trigger rightDPadAndX = m_rightDPad.and(m_xButton);
+        Trigger rightDPadAndY = m_rightDPad.and(m_yButton);
+        Trigger rightDPadAndB = m_rightDPad.and(m_bButton);
 
         Trigger aButton = m_aButton.and(noDPad);
         Trigger bButton = m_bButton.and(noDPad);
         Trigger yButton = m_yButton.and(noDPad);
         Trigger xButton = m_xButton.and(noDPad);
 
+        upDPadOnly.whileTrue(new ArmRotationCommand(axisRightStickY));
         leftDPadOnly.whileTrue(new ArmExtenderCommand(axisRightStickY));
-        aButton.onTrue(new WristToggleCommand());
+        leftDPadAndA.onTrue(new WristToggleCommand());
+        leftDPadAndB.onTrue(new ClawToggleCommand());
     }
 }
