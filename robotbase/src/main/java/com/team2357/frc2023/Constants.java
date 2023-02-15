@@ -252,6 +252,8 @@ public final class Constants {
 
         public static final double AUTO_SCORE_MID_ROTATIONS = 0;
         public static final double AUTO_SCORE_HIGH_ROTATIONS = 0;
+
+        public static final double AUTO_SCORE_LOW_RETRACT_WAIT_TIME = 1;
     }
 
     public static final class ARM_ROTATION {
