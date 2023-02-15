@@ -30,7 +30,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class SwerveDriveSubsystem extends SubsystemBase {
 	private static SwerveDriveSubsystem instance = null;
 
-	private boolean m_isZeroed;
+	private boolean m_areEncodersSynced;
 
 	public static SwerveDriveSubsystem getInstance() {
 		return instance;
@@ -111,7 +111,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	public SwerveDriveSubsystem(WPI_Pigeon2 pigeon, SwerveModule frontLeft, SwerveModule frontRight,
 			SwerveModule backLeft, SwerveModule backRight) {
 		m_pigeon = pigeon;
-
+		
 		m_frontLeftModule = frontLeft;
 		m_frontRightModule = frontRight;
 		m_backLeftModule = backLeft;
@@ -123,6 +123,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
 	public void configure(Configuration config) {
 		m_config = config;
+
+		m_pigeon.configFactoryDefault();
 
 		m_kinematics = new SwerveDriveKinematics(
 				new Translation2d(m_config.m_trackwidthMeters / 2.0,
@@ -162,33 +164,44 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	public PathConstraints getPathConstraints() {
 		return m_pathConstraints;
 	}
-
-	public boolean isReadyToZero() {
-		if (isReadyToZero(m_frontLeftModule) && isReadyToZero(m_frontRightModule) && isReadyToZero(m_backLeftModule)
-				&& isReadyToZero(m_backRightModule)) {
-			return true;
-		}
-		return false;
+	
+	public void syncEncoders() {
+		syncEncoder(m_frontLeftModule);
+		syncEncoder(m_frontRightModule);
+		syncEncoder(m_backLeftModule);
+		syncEncoder(m_backRightModule);
 	}
 
-	private boolean isReadyToZero(SwerveModule module) {
-		WPI_TalonFX steerMotor;
-		steerMotor = (WPI_TalonFX) (module.getSteerMotor());
+	private void syncEncoder(SwerveModule module) {
+		WPI_TalonFX steerMotor = (WPI_TalonFX) (module.getSteerMotor());
 
 		double absoluteAngle = module.getSteerEncoder().getAbsoluteAngle();
-		((WPI_TalonFX) (module.getSteerMotor()))
-				.setSelectedSensorPosition(absoluteAngle / m_config.m_sensorPositionCoefficient);
-
-		return isEncoderSynced(steerMotor, module.getSteerEncoder());
+		steerMotor.setSelectedSensorPosition(absoluteAngle / m_config.m_sensorPositionCoefficient);
 	}
 
-	private boolean isEncoderSynced(WPI_TalonFX steerMotor, AbsoluteEncoder steerEncoder) {
+	private boolean isEncoderSynced(SwerveModule module) {
+		WPI_TalonFX steerMotor = (WPI_TalonFX) (module.getSteerMotor());
+		AbsoluteEncoder steerEncoder = module.getSteerEncoder();
+
 		double difference = Math.abs(steerMotor.getSelectedSensorPosition() * m_config.m_sensorPositionCoefficient
 				- steerEncoder.getAbsoluteAngle());
 		difference %= Math.PI;
 		System.out.println(difference);
 		return difference < Constants.DRIVE.ENCODER_SYNC_ACCURACY_RADIANS
 				|| Math.abs(difference - Math.PI) < Constants.DRIVE.ENCODER_SYNC_ACCURACY_RADIANS;
+	}
+
+	public boolean checkEncodersSynced() {
+		m_areEncodersSynced = ((isEncoderSynced(m_frontLeftModule)) &&
+				(isEncoderSynced(m_frontRightModule)) &&
+				(isEncoderSynced(m_backLeftModule)) &&
+				(isEncoderSynced(m_backRightModule)));
+
+		return m_areEncodersSynced;
+	}
+
+	public boolean getIsEncodersSynced() {
+		return m_areEncodersSynced;
 	}
 
 	public void zero() {
@@ -208,19 +221,12 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 				state.angle.getRadians());
 	}
 
-	public void checkEncodersSynced() {
-		m_isZeroed = ((isEncoderSynced((WPI_TalonFX) m_frontLeftModule.getSteerMotor(),
-				m_frontLeftModule.getSteerEncoder())) &&
-				(isEncoderSynced((WPI_TalonFX) m_frontRightModule.getSteerMotor(),
-						m_frontRightModule.getSteerEncoder()))
-				&&
-				(isEncoderSynced((WPI_TalonFX) m_backLeftModule.getSteerMotor(), m_backLeftModule.getSteerEncoder())) &&
-				(isEncoderSynced((WPI_TalonFX) m_backRightModule.getSteerMotor(),
-						m_backRightModule.getSteerEncoder())));
-	}
-
 	public void zeroGyroscope() {
 		m_pigeon.reset();
+	}
+
+	public void setGyroScope(double degrees) {
+		m_pigeon.setYaw(degrees);
 	}
 
 	public double getYaw() {
@@ -236,7 +242,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	}
 
 	public Rotation2d getGyroscopeRotation() {
-		return Rotation2d.fromDegrees(m_pigeon.getYaw());
+		return Rotation2d.fromDegrees(getYaw());
 	}
 
 	public Pose2d getPose() {
@@ -244,8 +250,9 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	}
 
 	public void resetOdometry(Pose2d pose) {
+		setGyroScope(pose.getRotation().getDegrees());
 		m_odometry.resetPosition(
-				getGyroscopeRotation(),
+				pose.getRotation(),
 				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
 						m_frontRightModule.getPosition(),
 						m_backLeftModule.getPosition(), m_backRightModule.getPosition() },
@@ -263,13 +270,16 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	}
 
 	public void drive(ChassisSpeeds chassisSpeeds) {
-		if (!m_isZeroed) {
-			DriverStation.reportError("Swerve is not zeroed", false);
+		if (!m_areEncodersSynced) {
+			DriverStation.reportError("Swerve is not synced", false);
+			syncEncoders();
+			checkEncodersSynced();
 			return;
 		}
 		m_chassisSpeeds = chassisSpeeds;
 		SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
 		SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxVelocityMetersPerSecond);
+
 
 		m_frontLeftModule.set(
 				states[0].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
@@ -346,5 +356,14 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		SmartDashboard.putNumber("Pose Angle", m_odometry.getPoseMeters().getRotation().getDegrees());
 
 		Logger.getInstance().recordOutput("Robot Pose", m_odometry.getPoseMeters());
+	}
+
+	public void printEncoderVals() {
+		SmartDashboard.putNumber("front left encoder count", ((WPI_TalonFX) (m_frontLeftModule.getDriveMotor())).getSelectedSensorPosition(0));
+	
+		SmartDashboard.putNumber("front right encoder count", ((WPI_TalonFX) (m_frontRightModule.getDriveMotor())).getSelectedSensorPosition(0));
+		SmartDashboard.putNumber("back left module encoder count", ((WPI_TalonFX) (m_backLeftModule.getDriveMotor())).getSelectedSensorPosition(0));
+		SmartDashboard.putNumber("back right module encoder count", ((WPI_TalonFX) (m_backRightModule.getDriveMotor())).getSelectedSensorPosition(0));
+
 	}
 }
