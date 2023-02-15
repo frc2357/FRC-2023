@@ -12,15 +12,13 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 public class AutoScoreLowCommand extends SequentialCommandGroup {
     public AutoScoreLowCommand() {
         addCommands(new OpenClawCommand());
-        addCommands(new ParallelCommandGroup(
-            new ExtendArmToPositionCommand(Constants.ARM_EXTENSION.RETRACTED_ROTATIONS),
-            new DeployIntakeCommand()
-        ));
+
         addCommands(new ParallelRaceGroup(
             new ExtendArmToPositionCommand(Constants.ARM_EXTENSION.RETRACTED_ROTATIONS),
             new WaitCommand(Constants.ARM_EXTENSION.AUTO_SCORE_LOW_RETRACT_WAIT_TIME)
         ));
         addCommands(new DeployIntakeCommand());
+
         addCommands(new ParallelRaceGroup(
             new ReverseIntakeCommand(),
             new WaitCommand(Constants.INTAKE_ROLLER.AUTO_SCORE_LOW_REVERSE_TIME)
