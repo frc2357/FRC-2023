@@ -1,6 +1,8 @@
 package com.team2357.frc2023.subsystems;
 
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
@@ -8,6 +10,7 @@ import com.team2357.lib.subsystems.LimelightSubsystem;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -80,18 +83,16 @@ public class SubsystemFactory {
         }
 
         public WristSubsystem CreateWristSubsystem() {
-                DoubleSolenoid wristSolenoid = new DoubleSolenoid(Constants.CAN_ID.PNEUMATICS_HUB_ID,
-                                PneumaticsModuleType.REVPH, Constants.PH_ID.WRIST_SOLENOID_FORWARD_CHANNEL,
-                                Constants.PH_ID.WRIST_SOLENOID_REVERSE_CHANNEL);
+                Solenoid wristSolenoid = new Solenoid(Constants.CAN_ID.PNEUMATICS_HUB_ID,
+                                PneumaticsModuleType.REVPH, Constants.PH_ID.WRIST_SOLENOID_CHANNEL);
                 WristSubsystem subsystem = new WristSubsystem(wristSolenoid);
                 subsystem.configure(Constants.WRIST.GET_WRIST_CONFIG());
                 return subsystem;
         }
 
         public ClawSubsystem CreateClawSubsystem() {
-                DoubleSolenoid clawSolenoid = new DoubleSolenoid(Constants.CAN_ID.PNEUMATICS_HUB_ID,
-                                PneumaticsModuleType.REVPH, Constants.PH_ID.CLAW_SOLENOID_FORWARD_CHANNEL,
-                                Constants.PH_ID.CLAW_SOLENOID_REVERSE_CHANNEL);
+                Solenoid clawSolenoid = new Solenoid(Constants.CAN_ID.PNEUMATICS_HUB_ID,
+                                PneumaticsModuleType.REVPH, Constants.PH_ID.CLAW_SOLENOID_CHANNEL);
 
                 ClawSubsystem subsystem = new ClawSubsystem(clawSolenoid);
                 subsystem.configure(Constants.CLAW.GET_CLAW_CONFIG());
@@ -104,6 +105,27 @@ public class SubsystemFactory {
                                 Constants.PH_ID.INTAKE_SOLENOID_REVERSE_CHANNEL);
                 IntakeArmSubsystem subsystem = new IntakeArmSubsystem(intakeSolenoid);
                 subsystem.configure(Constants.INTAKE_ARM.GET_INTAKE_ARM_CONFIG());
+                return subsystem;
+        }
+        public ArmRotationSubsystem CreateArmRotationSubsystem(){
+                CANSparkMax masterMotor = new CANSparkMax(Constants.CAN_ID.MASTER_ROTATION_MOTOR, MotorType.kBrushless);
+                CANSparkMax followMotor = new CANSparkMax(Constants.CAN_ID.FOLLOWER_ROTATION_MOTOR, MotorType.kBrushless);
+                ArmRotationSubsystem subsystem = new ArmRotationSubsystem(masterMotor, followMotor);
+                subsystem.configure(Constants.ARM_ROTATION.GET_ROTATION_CONFIG());
+                return subsystem;
+        }
+        public ArmExtensionSubsystem CreateArmExtensionSubsystem(){
+                CANSparkMax extender = new CANSparkMax(Constants.CAN_ID.ARM_EXTENSION_MOTOR, MotorType.kBrushless);
+                ArmExtensionSubsystem subsystem = new ArmExtensionSubsystem(extender);
+                subsystem.configure(Constants.ARM_EXTENSION.GET_EXTENSION_CONFIG());
+                return subsystem;
+        }
+        public ElevatorSubsystem createElevatorSubsystem() {
+                CANSparkMax masterMotor = new CANSparkMax(Constants.CAN_ID.LEFT_ELEVATOR_MOTOR, MotorType.kBrushless);
+                CANSparkMax followerMotor = new CANSparkMax(Constants.CAN_ID.RIGHT_ELEVATOR_MOTOR, MotorType.kBrushless);
+
+                ElevatorSubsystem subsystem = new ElevatorSubsystem(masterMotor, followerMotor);
+                subsystem.configure(Constants.ELEVATOR.GET_ELEVATOR_CONFIG());
                 return subsystem;
         }
         public LimelightSubsystem CreateLimelightSubsystem(){

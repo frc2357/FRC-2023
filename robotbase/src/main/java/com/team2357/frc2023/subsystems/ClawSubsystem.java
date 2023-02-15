@@ -1,6 +1,6 @@
 package com.team2357.frc2023.subsystems;
 
-import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ClawSubsystem extends SubsystemBase {
@@ -19,12 +19,12 @@ public class ClawSubsystem extends SubsystemBase {
 
     private enum ClawState { Unknown, Open, Closed };
 
-    private DoubleSolenoid m_clawSolenoid;
+    private Solenoid m_clawSolenoid;
     private ClawState m_currentState;
     private ClawState m_desiredState;
     private long m_lastActionMillis;
     
-    public ClawSubsystem(DoubleSolenoid clawSolenoid) {
+    public ClawSubsystem(Solenoid clawSolenoid) {
         m_clawSolenoid = clawSolenoid;
 
         instance = this;
@@ -77,10 +77,9 @@ public class ClawSubsystem extends SubsystemBase {
         long now = System.currentTimeMillis();
 
         if (m_lastActionMillis == 0) {
-            m_clawSolenoid.set(DoubleSolenoid.Value.kForward);
+            m_clawSolenoid.set(true);
             m_lastActionMillis = now;
         } else if (now > m_lastActionMillis + m_config.m_openMilliseconds) {
-            m_clawSolenoid.set(DoubleSolenoid.Value.kOff);
             m_currentState = ClawState.Open;
             m_lastActionMillis = 0;
         }
@@ -90,10 +89,9 @@ public class ClawSubsystem extends SubsystemBase {
         long now = System.currentTimeMillis();
 
         if (m_lastActionMillis == 0) {
-            m_clawSolenoid.set(DoubleSolenoid.Value.kReverse);
+            m_clawSolenoid.set(false);
             m_lastActionMillis = now;
         } else if (now > m_lastActionMillis + m_config.m_openMilliseconds) {
-            m_clawSolenoid.set(DoubleSolenoid.Value.kOff);
             m_currentState = ClawState.Closed;
             m_lastActionMillis = 0;
         }

@@ -50,6 +50,8 @@ public class RobotContainer {
     subsystemFactory.CreateIntakeArmSubsystem();
     subsystemFactory.CreateClawSubsystem();
     subsystemFactory.CreateWristSubsystem();
+    subsystemFactory.CreateArmRotationSubsystem();
+    subsystemFactory.CreateArmExtensionSubsystem();
 
     m_drivetrainSubsystem = subsystemFactory.CreateSwerveDriveSubsystem();
 
