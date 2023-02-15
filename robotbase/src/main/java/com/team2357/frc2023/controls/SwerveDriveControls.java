@@ -1,6 +1,7 @@
 package com.team2357.frc2023.controls;
 
 import com.team2357.frc2023.commands.AutoBalanceCommand;
+import com.team2357.frc2023.commands.ChangeToDifferentialDriveCommand;
 import com.team2357.frc2023.commands.ReverseIntakeCommand;
 import com.team2357.frc2023.commands.RunIntakeCommand;
 import com.team2357.frc2023.subsystems.IntakeRollerSubsystem;
@@ -35,12 +36,7 @@ public class SwerveDriveControls {
         m_rightBumper.whileTrue(new RunIntakeCommand());
         m_leftBumper.whileTrue(new ReverseIntakeCommand());
 
-        m_aButton.onTrue(new InstantCommand(() -> {
-            m_isDifferentialDrive = !m_isDifferentialDrive;
-            if (m_isDifferentialDrive) {
-                SwerveDriveSubsystem.getInstance().zeroDifferentialDrive();
-            }
-        }));
+        m_aButton.toggleOnTrue(new ChangeToDifferentialDriveCommand(this));
     }
 
     public double getX() {

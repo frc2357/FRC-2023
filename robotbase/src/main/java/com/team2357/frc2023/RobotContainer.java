@@ -4,7 +4,7 @@
 
 package com.team2357.frc2023;
 
-import com.team2357.frc2023.commands.DefaultDriveCommand;
+import com.team2357.frc2023.commands.DefaultSwerveDriveCommand;
 import com.team2357.frc2023.controls.SwerveDriveControls;
 import com.team2357.frc2023.shuffleboard.AutoCommandChooser;
 import com.team2357.frc2023.subsystems.IntakeRollerSubsystem;
@@ -55,7 +55,7 @@ public class RobotContainer {
 
     m_drivetrainSubsystem = subsystemFactory.CreateSwerveDriveSubsystem();
 
-    m_drivetrainSubsystem.setDefaultCommand(new DefaultDriveCommand(
+    m_drivetrainSubsystem.setDefaultCommand(new DefaultSwerveDriveCommand(
         m_drivetrainSubsystem,
         new SwerveDriveControls(m_controller, Constants.CONTROLLER.DRIVE_CONTROLLER_DEADBAND)));
 

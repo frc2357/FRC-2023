@@ -6,11 +6,11 @@ import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class DefaultDriveCommand extends CommandBase {
+public class DefaultDifferentialDriveCommand extends CommandBase {
     private final SwerveDriveSubsystem m_drivetrainSubsystem;
     private final SwerveDriveControls m_controls;
 
-    public DefaultDriveCommand(SwerveDriveSubsystem drivetrainSubsystem,
+    public DefaultDifferentialDriveCommand(SwerveDriveSubsystem drivetrainSubsystem,
             SwerveDriveControls controls) {
         m_drivetrainSubsystem = drivetrainSubsystem;
         m_controls = controls;
@@ -20,15 +20,7 @@ public class DefaultDriveCommand extends CommandBase {
 
     @Override
     public void execute() {
-        if (m_controls.isDifferentialDrive()) {
-            m_drivetrainSubsystem.differentialDrive(m_controls.getY(), m_controls.getRotation());
-        } else {
-            m_drivetrainSubsystem.drive(
-                m_controls.getY(),
-                m_controls.getX(),
-                m_controls.getRotation());
-        }
-
+        m_drivetrainSubsystem.differentialDrive(m_controls.getY(), m_controls.getRotation());
     }
 
     @Override
