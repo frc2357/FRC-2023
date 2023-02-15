@@ -6,6 +6,7 @@ package com.team2357.frc2023.subsystems;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.pathplanner.lib.PathConstraints;
@@ -331,15 +332,16 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	}
 
 	public void zeroDifferentialDrive() {
-		WPI_TalonFX motor;
+		WPI_TalonFX frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor;
+		frontLeftMotor = (WPI_TalonFX)m_frontLeftModule.getDriveMotor();
+		frontRightMotor = (WPI_TalonFX)m_frontRightModule.getDriveMotor();
+		backLeftMotor = (WPI_TalonFX)m_backLeftModule.getDriveMotor();
+		backRightMotor = (WPI_TalonFX)m_backRightModule.getDriveMotor();
 
-		SwerveModuleState state = new SwerveModuleState(0.0, Rotation2d.fromDegrees(0.0));
-		double desiredAngle = state.angle.getRadians() / m_config.m_sensorPositionCoefficient;
-
-		for (SwerveModule module : new SwerveModule[]{m_frontLeftModule, m_frontRightModule, m_backLeftModule, m_backRightModule}) {
-			motor = (WPI_TalonFX)module.getSteerMotor();
-			motor.setSelectedSensorPosition(desiredAngle);
-		}
+		frontLeftMotor.set(ControlMode.Position, Constants.DRIVE.FRONT_LEFT_MODULE_STEER_OFFSET);
+		frontRightMotor.set(ControlMode.Position, Constants.DRIVE.FRONT_RIGHT_MODULE_STEER_OFFSET);
+		backLeftMotor.set(ControlMode.Position, Constants.DRIVE.BACK_LEFT_MODULE_STEER_OFFSET);
+		backRightMotor.set(ControlMode.Position, Constants.DRIVE.BACK_RIGHT_MODULE_STEER_OFFSET);
     }
 
 	public void setOdemetryFromApriltag() {
