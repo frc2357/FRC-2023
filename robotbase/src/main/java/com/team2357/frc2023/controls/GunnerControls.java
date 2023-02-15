@@ -15,7 +15,10 @@ import static com.team2357.frc2023.Constants.*;
 import com.team2357.frc2023.commands.human.panic.ArmExtenderCommand;
 import com.team2357.frc2023.commands.human.panic.ArmRotationCommand;
 import com.team2357.frc2023.commands.human.panic.ClawToggleCommand;
+import com.team2357.frc2023.commands.human.panic.IntakeArmToggleCommand;
+import com.team2357.frc2023.commands.human.panic.IntakeAxisRollerCommand;
 import com.team2357.frc2023.commands.human.panic.WristToggleCommand;
+
 
 /**
  * These are the controls for the gunner.
@@ -109,6 +112,7 @@ public class GunnerControls {
         Trigger rightDPadOnly = m_rightDPad.and(noLetterButtons);
         
         Trigger upDPadAndA = m_upDPad.and(m_aButton);
+
         Trigger upDPadAndX = m_upDPad.and(m_xButton);
         Trigger upDPadAndY = m_upDPad.and(m_yButton);
         Trigger upDPadAndB = m_upDPad.and(m_bButton);
@@ -137,5 +141,7 @@ public class GunnerControls {
         leftDPadOnly.whileTrue(new ArmExtenderCommand(axisRightStickY));
         leftDPadAndA.onTrue(new WristToggleCommand());
         leftDPadAndB.onTrue(new ClawToggleCommand());
+        rightDPadOnly.whileTrue(new IntakeAxisRollerCommand(axisRightStickY));
+        rightDPadAndA.onTrue(new IntakeArmToggleCommand());
     }
 }
