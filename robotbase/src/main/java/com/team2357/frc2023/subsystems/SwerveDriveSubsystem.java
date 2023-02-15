@@ -119,6 +119,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		 * moduleConfiguration.getSteerReduction()
 		 */
 		public double m_sensorPositionCoefficient;
+		public double m_sensorUnitsPerRotation;
 	}
 
 	public SwerveDriveSubsystem(WPI_Pigeon2 pigeon, SwerveModule frontLeft, SwerveModule frontRight,
@@ -331,15 +332,15 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
 	public void zeroDifferentialDrive() {
 		WPI_TalonFX frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor;
-		frontLeftMotor = (WPI_TalonFX)m_frontLeftModule.getDriveMotor();
-		frontRightMotor = (WPI_TalonFX)m_frontRightModule.getDriveMotor();
-		backLeftMotor = (WPI_TalonFX)m_backLeftModule.getDriveMotor();
-		backRightMotor = (WPI_TalonFX)m_backRightModule.getDriveMotor();
+		frontLeftMotor = (WPI_TalonFX)m_frontLeftModule.getSteerMotor();
+		frontRightMotor = (WPI_TalonFX)m_frontRightModule.getSteerMotor();
+		backLeftMotor = (WPI_TalonFX)m_backLeftModule.getSteerMotor();
+		backRightMotor = (WPI_TalonFX)m_backRightModule.getSteerMotor();
 
-		frontLeftMotor.set(ControlMode.Position, Constants.DRIVE.FRONT_LEFT_MODULE_STEER_OFFSET / m_config.m_sensorPositionCoefficient);
-		frontRightMotor.set(ControlMode.Position, Constants.DRIVE.FRONT_RIGHT_MODULE_STEER_OFFSET / m_config.m_sensorPositionCoefficient);
-		backLeftMotor.set(ControlMode.Position, Constants.DRIVE.BACK_LEFT_MODULE_STEER_OFFSET / m_config.m_sensorPositionCoefficient);
-		backRightMotor.set(ControlMode.Position, Constants.DRIVE.BACK_RIGHT_MODULE_STEER_OFFSET / m_config.m_sensorPositionCoefficient);
+		frontLeftMotor.set(ControlMode.Position, frontLeftMotor.getSelectedSensorPosition() + frontLeftMotor.getSelectedSensorPosition() % m_config.m_sensorUnitsPerRotation);
+		frontRightMotor.set(ControlMode.Position, frontRightMotor.getSelectedSensorPosition() + frontRightMotor.getSelectedSensorPosition() % m_config.m_sensorUnitsPerRotation);
+		backLeftMotor.set(ControlMode.Position, backLeftMotor.getSelectedSensorPosition() + backLeftMotor.getSelectedSensorPosition() % m_config.m_sensorUnitsPerRotation);
+		backRightMotor.set(ControlMode.Position, backRightMotor.getSelectedSensorPosition() + backRightMotor.getSelectedSensorPosition() % m_config.m_sensorUnitsPerRotation);
     }
 
 	public void setOdemetryFromApriltag() {
