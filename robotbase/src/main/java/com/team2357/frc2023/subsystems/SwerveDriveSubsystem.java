@@ -326,9 +326,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	}
 
 	public void differentialDrive(double speedProportion, double turnProportion) {
-		double leftProportion = speedProportion - turnProportion;
-		double rightProportion = speedProportion - turnProportion;
-		m_differentialDrive.tankDrive(leftProportion, rightProportion);
+		m_differentialDrive.arcadeDrive(speedProportion, turnProportion);
 	}
 
 	public void zeroDifferentialDrive() {
@@ -338,10 +336,10 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		backLeftMotor = (WPI_TalonFX)m_backLeftModule.getDriveMotor();
 		backRightMotor = (WPI_TalonFX)m_backRightModule.getDriveMotor();
 
-		frontLeftMotor.set(ControlMode.Position, Constants.DRIVE.FRONT_LEFT_MODULE_STEER_OFFSET);
-		frontRightMotor.set(ControlMode.Position, Constants.DRIVE.FRONT_RIGHT_MODULE_STEER_OFFSET);
-		backLeftMotor.set(ControlMode.Position, Constants.DRIVE.BACK_LEFT_MODULE_STEER_OFFSET);
-		backRightMotor.set(ControlMode.Position, Constants.DRIVE.BACK_RIGHT_MODULE_STEER_OFFSET);
+		frontLeftMotor.set(ControlMode.Position, Constants.DRIVE.FRONT_LEFT_MODULE_STEER_OFFSET / m_config.m_sensorPositionCoefficient);
+		frontRightMotor.set(ControlMode.Position, Constants.DRIVE.FRONT_RIGHT_MODULE_STEER_OFFSET / m_config.m_sensorPositionCoefficient);
+		backLeftMotor.set(ControlMode.Position, Constants.DRIVE.BACK_LEFT_MODULE_STEER_OFFSET / m_config.m_sensorPositionCoefficient);
+		backRightMotor.set(ControlMode.Position, Constants.DRIVE.BACK_RIGHT_MODULE_STEER_OFFSET / m_config.m_sensorPositionCoefficient);
     }
 
 	public void setOdemetryFromApriltag() {

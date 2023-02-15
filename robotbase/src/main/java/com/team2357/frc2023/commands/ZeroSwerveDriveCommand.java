@@ -6,10 +6,10 @@ import com.team2357.lib.commands.CommandLoggerBase;
 
 import edu.wpi.first.wpilibj.DriverStation;
 
-public class ZeroDriveCommand extends CommandLoggerBase {
+public class ZeroSwerveDriveCommand extends CommandLoggerBase {
     private double m_startMillis;
     
-    public ZeroDriveCommand() {
+    public ZeroSwerveDriveCommand() {
         addRequirements(SwerveDriveSubsystem.getInstance());
     }
 

@@ -1,6 +1,6 @@
 package com.team2357.frc2023.shuffleboard;
 
-import com.team2357.frc2023.commands.ZeroDriveCommand;
+import com.team2357.frc2023.commands.ZeroSwerveDriveCommand;
 import com.team2357.frc2023.commands.auto.blue.grid3.BlueGridThreeTwoConeAutoCommand;
 import com.team2357.frc2023.util.AvailableTrajectoryCommands;
 import com.team2357.frc2023.util.TrajectoryUtil;
@@ -64,7 +64,7 @@ public class AutoCommandChooser {
     public Command generateCommand() {
         CommandScheduler.getInstance().removeComposedCommand(choosers[0].getActionCommand());
         return new SequentialCommandGroup(
-                new ParallelCommandGroup(choosers[0].getWaitCommand(), new ZeroDriveCommand()),
+                new ParallelCommandGroup(choosers[0].getWaitCommand(), new ZeroSwerveDriveCommand()),
                 choosers[0].getActionCommand());
     }
 }

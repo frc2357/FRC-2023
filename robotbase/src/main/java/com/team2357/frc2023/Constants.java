@@ -134,6 +134,7 @@ public final class Constants {
         public static final double TICKS_PER_ROTATION = 2048.0;
 
         public static final double WAIT_FOR_ZERO_TIME_MILLIS = 250;
+        public static final double WAIT_FOR_DIFFERENTIAL_ZERO_TIME_MILLIS = 1;
 
         public static final double ENCODER_SYNC_ACCURACY_RADIANS = 0.05;
 
@@ -142,7 +143,6 @@ public final class Constants {
         public static final double ROTATE_MAX_SPEED = .45;
         public static final double SYNC_ENCODER_LIMIT_MS = 10000;
 
-        public static final double DIFFERENTIAL_ZERO_WAIT_SECONDS = 1;
     }
 
     public static final class INTAKE_ROLLER {
