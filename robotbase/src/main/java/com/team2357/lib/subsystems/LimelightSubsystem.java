@@ -9,12 +9,10 @@ package com.team2357.lib.subsystems;
 
 import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.DoubleArrayTopic;
-import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.PubSubOption;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * Controls the limelight camera options.
@@ -70,8 +68,8 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
   private NetworkTableEntry m_Thor = m_Table.getEntry("thor");
   private NetworkTableEntry m_Tvert = m_Table.getEntry("tvert");
 
-  private DoubleArrayTopic m_limelightOdometry = m_Table.getDoubleArrayTopic("botpose");
-  private DoubleArraySubscriber m_limelightOdometrySub = m_limelightOdometry.subscribe(null, PubSubOption.keepDuplicates(true));
+  private DoubleArrayTopic m_limelightPoseInfo = m_Table.getDoubleArrayTopic("botpose");
+  private DoubleArraySubscriber m_limelightPoseInfoSub = m_limelightPoseInfo.subscribe(null, PubSubOption.keepDuplicates(true));
   
   private Configuration m_Configuration = new Configuration();
 
@@ -247,8 +245,8 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
 
     return distance;
   }
-  public double[] getLimelightOdometry(){
-    return m_limelightOdometrySub.get();
+  public double[] getLimelightPoseInfo(){
+    return m_limelightPoseInfoSub.get();
   }
   /*
   @Override
