@@ -1,9 +1,10 @@
 package com.team2357.frc2023.commands;
 
 import com.team2357.frc2023.Constants;
-import com.team2357.frc2023.commands.scoring.CloseClawCommand;
-import com.team2357.frc2023.commands.scoring.ExtendArmToPositionCommand;
-import com.team2357.frc2023.commands.scoring.RotateArmToPositionCommand;
+import com.team2357.frc2023.commands.autoScoring.CloseClawCommand;
+import com.team2357.frc2023.commands.autoScoring.ExtendArmToPositionCommand;
+import com.team2357.frc2023.commands.autoScoring.RotateArmToPositionCommand;
+import com.team2357.frc2023.commands.intake.StowIntakeCommand;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
