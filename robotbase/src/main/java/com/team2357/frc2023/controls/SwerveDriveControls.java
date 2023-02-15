@@ -11,11 +11,14 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 public class SwerveDriveControls {
+    private boolean m_isDifferentialDrive;
+    
     private XboxController m_controller;
     private double m_deadband;
     private JoystickButton m_backButton;
     private JoystickButton m_rightBumper;
     private JoystickButton m_leftBumper;
+    private JoystickButton m_aButton;
 
     public static boolean isFlipped;
 
@@ -25,11 +28,16 @@ public class SwerveDriveControls {
         m_backButton = new JoystickButton(m_controller, XboxRaw.Back.value);
         m_rightBumper = new JoystickButton(m_controller, XboxRaw.BumperRight.value);
         m_leftBumper = new JoystickButton(m_controller, XboxRaw.BumperLeft.value);
+        m_aButton = new JoystickButton(m_controller, XboxRaw.A.value);
 
         m_backButton.onTrue(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().zeroGyroscope()));
 
         m_rightBumper.whileTrue(new RunIntakeCommand());
         m_leftBumper.whileTrue(new ReverseIntakeCommand());
+
+        m_aButton.onTrue(new InstantCommand(() -> {
+            m_isDifferentialDrive = !m_isDifferentialDrive;
+        }));
     }
 
     public double getX() {
@@ -66,5 +74,9 @@ public class SwerveDriveControls {
         value = deadband(value, m_deadband);
         value = Math.copySign(value * value, value);
         return value;
+    }
+
+    public boolean isDifferentialDrive() {
+        return m_isDifferentialDrive;
     }
 }
