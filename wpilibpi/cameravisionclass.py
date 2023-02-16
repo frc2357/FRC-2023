@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+import glob
 import json
 import time
 import sys
@@ -9,8 +9,6 @@ import numpy as np
 
 from cscore import CameraServer, VideoSource, UsbCamera, MjpegServer
 from ntcore import NetworkTableInstance, EventFlags
-
-CHECKERBOARD = (7,10)
 
 class CameraConfig: pass
 
@@ -27,21 +25,31 @@ def list_cameras():
         print(cam.getConfigJsonObject())
     return cams
 
+class CameraObject:
+    """ a lightweight class for cameras """
+    pass
+
 class CameraVision:
     """
     A consolidated class to configure and start cameras, for use on wpilipbi / opencv
     """
     
     # the following are singletons - i.e. we don't want to create more instances
-    __slots__ = ["configFile","team","server","cameraConfigs","cameras","sinks","outstreams"]
+    #__slots__ = ["configFile","team","server","cameraConfigs","cameras","sinks","outstreams"]
+    configFile = None
+    team = None
+    server = False 
+    cameraConfigs = []
+    cameras = []
+    outstreams = []
 
-    def __init__(self, configFile=".\\pc.json"):
+    def __init__(self, configFile=".\\pc.json", simulate=False):
         self.configFile = configFile 
-        self.team = None
-        self.server = False
-        self.cameraConfigs = []
-        self.cameras = []
-        self.outstreams = []
+        #self.team = None
+        #self.server = False
+        #self.cameraConfigs = []
+        #self.cameras = []
+        #self.outstreams = []
         self.readConfig(configFile)
         ntinst = NetworkTableInstance.getDefault()
         if self.server:
@@ -53,9 +61,26 @@ class CameraVision:
             ntinst.setServerTeam(self.team)
             ntinst.startDSClient()
 
-        # start cameras
-        for config in self.cameraConfigs:
-            self.cameras.append(self.startCamera(config))        
+        if simulate:
+            imgs = []
+            fimages = glob.glob(".\images\*.png")
+            print(fimages)
+            for fname in fimages:
+                imgs.append(np.ascontiguousarray(cv2.imread(fname)))
+            camConfig = dict()
+            camConfig['width'] = imgs[0].shape[1]
+            camConfig["height"] = imgs[0].shape[0]    
+            self.cameraConfigs.append(camConfig)   
+            c = CameraObject()
+            c.camera = None
+            c.config = camConfig 
+            c.sink = None
+            c.outstream = CameraServer.putVideo("VideoStream", camConfig["width"], camConfig["height"])
+            c.images = imgs
+            self.cameras.append(c)
+        else:
+            for config in self.cameraConfigs:
+                self.cameras.append(self.startCamera(config))        
 
     def parseError(self, str)->None:
         """Report parse error."""
@@ -64,14 +89,12 @@ class CameraVision:
     def readCameraConfig(self, config)->None:
         """Read single camera configuration."""
         cam = CameraConfig()
-
         # name
         try:
             cam.name = config["name"]
         except KeyError:
             self.parseError("could not read camera name")
             return False
-
         # path
         try:
             cam.path = config["path"]
@@ -85,9 +108,7 @@ class CameraVision:
             pass
         # stream properties
         cam.streamConfig = config.get("stream")
-
         cam.config = config
-
         self.cameraConfigs.append(cam)
         return True
     
@@ -95,7 +116,6 @@ class CameraVision:
         """Read configuration file."""
         if configFile:
             self.configFile = configFile
-        
         cfg = self.configFile
         # parse file
         try:
@@ -104,19 +124,16 @@ class CameraVision:
         except OSError as err:
             print("could not open '{}': {}".format(cfg, err), file=sys.stderr)
             return False
-
         # top level must be an object
         if not isinstance(j, dict):
             self.parseError("must be JSON object")
             return False
-
         # team number
         try:
             self.team = j["team"]
         except KeyError:
             self.parseError("could not read team number")
             return False
-
         # ntmode (optional)
         if "ntmode" in j:
             str = j["ntmode"]
@@ -126,7 +143,6 @@ class CameraVision:
                 self.server = True
             else:
                 self.parseError("could not understand ntmode value '{}'".format(str))
-
         # cameras
         try:
             cameras = j["cameras"]
@@ -159,8 +175,10 @@ class CameraVision:
         #blackFrame = np.zeros(shape=(camConfig["height"], camConfig["width"], 3), dtype=np.uint8)
         camConfig = camera.getConfigJsonObject()
         outputStream = CameraServer.putVideo("VideoStream", camConfig["width"], camConfig["height"])
-
-        self.cameras.append(camera)
-        self.outstreams.append(outputStream)
-        #return { "camera": camera, "sink": CameraServer.getVideo(camera=camera) }
+        c = CameraObject()
+        c.camera = camera
+        c.config = camConfig 
+        c.outstream = outputStream 
+        c.sink = CameraServer.getVideo(camera)
+        return c
 
