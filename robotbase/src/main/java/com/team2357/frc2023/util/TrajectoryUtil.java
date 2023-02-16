@@ -12,6 +12,7 @@ import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
@@ -21,6 +22,7 @@ public class TrajectoryUtil {
 			final boolean resetOdometry) {
 		final PathPlannerTrajectory trajectory = PathPlanner.loadPath(trajectoryFileName,
 				SwerveDriveSubsystem.getInstance().getPathConstraints());
+				
 		return createDrivePathCommand(trajectory, resetOdometry);
 	}
 
@@ -52,9 +54,10 @@ public class TrajectoryUtil {
 
 		pathCommand.addCommands(new InstantCommand(() -> {
 			if (resetOdometry) {
-				PathPlannerState initialSample = (PathPlannerState) trajectory.sample(0);
-				Pose2d initialPose = new Pose2d(initialSample.poseMeters.getTranslation(),
-						initialSample.holonomicRotation);
+				PathPlannerState initialState = trajectory.getInitialState();
+				initialState = PathPlannerTrajectory.transformStateForAlliance(initialState, DriverStation.getAlliance());
+				Pose2d initialPose = new Pose2d(initialState.poseMeters.getTranslation(),
+				initialState.holonomicRotation);
 				swerveDrive.resetOdometry(initialPose);
 			}
 			swerveDrive.getXController().reset();
@@ -70,7 +73,7 @@ public class TrajectoryUtil {
 				swerveDrive.getThetaController(),
 				(SwerveModuleState[] moduleStates) -> {
 					swerveDrive.drive(SwerveDriveSubsystem.getInstance().getKinematics().toChassisSpeeds(moduleStates));
-				}));
+				}, true));
 
 		pathCommand.addCommands(new InstantCommand(() -> swerveDrive.drive(new ChassisSpeeds())));
 
