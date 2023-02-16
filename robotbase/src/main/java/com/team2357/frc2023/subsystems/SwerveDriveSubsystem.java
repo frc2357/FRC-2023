@@ -64,8 +64,9 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	public DoubleArrayTopic m_limelightInfo;
 	private DoubleArraySubscriber m_limelightSubscriber;
 
-	private MotorControllerGroup m_rightControllerGroup, m_leftControllerGroup;
-	private DifferentialDrive m_differentialDrive;
+	private MotorControllerGroup m_rightControllerGroup = null;
+	private MotorControllerGroup m_leftControllerGroup = null;
+	private DifferentialDrive m_differentialDrive = null;
 
 	public static class Configuration {
 		/**
@@ -161,17 +162,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		m_pathConstraints = new PathConstraints(m_config.m_trajectoryMaxVelocityMetersPerSecond,
 				m_config.m_trajectoryMaxAccelerationMetersPerSecond);
 
-		// Differential dirve
-		m_leftControllerGroup = new MotorControllerGroup(
-			new WPI_TalonFX(Constants.CAN_ID.FRONT_LEFT_MODULE_DRIVE_MOTOR_ID),
-			new WPI_TalonFX[]{new WPI_TalonFX(Constants.CAN_ID.BACK_LEFT_MODULE_DRIVE_MOTOR_ID)}
-		);
-		m_rightControllerGroup = new MotorControllerGroup(
-			new WPI_TalonFX(Constants.CAN_ID.FRONT_RIGHT_MODULE_DRIVE_MOTOR_ID),
-			new WPI_TalonFX[]{new WPI_TalonFX(Constants.CAN_ID.BACK_RIGHT_MODULE_DRIVE_MOTOR_ID)}
-		);
-
-		m_differentialDrive = new DifferentialDrive(m_leftControllerGroup, m_rightControllerGroup);
+		
 	}
 
 	public PIDController getXController() {
@@ -215,9 +206,14 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		double difference = Math.abs(steerMotor.getSelectedSensorPosition() * m_config.m_sensorPositionCoefficient
 				- steerEncoder.getAbsoluteAngle());
 		difference %= Math.PI;
-		System.out.println(difference);
-		return difference < Constants.DRIVE.ENCODER_SYNC_ACCURACY_RADIANS
-				|| Math.abs(difference - Math.PI) < Constants.DRIVE.ENCODER_SYNC_ACCURACY_RADIANS;
+		boolean returnValue = difference < Constants.DRIVE.ENCODER_SYNC_ACCURACY_RADIANS
+		|| Math.abs(difference - Math.PI) < Constants.DRIVE.ENCODER_SYNC_ACCURACY_RADIANS;
+
+		if (!returnValue) {
+			System.out.println(difference);
+		}
+
+		return returnValue;
 	}
 
 	public boolean checkEncodersSynced() {
@@ -225,6 +221,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 				(isEncoderSynced(m_frontRightModule)) &&
 				(isEncoderSynced(m_backLeftModule)) &&
 				(isEncoderSynced(m_backRightModule)));
+		System.out.println("Break");
 
 		return m_areEncodersSynced;
 	}
@@ -324,6 +321,25 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 				states[3].angle.getRadians());
 
 		Logger.getInstance().recordOutput("Swerve States", states);
+	}
+
+	public void createDifferentialDrive() {
+		m_leftControllerGroup = new MotorControllerGroup(
+			new WPI_TalonFX(Constants.CAN_ID.FRONT_LEFT_MODULE_DRIVE_MOTOR_ID),
+			new WPI_TalonFX[]{new WPI_TalonFX(Constants.CAN_ID.BACK_LEFT_MODULE_DRIVE_MOTOR_ID)}
+		);
+		m_rightControllerGroup = new MotorControllerGroup(
+			new WPI_TalonFX(Constants.CAN_ID.FRONT_RIGHT_MODULE_DRIVE_MOTOR_ID),
+			new WPI_TalonFX[]{new WPI_TalonFX(Constants.CAN_ID.BACK_RIGHT_MODULE_DRIVE_MOTOR_ID)}
+		);
+
+		m_differentialDrive = new DifferentialDrive(m_leftControllerGroup, m_rightControllerGroup);
+	}
+
+	public void deleteDifferentialDrive() {
+		m_leftControllerGroup = null;
+		m_rightControllerGroup = null;
+		m_differentialDrive = null;
 	}
 
 	public void differentialDrive(double speedProportion, double turnProportion) {

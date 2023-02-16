@@ -100,7 +100,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void teleopInit() {
 
-    CommandScheduler.getInstance().schedule(new ZeroSwerveDriveCommand());
+    // CommandScheduler.getInstance().schedule(new ZeroSwerveDriveCommand());
     CommandScheduler.getInstance().schedule(new OrientControllerInputsCommand());
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to

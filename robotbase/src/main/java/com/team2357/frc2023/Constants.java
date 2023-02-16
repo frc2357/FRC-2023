@@ -134,7 +134,7 @@ public final class Constants {
         public static final double TICKS_PER_ROTATION = 2048.0;
 
         public static final double WAIT_FOR_ZERO_TIME_MILLIS = 250;
-        public static final double WAIT_FOR_DIFFERENTIAL_ZERO_TIME_MILLIS = 1;
+        public static final double WAIT_FOR_DIFFERENTIAL_ZERO_TIME = 1;
 
         public static final double ENCODER_SYNC_ACCURACY_RADIANS = 0.05;
 

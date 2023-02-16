@@ -14,12 +14,14 @@ public class ChangeToDifferentialDriveCommand extends CommandBase {
 
     @Override
     public void initialize() {
+        SwerveDriveSubsystem.getInstance().createDifferentialDrive();
         SwerveDriveSubsystem.getInstance().setDefaultCommand(new DefaultDifferentialDriveCommand(SwerveDriveSubsystem.getInstance(), m_controls));
         new ZeroDifferentialDriveCommand().schedule();
     }
 
     @Override
     public void end(boolean interrupted) {
+        SwerveDriveSubsystem.getInstance().deleteDifferentialDrive();
         SwerveDriveSubsystem.getInstance().setDefaultCommand(new DefaultSwerveDriveCommand(SwerveDriveSubsystem.getInstance(), m_controls));
     }
 }

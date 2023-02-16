@@ -19,6 +19,6 @@ public class ZeroDifferentialDriveCommand extends CommandLoggerBase {
 
     @Override
     public boolean isFinished() {
-        return System.currentTimeMillis() - m_startMillis >= Constants.DRIVE.WAIT_FOR_DIFFERENTIAL_ZERO_TIME_MILLIS;
+        return System.currentTimeMillis() - m_startMillis >= Constants.DRIVE.WAIT_FOR_DIFFERENTIAL_ZERO_TIME;
     }
 }
