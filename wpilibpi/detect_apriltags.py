@@ -15,34 +15,46 @@ import math
 
 from cameravisionclass import CameraVision
 from calibration_from_opencv import CameraCalibration
-cal = CameraCalibration()
+cal = CameraCalibration
 
-
+import glob
 if __name__ == "__main__":
-    cfgfile = None
+    cfgfile = "/boot/frc.json"
+    simulate = False
+    imgs = []
     if len(sys.argv) > 1:
         cfgfile = str(sys.argv[1])
-    camvis = CameraVision(cfgfile) # this class automatically creates all camera objects
-    camConfig = camvis.cameras[0].getConfigJsonObject()
-    detector,estimator = apriltag_funcs.get_apriltag_detector_and_estimator([camConfig["width"],camConfig["height"]])
+    if len(sys.argv) > 2:
+        simulate = True
+    camvis = CameraVision(cfgfile, simulate=True) # this class automatically creates all camera objects
+    cam0 = camvis.cameras[0]
+    #camConfig = camvis.cameras[0].getConfigJsonObject()
+    #sink1,outstream1 = camvis.getComponents(0)
+    print(f'Camera width = {cam0.config["width"]}, {cam0.config["height"]}')
+    frame = np.zeros(shape=(cam0.config["height"], cam0.config["width"], 3), dtype=np.uint8)
+    detector,estimator = apriltag_funcs.get_apriltag_detector_and_estimator([cam0.config["width"],cam0.config["height"]],1000,1000,cam0.config["width"]/2,cam0.config["height"]/2)
     
-    frame = np.zeros(shape=(camConfig["height"], camConfig["width"], 3), dtype=np.uint8)
-    sink1,outstream1 = camvis.getComponents(0)
-    #projectPoints	(	InputArray 	objectPoints,InputArray 	rvec,InputArray 	tvec,InputArray 	cameraMatrix,InputArray 	distCoeffs,OutputArray 	imagePoints,OutputArray 	jacobian = noArray(),double 	aspectRatio = 0 )	
-    # loop forever
 count = 0
 avg = 0
+import random
+idx = random.randint(0,9)
 while True:
     start = time.perf_counter()
-    sink1.grabFrame(frame)
-    #frame = cal.undistort(frame) # TODO: Is this necessary? -- AprilTags already using calibration values
+    
+    if simulate:
+        frame = cam0.images[count%len(cam0.images)]
+    else:
+        cam0.sink.grabFrame(frame)
+    #output = cal.undistort(frame) # this might not be necessary, AprilTags already using camera Cx,Cy,Fx,Fy values
     output = apriltag_funcs.detect_and_process_apriltag(frame, detector, estimator)
-    outstream1.putFrame(output)
+    cam0.outstream.putFrame(output)
     end = time.perf_counter()
     avg += end-start
     count += 1
     if(count%10 == 0):
         print(f"AprilTags Processing took Avg: {avg/10.0:.3f} sec")
         avg = 0
-        count = 0
-    time.sleep(0.05)
+        #count = 0
+    for i in range(0,30):
+        cam0.outstream.putFrame(output)
+        time.sleep(0.02)
