@@ -92,29 +92,34 @@ cal_json="""{"mtx":[1028.90904278,0.,638.57001085,0., 1028.49276415,337.36382032
 #     newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dst, (w,h), 1, (w,h))
 #     np.savez("CAL.npz",mtx,dist,rvecs,tvecs,newcameramtx,roi)
 
-def load_cal_npz(filename='CAL.npz'):
-    with np.load(filename) as X:
-        mtx, dist, rvecs, tvecs, newcameramtx, roi= [X[i] for i in ('mtx','dist','rvecs','tvecs')]
-    return mtx, dist, newcameramtx, roi
+#def load_cal_npz(filename='CAL.npz'):
+#    with np.load(filename) as X:
+#        mtx, dist, rvecs, tvecs, newcameramtx, roi= [X[i] for i in ('mtx','dist','rvecs','tvecs')]
+#    return mtx, dist, newcameramtx, roi
 
 class CameraCalibration:
     """ 
     Lightweight class to hold Calibration Coefficients and mapped undistort function
+    using __slots__ is the method to make the most lightweight class in python
     """
-    __slots__ = ["mtx","dst","img_size","newmtx","roi","undistort"]
+    def __init__(self, mtx,dst,img_size=(1280,720),newmtx=None,roi=None):
+        self.mtx = mtx
+        self.dst = dst
+        self.img_size = img_size
+        self.newmtx = newmtx
+        if roi is None:
+            self.roi = [0,0,img_size[0],img_size[1]]
 
-def wrapped_undistort(img):
-    c = CameraCalibration
-    ret = cv2.undistort(img,c.mtx,None,c.dst,c.newmtx)
-    x, y, w, h = c.roi 
-    return ret[y:y+h, x:x+w]
+    def undistort(self,img):
+        #cv.undistort(	src, cameraMatrix, distCoeffs[, dst[, newCameraMatrix]]	) ->	dst
+        dest = None
+        ret = cv2.undistort(img,self.mtx,self.dst,dest,self.newmtx)
+        x, y, w, h = self.roi 
+        return ret[y:y+h, x:x+w]
 
-def wrapped_projectPoints(pts, rvec=[0, 0, 0], tvec=[0, 0, 0] ):
-    c = CameraCalibration
-    return cv2.projectPoints(pts, rvec, tvec, c.mtx, c.dst)
-    
-CameraCalibration.undistort = wrapped_undistort # Now set the CameraCalibration.undistort function
-CameraCalibration.projectPoints = wrapped_projectPoints
+    def projectPoints(self, pts, rvec=[0, 0, 0], tvec=[0, 0, 0] ):
+        #cv.projectPoints(	objectPoints, rvec, tvec, cameraMatrix, distCoeffs[, imagePoints[, jacobian[, aspectRatio]]]	) ->	imagePoints, jacobian
+        return cv2.projectPoints(pts, rvec, tvec, self.mtx, self.dst)
 
 def load_cal_json(jstr):
     # calibdb.net json output
@@ -122,17 +127,14 @@ def load_cal_json(jstr):
     import numpy as np
     from functools import partial
     j = json.loads(jstr)
-    CameraCalibration.mtx = mtx= np.array(j['camera_matrix']['data']).reshape(3,3)
-    CameraCalibration.dst = dst= np.array(j['distortion_coefficients']['data'])
-    CameraCalibration.img_size = img_size = j['img_size']['data']
-    CameraCalibration.newmtx,CameraCalibration.roi = cv2.getOptimalNewCameraMatrix(mtx,dst,img_size,1,img_size)
+    mtx= np.array(j['camera_matrix']['data']).reshape(3,3)
+    dst= np.array(j['distortion_coefficients']['data'])
+    img_size = j['img_size']['data']
+    newmtx,roi= cv2.getOptimalNewCameraMatrix(mtx,dst,img_size,1,img_size)
+    return CameraCalibration(mtx, dst, img_size, newmtx,roi)
 
-load_cal_json(jsonstr) # load calibration data in CameraCalibration class
-
-#def undistort(img):
-#    dst = cv2.undistort(img, mtx, dst, None, newcameramtx)
-#    # crop the image
-#    x, y, w, h = roi
-#    dst = dst[y:y+h, x:x+w]
+# create imag_cal and cam0 CameraCalibration instances on import
+image_cal = CameraCalibration(mtx = np.array([1000, 0, 1280/2,0,1000,720/2,0,0,1]).reshape(3,3),dst=np.float32([0,0,0,0]))
+cam0 = load_cal_json(jsonstr) # load calibration data in CameraCalibration class
 
    
