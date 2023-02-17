@@ -106,7 +106,7 @@ public final class Constants {
             config.m_thetaController = new PIDController(2.15, 0, 0);
 
             config.m_sensorUnitsPerRotation = Constants.DRIVE.TICKS_PER_ROTATION * SdsModuleConfigurations.MK4I_L2.getSteerReduction();
-            config.m_sensorPositionCoefficient = 2.0 * Math.PI / config.m_sensorUnitsPerRotation;
+            config.m_sensorPositionCoefficient = 2.0 * Math.PI / Constants.DRIVE.TICKS_PER_ROTATION * SdsModuleConfigurations.MK4I_L2.getSteerReduction();
 
             return config;
         }
