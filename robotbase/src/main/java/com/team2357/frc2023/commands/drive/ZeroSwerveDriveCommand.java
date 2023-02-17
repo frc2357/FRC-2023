@@ -26,7 +26,7 @@ public class ZeroSwerveDriveCommand extends CommandLoggerBase {
 
     @Override
     public void end(boolean interrupted) {
-        if (!SwerveDriveSubsystem.getInstance().getIsEncodersSynced()) {
+        if (!SwerveDriveSubsystem.getInstance().checkEncodersSynced()) {
             DriverStation.reportWarning("Swerve drive appears to not be zeroed", false);
         }
     }
