@@ -23,8 +23,8 @@ void loop() {
   while(customKeypad.available()){
     keypadEvent e = customKeypad.read();
     if(e.bit.EVENT == KEY_JUST_PRESSED){
-      Json::Int["keyInfo"][0] = e.bit.ROW;
-      Json::Int["keyInfo"][1] = e.bit.COL;
+      Json::Int("keyRow",e.bit.ROW);
+      Json::Int("keyCol",e.bit.COL);
     }
   }
   
