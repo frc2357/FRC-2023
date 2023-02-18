@@ -214,7 +214,6 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		double difference = Math.abs(steerMotor.getSelectedSensorPosition() * m_config.m_sensorPositionCoefficient
 				- steerEncoder.getAbsoluteAngle());
 		difference %= Math.PI;
-		System.out.println(difference);
 		return difference < m_config.m_encoderSyncAccuracyRadians
 		|| Math.abs(difference - Math.PI) < m_config.m_encoderSyncAccuracyRadians;
 	}
@@ -224,7 +223,6 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 				(isEncoderSynced(m_frontRightModule)) &&
 				(isEncoderSynced(m_backLeftModule)) &&
 				(isEncoderSynced(m_backRightModule)));
-		System.out.println("Break");
 
 		return m_areEncodersSynced;
 	}
@@ -346,7 +344,10 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	}
 
 	public void differentialDrive(double speedProportion, double turnProportion) {
-		m_differentialDrive.arcadeDrive(speedProportion, turnProportion);
+		if (m_differentialDrive != null) {
+			m_differentialDrive.arcadeDrive(speedProportion, turnProportion);
+
+		}
 	}
 
 	public void zeroDifferentialDrive() {

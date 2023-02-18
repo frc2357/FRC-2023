@@ -108,6 +108,8 @@ public final class Constants {
             config.m_sensorUnitsPerRotation = Constants.DRIVE.TICKS_PER_ROTATION * SdsModuleConfigurations.MK4I_L2.getSteerReduction();
             config.m_sensorPositionCoefficient = 2.0 * Math.PI / Constants.DRIVE.TICKS_PER_ROTATION * SdsModuleConfigurations.MK4I_L2.getSteerReduction();
 
+            config.m_encoderSyncAccuracyRadians = DRIVE.ENCODER_SYNC_ACCURACY_RADIANS;
+            
             config.m_balanceLevelDegrees = DRIVE.BALANCE_LEVEL_DEGREES;
             config.m_balanceFullTiltDegrees = DRIVE.BALANCE_FULL_TILT_DEGREES;
             config.m_balanceMaxPower = DRIVE.BALANCE_MAX_POWER;

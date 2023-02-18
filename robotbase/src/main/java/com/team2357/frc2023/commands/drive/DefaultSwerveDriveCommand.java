@@ -20,10 +20,14 @@ public class DefaultSwerveDriveCommand extends CommandBase {
 
     @Override
     public void execute() {
-        m_drivetrainSubsystem.drive(
-            m_controls.getY(),
-            m_controls.getX(),
-            m_controls.getRotation());
+        if (m_controls.m_isDifferentialDrive) {
+            m_drivetrainSubsystem.differentialDrive(m_controls.getY(), m_controls.getRotation());
+        } else {
+            m_drivetrainSubsystem.drive(
+                    m_controls.getY(),
+                    m_controls.getX(),
+                    m_controls.getRotation());
+        }
     }
 
     @Override

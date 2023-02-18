@@ -1,8 +1,8 @@
 package com.team2357.frc2023.controls;
 
 import com.team2357.frc2023.commands.drive.AutoBalanceCommand;
-import com.team2357.frc2023.commands.drive.ChangeToDifferentialDriveCommand;
-// import com.team2357.frc2023.commands.drive.ChangeToDifferentialDriveCommand;
+import com.team2357.frc2023.commands.drive.ZeroDifferentialDriveCommand;
+import com.team2357.frc2023.commands.drive.ZeroSwerveDriveCommand;
 import com.team2357.frc2023.commands.intake.ReverseIntakeCommand;
 import com.team2357.frc2023.commands.intake.RunIntakeCommand;
 import com.team2357.frc2023.subsystems.IntakeRollerSubsystem;
@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 public class SwerveDriveControls {
-    private boolean m_isDifferentialDrive;
+    public boolean m_isDifferentialDrive;
     
     private XboxController m_controller;
     private double m_deadband;
@@ -26,7 +26,7 @@ public class SwerveDriveControls {
 
     public SwerveDriveControls(XboxController controller, double deadband) {
         m_controller = controller;
-        m_deadband = deadband;
+    m_deadband = deadband;
         m_backButton = new JoystickButton(m_controller, XboxRaw.Back.value);
         m_rightBumper = new JoystickButton(m_controller, XboxRaw.BumperRight.value);
         m_leftBumper = new JoystickButton(m_controller, XboxRaw.BumperLeft.value);
@@ -37,7 +37,15 @@ public class SwerveDriveControls {
         m_rightBumper.whileTrue(new RunIntakeCommand());
         m_leftBumper.whileTrue(new ReverseIntakeCommand());
 
-        // m_aButton.toggleOnTrue(new ChangeToDifferentialDriveCommand(this));
+        m_aButton.onTrue(new InstantCommand(() -> {
+            m_isDifferentialDrive = !m_isDifferentialDrive;
+
+            if (m_isDifferentialDrive) {
+                new ZeroDifferentialDriveCommand().schedule();
+            } else {
+                new ZeroSwerveDriveCommand().schedule();
+            }
+        }));
     }
 
     public double getX() {
