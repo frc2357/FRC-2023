@@ -13,6 +13,7 @@ import com.pathplanner.lib.PathConstraints;
 import com.swervedrivespecialties.swervelib.AbsoluteEncoder;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
+import com.team2357.lib.subsystems.LimelightSubsystem;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -23,11 +24,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.networktables.DoubleArraySubscriber;
-import edu.wpi.first.networktables.DoubleArrayTopic;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.PubSubOption;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
@@ -60,9 +56,6 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
 	private PathConstraints m_pathConstraints;
 
-	public NetworkTable m_limelightTable;
-	public DoubleArrayTopic m_limelightInfo;
-	private DoubleArraySubscriber m_limelightSubscriber;
 
 	private MotorControllerGroup m_rightControllerGroup = null;
 	private MotorControllerGroup m_leftControllerGroup = null;
@@ -132,9 +125,6 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		m_backLeftModule = backLeft;
 		m_backRightModule = backRight;
 
-		m_limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
-		m_limelightInfo = m_limelightTable.getDoubleArrayTopic("botpose");
-		m_limelightSubscriber = m_limelightInfo.subscribe(null, PubSubOption.keepDuplicates(true));
 
 		instance = this;
 	}
@@ -355,11 +345,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     }
 
 	public void setOdemetryFromApriltag() {
-		double[] vals = m_limelightSubscriber.get();
-		if (vals.length >= 2) {
-			Translation2d t2d = new Translation2d(vals[0], vals[1]);
-			Rotation2d r2d = new Rotation2d(getYaw());
-			Pose2d p2d = new Pose2d(t2d, r2d);
+		if (LimelightSubsystem.getInstance().validTargetExists()) {
+			Pose2d p2d = LimelightSubsystem.getInstance().getLimelightPose2d();
 			resetOdometry(p2d);
 		} else {
 			DriverStation.reportError("No AprilTag target", false);

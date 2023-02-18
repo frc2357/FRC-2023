@@ -56,12 +56,14 @@ public class RobotContainer {
 
     m_drivetrainSubsystem = subsystemFactory.CreateSwerveDriveSubsystem();
 
-    // m_drivetrainSubsystem.setDefaultCommand(new DefaultSwerveDriveCommand(
-    // m_drivetrainSubsystem,
+    m_drivetrainSubsystem.setDefaultCommand(new DefaultSwerveDriveCommand(
+        m_drivetrainSubsystem,
+        new SwerveDriveControls(m_controller,
+            Constants.CONTROLLER.DRIVE_CONTROLLER_DEADBAND)));
+    // m_drivetrainSubsystem.setDefaultCommand(new
+    // DefaultDifferentialDriveCommand(m_drivetrainSubsystem,
     // new SwerveDriveControls(m_controller,
     // Constants.CONTROLLER.DRIVE_CONTROLLER_DEADBAND)));
-    m_drivetrainSubsystem.setDefaultCommand(new DefaultDifferentialDriveCommand(m_drivetrainSubsystem,
-        new SwerveDriveControls(m_controller, Constants.CONTROLLER.DRIVE_CONTROLLER_DEADBAND)));
 
     // Setup compressor
     m_compressor = new Compressor(Constants.CAN_ID.PNEUMATICS_HUB_ID, PneumaticsModuleType.REVPH);

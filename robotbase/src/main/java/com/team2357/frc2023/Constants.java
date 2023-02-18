@@ -153,12 +153,14 @@ public final class Constants {
             config.m_reversePercentOutput = -0.3;
 
             config.m_rampRate = 1;
-            config.m_currentLimit = 30;
             config.m_rollerAxisMaxSpeed = 1;
+            config.m_peakCurrentLimit = 5;
+            config.m_peakCurrentDuration = 0;
+            config.m_continuousCurrentLimit = 5;
 
             // TODO: Make sure these are correct
-            config.m_rightInverted = false;
-            config.m_leftInverted = true;
+            config.m_masterInverted = false;
+            config.m_followerInverted = true;
 
             return config;
         }
