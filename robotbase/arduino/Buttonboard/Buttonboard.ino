@@ -15,7 +15,7 @@ byte colPins[COLS] = {9, 1, 2, 3,4,5,6,7,8}; //connect to the column pinouts of 
 //initialize an instance of class NewKeypad
 Adafruit_Keypad customKeypad = Adafruit_Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
-SensorDevice_Seeed_XIAO_RP2040<1> device("LaserLightSensor");
+SensorDevice_Seeed_XIAO_RP2040<1> device("ButtonBoard");
 //makes Json variables for what we need, returns 1 if a button was pressed, 0 if not.
 int readIntValue(int min, int max){  
   customKeypad.tick();
