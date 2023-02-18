@@ -54,6 +54,10 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	private PathConstraints m_pathConstraints;
 
+	private PIDController m_translateXController;
+	private PIDController m_translateYController;
+
+	private boolean m_isTracking;
 	public static class Configuration {
 		/**
 		 * The left-to-right distance between the drivetrain wheels (measured from
