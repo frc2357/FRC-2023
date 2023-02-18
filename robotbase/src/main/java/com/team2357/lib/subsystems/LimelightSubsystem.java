@@ -7,17 +7,10 @@
 
 package com.team2357.lib.subsystems;
 
-import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.networktables.DoubleArraySubscriber;
-import edu.wpi.first.networktables.DoubleArrayTopic;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.PubSubOption;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * Controls the limelight camera options.
@@ -73,9 +66,6 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
   private NetworkTableEntry m_Thor = m_Table.getEntry("thor");
   private NetworkTableEntry m_Tvert = m_Table.getEntry("tvert");
 
-  private DoubleArrayTopic m_limelightPoseInfo = m_Table.getDoubleArrayTopic("botpose");
-  private DoubleArraySubscriber m_limelightPoseInfoSub = m_limelightPoseInfo.subscribe(null, PubSubOption.keepDuplicates(true));
-  
   private Configuration m_Configuration = new Configuration();
 
   /**
@@ -249,12 +239,6 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
     double distance = heightDifference / Math.tan(Math.toRadians(angleDegrees));
 
     return distance;
-  }
-  public Pose2d getLimelightPose2d(){
-    double[] values = m_limelightPoseInfoSub.get();
-    Translation2d t2d = new Translation2d(values[0],values[1]);
-    Rotation2d r2d = new Rotation2d(SwerveDriveSubsystem.getInstance().getYaw());
-    return new Pose2d(t2d, r2d);
   }
   /*
   @Override
