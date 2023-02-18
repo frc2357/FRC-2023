@@ -3,6 +3,7 @@ package com.team2357.frc2023.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
+import com.team2357.frc2023.shuffleboard.ShuffleboardPIDTuner;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 import com.team2357.lib.util.Utility;
 
@@ -49,12 +50,13 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
     private CANSparkMax m_extendMotor;
     private SparkMaxPIDController m_pidcontroller;
     private double m_targetRotations;
+    private ShuffleboardPIDTuner shuffleboardPIDTuner;
 
     public ArmExtensionSubsystem(CANSparkMax extender) {
         m_extendMotor = extender;
         instance = this;
+        shuffleboardPIDTuner = new ShuffleboardPIDTuner();
     }
-
     public void configure(Configuration config) {
         m_config = config;
 
@@ -114,9 +116,16 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
     public double getExtenderMotorRotations() {
         return m_extendMotor.getEncoder().getPosition();
     }
-
+    public void updatePID(){
+        m_pidcontroller.setP(shuffleboardPIDTuner.getDouble("ExtensionP"));
+            m_pidcontroller.setI(shuffleboardPIDTuner.getDouble("ExtensionI"));
+            m_pidcontroller.setD(shuffleboardPIDTuner.getDouble("ExtensionD"));
+    }
     @Override
     public void periodic() {
+        if( shuffleboardPIDTuner.isExtensionUpdated()){
+            updatePID();
+        }
         if (isClosedLoopEnabled() && isExtenderRotatorAtRotations()) {
             setClosedLoopEnabled(false);
         }
