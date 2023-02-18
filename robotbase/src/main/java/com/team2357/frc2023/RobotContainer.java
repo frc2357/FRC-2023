@@ -105,10 +105,10 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    int auto = -1;
+    int auto = 1;
 
-    switch (auto) {
-      case 1:
+    switch(auto){
+      case -1: 
         return AvailableTrajectories.lineTrajectory;
       default:
         return m_autoCommandChooser.generateCommand();

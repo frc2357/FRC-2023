@@ -11,10 +11,11 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import com.team2357.frc2023.commands.OrientControllerInputsCommand;
-import com.team2357.frc2023.commands.WaitForZeroCommand;
+import com.team2357.frc2023.commands.SyncDriveEncodersCommand;
+import com.team2357.frc2023.commands.ZeroDriveCommand;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
-import com.team2357.frc2023.commands.auto.*;
-import edu.wpi.first.wpilibj.DriverStation;
+
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -55,21 +56,7 @@ public class Robot extends LoggedRobot {
 
     m_robotContainer = new RobotContainer();
 
-    double startTime = System.currentTimeMillis();
-    double time = 0;
-
-    while (time - startTime != 10000) {
-      if (SwerveDriveSubsystem.getInstance().isReadyToZero()) {
-        System.out.print("Swerve ready to zero in ");
-        System.out.print((time - startTime)/1000);
-        System.out.println(" seconds");
-        return;
-      }
-
-      time = System.currentTimeMillis();
-    }
-
-		DriverStation.reportError("***************************************************\nSWERVE COULD NOT ZERO\n***************************************************", false);
+    new SyncDriveEncodersCommand().schedule();
   }
 
   /**
@@ -98,9 +85,6 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    SwerveDriveSubsystem.getInstance().zero();
-    CommandScheduler.getInstance().schedule(new WaitForZeroCommand());
-
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -115,8 +99,8 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopInit() {
-    SwerveDriveSubsystem.getInstance().zero();
-    CommandScheduler.getInstance().schedule(new WaitForZeroCommand());
+
+    CommandScheduler.getInstance().schedule(new ZeroDriveCommand());
     CommandScheduler.getInstance().schedule(new OrientControllerInputsCommand());
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
@@ -135,11 +119,16 @@ public class Robot extends LoggedRobot {
   public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
+
+    SwerveDriveSubsystem.getInstance().zeroGyroscope();
+    SwerveDriveSubsystem.getInstance().drive(ChassisSpeeds.fromFieldRelativeSpeeds(0.3, 0.0, 0.0, SwerveDriveSubsystem.getInstance().getGyroscopeRotation()));
   }
 
   /** This function is called periodically during test mode. */
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+    SwerveDriveSubsystem.getInstance().printEncoderVals();
+  }
 
   /** This function is called once when the robot is first started up. */
   @Override
