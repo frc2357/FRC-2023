@@ -113,6 +113,14 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		public PIDController m_yController;
 		public PIDController m_thetaController;
 
+		public double m_encoderSyncAccuracyRadians;
+
+		public double m_balanceLevelDegrees;
+		public double m_balanceFullTiltDegrees;
+		public double m_balanceMaxPower;
+		public double m_balanceKP;
+
+
 		/**
 		 * Conversion coefficient to go from degrees to Falcon500 sensor units
 		 * 
@@ -207,8 +215,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 				- steerEncoder.getAbsoluteAngle());
 		difference %= Math.PI;
 		System.out.println(difference);
-		return difference < Constants.DRIVE.ENCODER_SYNC_ACCURACY_RADIANS
-		|| Math.abs(difference - Math.PI) < Constants.DRIVE.ENCODER_SYNC_ACCURACY_RADIANS;
+		return difference < m_config.m_encoderSyncAccuracyRadians
+		|| Math.abs(difference - Math.PI) < m_config.m_encoderSyncAccuracyRadians;
 	}
 
 	public boolean checkEncodersSynced() {
@@ -387,12 +395,12 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 			angle = getPitch();
 		}
 
-		if (angle > Constants.DRIVE.BALANCE_FULL_TILT_DEGREES) {
+		if (angle > m_config.m_balanceFullTiltDegrees) {
 			return;
 		}
 
-		error = Math.copySign(Constants.DRIVE.BALANCE_LEVEL_DEGREES + Math.abs(angle), angle);
-		power = Math.min(Math.abs(Constants.DRIVE.BALANCE_KP * error), Constants.DRIVE.BALANCE_MAX_POWER);
+		error = Math.copySign(m_config.m_balanceLevelDegrees + Math.abs(angle), angle);
+		power = Math.min(Math.abs(m_config.m_balanceKP * error), m_config.m_balanceMaxPower);
 		power = Math.copySign(power, error);
 
 		power *= direction;
