@@ -155,8 +155,8 @@ public final class Constants {
             config.m_rollerAxisMaxSpeed = 1;
 
             // TODO: Make sure these are correct
-            config.m_rightInverted = false;
-            config.m_leftInverted = true;
+            config.m_rightInverted = true;
+            config.m_leftInverted = false;
 
             return config;
         }
