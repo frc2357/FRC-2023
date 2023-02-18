@@ -61,8 +61,8 @@ public final class Constants {
         public static final int BACK_RIGHT_MODULE_STEER_MOTOR_ID = 18;
         public static final int BACK_RIGHT_MODULE_STEER_ENCODER_ID = 22;
 
-        public static final int LEFT_INTAKE_MOTOR = 23;
-        public static final int RIGHT_INTAKE_MOTOR = 24;
+        public static final int MASTER_INTAKE_MOTOR = 23;
+        public static final int FOLLOWER_INTAKE_MOTOR = 24;
 
         public static final int LEFT_ELEVATOR_MOTOR = 29;
         public static final int RIGHT_ELEVATOR_MOTOR = 30;
@@ -150,13 +150,16 @@ public final class Constants {
             config.m_runPercentOutput = 0.5;
             config.m_reversePercentOutput = -0.3;
 
-            config.m_rampRate = 1;
-            config.m_currentLimit = 30;
             config.m_rollerAxisMaxSpeed = 1;
 
-            // TODO: Make sure these are correct
-            config.m_rightInverted = true;
-            config.m_leftInverted = false;
+            config.m_rampRate = 1;
+
+            config.m_peakCurrentLimit = 5;
+            config.m_peakCurrentDuration = 0;
+            config.m_continuousCurrentLimit = 5;
+
+            config.m_masterInverted = false;
+            config.m_followerInverted = true;
 
             return config;
         }
