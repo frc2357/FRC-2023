@@ -117,10 +117,10 @@ public final class Constants {
         // sensorDirection = false;
         // initializationStrategy = bootToAbsValue;
 
-        public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(8.79+180);
-        public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(314.38-180); 
-        public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(306.3-180); 
-        public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(163.04+180);
+        public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(171.56);
+        public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(135); 
+        public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(126.21); 
+        public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(342.95);
         
         public static final PIDController CHARGE_STATION_BALANCE_ANGLE_CONTROLLER = new PIDController(0.5, 0, 0);
         public static final PIDController CHARGE_STATION_DISTANCE_CONTROLLER = new PIDController(0.5, 0, 0);
@@ -151,12 +151,14 @@ public final class Constants {
             config.m_reversePercentOutput = -0.3;
 
             config.m_rampRate = 1;
-            config.m_currentLimit = 30;
             config.m_rollerAxisMaxSpeed = 1;
+            config.m_peakCurrentLimit = 5;
+            config.m_peakCurrentDuration = 0;
+            config.m_continuousCurrentLimit = 5;
 
             // TODO: Make sure these are correct
-            config.m_rightInverted = false;
-            config.m_leftInverted = true;
+            config.m_masterInverted = false;
+            config.m_followerInverted = true;
 
             return config;
         }

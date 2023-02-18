@@ -1,6 +1,8 @@
 package com.team2357.frc2023.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -11,8 +13,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class IntakeRollerSubsystem extends SubsystemBase {
     public static IntakeRollerSubsystem instance = null;
 
-    private CANSparkMax m_rightMotor;
-    private CANSparkMax m_leftMotor;
+    private WPI_TalonSRX m_masterIntakeMotor;
+    private WPI_TalonSRX m_followerIntakeMotor;
 
     public static IntakeRollerSubsystem getInstance() {
         return instance;
@@ -25,17 +27,20 @@ public class IntakeRollerSubsystem extends SubsystemBase {
         public double m_rollerAxisMaxSpeed;
 
         public double m_rampRate;
-        public int m_currentLimit;
+        public int m_peakCurrentLimit;
+        public int m_peakCurrentDuration;
+        public int m_continuousCurrentLimit;
+        // public int m_currentLimit;
 
-        public boolean m_rightInverted;
-        public boolean m_leftInverted;
+        public boolean m_masterInverted;
+        public boolean m_followerInverted;
     }
 
     public Configuration m_config;
 
     public IntakeRollerSubsystem() {
-        m_rightMotor = new CANSparkMax(Constants.CAN_ID.RIGHT_INTAKE_MOTOR, MotorType.kBrushless);
-        m_leftMotor = new CANSparkMax(Constants.CAN_ID.LEFT_INTAKE_MOTOR, MotorType.kBrushless);
+        m_masterIntakeMotor = new WPI_TalonSRX(Constants.CAN_ID.RIGHT_INTAKE_MOTOR);
+        m_followerIntakeMotor = new WPI_TalonSRX(Constants.CAN_ID.LEFT_INTAKE_MOTOR);
 
         instance = this;
     }
@@ -43,37 +48,46 @@ public class IntakeRollerSubsystem extends SubsystemBase {
     public void configure(Configuration config) {
         m_config = config;
 
-        m_rightMotor.setIdleMode(IdleMode.kBrake);
-        m_leftMotor.setIdleMode(IdleMode.kBrake);
+        m_followerIntakeMotor.setInverted(m_config.m_followerInverted);
+        m_masterIntakeMotor.setInverted(m_config.m_masterInverted);
 
-        m_rightMotor.setOpenLoopRampRate(m_config.m_rampRate);
-        m_leftMotor.setOpenLoopRampRate(m_config.m_rampRate);
+        m_followerIntakeMotor.follow(m_masterIntakeMotor);
 
-        m_rightMotor.setSmartCurrentLimit(m_config.m_currentLimit);
-        m_leftMotor.setSmartCurrentLimit(m_config.m_currentLimit);
+        m_masterIntakeMotor.setNeutralMode(NeutralMode.Coast);
+        m_masterIntakeMotor.enableCurrentLimit(true);
+        m_masterIntakeMotor.configPeakCurrentLimit(m_config.m_peakCurrentLimit);
+        m_masterIntakeMotor.configPeakCurrentDuration(m_config.m_peakCurrentDuration);
+        m_masterIntakeMotor.configContinuousCurrentLimit(m_config.m_continuousCurrentLimit);
 
-        m_rightMotor.setInverted(m_config.m_rightInverted);
-        m_leftMotor.setInverted(m_config.m_leftInverted);
+        // m_rightMotor.setIdleMode(IdleMode.kBrake);
+        // m_leftMotor.setIdleMode(IdleMode.kBrake);
+
+        // m_rightMotor.setOpenLoopRampRate(m_config.m_rampRate);
+        // m_leftMotor.setOpenLoopRampRate(m_config.m_rampRate);
+
+        // m_rightMotor.setSmartCurrentLimit(m_config.m_currentLimit);
+        // m_leftMotor.setSmartCurrentLimit(m_config.m_currentLimit);
+
     }
 
     public void runIntake(boolean reverse) {
         if (reverse) {
-            m_rightMotor.set(m_config.m_reversePercentOutput);
-            m_leftMotor.set(m_config.m_reversePercentOutput);
+            m_masterIntakeMotor.set(m_config.m_reversePercentOutput);
+            m_followerIntakeMotor.set(m_config.m_reversePercentOutput);
         } else {
-            m_rightMotor.set(m_config.m_runPercentOutput);
-            m_leftMotor.set(m_config.m_runPercentOutput);
+            m_masterIntakeMotor.set(m_config.m_runPercentOutput);
+            m_followerIntakeMotor.set(m_config.m_runPercentOutput);
         }
     }
 
     public void setAxisRollerSpeed(double axisSpeed) {
         double motorSpeed = (-axisSpeed) * m_config.m_rollerAxisMaxSpeed;
-        m_leftMotor.set(motorSpeed);
-        m_rightMotor.set(motorSpeed);
+        m_followerIntakeMotor.set(motorSpeed);
+        m_masterIntakeMotor.set(motorSpeed);
     }
 
     public void stopIntake() {
-        m_rightMotor.set(0.0);
-        m_leftMotor.set(0.0);
+        m_masterIntakeMotor.set(0.0);
+        m_followerIntakeMotor.set(0.0);
     }
 }
