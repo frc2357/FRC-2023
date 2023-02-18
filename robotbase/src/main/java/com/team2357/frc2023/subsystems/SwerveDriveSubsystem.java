@@ -64,9 +64,9 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	public DoubleArrayTopic m_limelightInfo;
 	private DoubleArraySubscriber m_limelightSubscriber;
 
-	// private MotorControllerGroup m_rightControllerGroup = null;
-	// private MotorControllerGroup m_leftControllerGroup = null;
-	// private DifferentialDrive m_differentialDrive = null;
+	private MotorControllerGroup m_rightControllerGroup = null;
+	private MotorControllerGroup m_leftControllerGroup = null;
+	private DifferentialDrive m_differentialDrive = null;
 
 	public static class Configuration {
 		/**
@@ -318,41 +318,41 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		Logger.getInstance().recordOutput("Swerve States", states);
 	}
 
-	// public void createDifferentialDrive() {
-	// 	m_leftControllerGroup = new MotorControllerGroup(
-	// 		new WPI_TalonFX(Constants.CAN_ID.FRONT_LEFT_MODULE_DRIVE_MOTOR_ID),
-	// 		new WPI_TalonFX[]{new WPI_TalonFX(Constants.CAN_ID.BACK_LEFT_MODULE_DRIVE_MOTOR_ID)}
-	// 	);
-	// 	m_rightControllerGroup = new MotorControllerGroup(
-	// 		new WPI_TalonFX(Constants.CAN_ID.FRONT_RIGHT_MODULE_DRIVE_MOTOR_ID),
-	// 		new WPI_TalonFX[]{new WPI_TalonFX(Constants.CAN_ID.BACK_RIGHT_MODULE_DRIVE_MOTOR_ID)}
-	// 	);
+	public void createDifferentialDrive() {
+		m_leftControllerGroup = new MotorControllerGroup(
+			new WPI_TalonFX(Constants.CAN_ID.FRONT_LEFT_MODULE_DRIVE_MOTOR_ID),
+			new WPI_TalonFX[]{new WPI_TalonFX(Constants.CAN_ID.BACK_LEFT_MODULE_DRIVE_MOTOR_ID)}
+		);
+		m_rightControllerGroup = new MotorControllerGroup(
+			new WPI_TalonFX(Constants.CAN_ID.FRONT_RIGHT_MODULE_DRIVE_MOTOR_ID),
+			new WPI_TalonFX[]{new WPI_TalonFX(Constants.CAN_ID.BACK_RIGHT_MODULE_DRIVE_MOTOR_ID)}
+		);
 
-	// 	m_differentialDrive = new DifferentialDrive(m_leftControllerGroup, m_rightControllerGroup);
-	// }
+		m_differentialDrive = new DifferentialDrive(m_leftControllerGroup, m_rightControllerGroup);
+	}
 
-	// public void deleteDifferentialDrive() {
-	// 	m_leftControllerGroup = null;
-	// 	m_rightControllerGroup = null;
-	// 	m_differentialDrive = null;
-	// }
+	public void deleteDifferentialDrive() {
+		m_leftControllerGroup = null;
+		m_rightControllerGroup = null;
+		m_differentialDrive = null;
+	}
 
-	// public void differentialDrive(double speedProportion, double turnProportion) {
-	// 	m_differentialDrive.arcadeDrive(speedProportion, turnProportion);
-	// }
+	public void differentialDrive(double speedProportion, double turnProportion) {
+		m_differentialDrive.arcadeDrive(speedProportion, turnProportion);
+	}
 
-	// public void zeroDifferentialDrive() {
-	// 	WPI_TalonFX frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor;
-	// 	frontLeftMotor = (WPI_TalonFX)m_frontLeftModule.getSteerMotor();
-	// 	frontRightMotor = (WPI_TalonFX)m_frontRightModule.getSteerMotor();
-	// 	backLeftMotor = (WPI_TalonFX)m_backLeftModule.getSteerMotor();
-	// 	backRightMotor = (WPI_TalonFX)m_backRightModule.getSteerMotor();
+	public void zeroDifferentialDrive() {
+		WPI_TalonFX frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor;
+		frontLeftMotor = (WPI_TalonFX)m_frontLeftModule.getSteerMotor();
+		frontRightMotor = (WPI_TalonFX)m_frontRightModule.getSteerMotor();
+		backLeftMotor = (WPI_TalonFX)m_backLeftModule.getSteerMotor();
+		backRightMotor = (WPI_TalonFX)m_backRightModule.getSteerMotor();
 
-	// 	frontLeftMotor.set(ControlMode.Position, frontLeftMotor.getSelectedSensorPosition() + frontLeftMotor.getSelectedSensorPosition() % m_config.m_sensorUnitsPerRotation);
-	// 	frontRightMotor.set(ControlMode.Position, frontRightMotor.getSelectedSensorPosition() + frontRightMotor.getSelectedSensorPosition() % m_config.m_sensorUnitsPerRotation);
-	// 	backLeftMotor.set(ControlMode.Position, backLeftMotor.getSelectedSensorPosition() + backLeftMotor.getSelectedSensorPosition() % m_config.m_sensorUnitsPerRotation);
-	// 	backRightMotor.set(ControlMode.Position, backRightMotor.getSelectedSensorPosition() + backRightMotor.getSelectedSensorPosition() % m_config.m_sensorUnitsPerRotation);
-    // }
+		frontLeftMotor.set(ControlMode.Position, frontLeftMotor.getSelectedSensorPosition() + frontLeftMotor.getSelectedSensorPosition() % m_config.m_sensorUnitsPerRotation);
+		frontRightMotor.set(ControlMode.Position, frontRightMotor.getSelectedSensorPosition() + frontRightMotor.getSelectedSensorPosition() % m_config.m_sensorUnitsPerRotation);
+		backLeftMotor.set(ControlMode.Position, backLeftMotor.getSelectedSensorPosition() + backLeftMotor.getSelectedSensorPosition() % m_config.m_sensorUnitsPerRotation);
+		backRightMotor.set(ControlMode.Position, backRightMotor.getSelectedSensorPosition() + backRightMotor.getSelectedSensorPosition() % m_config.m_sensorUnitsPerRotation);
+    }
 
 	public void setOdemetryFromApriltag() {
 		double[] vals = m_limelightSubscriber.get();

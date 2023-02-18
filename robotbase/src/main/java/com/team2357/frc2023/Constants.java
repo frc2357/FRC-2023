@@ -117,9 +117,9 @@ public final class Constants {
         // sensorDirection = false;
         // initializationStrategy = bootToAbsValue;
 
-        public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(8.79+180);
+        public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(-8.45+180);
         public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(314.38-180); 
-        public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(306.3-180); 
+        public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(135); 
         public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(163.04+180);
         
         public static final PIDController CHARGE_STATION_BALANCE_ANGLE_CONTROLLER = new PIDController(0.5, 0, 0);

@@ -4,6 +4,7 @@
 
 package com.team2357.frc2023;
 
+import com.team2357.frc2023.commands.drive.DefaultDifferentialDriveCommand;
 import com.team2357.frc2023.commands.drive.DefaultSwerveDriveCommand;
 import com.team2357.frc2023.controls.SwerveDriveControls;
 import com.team2357.frc2023.shuffleboard.AutoCommandChooser;
@@ -55,14 +56,16 @@ public class RobotContainer {
 
     m_drivetrainSubsystem = subsystemFactory.CreateSwerveDriveSubsystem();
 
-    m_drivetrainSubsystem.setDefaultCommand(new DefaultSwerveDriveCommand(
-        m_drivetrainSubsystem,
+    // m_drivetrainSubsystem.setDefaultCommand(new DefaultSwerveDriveCommand(
+    // m_drivetrainSubsystem,
+    // new SwerveDriveControls(m_controller,
+    // Constants.CONTROLLER.DRIVE_CONTROLLER_DEADBAND)));
+    m_drivetrainSubsystem.setDefaultCommand(new DefaultDifferentialDriveCommand(m_drivetrainSubsystem,
         new SwerveDriveControls(m_controller, Constants.CONTROLLER.DRIVE_CONTROLLER_DEADBAND)));
 
     // Setup compressor
     m_compressor = new Compressor(Constants.CAN_ID.PNEUMATICS_HUB_ID, PneumaticsModuleType.REVPH);
     m_compressor.enableAnalog(Constants.COMPRESSOR.MIN_PRESSURE_PSI, Constants.COMPRESSOR.MAX_PRESSURE_PSI);
-
 
     // Build trajectory paths
     AvailableTrajectories.generateTrajectories();
@@ -71,7 +74,7 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
 
-    //Configure Shuffleboard
+    // Configure Shuffleboard
     configureShuffleboard();
   }
 
@@ -106,8 +109,8 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     int auto = 1;
 
-    switch(auto){
-      case -1: 
+    switch (auto) {
+      case -1:
         return AvailableTrajectories.lineTrajectory;
       default:
         return m_autoCommandChooser.generateCommand();
