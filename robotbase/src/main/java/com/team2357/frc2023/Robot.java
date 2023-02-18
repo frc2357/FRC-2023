@@ -12,6 +12,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import com.team2357.frc2023.commands.OrientControllerInputsCommand;
 import com.team2357.frc2023.commands.drive.SyncDriveEncodersCommand;
+import com.team2357.frc2023.commands.drive.ZeroDifferentialDriveCommand;
 import com.team2357.frc2023.commands.drive.ZeroSwerveDriveCommand;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 
@@ -101,11 +102,12 @@ public class Robot extends LoggedRobot {
   public void teleopInit() {
 
     // CommandScheduler.getInstance().schedule(new ZeroSwerveDriveCommand());
-    CommandScheduler.getInstance().schedule(new OrientControllerInputsCommand());
+    // CommandScheduler.getInstance().schedule(new OrientControllerInputsCommand());
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out.
+    new ZeroDifferentialDriveCommand().schedule();
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }

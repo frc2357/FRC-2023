@@ -47,7 +47,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
 	private WPI_Pigeon2 m_pigeon;
 
-	private SwerveModule m_frontLeftModule;
+	public SwerveModule m_frontLeftModule;
 	private SwerveModule m_frontRightModule;
 	private SwerveModule m_backLeftModule;
 	private SwerveModule m_backRightModule;
@@ -63,10 +63,6 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	public NetworkTable m_limelightTable;
 	public DoubleArrayTopic m_limelightInfo;
 	private DoubleArraySubscriber m_limelightSubscriber;
-
-	private MotorControllerGroup m_rightControllerGroup = null;
-	private MotorControllerGroup m_leftControllerGroup = null;
-	private DifferentialDrive m_differentialDrive = null;
 
 	public static class Configuration {
 		/**
@@ -120,7 +116,6 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		public double m_balanceMaxPower;
 		public double m_balanceKP;
 
-
 		/**
 		 * Conversion coefficient to go from degrees to Falcon500 sensor units
 		 * 
@@ -134,7 +129,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	public SwerveDriveSubsystem(WPI_Pigeon2 pigeon, SwerveModule frontLeft, SwerveModule frontRight,
 			SwerveModule backLeft, SwerveModule backRight) {
 		m_pigeon = pigeon;
-		
+
 		m_frontLeftModule = frontLeft;
 		m_frontRightModule = frontRight;
 		m_backLeftModule = backLeft;
@@ -170,7 +165,6 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		m_pathConstraints = new PathConstraints(m_config.m_trajectoryMaxVelocityMetersPerSecond,
 				m_config.m_trajectoryMaxAccelerationMetersPerSecond);
 
-		
 	}
 
 	public PIDController getXController() {
@@ -192,7 +186,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	public PathConstraints getPathConstraints() {
 		return m_pathConstraints;
 	}
-	
+
 	public void syncEncoders() {
 		syncEncoder(m_frontLeftModule);
 		syncEncoder(m_frontRightModule);
@@ -215,7 +209,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 				- steerEncoder.getAbsoluteAngle());
 		difference %= Math.PI;
 		return difference < m_config.m_encoderSyncAccuracyRadians
-		|| Math.abs(difference - Math.PI) < m_config.m_encoderSyncAccuracyRadians;
+				|| Math.abs(difference - Math.PI) < m_config.m_encoderSyncAccuracyRadians;
 	}
 
 	public boolean checkEncodersSynced() {
@@ -307,7 +301,6 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
 		SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxVelocityMetersPerSecond);
 
-
 		m_frontLeftModule.set(
 				states[0].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
 				states[0].angle.getRadians());
@@ -324,44 +317,42 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		Logger.getInstance().recordOutput("Swerve States", states);
 	}
 
-	public void createDifferentialDrive() {
-		m_leftControllerGroup = new MotorControllerGroup(
-			new WPI_TalonFX(Constants.CAN_ID.FRONT_LEFT_MODULE_DRIVE_MOTOR_ID),
-			new WPI_TalonFX[]{new WPI_TalonFX(Constants.CAN_ID.BACK_LEFT_MODULE_DRIVE_MOTOR_ID)}
-		);
-		m_rightControllerGroup = new MotorControllerGroup(
-			new WPI_TalonFX(Constants.CAN_ID.FRONT_RIGHT_MODULE_DRIVE_MOTOR_ID),
-			new WPI_TalonFX[]{new WPI_TalonFX(Constants.CAN_ID.BACK_RIGHT_MODULE_DRIVE_MOTOR_ID)}
-		);
-
-		m_differentialDrive = new DifferentialDrive(m_leftControllerGroup, m_rightControllerGroup);
-	}
-
-	public void deleteDifferentialDrive() {
-		m_leftControllerGroup = null;
-		m_rightControllerGroup = null;
-		m_differentialDrive = null;
-	}
-
 	public void differentialDrive(double speedProportion, double turnProportion) {
-		if (m_differentialDrive != null) {
-			m_differentialDrive.arcadeDrive(speedProportion, turnProportion);
+		double leftProportion = speedProportion - turnProportion;
+		double rightProportion = speedProportion + turnProportion;
 
-		}
+		WPI_TalonFX frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor;
+		frontLeftMotor = (WPI_TalonFX) m_frontLeftModule.getDriveMotor();
+		frontRightMotor = (WPI_TalonFX) m_frontRightModule.getDriveMotor();
+		backLeftMotor = (WPI_TalonFX) m_backLeftModule.getDriveMotor();
+		backRightMotor = (WPI_TalonFX) m_backRightModule.getDriveMotor();
+
+		frontLeftMotor.set(leftProportion);
+		backLeftMotor.set(leftProportion);
+
+		frontRightMotor.set(rightProportion);
+		backRightMotor.set(rightProportion);
 	}
 
 	public void zeroDifferentialDrive() {
 		WPI_TalonFX frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor;
-		frontLeftMotor = (WPI_TalonFX)m_frontLeftModule.getSteerMotor();
-		frontRightMotor = (WPI_TalonFX)m_frontRightModule.getSteerMotor();
-		backLeftMotor = (WPI_TalonFX)m_backLeftModule.getSteerMotor();
-		backRightMotor = (WPI_TalonFX)m_backRightModule.getSteerMotor();
+		frontLeftMotor = (WPI_TalonFX) m_frontLeftModule.getSteerMotor();
+		frontRightMotor = (WPI_TalonFX) m_frontRightModule.getSteerMotor();
+		backLeftMotor = (WPI_TalonFX) m_backLeftModule.getSteerMotor();
+		backRightMotor = (WPI_TalonFX) m_backRightModule.getSteerMotor();
 
-		frontLeftMotor.set(ControlMode.Position, frontLeftMotor.getSelectedSensorPosition() + frontLeftMotor.getSelectedSensorPosition() % m_config.m_sensorUnitsPerRotation);
-		frontRightMotor.set(ControlMode.Position, frontRightMotor.getSelectedSensorPosition() + frontRightMotor.getSelectedSensorPosition() % m_config.m_sensorUnitsPerRotation);
-		backLeftMotor.set(ControlMode.Position, backLeftMotor.getSelectedSensorPosition() + backLeftMotor.getSelectedSensorPosition() % m_config.m_sensorUnitsPerRotation);
-		backRightMotor.set(ControlMode.Position, backRightMotor.getSelectedSensorPosition() + backRightMotor.getSelectedSensorPosition() % m_config.m_sensorUnitsPerRotation);
-    }
+		System.out.println(frontLeftMotor.getSelectedSensorPosition() + frontLeftMotor.getSelectedSensorPosition() % m_config.m_sensorUnitsPerRotation);
+
+		frontLeftMotor.set(ControlMode.Position, frontLeftMotor.getSelectedSensorPosition()
+				+ frontLeftMotor.getSelectedSensorPosition() % m_config.m_sensorUnitsPerRotation);
+		frontRightMotor.set(ControlMode.Position, frontRightMotor.getSelectedSensorPosition()
+				+ frontRightMotor.getSelectedSensorPosition() % m_config.m_sensorUnitsPerRotation);
+		backLeftMotor.set(ControlMode.Position, backLeftMotor.getSelectedSensorPosition()
+				+ backLeftMotor.getSelectedSensorPosition() % m_config.m_sensorUnitsPerRotation);
+		backRightMotor.set(ControlMode.Position, backRightMotor.getSelectedSensorPosition()
+				+ backRightMotor.getSelectedSensorPosition() % m_config.m_sensorUnitsPerRotation);
+
+	}
 
 	public void setOdemetryFromApriltag() {
 		double[] vals = m_limelightSubscriber.get();
@@ -428,11 +419,15 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	}
 
 	public void printEncoderVals() {
-		SmartDashboard.putNumber("front left encoder count", ((WPI_TalonFX) (m_frontLeftModule.getDriveMotor())).getSelectedSensorPosition(0));
-	
-		SmartDashboard.putNumber("front right encoder count", ((WPI_TalonFX) (m_frontRightModule.getDriveMotor())).getSelectedSensorPosition(0));
-		SmartDashboard.putNumber("back left module encoder count", ((WPI_TalonFX) (m_backLeftModule.getDriveMotor())).getSelectedSensorPosition(0));
-		SmartDashboard.putNumber("back right module encoder count", ((WPI_TalonFX) (m_backRightModule.getDriveMotor())).getSelectedSensorPosition(0));
+		SmartDashboard.putNumber("front left encoder count",
+				((WPI_TalonFX) (m_frontLeftModule.getDriveMotor())).getSelectedSensorPosition(0));
+
+		SmartDashboard.putNumber("front right encoder count",
+				((WPI_TalonFX) (m_frontRightModule.getDriveMotor())).getSelectedSensorPosition(0));
+		SmartDashboard.putNumber("back left module encoder count",
+				((WPI_TalonFX) (m_backLeftModule.getDriveMotor())).getSelectedSensorPosition(0));
+		SmartDashboard.putNumber("back right module encoder count",
+				((WPI_TalonFX) (m_backRightModule.getDriveMotor())).getSelectedSensorPosition(0));
 
 	}
 }

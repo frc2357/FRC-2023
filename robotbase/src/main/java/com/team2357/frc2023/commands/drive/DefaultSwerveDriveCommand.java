@@ -1,5 +1,7 @@
 package com.team2357.frc2023.commands.drive;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.team2357.frc2023.controls.SwerveDriveControls;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 
@@ -28,6 +30,9 @@ public class DefaultSwerveDriveCommand extends CommandBase {
                     m_controls.getX(),
                     m_controls.getRotation());
         }
+
+        // WPI_TalonFX motor = (WPI_TalonFX)SwerveDriveSubsystem.getInstance().m_frontLeftModule.getSteerMotor();
+        // motor.set(ControlMode.Position, 0);
     }
 
     @Override
