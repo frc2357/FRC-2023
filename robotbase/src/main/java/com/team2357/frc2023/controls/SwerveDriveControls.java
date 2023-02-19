@@ -2,10 +2,6 @@ package com.team2357.frc2023.controls;
 
 import com.team2357.frc2023.commands.ReverseIntakeCommand;
 import com.team2357.frc2023.commands.RunIntakeCommand;
-import com.team2357.frc2023.commands.auto.TranslateToTargetCommand;
-import com.team2357.frc2023.commands.auto.TranslateToTargetCommandGroup;
-import com.team2357.frc2023.commands.human.panic.IntakeArmToggleCommand;
-import com.team2357.frc2023.commands.human.panic.IntakeAxisRollerCommand;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.lib.triggers.AxisThresholdTrigger;
 import com.team2357.lib.util.XboxRaw;
@@ -25,20 +21,14 @@ public class SwerveDriveControls {
 
     public static boolean isFlipped;
 
-    private Trigger m_rightTrigger;
-
     public SwerveDriveControls(XboxController controller, double deadband) {
         m_controller = controller;
         m_deadband = deadband;
         m_backButton = new JoystickButton(m_controller, XboxRaw.Back.value);
         m_rightBumper = new JoystickButton(m_controller, XboxRaw.BumperRight.value);
         m_leftBumper = new JoystickButton(m_controller, XboxRaw.BumperLeft.value);
-        m_rightBumper = new JoystickButton(m_controller, XboxRaw.BumperRight.value);
-
-        m_rightTrigger = new AxisThresholdTrigger(controller, Axis.kRightTrigger, 0.2);
 
         m_backButton.whileTrue(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().zeroGyroscope()));
-
         m_rightBumper.whileTrue(new RunIntakeCommand());
         m_leftBumper.whileTrue(new ReverseIntakeCommand());
 
