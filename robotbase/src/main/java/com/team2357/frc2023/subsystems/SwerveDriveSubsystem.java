@@ -117,8 +117,13 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		/**
 		 * These are the setpoints for the PID's that the translate commands use
 		 */
-		public double m_translateXSetpoint;
-		public double m_translateYSetpoint;
+		public double m_defaultXSetpoint;
+		public double m_defaultYSetpoint;
+
+		public double m_leftColXSetpoint;
+		public double m_midColXSetpoint;
+		public double m_rightColXSetpoint;
+
 		/*
 		 * Open loop ramp rate for auto targeting
 		 * In seconds from neutral to full throttle
@@ -425,23 +430,36 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		return isAtXTarget() && isAtYTarget();
 	}
 
-	public void trackTarget() {
+	private double getXSetPoint(int col) {
+		switch (col) {
+			case 0:
+				return m_config.m_leftColXSetpoint;
+			case 1:
+				return m_config.m_midColXSetpoint;
+			case 2:
+				return m_config.m_rightColXSetpoint;
+			default:
+				return m_config.m_defaultXSetpoint;
+		}
+	}
+
+	public void trackTarget(int col) {
 		System.out.println("track target");
 		m_isTracking = true;
-		trackXTarget();
+		trackXTarget(getXSetPoint(col));
 		trackYTarget();
 		enableOpenLoopRamp();
 	}
 
-	public void trackXTarget() {
+	public void trackXTarget(double setpoint) {
 		m_translateXController.reset();
-		m_translateXController.setSetpoint(m_config.m_translateXSetpoint);
+		m_translateXController.setSetpoint(setpoint);
 		m_translateXController.setTolerance(m_config.m_translateXToleranceMeters);
 	}
 
 	public void trackYTarget() {
 		m_translateYController.reset();
-		m_translateYController.setSetpoint(m_config.m_translateYSetpoint);
+		m_translateYController.setSetpoint(m_config.m_defaultYSetpoint);
 		m_translateYController.setTolerance(m_config.m_translateYToleranceMeters);
 	}
 

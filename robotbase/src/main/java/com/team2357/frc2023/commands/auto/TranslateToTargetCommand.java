@@ -5,14 +5,17 @@ import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class TranslateToTargetCommand extends CommandBase {
-    public TranslateToTargetCommand() {
+    private int m_column;
+
+    public TranslateToTargetCommand(int column) {
+        m_column = column;
         addRequirements(SwerveDriveSubsystem.getInstance());
     }
 
     @Override
     public void initialize() {
         SwerveDriveSubsystem.getInstance().setClosedLoopEnabled(true);
-        SwerveDriveSubsystem.getInstance().trackTarget();
+        SwerveDriveSubsystem.getInstance().trackTarget(m_column);
     }
 
     @Override
