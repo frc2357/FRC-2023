@@ -107,9 +107,6 @@ public final class Constants {
 
             config.m_sensorPositionCoefficient = 2.0 * Math.PI / Constants.DRIVE.TICKS_PER_ROTATION
                     * SdsModuleConfigurations.MK4I_L2.getSteerReduction();
-            
-            config.m_sensorPositionCoefficient = 2.0 * Math.PI / Constants.DRIVE.TICKS_PER_ROTATION
-                    * SdsModuleConfigurations.MK4I_L2.getSteerReduction();
 
             config.m_translateXMaxSpeedMeters = 0.25;
             config.m_translateYMaxSpeedMeters = 0.25;
@@ -156,7 +153,7 @@ public final class Constants {
 
         public static final PIDController ROTATE_TO_TARGET_CONTROLLER = new PIDController(0.1, 0, 0);
 
-        public static final double ROTATE_MAXSPEED_METERS_PER_SECOND = 0.91;
+        public static final double ROTATE_MAXSPEED_RADIANS_PER_SECOND = 0.91;
         public static final double SYNC_ENCODER_LIMIT_MS = 10000;
     }
 
@@ -333,6 +330,13 @@ public final class Constants {
 
         public static final double AUTO_SCORE_MID_ROTATIONS = 0;
         public static final double AUTO_SCORE_HIGH_ROTATIONS = 0;
+    }
+
+    public static final class BUTTONBOARD {
+        public static final String BUTTONBOARD_TABLE_NAME = "buttonboard";
+        public static final String ROW_TOPIC_NAME = "row";
+        public static final String COLUMN_TOPIC_NAME = "col";
+    
     }
 
     public static final class CONTROLLER {

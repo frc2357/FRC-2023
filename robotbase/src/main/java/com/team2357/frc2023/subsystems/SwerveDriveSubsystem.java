@@ -101,14 +101,14 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 		/**
 		 * These are the maximum speeds that the targeting methods should achieve in
-		 * percent output
+		 * meters per second
 		 */
 		public double m_translateXMaxSpeedMeters;
 
 		public double m_translateYMaxSpeedMeters;
 
 		/**
-		 * These are the tolerances for the targeting methods in percent output
+		 * These are the tolerances for the targeting methods in meters
 		 */
 		public double m_translateXToleranceMeters;
 
