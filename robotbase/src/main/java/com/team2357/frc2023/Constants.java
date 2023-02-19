@@ -16,6 +16,7 @@ import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.frc2023.subsystems.WristSubsystem;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -169,6 +170,13 @@ public final class Constants {
         public static final double LEFT_COL_X_ANGLE_SETPOINT = -10;
         public static final double MID_COL_X_ANGLE_SETPOINT = -9;
         public static final double RIGHT_COL_X_ANGLE_SETPOINT = -8;
+
+        public static final double DEAD_RECKONING_TRANSLATION_METERS_PER_SECOND = 1;
+        public static final double DEAD_RECKONING_ROTATION_RADIANS_PER_SECOND = 0.1;
+
+        public static final ChassisSpeeds DEAD_RECKONING_X_CHASSIS_SPEEDS = new ChassisSpeeds(DEAD_RECKONING_TRANSLATION_METERS_PER_SECOND, 0, 0);
+        public static final ChassisSpeeds DEAD_RECKONING_Y_CHASSIS_SPEEDS = new ChassisSpeeds(0, DEAD_RECKONING_TRANSLATION_METERS_PER_SECOND, 0);
+        public static final ChassisSpeeds DEAD_RECKONING_ROTATION_CHASSIS_SPEEDS = new ChassisSpeeds(0, 0, DEAD_RECKONING_ROTATION_RADIANS_PER_SECOND);
     }
 
     public static final class INTAKE_ROLLER {
