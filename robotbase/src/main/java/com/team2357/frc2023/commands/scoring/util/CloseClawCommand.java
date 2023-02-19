@@ -1,21 +1,22 @@
-package com.team2357.frc2023.commands.scoring;
+package com.team2357.frc2023.commands.scoring.util;
 
 import com.team2357.frc2023.subsystems.ClawSubsystem;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class OpenClawCommand extends CommandBase {
-    public OpenClawCommand() {
+public class CloseClawCommand extends CommandBase {
+    
+    public CloseClawCommand() {
         addRequirements(ClawSubsystem.getInstance());
     }
 
     @Override
     public void initialize() {
-        ClawSubsystem.getInstance().open();
+        ClawSubsystem.getInstance().close();
     }
 
     @Override
     public boolean isFinished() {
-        return ClawSubsystem.getInstance().isOpen();
+        return ClawSubsystem.getInstance().isClosed();
     }
 }

@@ -1,4 +1,4 @@
-package com.team2357.frc2023.commands.scoring;
+package com.team2357.frc2023.commands.scoring.util;
 
 import com.team2357.frc2023.subsystems.ArmRotationSubsystem;
 

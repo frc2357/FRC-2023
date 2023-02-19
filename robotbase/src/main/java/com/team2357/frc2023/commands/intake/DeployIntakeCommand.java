@@ -1,4 +1,4 @@
-package com.team2357.frc2023.commands;
+package com.team2357.frc2023.commands.intake;
 
 import com.team2357.frc2023.subsystems.IntakeArmSubsystem;
 

@@ -37,6 +37,19 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		return instance;
 	}
 
+	public static enum ColumnSetpoints {
+		LEFT(Constants.DRIVE.LEFT_COL_X_ANGLE_SETPOINT),
+		MIDDLE(Constants.DRIVE.MID_COL_X_ANGLE_SETPOINT),
+		RIGHT(Constants.DRIVE.RIGHT_COL_X_ANGLE_SETPOINT),
+		DEFAULT(Constants.DRIVE.DEFAULT_X_ANGLE_SETPOINT);
+
+		public final double setpoint;
+
+		private ColumnSetpoints(double setpoint) {
+			this.setpoint = setpoint;
+		}
+	}
+
 	private SwerveDriveKinematics m_kinematics;
 
 	private WPI_Pigeon2 m_pigeon;
@@ -117,8 +130,13 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		/**
 		 * These are the setpoints for the PID's that the translate commands use
 		 */
-		public double m_translateXSetpoint;
-		public double m_translateYSetpoint;
+		public double m_defaultXAngleSetpoint;
+		public double m_defaultYAngleSetpoint;
+
+		public double m_leftColXAngleSetpoint;
+		public double m_midColXAngleSetpoint;
+		public double m_rightColXAngleSetpoint;
+
 		/*
 		 * Open loop ramp rate for auto targeting
 		 * In seconds from neutral to full throttle
@@ -421,27 +439,27 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	public boolean isAtTarget() {
 		// System.out.println(isAtXTarget() && isAtYTarget());
 		//return isAtXTarget();
-		return isAtYTarget();
-		// return isAtXTarget() && isAtYTarget();
+		// return isAtYTarget();
+		return isAtXTarget() && isAtYTarget();
 	}
 
-	public void trackTarget() {
+	public void trackTarget(double setpoint) {
 		System.out.println("track target");
 		m_isTracking = true;
-		//trackXTarget();
+		trackXTarget(setpoint);
 		trackYTarget();
 		enableOpenLoopRamp();
 	}
 
-	public void trackXTarget() {
+	public void trackXTarget(double setpoint) {
 		m_translateXController.reset();
-		m_translateXController.setSetpoint(m_config.m_translateXSetpoint);
+		m_translateXController.setSetpoint(setpoint);
 		m_translateXController.setTolerance(m_config.m_translateXToleranceMeters);
 	}
 
 	public void trackYTarget() {
 		m_translateYController.reset();
-		m_translateYController.setSetpoint(m_config.m_translateYSetpoint);
+		m_translateYController.setSetpoint(m_config.m_defaultYAngleSetpoint);
 		m_translateYController.setTolerance(m_config.m_translateYToleranceMeters);
 	}
 
@@ -468,9 +486,9 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		}
 		System.out.println(isTracking());
 
-		drive(new ChassisSpeeds(0, calculateYMetersPerSecond(), 0));
+		// drive(new ChassisSpeeds(0, calculateYMetersPerSecond(), 0));
 		//drive(new ChassisSpeeds(calculateX(), 0, 0));
-		//drive(new ChassisSpeeds(calculateX(), calculateY(), 0));
+		drive(new ChassisSpeeds(calculateXMetersPerSecond(), calculateYMetersPerSecond(), 0));
 	}
 
 	public void stopTracking() {

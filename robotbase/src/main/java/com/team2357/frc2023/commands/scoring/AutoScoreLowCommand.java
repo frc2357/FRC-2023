@@ -1,8 +1,10 @@
-package com.team2357.frc2023.commands;
+package com.team2357.frc2023.commands.scoring;
 
 import com.team2357.frc2023.Constants;
-import com.team2357.frc2023.commands.scoring.ExtendArmToPositionCommand;
-import com.team2357.frc2023.commands.scoring.OpenClawCommand;
+import com.team2357.frc2023.commands.intake.DeployIntakeCommand;
+import com.team2357.frc2023.commands.intake.ReverseIntakeCommand;
+import com.team2357.frc2023.commands.scoring.util.ExtendArmToPositionCommand;
+import com.team2357.frc2023.commands.scoring.util.OpenClawCommand;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
