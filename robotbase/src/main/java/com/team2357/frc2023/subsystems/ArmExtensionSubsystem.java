@@ -55,7 +55,7 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
     public ArmExtensionSubsystem(CANSparkMax extender) {
         m_extendMotor = extender;
         instance = this;
-        shuffleboardPIDTuner = new ShuffleboardPIDTuner();
+        shuffleboardPIDTuner = new ShuffleboardPIDTuner("Arm Extension",0.2,0.2,0.2);
     }
     public void configure(Configuration config) {
         m_config = config;
@@ -123,7 +123,7 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
     }
     @Override
     public void periodic() {
-        if( shuffleboardPIDTuner.isExtensionUpdated()){
+        if( shuffleboardPIDTuner.arePIDsUpdated(m_pidcontroller.getP(),m_pidcontroller.getI(),m_pidcontroller.getD())){
             updatePID();
         }
         if (isClosedLoopEnabled() && isExtenderRotatorAtRotations()) {

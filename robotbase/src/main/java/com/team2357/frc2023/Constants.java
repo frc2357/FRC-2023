@@ -16,6 +16,8 @@ import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.frc2023.subsystems.WristSubsystem;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -333,6 +335,10 @@ public final class Constants {
     public static final class COMPRESSOR {
         public static final int MIN_PRESSURE_PSI = 90;
         public static final int MAX_PRESSURE_PSI = 120;
+    }
+
+    public static final class SHUFFLEBOARD {
+        public static final ShuffleboardTab PID_TUNER_TAB = Shuffleboard.getTab("PID's");
     }
 
 }
