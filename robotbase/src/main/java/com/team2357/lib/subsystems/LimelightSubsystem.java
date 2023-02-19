@@ -14,8 +14,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.DoubleArrayTopic;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.DoubleSubscriber;
+import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.PubSubOption;
 
@@ -60,23 +62,26 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
     return instance;
   }
 
+  private Configuration m_Configuration = new Configuration();
+
   protected NetworkTable m_Table = NetworkTableInstance
-    .getDefault()
-    .getTable("limelight");
-  private NetworkTableEntry m_stream = m_Table.getEntry("stream");
-  private NetworkTableEntry m_pipeline = m_Table.getEntry("pipeline");
-  private NetworkTableEntry m_Tv = m_Table.getEntry("tv");
-  private NetworkTableEntry m_Tx = m_Table.getEntry("tx");
-  private NetworkTableEntry m_Ty = m_Table.getEntry("ty");
-  private NetworkTableEntry m_Ta = m_Table.getEntry("ta");
-  private NetworkTableEntry m_Ts = m_Table.getEntry("ts");
-  private NetworkTableEntry m_Thor = m_Table.getEntry("thor");
-  private NetworkTableEntry m_Tvert = m_Table.getEntry("tvert");
+      .getDefault()
+      .getTable("limelight");
+
+  private IntegerPublisher m_streamPub = m_Table.getIntegerTopic("stream").publish();
+  private DoublePublisher m_pipelinePub = m_Table.getDoubleTopic("pipeline").publish();
+  private DoubleSubscriber m_pipelineSub = m_Table.getDoubleTopic("pipeline").subscribe(Double.NaN);
+  private DoubleSubscriber m_TvSub = m_Table.getDoubleTopic("tv").subscribe(m_Configuration.m_DefaultReturnValue);
+  private DoubleSubscriber m_TxSub = m_Table.getDoubleTopic("tx").subscribe(m_Configuration.m_DefaultReturnValue);
+  private DoubleSubscriber m_TySub = m_Table.getDoubleTopic("ty").subscribe(m_Configuration.m_DefaultReturnValue);
+  private DoubleSubscriber m_TaSub = m_Table.getDoubleTopic("ta").subscribe(m_Configuration.m_DefaultReturnValue);
+  private DoubleSubscriber m_TsSub = m_Table.getDoubleTopic("ts").subscribe(m_Configuration.m_DefaultReturnValue);
+  private DoubleSubscriber m_ThorSub = m_Table.getDoubleTopic("thor").subscribe(m_Configuration.m_DefaultReturnValue);
+  private DoubleSubscriber m_TvertSub = m_Table.getDoubleTopic("tvert").subscribe(m_Configuration.m_DefaultReturnValue);
 
   private DoubleArrayTopic m_limelightPoseInfo = m_Table.getDoubleArrayTopic("botpose");
-  private DoubleArraySubscriber m_limelightPoseInfoSub = m_limelightPoseInfo.subscribe(null, PubSubOption.keepDuplicates(true));
-  
-  private Configuration m_Configuration = new Configuration();
+  private DoubleArraySubscriber m_limelightPoseInfoSub = m_limelightPoseInfo.subscribe(null,
+      PubSubOption.keepDuplicates(true));
 
   /**
    * Sets the camera stream.
@@ -91,7 +96,7 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
     m_Configuration = configuration;
 
     setHumanPipelineActive();
-    //setTargetingPipelineActive();
+    // setTargetingPipelineActive();
     setStream(configuration.m_isLimelightPrimaryStream);
   }
 
@@ -103,70 +108,82 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
     return getPipeline() == m_Configuration.m_humanPipelineIndex;
   }
 
-  public void setHumanPipelineActive() {
-    m_pipeline.setDouble(m_Configuration.m_humanPipelineIndex);
+  protected void setPipeline(int index) {
+    m_pipelinePub.set(index);
   }
+
+  public void setHumanPipelineActive() {
+    m_pipelinePub.set(m_Configuration.m_humanPipelineIndex);
+  }
+
   public boolean isTargetingPipelineActive() {
     return getPipeline() == m_Configuration.m_targetingPipelineIndex;
   }
 
   public void setTargetingPipelineActive() {
-    m_pipeline.setDouble(m_Configuration.m_targetingPipelineIndex);
+    m_pipelinePub.set(m_Configuration.m_targetingPipelineIndex);
   }
+
   public boolean isAprilTagPipelineActive() {
     return getPipeline() == m_Configuration.m_aprilTagPipelineIndex;
   }
+
   public void setAprilTagPipelineActive() {
-    m_pipeline.setDouble(m_Configuration.m_aprilTagPipelineIndex);
+    m_pipelinePub.set(m_Configuration.m_aprilTagPipelineIndex);
   }
+
   private int getPipeline() {
-    double value = m_pipeline.getDouble(Double.NaN);
+    double value = m_pipelineSub.get();
     return (int) Math.round(value);
   }
 
   public void setStream(boolean isLimelightPrimary) {
-    m_stream.setValue(isLimelightPrimary ? 1 : 2);
+    m_streamPub.set(isLimelightPrimary ? 1 : 2);
   }
 
   /**
    * Whether the camera has a valid target
+   * 
    * @return 1 for true, 0 for false
    */
   public double getTV() {
-    return m_Tv.getDouble(m_Configuration.m_DefaultReturnValue);
+    return m_TvSub.get();
   }
 
   /** Horizontal offset from crosshair to target (degrees) */
   public double getTX() {
-    return m_Tx.getDouble(m_Configuration.m_DefaultReturnValue);
+    return m_TxSub.get();
   }
 
   /** Vertical offset from crosshair to target (degrees) */
   public double getTY() {
-    return m_Ty.getDouble(m_Configuration.m_DefaultReturnValue);
+    return m_TySub.get();
   }
 
   /** Percent of image covered by target [0, 100] */
   public double getTA() {
-    return m_Ta.getDouble(m_Configuration.m_DefaultReturnValue);
+    return m_TaSub.get();
   }
 
   /** Skew or rotation (degrees, [-90, 0]) */
   public double getTS() {
-    return m_Ts.getDouble(m_Configuration.m_DefaultReturnValue);
+    return m_TsSub.get();
   }
 
   /** Horizontal sidelength of rough bounding box (0 - 320 pixels) */
   public double getTHOR() {
-    return m_Thor.getDouble(m_Configuration.m_DefaultReturnValue);
+    return m_ThorSub.get();
   }
 
   /** Vertical sidelength of rough bounding box (0 - 320 pixels) */
   public double getTVERT() {
-    return m_Tvert.getDouble(m_Configuration.m_DefaultReturnValue);
+    return m_TvertSub.get();
   }
 
-  /** Skew of target in degrees. Positive values are to the left, negative to the right */
+  /**
+   * Skew of target in degrees. Positive values are to the left, negative to the
+   * right
+   */
   public double getSkew() {
     if (!validTargetExists()) {
       return Double.NaN;
@@ -186,10 +203,8 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
     }
 
     double skew = getSkew();
-    return (
-      -m_Configuration.m_HeadOnTolerance <= skew &&
-      skew <= m_Configuration.m_HeadOnTolerance
-    );
+    return (-m_Configuration.m_HeadOnTolerance <= skew &&
+        skew <= m_Configuration.m_HeadOnTolerance);
   }
 
   public boolean isToLeft() {
@@ -228,10 +243,9 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
     }
 
     double proportion = getTHOR() / getTVERT();
-    double factor =
-      proportion *
-      m_Configuration.m_TargetHeight /
-      m_Configuration.m_TargetWidth;
+    double factor = proportion *
+        m_Configuration.m_TargetHeight /
+        m_Configuration.m_TargetWidth;
     return 90.0 * (1 - factor);
   }
 
@@ -240,26 +254,25 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
       return Double.NaN;
     }
 
-    double angleDegrees =
-      Math.abs(getTY()) + m_Configuration.m_LimelightMountingAngle;
+    double angleDegrees = Math.abs(getTY()) + m_Configuration.m_LimelightMountingAngle;
 
-    double heightDifference =
-      m_Configuration.m_LimelightMountingHeightInches -
-      m_Configuration.m_targetHeightFromFloor;
+    double heightDifference = m_Configuration.m_LimelightMountingHeightInches -
+        m_Configuration.m_targetHeightFromFloor;
     double distance = heightDifference / Math.tan(Math.toRadians(angleDegrees));
 
     return distance;
   }
-  public Pose2d getLimelightPose2d(){
+
+  public Pose2d getLimelightPose2d() {
     double[] values = m_limelightPoseInfoSub.get();
-    Translation2d t2d = new Translation2d(values[0],values[1]);
+    Translation2d t2d = new Translation2d(values[0], values[1]);
     Rotation2d r2d = new Rotation2d(SwerveDriveSubsystem.getInstance().getYaw());
     return new Pose2d(t2d, r2d);
   }
   /*
-  @Override
-  public void periodic() {
-    SmartDashboard.putNumber("Y", getTY());
-  }
-  */
+   * @Override
+   * public void periodic() {
+   * SmartDashboard.putNumber("Y", getTY());
+   * }
+   */
 }
