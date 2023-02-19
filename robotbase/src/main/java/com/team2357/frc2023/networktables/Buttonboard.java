@@ -1,4 +1,4 @@
-package com.team2357.networktables;
+package com.team2357.frc2023.networktables;
 
 import java.util.EnumSet;
 import java.util.concurrent.atomic.AtomicReference;
