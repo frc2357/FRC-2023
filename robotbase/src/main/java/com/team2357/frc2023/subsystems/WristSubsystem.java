@@ -82,6 +82,7 @@ public class WristSubsystem extends SubsystemBase {
             m_wristeSolenoid.set(Value.kForward);
             m_lastActionMillis = now;
         } else if (now > m_lastActionMillis + m_config.m_extendMilliseconds) {
+            m_wristeSolenoid.set(Value.kOff);
             m_currentState = WristState.Extended;
             m_lastActionMillis = 0;
         }
@@ -94,6 +95,7 @@ public class WristSubsystem extends SubsystemBase {
             m_wristeSolenoid.set(Value.kReverse);
             m_lastActionMillis = now;
         } else if (now > m_lastActionMillis + m_config.m_extendMilliseconds) {
+            m_wristeSolenoid.set(Value.kOff);
             m_currentState = WristState.Retracted;
             m_lastActionMillis = 0;
         }

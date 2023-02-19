@@ -79,6 +79,7 @@ public class ClawSubsystem extends SubsystemBase {
             m_clawSolenoid.set(Value.kReverse);
             m_lastActionMillis = now;
         } else if (now > m_lastActionMillis + m_config.m_openMilliseconds) {
+            m_clawSolenoid.set(Value.kOff);
             m_currentState = ClawState.Open;
             m_lastActionMillis = 0;
         }
@@ -91,6 +92,7 @@ public class ClawSubsystem extends SubsystemBase {
             m_clawSolenoid.set(Value.kForward);
             m_lastActionMillis = now;
         } else if (now > m_lastActionMillis + m_config.m_openMilliseconds) {
+            m_clawSolenoid.set(Value.kOff);
             m_currentState = ClawState.Closed;
             m_lastActionMillis = 0;
         }
