@@ -55,8 +55,10 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
     public ArmExtensionSubsystem(CANSparkMax extender) {
         m_extendMotor = extender;
         instance = this;
-        shuffleboardPIDTuner = new ShuffleboardPIDTuner("Arm Extension",0.2,0.2,0.2);
+        shuffleboardPIDTuner = new ShuffleboardPIDTuner("Arm Extension", 0.2, 0.2, 0.2, m_config.m_extendMotorP,
+                m_config.m_extendMotorI, m_config.m_extendMotorD);
     }
+
     public void configure(Configuration config) {
         m_config = config;
 
@@ -69,9 +71,10 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
         m_extendMotor.setOpenLoopRampRate(m_config.m_extendMotorRampRate);
 
     }
-    //Mehtod for the panic mode to extend the arms
+
+    // Mehtod for the panic mode to extend the arms
     public void manualExtend(double sensorUnits) {
-        m_extendMotor.set(sensorUnits*m_config.m_maxSpeedPercent);
+        m_extendMotor.set(sensorUnits * m_config.m_maxSpeedPercent);
     }
 
     private void configureExtenderPID(SparkMaxPIDController pidController) {
@@ -87,7 +90,8 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
         pidController.setSmartMotionMaxVelocity(m_config.m_extendMotorMaxVel, m_config.m_smartMotionSlot);
         pidController.setSmartMotionMinOutputVelocity(m_config.m_extendMotorMinVel, m_config.m_smartMotionSlot);
         pidController.setSmartMotionMaxAccel(m_config.m_extendMotorMaxAcc, m_config.m_smartMotionSlot);
-        pidController.setSmartMotionAllowedClosedLoopError(m_config.m_extendMotorAllowedError, m_config.m_smartMotionSlot);
+        pidController.setSmartMotionAllowedClosedLoopError(m_config.m_extendMotorAllowedError,
+                m_config.m_smartMotionSlot);
     }
 
     public void stopExtensionMotors() {
@@ -104,6 +108,7 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
         m_targetRotations = rotations;
         m_pidcontroller.setReference(m_targetRotations, CANSparkMax.ControlType.kSmartMotion);
     }
+
     /**
      * @return Is the Extender arm motor at the setpoint set by m_targetRotations
      */
@@ -116,14 +121,17 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
     public double getExtenderMotorRotations() {
         return m_extendMotor.getEncoder().getPosition();
     }
-    public void updatePID(){
+
+    public void updatePID() {
         m_pidcontroller.setP(shuffleboardPIDTuner.getDouble("ExtensionP"));
-            m_pidcontroller.setI(shuffleboardPIDTuner.getDouble("ExtensionI"));
-            m_pidcontroller.setD(shuffleboardPIDTuner.getDouble("ExtensionD"));
+        m_pidcontroller.setI(shuffleboardPIDTuner.getDouble("ExtensionI"));
+        m_pidcontroller.setD(shuffleboardPIDTuner.getDouble("ExtensionD"));
     }
+
     @Override
     public void periodic() {
-        if( shuffleboardPIDTuner.arePIDsUpdated(m_pidcontroller.getP(),m_pidcontroller.getI(),m_pidcontroller.getD())){
+        if (shuffleboardPIDTuner.arePIDsUpdated(m_pidcontroller.getP(), m_pidcontroller.getI(),
+                m_pidcontroller.getD())) {
             updatePID();
         }
         if (isClosedLoopEnabled() && isExtenderRotatorAtRotations()) {

@@ -26,15 +26,22 @@ public class ShuffleboardPIDTuner {
     private double m_pRange;
     private double m_iRange;
     private double m_dRange;
+    private double m_pDefault;
+    private double m_iDefault;
+    private double m_dDefault;
     private NetworkTable m_table;
     private ShuffleboardTab m_tab;
 
-    public ShuffleboardPIDTuner(String subsystemName, double pRange, double iRange, double dRange) {
+    public ShuffleboardPIDTuner(String subsystemName, double pRange, double iRange, double dRange, double pDefault,
+            double iDefault, double dDefault) {
         m_subsystemName = subsystemName;
         m_tab = Constants.SHUFFLEBOARD.PID_TUNER_TAB;
         m_pRange = pRange;
         m_iRange = iRange;
         m_dRange = dRange;
+        m_pDefault = pDefault;
+        m_iDefault = iDefault;
+        m_dDefault = dDefault;
         m_table = NetworkTableInstance.getDefault().getTable("Shuffleboard");
         instance = this;
         makePIDWidgets();
@@ -46,11 +53,11 @@ public class ShuffleboardPIDTuner {
 
     public void makePIDWidgets() {
         ShuffleboardLayout layout = m_tab.getLayout(m_subsystemName, BuiltInLayouts.kList);
-        SimpleWidget pWidget = layout.add(m_subsystemName + " P", 0).withWidget(BuiltInWidgets.kNumberSlider)
+        SimpleWidget pWidget = layout.add(m_subsystemName + " P", m_pDefault).withWidget(BuiltInWidgets.kNumberSlider)
                 .withProperties(Map.of("min", m_pRange * -1, "max", m_pRange));
-        SimpleWidget iWidget = layout.add(m_subsystemName + " I", 0).withWidget(BuiltInWidgets.kNumberSlider)
+        SimpleWidget iWidget = layout.add(m_subsystemName + " I", m_iDefault).withWidget(BuiltInWidgets.kNumberSlider)
                 .withProperties(Map.of("min", m_iRange * -1, "max", m_iRange));
-        SimpleWidget dWidget = layout.add(m_subsystemName + " D", 0).withWidget(BuiltInWidgets.kNumberSlider)
+        SimpleWidget dWidget = layout.add(m_subsystemName + " D", m_dDefault).withWidget(BuiltInWidgets.kNumberSlider)
                 .withProperties(Map.of("min", m_dRange * -1, "max", m_dRange));
     }
 
