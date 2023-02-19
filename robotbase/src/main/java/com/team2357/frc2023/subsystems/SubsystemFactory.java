@@ -6,6 +6,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
+import com.team2357.lib.subsystems.LimelightSubsystem;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -125,6 +126,10 @@ public class SubsystemFactory {
 
                 ElevatorSubsystem subsystem = new ElevatorSubsystem(masterMotor, followerMotor);
                 subsystem.configure(Constants.ELEVATOR.GET_ELEVATOR_CONFIG());
+                return subsystem;
+        }
+        public LimelightSubsystem CreateLimelightSubsystem(){
+                LimelightSubsystem subsystem = new LimelightSubsystem();
                 return subsystem;
         }
 }
