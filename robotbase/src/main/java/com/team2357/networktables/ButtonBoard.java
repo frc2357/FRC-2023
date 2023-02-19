@@ -11,7 +11,7 @@ import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.PubSubOption;
 
-public class Buttonboard {
+public class ButtonBoard {
 
     private static Buttonboard m_instance;
 
