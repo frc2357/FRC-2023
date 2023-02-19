@@ -6,17 +6,17 @@ import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class TranslateToColumnCommand extends CommandBase {
-    private int m_col;
+    private int m_column;
     
     /**
-     * @param col Column to translate to (0 = left, 1 = middle, 2 = right)
+     * @param column Column to translate to (0 = left, 1 = middle, 2 = right)
      */
-    public TranslateToColumnCommand(int col) {
-        m_col = col;
+    public TranslateToColumnCommand(int column) {
+        m_column = column;
     }
 
     @Override
     public void initialize() {
-        new TranslateToTargetCommand(SwerveDriveSubsystem.getInstance().getXSetPoint(m_col));
+        new TranslateToTargetCommand(SwerveDriveSubsystem.getInstance().getXSetPoint(m_column));
     }
 }
