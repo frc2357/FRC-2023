@@ -1,6 +1,6 @@
 package com.team2357.frc2023.commands.scoring;
 
-import com.team2357.frc2023.commands.auto.TranslateToTargetCommand;
+import com.team2357.frc2023.commands.auto.TranslateToTargetCommandGroup;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -14,6 +14,11 @@ public class TranslateToColumnCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        new TranslateToTargetCommand(m_column.setpoint).schedule();
+        new TranslateToTargetCommandGroup(m_column.setpoint).schedule();
+    }
+
+    @Override
+    public boolean isFinished() {
+        return true;
     }
 }
