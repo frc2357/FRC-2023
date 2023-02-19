@@ -430,7 +430,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		return isAtXTarget() && isAtYTarget();
 	}
 
-	private double getXSetPoint(int col) {
+	public double getXSetPoint(int col) {
 		switch (col) {
 			case 0:
 				return m_config.m_leftColXSetpoint;
@@ -443,10 +443,10 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		}
 	}
 
-	public void trackTarget(int col) {
+	public void trackTarget(double setpoint) {
 		System.out.println("track target");
 		m_isTracking = true;
-		trackXTarget(getXSetPoint(col));
+		trackXTarget(setpoint);
 		trackYTarget();
 		enableOpenLoopRamp();
 	}

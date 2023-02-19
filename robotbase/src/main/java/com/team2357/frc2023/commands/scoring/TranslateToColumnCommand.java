@@ -1,5 +1,8 @@
 package com.team2357.frc2023.commands.scoring;
 
+import com.team2357.frc2023.commands.auto.TranslateToTargetCommand;
+import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
+
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class TranslateToColumnCommand extends CommandBase {
@@ -14,6 +17,6 @@ public class TranslateToColumnCommand extends CommandBase {
 
     @Override
     public void initialize() {
-
+        new TranslateToTargetCommand(SwerveDriveSubsystem.getInstance().getXSetPoint(m_col));
     }
 }
