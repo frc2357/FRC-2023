@@ -167,6 +167,9 @@ public final class Constants {
         public static final double LEFT_COL_X_ANGLE_SETPOINT = -10;
         public static final double MID_COL_X_ANGLE_SETPOINT = -9;
         public static final double RIGHT_COL_X_ANGLE_SETPOINT = -8;
+
+        public static final double DEAD_RECKONING_TRANSLATION_SPEED_PROPORTION = 0;
+        public static final double DEAD_RECKONING_ROTATION_SPEED_PROPORTION = 0;
     }
 
     public static final class INTAKE_ROLLER {
