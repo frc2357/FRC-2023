@@ -3,6 +3,7 @@ package com.team2357.frc2023.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.SparkMaxPIDController;
+import com.team2357.frc2023.shuffleboard.ShuffleboardPIDTuner;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 import com.team2357.lib.util.Utility;
 
@@ -27,6 +28,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
         public double m_rotationMotorP;
         public double m_rotationMotorI;
         public double m_rotationMotorD;
+        
         public double m_rotationMotorIZone;
         public double m_rotationMotorFF;
         public double m_rotationMotorMaxOutput;
@@ -45,7 +47,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
     private CANSparkMax m_followerRotationMotor;
     private SparkMaxPIDController m_pidController;
     private double m_targetRotations;
-
+    private ShuffleboardPIDTuner m_shuffleboardPIDTuner;
     public ArmRotationSubsystem(CANSparkMax masterRotationMotor, CANSparkMax followerRotationMotor) {
         instance = this;
         m_masterRotationMotor = masterRotationMotor;
@@ -54,7 +56,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
 
     public void configure(Configuration config) {
         m_config = config;
-
+        m_shuffleboardPIDTuner = new ShuffleboardPIDTuner("Arm Rotation",0.2,0.2,0.2,m_config.m_rotationMotorP,m_config.m_rotationMotorI,m_config.m_rotationMotorD);
         configureRotationMotor(m_masterRotationMotor);
         configureRotationMotor(m_followerRotationMotor);
 
@@ -132,11 +134,18 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
     public double getFollowerMotorRotations() {
         return m_followerRotationMotor.getEncoder().getPosition();
     }
-
+    public void updatePID() {
+        m_pidController.setP(m_shuffleboardPIDTuner.getDouble("P"));
+        m_pidController.setI(m_shuffleboardPIDTuner.getDouble("I"));
+        m_pidController.setD(m_shuffleboardPIDTuner.getDouble("D"));
+    }
     @Override
     public void periodic() {
         if (isClosedLoopEnabled() && isRotatorAtRotations()) {
             setClosedLoopEnabled(false);
+        }
+        if(m_shuffleboardPIDTuner.arePIDsUpdated(m_pidController.getP(), m_pidController.getI(), m_pidController.getD())){
+            updatePID();
         }
     }
 }

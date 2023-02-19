@@ -50,7 +50,7 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
     private CANSparkMax m_extendMotor;
     private SparkMaxPIDController m_pidcontroller;
     private double m_targetRotations;
-    private ShuffleboardPIDTuner shuffleboardPIDTuner;
+    private ShuffleboardPIDTuner m_shuffleboardPIDTuner;
 
     public ArmExtensionSubsystem(CANSparkMax extender) {
         m_extendMotor = extender;
@@ -60,7 +60,7 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
 
     public void configure(Configuration config) {
         m_config = config;
-        shuffleboardPIDTuner = new ShuffleboardPIDTuner("Arm Extension", 0.2, 0.2, 0.2, m_config.m_extendMotorP,
+        m_shuffleboardPIDTuner = new ShuffleboardPIDTuner("Arm Extension", 0.2, 0.2, 0.2, m_config.m_extendMotorP,
                 m_config.m_extendMotorI, m_config.m_extendMotorD);
         m_extendMotor.setIdleMode(m_config.m_extendMotorIdleMode);
         m_extendMotor.setSmartCurrentLimit(m_config.m_extendMotorStallLimitAmps, m_config.m_extendMotorFreeLimitAmps);
@@ -123,14 +123,14 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
     }
 
     public void updatePID() {
-        m_pidcontroller.setP(shuffleboardPIDTuner.getDouble("ExtensionP"));
-        m_pidcontroller.setI(shuffleboardPIDTuner.getDouble("ExtensionI"));
-        m_pidcontroller.setD(shuffleboardPIDTuner.getDouble("ExtensionD"));
+        m_pidcontroller.setP(m_shuffleboardPIDTuner.getDouble("P"));
+        m_pidcontroller.setI(m_shuffleboardPIDTuner.getDouble("I"));
+        m_pidcontroller.setD(m_shuffleboardPIDTuner.getDouble("D"));
     }
 
     @Override
     public void periodic() {
-        if (shuffleboardPIDTuner.arePIDsUpdated(m_pidcontroller.getP(), m_pidcontroller.getI(),
+        if (m_shuffleboardPIDTuner.arePIDsUpdated(m_pidcontroller.getP(), m_pidcontroller.getI(),
                 m_pidcontroller.getD())) {
             updatePID();
         }

@@ -61,8 +61,12 @@ public class ShuffleboardPIDTuner {
         instance = this;
     }
 
-    public double getDouble(String entry) {
-        return m_table.getEntry(entry).getDouble(0);
+    /**
+     * @param desiredPIDValue is the desired value you want to get P/I/D made to be easier.
+     * @return the value of the desired entry.
+     */
+    public double getDouble(String desiredPIDValue) {
+        return m_table.getEntry(m_subsystemName + " "+desiredPIDValue).getDouble(0);
     }
 
     public void makePIDWidgets() {
@@ -76,9 +80,9 @@ public class ShuffleboardPIDTuner {
     }
 
     public boolean arePIDsUpdated(double currentPValue, double currentIValue, double currentDValue) {
-        m_updatedPValue = getDouble(m_subsystemName + " P");
-        m_updatedIValue = getDouble(m_subsystemName + " I");
-        m_updatedDValue = getDouble(m_subsystemName + " D");
+        m_updatedPValue = getDouble("P");
+        m_updatedIValue = getDouble("I");
+        m_updatedDValue = getDouble("D");
         if ((m_updatedPValue != currentPValue) || (m_updatedIValue != currentIValue)
                 || (m_updatedDValue != currentDValue)) {
             return true;
