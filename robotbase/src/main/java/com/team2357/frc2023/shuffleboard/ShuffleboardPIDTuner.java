@@ -19,13 +19,27 @@ public class ShuffleboardPIDTuner {
         return instance;
     }
 
+    /**
+     * The name of the subsystem PID that this instance will control.
+     */
     private String m_subsystemName;
+    /**
+     * These are the updated values for the PID the instance of this controls.
+     */
     private double m_updatedPValue;
     private double m_updatedIValue;
     private double m_updatedDValue;
+    /**
+     * These are how far the sliders can be set in each direction away from the
+     * default value.
+     */
     private double m_pRange;
     private double m_iRange;
     private double m_dRange;
+    /**
+     * The defaults for the PID this instance will control
+     * should be set from constants or the controler.
+     */
     private double m_pDefault;
     private double m_iDefault;
     private double m_dDefault;
