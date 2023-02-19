@@ -21,7 +21,7 @@ import math
 from robotpy_apriltag import AprilTagFieldLayout
 import math
 import numpy as np
-from calibration_from_opencv import imag_cal, cam0
+from calibration_from_opencv import image_cal, cam0 #bandaid for now
 
 
 # more research needed here
@@ -117,21 +117,39 @@ def draw_tag(frame, result):
     frame = draw_tagframe(frame, tag)
     frame = draw_tagid(frame, tag)
     frame = draw_tagpose(frame, pose, tag)
+    if tag_id not in [1,2,3,6,7,8]:
+        return
     frame = draw_cube(frame, result)
-    project_gamepiece_locations(roi_map,frame,result,)
+    frame = project_gamepiece_locations(roi_map,frame,result,)
     return frame
 
-roi_map = np.float32([[-22,27.65, 0],[-22, 7.84, 0],[-22,-12.16,0]])
+#roi_map units = inches.  gets converted to meters in project_gamepiece_locations()
+#roi_map element is X,Y,Z,W,H
+# for some reason the coordinate system seems to be:
+# X horizontal, -Y vertical, Z is distance from plane created by tag
+# W is total width of detection area
+# H is total height of detection area
+roi_map = np.float32([[ 22,-15.84,8.43,2,2], #mid cone
+                      [-22,-15.84,8.43,2,2],#mid cone
+                      [ 22,-27.84,25.45,2,2],#high cone
+                      [-22,-27.84,25.45,2,2],#high cone
+                      [ 25.625, 12,-12,12,4], #low cone
+                      [-25.625, 12,-12,12,4], #low cone
+                      ])
+                      
 
 def expand_location(roi):
-    x,y,z= roi 
-    dd = 3/39.37
-    return np.float32([[x-dd,y-dd,z],
-                       [x-dd,y+dd,z],
-                       [x+dd,y+dd,z],
+    x,y,z,W,H= roi 
+    w = W/2.
+    h = H/2
+
+    return np.float32([[x-w,y-h,z],
+                       [x-w,y+h,z],
+                       [x+w,y+h,z],
+                       [x+w,y-h,z]
                                    ])
 
-def project_gamepiece_locations(roi_map, frame, result, cal_factors)->list:
+def project_gamepiece_locations(roi_map, frame, result)->list:
     """
     Function that transforms roi rectangles based on
     AprilTag pose and camera calibration values 
@@ -141,15 +159,23 @@ def project_gamepiece_locations(roi_map, frame, result, cal_factors)->list:
     cal_factors: CameraCalibration instance
     """
     tag_id, pose, center, tag = result
-    tvec = 39.37*np.array(pose.translation())
+    if tag_id not in [1,2,3,6,7,8]:
+        return
+    tvec = np.array(pose.translation())
     rvec = pose.rotation().getQuaternion().toRotationVector()
     ret = []
     for roi in roi_map:
         rect = expand_location(roi)
-        imgpts,jac = cv2.projectPoints(rect, rvec, tvec,cal_factors.mtx, cal_factors.dst)
+        rect /=39.37
+        # using the imag_cal class to automatically pull in the calibration values needed for cv2.projectPoints
+        #imgpts,jac = cv2.projectPoints(rect, rvec, tvec,cal_factors.mtx, cal_factors.dst)
+        imgpts,jac = image_cal.projectPoints(rect,rvec,tvec)
+        imgpts = np.int32(imgpts).reshape(-1,2)
+        
         for i in range(4):
             j = (i + 1) % 4
-            frame = cv2.line(frame, tuple(imgpts[i]), tuple(imgpts[j]),(255),3)        
+            print("\t",i,tuple(imgpts[i]), tuple(imgpts[j]))
+            ret = cv2.line(frame, tuple(imgpts[i]), tuple(imgpts[j]),(0,205,205),3)        
     return ret
 
 
@@ -170,9 +196,9 @@ def draw_cube(frame, result):
     print(f"Translation:{tvec}\nRotation:{rvec}")
 
     #TODO: Change back for actual camera -- Using static values for mtx/distCoeff for field images
-    mtx = np.float32([1000, 0, 1280/2,0,1000,720/2,0,0,1]).reshape(3,3)
-    imgpts, jac = cv2.projectPoints(axis, rvec, tvec, mtx, np.float32([0,0,0,0]))
-    #imgpts, jac = cv2.projectPoints(axis, rvec, tvec, cal.mtx, cal.dst)
+    #mtx = np.float32([1000, 0, 1280/2,0,1000,720/2,0,0,1]).reshape(3,3)
+    imgpts,jac = image_cal.projectPoints(axis,rvec,tvec)
+    #imgpts, jac = cv2.projectPoints(axis, rvec, tvec, mtx, np.float32([0,0,0,0]))
     imgpts = np.int32(imgpts).reshape(-1,2)
     # draw ground floor in green
     frame = cv2.drawContours(frame, [imgpts[:4]],-1,(0,255,0),-3)

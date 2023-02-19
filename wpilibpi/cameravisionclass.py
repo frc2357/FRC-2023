@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from dataclass import dataclass
+
 import glob
 import json
 import time
@@ -9,6 +11,7 @@ import numpy as np
 
 from cscore import CameraServer, VideoSource, UsbCamera, MjpegServer
 from ntcore import NetworkTableInstance, EventFlags
+from calibration_from_opencv import cam0, image_cal
 
 class CameraConfig: pass
 
@@ -27,6 +30,12 @@ def list_cameras():
 
 class CameraObject:
     """ a lightweight class for cameras """
+    """ c.camera = None
+            c.config = camConfig 
+            c.sink = None
+            c.outstream = CameraServer.putVideo("VideoStream", camConfig["width"], camConfig["height"])
+            c.images = imgs
+            c.cal """
     pass
 
 class CameraVision:
@@ -77,6 +86,7 @@ class CameraVision:
             c.sink = None
             c.outstream = CameraServer.putVideo("VideoStream", camConfig["width"], camConfig["height"])
             c.images = imgs
+            c.cal = image_cal  #bandaid for now
             self.cameras.append(c)
         else:
             for config in self.cameraConfigs:
@@ -113,7 +123,7 @@ class CameraVision:
         return True
     
     def readConfig(self, configFile=None)->None:
-        """Read configuration file."""
+        """Read configuration file (json)."""
         if configFile:
             self.configFile = configFile
         cfg = self.configFile
