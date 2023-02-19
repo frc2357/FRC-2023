@@ -57,8 +57,8 @@ public class ShuffleboardPIDTuner {
         m_iDefault = iDefault;
         m_dDefault = dDefault;
         m_table = NetworkTableInstance.getDefault().getTable("Shuffleboard");
-        instance = this;
         makePIDWidgets();
+        instance = this;
     }
 
     public double getDouble(String entry) {
@@ -66,7 +66,7 @@ public class ShuffleboardPIDTuner {
     }
 
     public void makePIDWidgets() {
-        ShuffleboardLayout layout = m_tab.getLayout(m_subsystemName, BuiltInLayouts.kList);
+        ShuffleboardLayout layout = m_tab.getLayout(m_subsystemName, BuiltInLayouts.kList).withSize(2,3);
         SimpleWidget pWidget = layout.add(m_subsystemName + " P", m_pDefault).withWidget(BuiltInWidgets.kNumberSlider)
                 .withProperties(Map.of("min", m_pRange * -1, "max", m_pRange));
         SimpleWidget iWidget = layout.add(m_subsystemName + " I", m_iDefault).withWidget(BuiltInWidgets.kNumberSlider)

@@ -55,13 +55,13 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
     public ArmExtensionSubsystem(CANSparkMax extender) {
         m_extendMotor = extender;
         instance = this;
-        shuffleboardPIDTuner = new ShuffleboardPIDTuner("Arm Extension", 0.2, 0.2, 0.2, m_config.m_extendMotorP,
-                m_config.m_extendMotorI, m_config.m_extendMotorD);
+        
     }
 
     public void configure(Configuration config) {
         m_config = config;
-
+        shuffleboardPIDTuner = new ShuffleboardPIDTuner("Arm Extension", 0.2, 0.2, 0.2, m_config.m_extendMotorP,
+                m_config.m_extendMotorI, m_config.m_extendMotorD);
         m_extendMotor.setIdleMode(m_config.m_extendMotorIdleMode);
         m_extendMotor.setSmartCurrentLimit(m_config.m_extendMotorStallLimitAmps, m_config.m_extendMotorFreeLimitAmps);
         m_pidcontroller = m_extendMotor.getPIDController();
