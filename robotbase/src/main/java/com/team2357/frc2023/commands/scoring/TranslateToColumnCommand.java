@@ -17,6 +17,6 @@ public class TranslateToColumnCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        new TranslateToTargetCommand(SwerveDriveSubsystem.getInstance().getXSetPoint(m_column));
+        new TranslateToTargetCommand(SwerveDriveSubsystem.getInstance().getXSetPoint(m_column)).schedule();
     }
 }
