@@ -1,16 +1,16 @@
-package com.team2357.frc2023.commands;
+package com.team2357.frc2023.commands.intake;
 
 import com.team2357.frc2023.subsystems.IntakeRollerSubsystem;
 import com.team2357.lib.commands.CommandLoggerBase;
 
-public class RunIntakeCommand extends CommandLoggerBase {
-    public RunIntakeCommand() {
+public class ReverseIntakeCommand extends CommandLoggerBase {
+    public ReverseIntakeCommand() {
         addRequirements(IntakeRollerSubsystem.getInstance());
     }
 
     @Override
     public void execute() {
-        IntakeRollerSubsystem.getInstance().runIntake(false);
+        IntakeRollerSubsystem.getInstance().runIntake(true);
     }
 
     @Override

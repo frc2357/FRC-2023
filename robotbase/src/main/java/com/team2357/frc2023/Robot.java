@@ -11,8 +11,8 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import com.team2357.frc2023.commands.OrientControllerInputsCommand;
-import com.team2357.frc2023.commands.SyncDriveEncodersCommand;
-import com.team2357.frc2023.commands.ZeroDriveCommand;
+import com.team2357.frc2023.commands.drive.SyncDriveEncodersCommand;
+import com.team2357.frc2023.commands.drive.ZeroDriveCommand;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;

@@ -421,14 +421,14 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	public boolean isAtTarget() {
 		// System.out.println(isAtXTarget() && isAtYTarget());
 		//return isAtXTarget();
-		return isAtYTarget();
-		// return isAtXTarget() && isAtYTarget();
+		// return isAtYTarget();
+		return isAtXTarget() && isAtYTarget();
 	}
 
 	public void trackTarget() {
 		System.out.println("track target");
 		m_isTracking = true;
-		//trackXTarget();
+		trackXTarget();
 		trackYTarget();
 		enableOpenLoopRamp();
 	}
@@ -468,9 +468,9 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		}
 		System.out.println(isTracking());
 
-		drive(new ChassisSpeeds(0, calculateYMetersPerSecond(), 0));
+		// drive(new ChassisSpeeds(0, calculateYMetersPerSecond(), 0));
 		//drive(new ChassisSpeeds(calculateX(), 0, 0));
-		//drive(new ChassisSpeeds(calculateX(), calculateY(), 0));
+		drive(new ChassisSpeeds(calculateXMetersPerSecond(), calculateYMetersPerSecond(), 0));
 	}
 
 	public void stopTracking() {
