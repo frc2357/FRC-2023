@@ -46,6 +46,15 @@ public class ShuffleboardPIDTuner {
     private NetworkTable m_table;
     private ShuffleboardTab m_tab;
 
+    /**
+     * @param subsystemName The name of the subsystem, used to give the widgts and layout their names.
+     * @param pRange How far the p slider can go to adjust the P value.
+     * @param iRange How far the i slider can go to adjust the I value.
+     * @param dRange How far teh d slider can go to adjust the D value.
+     * @param pDefault the default P value, should be a config or from the PID controller itself.
+     * @param iDefault the default I value, should be a config or from the PID controller itself.
+     * @param dDefault the default D value, should be a config or from the PID controller itself.
+     */
     public ShuffleboardPIDTuner(String subsystemName, double pRange, double iRange, double dRange, double pDefault,
             double iDefault, double dDefault) {
         m_subsystemName = subsystemName;
@@ -62,8 +71,8 @@ public class ShuffleboardPIDTuner {
     }
 
     /**
-     * @param desiredPIDValue is the desired value you want to get P/I/D made to be easier.
-     * @return the value of the desired entry.
+     * @param desiredPIDValue The desired value you want to get. P/I/D
+     * @return The value of the desired entry.
      */
     public double getDouble(String desiredPIDValue) {
         return m_table.getEntry(m_subsystemName + " "+desiredPIDValue).getDouble(0);
@@ -79,6 +88,12 @@ public class ShuffleboardPIDTuner {
                 .withProperties(Map.of("min", m_dRange * -1, "max", m_dRange));
     }
 
+    /**
+     * @param currentPValue The current P value of the PID controller. use the getP method to get this.
+     * @param currentIValue The current I value of the PID controller. use the getI method to get this.
+     * @param currentDValue The current D value of the PID controller. use the getD method to get this.
+     * @return
+     */
     public boolean arePIDsUpdated(double currentPValue, double currentIValue, double currentDValue) {
         m_updatedPValue = getDouble("P");
         m_updatedIValue = getDouble("I");
