@@ -5,6 +5,7 @@ import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.lib.subsystems.LimelightSubsystem;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class TranslateToTargetXCommand extends CommandBase {
@@ -30,7 +31,7 @@ public class TranslateToTargetXCommand extends CommandBase {
         double newSpeed = m_pidController.calculate(m_limeLight.getTY());
         newSpeed = newSpeed * Constants.DRIVE.GET_SWERVE_DRIVE_CONFIG().m_translateXMaxSpeedMeters;
         newSpeed = newSpeed * -1;
-        m_swerve.drive(newSpeed, 0, 0);
+        m_swerve.drive(new ChassisSpeeds(newSpeed, 0, 0));
     }
 
     @Override
