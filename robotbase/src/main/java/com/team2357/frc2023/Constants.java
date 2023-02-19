@@ -112,7 +112,7 @@ public final class Constants {
                     * SdsModuleConfigurations.MK4I_L2.getSteerReduction();
 
             config.m_translateXMaxSpeedMeters = 0.25;
-            config.m_translateMaxSpeedMeters = 0.25;
+            config.m_translateYMaxSpeedMeters = 0.25;
 
             config.m_translateXToleranceMeters = 0.05;
             config.m_translateYToleranceMeters = 0.05;

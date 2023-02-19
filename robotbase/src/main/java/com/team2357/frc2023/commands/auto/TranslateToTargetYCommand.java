@@ -11,9 +11,10 @@ public class TranslateToTargetYCommand extends CommandBase {
     public PIDController m_pidController;
     public SwerveDriveSubsystem m_swerve = SwerveDriveSubsystem.getInstance();
     public LimelightSubsystem m_limeLight = LimelightSubsystem.getInstance();
+    public SwerveDriveSubsystem.Configuration m_swerveConfig = Constants.DRIVE.GET_SWERVE_DRIVE_CONFIG();
 
     public TranslateToTargetYCommand() {
-        m_pidController = Constants.DRIVE.GET_SWERVE_DRIVE_CONFIG().m_translateYController;
+        m_pidController = m_swerveConfig.m_translateYController;
         m_pidController.setTolerance(0.4);
 
         addRequirements(m_swerve, m_limeLight);
@@ -28,7 +29,7 @@ public class TranslateToTargetYCommand extends CommandBase {
     @Override
     public void execute() {
         double newSpeed = m_pidController.calculate(m_limeLight.getTX());
-        newSpeed = newSpeed * Constants.DRIVE.GET_SWERVE_DRIVE_CONFIG().m_translateMaxSpeedMeters;
+        newSpeed = newSpeed * m_swerveConfig.m_translateYMaxSpeedMeters;
         m_swerve.drive(0, newSpeed, 0);
     }
 

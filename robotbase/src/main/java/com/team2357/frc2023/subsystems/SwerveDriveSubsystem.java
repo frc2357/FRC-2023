@@ -105,7 +105,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		 */
 		public double m_translateXMaxSpeedMeters;
 
-		public double m_translateMaxSpeedMeters;
+		public double m_translateYMaxSpeedMeters;
 
 		/**
 		 * These are the tolerances for the targeting methods in percent output
@@ -141,6 +141,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		 * moduleConfiguration.getSteerReduction()
 		 */
 		public double m_sensorPositionCoefficient;
+
 	}
 
 	public SwerveDriveSubsystem(WPI_Pigeon2 pigeon, SwerveModule frontLeft, SwerveModule frontRight,
@@ -453,7 +454,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	public double calculateY() {
 		double output = m_translateYController.calculate(LimelightSubsystem.getInstance().getTX());
-		output = MathUtil.clamp(output, m_config.m_translateMaxSpeedMeters*-1, m_config.m_translateMaxSpeedMeters);
+		output = MathUtil.clamp(output, m_config.m_translateYMaxSpeedMeters*-1, m_config.m_translateYMaxSpeedMeters);
 		return output;
 	}
 
