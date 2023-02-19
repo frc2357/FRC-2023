@@ -11,9 +11,9 @@ import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.PubSubOption;
 
-public class ButtonBoard {
+public class Buttonboard {
 
-    private static ButtonBoard m_instance;
+    private static Buttonboard m_instance;
 
     private final AtomicReference<Integer> m_rowValue = new AtomicReference<Integer>();
     private final AtomicReference<Integer> m_colValue = new AtomicReference<Integer>();
@@ -25,27 +25,27 @@ public class ButtonBoard {
         String[] split = event.valueData.getTopic().getName().split("/");
         String name = split[split.length - 1];
         switch(name) {
-            case Constants.BUTTON_BOARD.COLUMN_TOPIC_NAME:
+            case Constants.BUTTONBOARD.COLUMN_TOPIC_NAME:
                 m_colValue.set((int) event.valueData.value.getInteger());
                 break;
-            case Constants.BUTTON_BOARD.ROW_TOPIC_NAME: 
+            case Constants.BUTTONBOARD.ROW_TOPIC_NAME: 
                 m_rowValue.set((int) event.valueData.value.getInteger());
                 break;
         }
     };
 
-    public static ButtonBoard getInstance() {
+    public static Buttonboard getInstance() {
         if (m_instance == null) {
-            m_instance = new ButtonBoard();
+            m_instance = new Buttonboard();
         }
         return m_instance;
     }
 
-    private ButtonBoard() {
+    private Buttonboard() {
         NetworkTableInstance inst = NetworkTableInstance.getDefault();
        
         m_buttonboardSub = new MultiSubscriber(inst, 
-        new String[] {"/" + Constants.BUTTON_BOARD.BUTTONBOARD_TABLE_NAME + "/"},
+        new String[] {"/" + Constants.BUTTONBOARD.BUTTONBOARD_TABLE_NAME + "/"},
         PubSubOption.keepDuplicates(false), PubSubOption.pollStorage(1));
 
         m_buttonboardListenerHandle = inst.addListener(m_buttonboardSub, 

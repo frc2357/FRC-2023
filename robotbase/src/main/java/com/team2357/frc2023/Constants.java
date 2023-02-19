@@ -318,7 +318,7 @@ public final class Constants {
         public static final double AUTO_SCORE_HIGH_ROTATIONS = 0;
     }
 
-    public static final class BUTTON_BOARD {
+    public static final class BUTTONBOARD {
         public static final String BUTTONBOARD_TABLE_NAME = "buttonboard";
         public static final String ROW_TOPIC_NAME = "row";
         public static final String COLUMN_TOPIC_NAME = "col";
