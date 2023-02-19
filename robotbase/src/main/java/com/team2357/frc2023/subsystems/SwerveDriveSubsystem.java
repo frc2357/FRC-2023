@@ -38,9 +38,10 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	public static enum ColumnSetpoints {
-		LEFT(Constants.DRIVE.LEFT_COL_X_SETPOINT),
-		MIDDLE(Constants.DRIVE.MID_COL_X_SETPOINT),
-		RIGHT(Constants.DRIVE.RIGHT_COL_X_SETPOINT);
+		LEFT(Constants.DRIVE.LEFT_COL_X_ANGLE_SETPOINT),
+		MIDDLE(Constants.DRIVE.MID_COL_X_ANGLE_SETPOINT),
+		RIGHT(Constants.DRIVE.RIGHT_COL_X_ANGLE_SETPOINT),
+		DEFAULT(Constants.DRIVE.DEFAULT_X_ANGLE_SETPOINT);
 
 		public final double setpoint;
 
@@ -129,12 +130,12 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		/**
 		 * These are the setpoints for the PID's that the translate commands use
 		 */
-		public double m_defaultXSetpoint;
-		public double m_defaultYSetpoint;
+		public double m_defaultXAngleSetpoint;
+		public double m_defaultYAngleSetpoint;
 
-		public double m_leftColXSetpoint;
-		public double m_midColXSetpoint;
-		public double m_rightColXSetpoint;
+		public double m_leftColXAngleSetpoint;
+		public double m_midColXAngleSetpoint;
+		public double m_rightColXAngleSetpoint;
 
 		/*
 		 * Open loop ramp rate for auto targeting
@@ -442,19 +443,6 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		return isAtXTarget() && isAtYTarget();
 	}
 
-	public double getXSetPoint(int col) {
-		switch (col) {
-			case 0:
-				return m_config.m_leftColXSetpoint;
-			case 1:
-				return m_config.m_midColXSetpoint;
-			case 2:
-				return m_config.m_rightColXSetpoint;
-			default:
-				return m_config.m_defaultXSetpoint;
-		}
-	}
-
 	public void trackTarget(double setpoint) {
 		System.out.println("track target");
 		m_isTracking = true;
@@ -471,7 +459,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	public void trackYTarget() {
 		m_translateYController.reset();
-		m_translateYController.setSetpoint(m_config.m_defaultYSetpoint);
+		m_translateYController.setSetpoint(m_config.m_defaultYAngleSetpoint);
 		m_translateYController.setTolerance(m_config.m_translateYToleranceMeters);
 	}
 

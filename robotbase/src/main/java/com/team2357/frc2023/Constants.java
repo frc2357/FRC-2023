@@ -114,6 +114,13 @@ public final class Constants {
             config.m_translateXToleranceMeters = 0.05;
             config.m_translateYToleranceMeters = 0.05;
 
+            config.m_defaultXAngleSetpoint = DRIVE.DEFAULT_X_ANGLE_SETPOINT;
+            config.m_defaultYAngleSetpoint = DRIVE.DEFAULT_Y_ANGLE_SETPOINT;
+
+            config.m_leftColXAngleSetpoint = DRIVE.LEFT_COL_X_ANGLE_SETPOINT;
+            config.m_midColXAngleSetpoint = DRIVE.MID_COL_X_ANGLE_SETPOINT;
+            config.m_rightColXAngleSetpoint = DRIVE.RIGHT_COL_X_ANGLE_SETPOINT;
+
             config.m_translateXController = new PIDController(0.5, 0, 0);
             config.m_translateYController = new PIDController(0.05, 0, 0);
 
@@ -154,11 +161,12 @@ public final class Constants {
         public static final double SYNC_ENCODER_LIMIT_MS = 10000;
 
 
-        public static final double DEFAULT_Y_SETPOINT = 0;
-        public static final double DEFAULT_X_SETPOINT = -9;
-        public static final double LEFT_COL_X_SETPOINT = -10;
-        public static final double MID_COL_X_SETPOINT = -9;
-        public static final double RIGHT_COL_X_SETPOINT = -8;
+        public static final double DEFAULT_Y_ANGLE_SETPOINT = 0;
+        public static final double DEFAULT_X_ANGLE_SETPOINT = -9;
+
+        public static final double LEFT_COL_X_ANGLE_SETPOINT = -10;
+        public static final double MID_COL_X_ANGLE_SETPOINT = -9;
+        public static final double RIGHT_COL_X_ANGLE_SETPOINT = -8;
     }
 
     public static final class INTAKE_ROLLER {
