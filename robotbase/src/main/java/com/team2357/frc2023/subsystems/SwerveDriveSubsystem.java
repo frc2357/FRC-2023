@@ -445,17 +445,17 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		m_translateYController.setTolerance(m_config.m_translateYToleranceMeters);
 	}
 
-	public double calculateX() {
-		double output = m_translateXController.calculate(LimelightSubsystem.getInstance().getTY());
-		output = output * -1; // Invert output
-		output = MathUtil.clamp(output, m_config.m_translateXMaxSpeedMeters*-1, m_config.m_translateXMaxSpeedMeters);
-		return output;
+	public double calculateXMetersPerSecond() {
+		double outputMetersPerSecond = m_translateXController.calculate(LimelightSubsystem.getInstance().getTY());
+		outputMetersPerSecond = outputMetersPerSecond * -1; // Invert output
+		outputMetersPerSecond = MathUtil.clamp(outputMetersPerSecond, m_config.m_translateXMaxSpeedMeters*-1, m_config.m_translateXMaxSpeedMeters);
+		return outputMetersPerSecond;
 	}
 
-	public double calculateY() {
-		double output = m_translateYController.calculate(LimelightSubsystem.getInstance().getTX());
-		output = MathUtil.clamp(output, m_config.m_translateYMaxSpeedMeters*-1, m_config.m_translateYMaxSpeedMeters);
-		return output;
+	public double calculateYMetersPerSecond() {
+		double outputMetersPerSecond = m_translateYController.calculate(LimelightSubsystem.getInstance().getTX());
+		outputMetersPerSecond = MathUtil.clamp(outputMetersPerSecond, m_config.m_translateYMaxSpeedMeters*-1, m_config.m_translateYMaxSpeedMeters);
+		return outputMetersPerSecond;
 	}
 
 	public void trackingPeriodic() {
@@ -468,7 +468,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		}
 		System.out.println(isTracking());
 
-		drive(new ChassisSpeeds(0, calculateY(), 0));
+		drive(new ChassisSpeeds(0, calculateYMetersPerSecond(), 0));
 		//drive(new ChassisSpeeds(calculateX(), 0, 0));
 		//drive(new ChassisSpeeds(calculateX(), calculateY(), 0));
 	}
