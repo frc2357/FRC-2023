@@ -17,7 +17,7 @@ public class DeadReckoningXCommand extends CommandBase {
     @Override
     public void initialize() {
         m_startTime = System.currentTimeMillis();
-        SwerveDriveSubsystem.getInstance().drive(Constants.DRIVE.DEAD_RECKONING_TRANSLATION_SPEED_PROPORTION, 0, 0);
+        SwerveDriveSubsystem.getInstance().drive(Constants.DRIVE.DEAD_RECKONING_X_CHASSIS_SPEEDS);
     }
 
     @Override

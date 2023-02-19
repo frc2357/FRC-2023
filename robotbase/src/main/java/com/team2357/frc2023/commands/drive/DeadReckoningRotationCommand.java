@@ -3,6 +3,7 @@ package com.team2357.frc2023.commands.drive;
 import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class DeadReckoningRotationCommand extends CommandBase {
@@ -17,7 +18,7 @@ public class DeadReckoningRotationCommand extends CommandBase {
     @Override
     public void initialize() {
         m_startTime = System.currentTimeMillis();
-        SwerveDriveSubsystem.getInstance().drive(0, 0, Constants.DRIVE.DEAD_RECKONING_ROTATION_SPEED_PROPORTION);
+        SwerveDriveSubsystem.getInstance().drive(Constants.DRIVE.DEAD_RECKONING_ROTATION_CHASSIS_SPEEDS);
     }
 
     @Override
