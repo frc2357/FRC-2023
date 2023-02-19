@@ -114,13 +114,6 @@ public final class Constants {
             config.m_translateXToleranceMeters = 0.05;
             config.m_translateYToleranceMeters = 0.05;
 
-            config.m_defaultXSetpoint = -9;
-            config.m_defaultYSetpoint = 0;
-
-            config.m_leftColXSetpoint = -10;
-            config.m_midColXSetpoint = -9;
-            config.m_rightColXSetpoint = -8;
-
             config.m_translateXController = new PIDController(0.5, 0, 0);
             config.m_translateYController = new PIDController(0.05, 0, 0);
 
@@ -159,6 +152,13 @@ public final class Constants {
 
         public static final double ROTATE_MAXSPEED_RADIANS_PER_SECOND = 0.91;
         public static final double SYNC_ENCODER_LIMIT_MS = 10000;
+
+
+        public static final double DEFAULT_Y_SETPOINT = 0;
+        public static final double DEFAULT_X_SETPOINT = -9;
+        public static final double LEFT_COL_X_SETPOINT = -10;
+        public static final double MID_COL_X_SETPOINT = -9;
+        public static final double RIGHT_COL_X_SETPOINT = -8;
     }
 
     public static final class INTAKE_ROLLER {

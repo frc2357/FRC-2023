@@ -37,6 +37,18 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		return instance;
 	}
 
+	public static enum ColumnSetpoints {
+		LEFT(Constants.DRIVE.LEFT_COL_X_SETPOINT),
+		MIDDLE(Constants.DRIVE.MID_COL_X_SETPOINT),
+		RIGHT(Constants.DRIVE.RIGHT_COL_X_SETPOINT);
+
+		public final double setpoint;
+
+		private ColumnSetpoints(double setpoint) {
+			this.setpoint = setpoint;
+		}
+	}
+
 	private SwerveDriveKinematics m_kinematics;
 
 	private WPI_Pigeon2 m_pigeon;

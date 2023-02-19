@@ -4,6 +4,7 @@ import com.team2357.lib.triggers.AxisThresholdTrigger;
 import com.team2357.lib.util.Utility;
 import com.team2357.lib.util.XboxRaw;
 import com.team2357.frc2023.controls.AxisInterface;
+import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
@@ -153,9 +154,9 @@ public class GunnerControls {
         rightDPadAndA.onTrue(new IntakeArmToggleCommand());
         rightDPadOnly.whileTrue(new IntakeAxisRollerCommand(axisRightStickY));
 
-        downDPadAndX.onTrue(new TranslateToColumnCommand(0));
-        downDPadAndA.onTrue(new TranslateToColumnCommand(1));
-        downDPadAndB.onTrue(new TranslateToColumnCommand(2));
+        downDPadAndX.onTrue(new TranslateToColumnCommand(SwerveDriveSubsystem.ColumnSetpoints.LEFT));
+        downDPadAndA.onTrue(new TranslateToColumnCommand(SwerveDriveSubsystem.ColumnSetpoints.MIDDLE));
+        downDPadAndB.onTrue(new TranslateToColumnCommand(SwerveDriveSubsystem.ColumnSetpoints.RIGHT));
 
         m_yButton.onTrue(new AutoScoreHighCommand());
         m_xButton.onTrue(new AutoScoreMidCommand());
