@@ -56,7 +56,7 @@ public class Buttonboard {
     public int getRowValue() {
         if(m_rowValue.get() == null) {
             return -1;
-        }
+        } 
         return m_rowValue.get();
     }
 
