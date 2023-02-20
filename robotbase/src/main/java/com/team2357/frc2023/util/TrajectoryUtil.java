@@ -19,11 +19,13 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 public class TrajectoryUtil {
 
 	public static SequentialCommandGroup createTrajectoryPathCommand(String trajectoryFileName,
-			final boolean resetOdometry) {
-		final PathPlannerTrajectory trajectory = PathPlanner.loadPath(trajectoryFileName,
+			final boolean resetOdometry) {		
+		return createDrivePathCommand(createPathPlannerTrajectory(trajectoryFileName), resetOdometry);
+	}
+
+	public static PathPlannerTrajectory createPathPlannerTrajectory(String trajectoryFileName) {
+		return PathPlanner.loadPath(trajectoryFileName,
 				SwerveDriveSubsystem.getInstance().getPathConstraints());
-				
-		return createDrivePathCommand(trajectory, resetOdometry);
 	}
 
 	public static SequentialCommandGroup CreateTwoPointTrajectoryPathCommand(Pose2d startPose, Pose2d endPose,
