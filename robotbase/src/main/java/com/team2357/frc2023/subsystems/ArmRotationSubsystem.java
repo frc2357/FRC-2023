@@ -144,7 +144,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
         if (isClosedLoopEnabled() && isRotatorAtRotations()) {
             setClosedLoopEnabled(false);
         }
-        if(m_shuffleboardPIDTuner.arePIDsUpdated(m_pidController.getP(), m_pidController.getI(), m_pidController.getD())){
+        if(m_shuffleboardPIDTuner.arePIDsUpdated()){
             updatePID();
         }
     }

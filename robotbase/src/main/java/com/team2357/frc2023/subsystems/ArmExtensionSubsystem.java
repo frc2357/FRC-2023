@@ -130,8 +130,7 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
 
     @Override
     public void periodic() {
-        if (m_shuffleboardPIDTuner.arePIDsUpdated(m_pidcontroller.getP(), m_pidcontroller.getI(),
-                m_pidcontroller.getD())) {
+        if (m_shuffleboardPIDTuner.arePIDsUpdated()) {
             updatePID();
         }
         if (isClosedLoopEnabled() && isExtenderRotatorAtRotations()) {
