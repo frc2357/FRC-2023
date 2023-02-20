@@ -4,6 +4,7 @@ import com.team2357.lib.triggers.AxisThresholdTrigger;
 import com.team2357.lib.util.Utility;
 import com.team2357.lib.util.XboxRaw;
 import com.team2357.frc2023.controls.AxisInterface;
+import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
@@ -22,6 +23,10 @@ import com.team2357.frc2023.commands.human.panic.ClawToggleCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeArmToggleCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeAxisRollerCommand;
 import com.team2357.frc2023.commands.human.panic.WristToggleCommand;
+import com.team2357.frc2023.commands.scoring.AutoScoreHighCommand;
+import com.team2357.frc2023.commands.scoring.AutoScoreLowCommand;
+import com.team2357.frc2023.commands.scoring.AutoScoreMidCommand;
+import com.team2357.frc2023.commands.scoring.TranslateToColumnCommand;
 
 /**
  * These are the controls for the gunner.
@@ -144,9 +149,17 @@ public class GunnerControls {
         leftDPadOnly.whileTrue(new ArmExtenderCommand(axisRightStickY));
         leftDPadAndA.onTrue(new WristToggleCommand());
         leftDPadAndB.onTrue(new ClawToggleCommand());
-        m_rightTrigger.whileTrue(new TranslateToTargetCommand());
-        m_rightBumper.whileTrue(new TranslateToTargetCommandGroup());
+        m_rightTrigger.whileTrue(new TranslateToTargetCommand(-1));
+        m_rightBumper.whileTrue(new TranslateToTargetCommandGroup(-1));
         rightDPadAndA.onTrue(new IntakeArmToggleCommand());
         rightDPadOnly.whileTrue(new IntakeAxisRollerCommand(axisRightStickY));
+
+        downDPadAndX.onTrue(new TranslateToColumnCommand(SwerveDriveSubsystem.ColumnSetpoints.LEFT));
+        downDPadAndA.onTrue(new TranslateToColumnCommand(SwerveDriveSubsystem.ColumnSetpoints.MIDDLE));
+        downDPadAndB.onTrue(new TranslateToColumnCommand(SwerveDriveSubsystem.ColumnSetpoints.RIGHT));
+
+        m_yButton.onTrue(new AutoScoreHighCommand());
+        m_xButton.onTrue(new AutoScoreMidCommand());
+        m_aButton.onTrue(new AutoScoreLowCommand());
     }
 }

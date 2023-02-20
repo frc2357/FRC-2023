@@ -1,7 +1,7 @@
 package com.team2357.frc2023.controls;
 
-import com.team2357.frc2023.commands.ReverseIntakeCommand;
-import com.team2357.frc2023.commands.RunIntakeCommand;
+import com.team2357.frc2023.commands.intake.ReverseIntakeCommand;
+import com.team2357.frc2023.commands.intake.RunIntakeCommand;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.lib.util.XboxRaw;
 

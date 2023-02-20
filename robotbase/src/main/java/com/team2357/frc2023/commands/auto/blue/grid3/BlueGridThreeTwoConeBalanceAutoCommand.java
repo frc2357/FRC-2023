@@ -1,6 +1,6 @@
 package com.team2357.frc2023.commands.auto.blue.grid3;
 
-import com.team2357.frc2023.commands.AutoBalanceCommand;
+import com.team2357.frc2023.commands.drive.AutoBalanceCommand;
 import com.team2357.frc2023.util.TrajectoryUtil;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
