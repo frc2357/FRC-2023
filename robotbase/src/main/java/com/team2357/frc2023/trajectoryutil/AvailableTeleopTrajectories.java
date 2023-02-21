@@ -43,10 +43,22 @@ public class AvailableTeleopTrajectories {
 
     /**
      * 
-     * @param pose The robot's current position
-     * @return The start trajectory for teleop autos
+     * @param col Column from 0-8 on the grid
+     * @param pose Current robot pose
+     * @return A command to run to get to column
      */
-    public static Command getStartTrajectory(Pose2d pose) {
+    public static Command BuildTrajectory(int col, Pose2d pose) {
+        double startKey = getStartTrajectoryKey(pose);
+        Command startCommand = trajMap.get(startKey);
+        return new WaitCommand(0);
+    }
+
+    /**
+     * 
+     * @param pose The robot's current position
+     * @return The key for the start trajectory
+     */
+    public static double getStartTrajectoryKey(Pose2d pose) {
 
         // Robot pose values we are trying to match to.
         double robotYPos = pose.getY();
@@ -58,7 +70,7 @@ public class AvailableTeleopTrajectories {
         boolean isGreaterThan = false;
 
         // Resulting key for hashmap
-        Double key = -1.0;
+        double key = -1.0;
 
         while (low <= high) {
             mid = low + ((high - low) / 2);
@@ -76,7 +88,7 @@ public class AvailableTeleopTrajectories {
         }
 
         try {
-            Double nextClosest = yVals[mid + (isGreaterThan ? 1 : -1)];
+            double nextClosest = yVals[mid + (isGreaterThan ? 1 : -1)];
 
             if (Math.abs(nextClosest - robotYPos) < Math.abs(yVals[mid] - robotYPos)) {
                 key = nextClosest;
@@ -92,9 +104,9 @@ public class AvailableTeleopTrajectories {
         // If too far away
         if (!Utility.isWithinTolerance(robotYPos, key, 0.1)
                 || Utility.isWithinTolerance(robotXPos, xMap.get(key), 0.1)) {
-            return new WaitCommand(0);
+            return -1.0;
         }
 
-        return trajMap.get(key);
+        return key;
     }
 }
