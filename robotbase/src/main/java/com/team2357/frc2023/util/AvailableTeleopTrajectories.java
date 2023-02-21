@@ -5,14 +5,16 @@ import java.util.HashMap;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
+import com.team2357.lib.util.Utility;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 public class AvailableTeleopTrajectories {
-    
+
     private static HashMap<Double, Command> trajMap = new HashMap<Double, Command>();
+    private static HashMap<Double, Double> xMap = new HashMap<Double, Double>();
     private static Double[] yVals;
 
     public static void generateTrajectories() {
@@ -30,10 +32,12 @@ public class AvailableTeleopTrajectories {
         PathPlannerTrajectory trajectory = TrajectoryUtil.createPathPlannerTrajectory(fileName);
         Command TrajCmd = TrajectoryUtil.createDrivePathCommand(trajectory, false);
 
-        PathPlannerState initialState= PathPlannerTrajectory.transformStateForAlliance(trajectory.getInitialState(), DriverStationAllianceGetter.getAlliance());
+        PathPlannerState initialState = PathPlannerTrajectory.transformStateForAlliance(trajectory.getInitialState(),
+                DriverStationAllianceGetter.getAlliance());
         double yVal = initialState.poseMeters.getY();
-        
+
         trajMap.put(yVal, TrajCmd);
+        xMap.put(yVal, initialState.poseMeters.getX());
     }
 
     /**
@@ -42,26 +46,54 @@ public class AvailableTeleopTrajectories {
      * @return The start trajectory for teleop autos
      */
     public static Command getStartTrajectory(Pose2d pose) {
-     
-        double matchYVal = pose.getY();
+
+        // Robot pose values we are trying to match to.
+        double robotYPos = pose.getY();
+        double robotXPos = pose.getX();
+
+        // Binary search setup
         int high = yVals.length;
-        int low = 0;
-        int key = -1;
+        int low = 0, mid = 0;
+        boolean isGreaterThan = false;
+
+        // Resulting key for hashmap
+        Double key = -1.0;
+
         while (low <= high) {
-            int mid = low  + ((high - low) / 2);
-            if (yVals[mid] < matchYVal) {
+            mid = low + ((high - low) / 2);
+
+            if (yVals[mid] < robotYPos) {
                 low = mid + 1;
-            } else if (yVals[mid] > matchYVal) {
+                isGreaterThan = false;
+            } else if (yVals[mid] > robotYPos) {
                 high = mid - 1;
-            } else if (yVals[mid] == matchYVal) {
-                key = mid;
+                isGreaterThan = true;
+            } else if (yVals[mid] == robotYPos) {
+                key = yVals[mid];
                 break;
             }
+        }
 
+        try {
+            Double nextClosest = yVals[mid + (isGreaterThan ? 1 : -1)];
+
+            if (Math.abs(nextClosest - robotYPos) < Math.abs(yVals[mid] - robotYPos)) {
+                key = nextClosest;
+            } else {
+                key = yVals[mid];
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // Means next closest element does not exist, use current mid value
+            key = yVals[mid];
         }
-        
-        if (key == -1) {
-            DriverStation.reportWarning("Trajectory not found", null);
+
+        // TODO: Remove magic number
+        // If too far away
+        if (!Utility.isWithinTolerance(robotYPos, key, 0.1)
+                || Utility.isWithinTolerance(robotXPos, xMap.get(key), 0.1)) {
+            return new WaitCommand(0);
         }
+
+        return trajMap.get(key);
     }
 }
