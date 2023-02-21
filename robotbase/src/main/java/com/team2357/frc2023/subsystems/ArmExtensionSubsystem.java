@@ -26,6 +26,10 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
 
         public int m_extendGrippedAmps;
 
+        public double m_shuffleboardTunerPRange;
+        public double m_shuffleboardTunerIRange;
+        public double m_shuffleboardTunerDRange;
+
         // smart motion config
         public double m_extendMotorP;
         public double m_extendMotorI;
@@ -55,12 +59,13 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
     public ArmExtensionSubsystem(CANSparkMax extender) {
         m_extendMotor = extender;
         instance = this;
-        
+
     }
 
     public void configure(Configuration config) {
         m_config = config;
-        m_shuffleboardPIDTuner = new ShuffleboardPIDTuner("Arm Extension", 0.2, 0.2, 0.2, m_config.m_extendMotorP,
+        m_shuffleboardPIDTuner = new ShuffleboardPIDTuner("Arm Extension", m_config.m_shuffleboardTunerPRange,
+                m_config.m_shuffleboardTunerIRange, m_config.m_shuffleboardTunerDRange, m_config.m_extendMotorP,
                 m_config.m_extendMotorI, m_config.m_extendMotorD);
         m_extendMotor.setIdleMode(m_config.m_extendMotorIdleMode);
         m_extendMotor.setSmartCurrentLimit(m_config.m_extendMotorStallLimitAmps, m_config.m_extendMotorFreeLimitAmps);
@@ -123,9 +128,9 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
     }
 
     public void updatePID() {
-        m_pidcontroller.setP(m_shuffleboardPIDTuner.getDouble("P"));
-        m_pidcontroller.setI(m_shuffleboardPIDTuner.getDouble("I"));
-        m_pidcontroller.setD(m_shuffleboardPIDTuner.getDouble("D"));
+        m_pidcontroller.setP(m_shuffleboardPIDTuner.getPValue());
+        m_pidcontroller.setI(m_shuffleboardPIDTuner.getIValue());
+        m_pidcontroller.setD(m_shuffleboardPIDTuner.getDValue());
     }
 
     @Override

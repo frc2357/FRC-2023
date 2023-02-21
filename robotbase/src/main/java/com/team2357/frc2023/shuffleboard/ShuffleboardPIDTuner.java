@@ -83,11 +83,22 @@ public class ShuffleboardPIDTuner {
     }
 
     /**
-     * @param desiredPIDValue The desired value you want to get. Use P/I/D
-     * @return The value of the desired entry.
+     * @return The P value of the PID this instance controls.
      */
-    public double getDouble(String desiredPIDValue) {
-        return m_table.getEntry(m_subsystemName + " " + desiredPIDValue).getDouble(0);
+    public double getPValue() {
+        return m_table.getEntry(m_subsystemName + " P").getDouble(0);
+    }
+    /**
+     * @return The I value of the PID this instance controls.
+     */
+    public double getIValue() {
+        return m_table.getEntry(m_subsystemName + " I").getDouble(0);
+    }
+    /**
+     * @return The D value of the PID this instance controls.
+     */
+    public double getDValue() {
+        return m_table.getEntry(m_subsystemName + " D").getDouble(0);
     }
 
     public void makePIDWidgets() {
@@ -104,9 +115,9 @@ public class ShuffleboardPIDTuner {
      * @return Whether or not the PID this instance controls has been updated.
      */
     public boolean arePIDsUpdated() {
-        m_updatedPValue = getDouble("P");
-        m_updatedIValue = getDouble("I");
-        m_updatedDValue = getDouble("D");
+        m_updatedPValue = getPValue();
+        m_updatedIValue = getIValue();
+        m_updatedDValue = getDValue();
         if ((m_updatedPValue != m_measuredPValue) || (m_updatedIValue != m_measuredIValue)
                 || (m_updatedDValue != m_measuredDValue)) {
             m_measuredPValue = m_updatedPValue;

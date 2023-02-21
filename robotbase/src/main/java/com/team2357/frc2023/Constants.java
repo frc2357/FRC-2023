@@ -267,6 +267,10 @@ public final class Constants {
 
             config.m_extendMotorRampRate = 0;
 
+            config.m_shuffleboardTunerPRange = 0.2;
+            config.m_shuffleboardTunerIRange = 0.2;
+            config.m_shuffleboardTunerDRange = 0.2;
+
             // smart motion config
             config.m_extendMotorP = 0;
             config.m_extendMotorI = 0;
@@ -306,6 +310,10 @@ public final class Constants {
             config.m_rotationMotorFreeLimitAmps = 0;
 
             config.m_isFollowerInverted = false;
+
+            config.m_shuffleboardTunerPRange = 0.2;
+            config.m_shuffleboardTunerIRange = 0.2;
+            config.m_shuffleboardTunerDRange = 0.2;
 
             // smart motion config
             config.m_rotationMotorP = 0;

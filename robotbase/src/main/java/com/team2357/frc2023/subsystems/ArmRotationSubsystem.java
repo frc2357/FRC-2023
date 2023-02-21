@@ -24,6 +24,10 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
 
         public boolean m_isFollowerInverted;
 
+        public double m_shuffleboardTunerPRange;
+        public double m_shuffleboardTunerIRange;
+        public double m_shuffleboardTunerDRange;
+
         // smart motion config
         public double m_rotationMotorP;
         public double m_rotationMotorI;
@@ -135,9 +139,9 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
         return m_followerRotationMotor.getEncoder().getPosition();
     }
     public void updatePID() {
-        m_pidController.setP(m_shuffleboardPIDTuner.getDouble("P"));
-        m_pidController.setI(m_shuffleboardPIDTuner.getDouble("I"));
-        m_pidController.setD(m_shuffleboardPIDTuner.getDouble("D"));
+        m_pidController.setP(m_shuffleboardPIDTuner.getPValue());
+        m_pidController.setI(m_shuffleboardPIDTuner.getIValue());
+        m_pidController.setD(m_shuffleboardPIDTuner.getDValue());
     }
     @Override
     public void periodic() {
