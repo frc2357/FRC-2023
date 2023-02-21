@@ -7,14 +7,24 @@ import time
 import sys
 import cv2
 import numpy as np
-# need numpy, robotpy, opencv installed to run
+# to use on your PC vs Raspberry PI, need numpy, robotpy, opencv installed to run
+# See https://robotpy.readthedocs.io/en/stable/getting_started.html
 
 from cscore import CameraServer, VideoSource, UsbCamera, MjpegServer
 from ntcore import NetworkTableInstance, EventFlags
 from calibration import cam0, image_cal
 
-
 class CameraConfig: pass
+
+class CameraObject:
+    #team: int
+    #config: dict 
+    #camera: object
+    #sink: object
+    #outstream: object
+    #images: list 
+    #cal: dict     
+    pass
 
 def list_cameras():
     """
@@ -27,29 +37,15 @@ def list_cameras():
         cam = cams[-1]
         print(c.name,f"{c.path}")
         print(cam.getConfigJsonObject())
-    return cams
-
-
-class CameraObject:
-    #team: int
-    #config: dict 
-    #camera: object
-    #sink: object
-    #outstream: object
-    #images: list 
-    #cal: dict     
-    pass
-
-    
+    return cams 
 
 class CameraVision:
     """
     A consolidated class to configure and start cameras, for use on wpilipbi / opencv
     """
     
-    # the following are singletons
-    # by defining them here, all instances of CameraVision will share these
-    # variables
+    # the following are singleton -  by defining them here, all instances of 
+    # CameraVision will share these variables
     configFile = None
     team = None
     server = False 
@@ -60,7 +56,7 @@ class CameraVision:
     def __init__(self, configFile=".\\pc.json", simulate=False):
         self.configFile = configFile 
         self.readConfig(configFile) # sets team, server, cameraConfigs[]
-        ntinst = NetworkTableInstance.getDefault()
+        self.ntinst = ntinst = NetworkTableInstance.getDefault()
         if self.server:
             print("Setting up NetworkTables server")
             ntinst.startServer()
@@ -70,7 +66,7 @@ class CameraVision:
             ntinst.setServerTeam(self.team)
             ntinst.startDSClient()
 
-        if simulate: # simulate mode loads a set of images to class
+        if simulate: # simulate mode loads a set of images into the camera class
             imgs = []
             fimages = glob.glob(".\\images\\*Angle*.png")
             print(fimages)
@@ -88,7 +84,6 @@ class CameraVision:
             c.outstream = CameraServer.putVideo("VideoStream", camConfig["width"], camConfig["height"])
             c.images = imgs
             c.cal = image_cal  #bandaid for now
-
             self.cameras.append(c)
         else:
             for config in self.cameraConfigs:

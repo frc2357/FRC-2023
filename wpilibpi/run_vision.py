@@ -23,7 +23,7 @@ from cameravision import CameraVision
 from detect_colors import detect_colors
 from calibration import image_cal, cam0 #bandaid for now
 
-logging.basicConfig(level="DEBUG")
+logging.basicConfig(level="INFO")
 
 def timeit(func):
     # This function shows the execution time of 
@@ -85,9 +85,9 @@ if __name__ == "__main__":
             avg += end-start
             count += 1
             if(count%10 == 0):
-                print(f"Processing took Avg: {avg/10.0:.4f} sec")
+                logging.info(f"Processing took Avg: {avg/10.0:.4f} sec")
                 avg = 0
-            if simulate: # the following slows down disk image processing w/out messing up web server function
+            if simulate: # the following slows down image processing w/out messing up web server function
                 for i in range(0,30):
                     cam0.outstream.putFrame(frame)
                     time.sleep(0.01)
