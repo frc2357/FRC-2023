@@ -1,10 +1,11 @@
-package com.team2357.frc2023.util;
+package com.team2357.frc2023.trajectoryutil;
 
 import java.util.Arrays;
 import java.util.HashMap;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
+import com.team2357.frc2023.util.DriverStationAllianceGetter;
 import com.team2357.lib.util.Utility;
 
 import edu.wpi.first.math.geometry.Pose2d;

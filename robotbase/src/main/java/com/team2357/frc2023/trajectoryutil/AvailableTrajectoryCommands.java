@@ -1,4 +1,4 @@
-package com.team2357.frc2023.util;
+package com.team2357.frc2023.trajectoryutil;
 
 import com.team2357.frc2023.commands.auto.blue.grid1.BlueGridOneTwoConeAutoCommand;
 import com.team2357.frc2023.commands.auto.blue.grid1.BlueGridOneTwoConeBalanceAutoCommand;
