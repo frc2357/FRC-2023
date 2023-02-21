@@ -1,17 +1,15 @@
-# The following defines the code for finding AprilTags, getting Pose estimation
-# and then using the tranlsation and rotation pose estimations
-# to calculate locations of game pieces on the field.  This information can then be used
+# The following defines the code for finding AprilTags, getting Pose estimation and then using the tranlsation and 
+# rotation pose estimations to calculate locations of game pieces on the field.  This information can then be used
 # to determine if the game piece is present or not.
 # 
-#
 # See the following for inspiration
 #   From https://github.com/AprilRobotics/apriltag/wiki/AprilTag-User-Guide#python
 #   From https://github.com/churrobots/vision2023/blob/main/app.py
 #   Modified to use robotbpy_apriltag Detector instead of pupil_apriltags
 #   Also see https://gist.github.com/lobrien/5d5e1b38e5fd64062c43ac752b74889c
 #
-#   https://docs.opencv.org/4.7.0/d9/d0c/group__calib3d.html
-#   projectPoints https://docs.opencv.org/4.7.0/d9/d0c/group__calib3d.html#ga1019495a2c8d1743ed5cc23fa0daff8c
+#   Calibration: https://docs.opencv.org/4.7.0/d9/d0c/group__calib3d.html
+#   projectPoints: https://docs.opencv.org/4.7.0/d9/d0c/group__calib3d.html#ga1019495a2c8d1743ed5cc23fa0daff8c
 
 import cv2
 import robotpy_apriltag
@@ -60,7 +58,7 @@ def create_roi_rect(roi):
                        [x+w,y+h,z],
                        [x+w,y-h,z]])
 
-# CALIBRATION data from 
+# CALIBRATION data from one of the global shutter cameras on my laptop
 #             6.0/39.37, # 6" tags for FRC2023, 39.37 inches/meter
 #             Fx,#1028.90904278, #  (Fx)
 #             Fy,#1028.49276415, #  (Fy)
@@ -96,13 +94,13 @@ class AprilTagPipeline:
         hamming = tag.getHamming()
         decision_margin = tag.getDecisionMargin()
         est = self.estimator.estimateOrthogonalIteration(tag, 125)
-        log.debug("Hamming for {} is {} with decision margin {:0.2f}, Ambiguity {:.3f}".format(tag_id, hamming, decision_margin,est.getAmbiguity()))
         return tag_id, est.pose1, center, tag, est
 
-    def runPipeline(self,frame, cal):#, detector, estimator, cameracalibration):
+    def runPipeline(self, frame, cal):#, detector, estimator, cameracalibration):
+        roipts = []
         if frame is None:
             log.error("runPipeline called with no frame")
-            return self.black_frame
+            return self.black_frame,[]
         try:
             # Convert the frame to grayscale
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -110,24 +108,25 @@ class AprilTagPipeline:
             tag_info = self.detector.detect(gray)
             DETECTION_MARGIN_THRESHOLD = 100
             filter_tags = [tag for tag in tag_info if tag.getDecisionMargin() > DETECTION_MARGIN_THRESHOLD]
+            log.debug(f"Num Filtered Tags={len(filter_tags)}")
             self.results = [ self.process_apriltag(tag) for tag in filter_tags ]
             
-            for result in self.results:
+            for idx,result in enumerate(self.results):
                 tag_id, pose, center, tag, est = result
                 amb = est.getAmbiguity()
-                log.debug(f"Ambiguity: {amb}\tError: {est.error1}")
+                log.debug(f"Result[{idx}]\tAmbiguity: {amb:0.4f}\tError: {est.error1:3f}")
                 if tag_id not in [1,2,3,6,7,8]: # we only care about these tags.  We might only care about 1,2,3 or 6,7,8 depending on match        
                     continue
                 frame = draw_tagframe(frame, tag)
                 frame = draw_tagid(frame, tag)
-                frame = draw_tagpose(frame, pose, tag)
-                #frame = draw_cube(frame, result)
+                #frame = draw_tagpose(frame, pose, tag)
                 frame,roipts = project_gamepiece_locations(roi_map, frame, result, cal)   
-                print(roipts)   
-            return frame
-        except:     
+                #log.debug(roipts)   
+            return frame,roipts
+        except Exception as e:
+            log.error(e,)
             self.results = []
-            return self.black_frame 
+            return self.black_frame,[]
         #return frame
 
     
@@ -193,7 +192,6 @@ def draw_tagframe(frame,tag):
     ptB = (int(ptB.x), int(ptB.y))
     ptC = (int(ptC.x), int(ptC.y))
     ptD = (int(ptD.x), int(ptD.y))
-    log.debug(f"tagframe locs: {ptA},{ptB},{ptC},{ptD}")
     cv2.line(frame, ptA, ptB, (255, 255, 255), 2)
     cv2.line(frame, ptB, ptC, (255, 255, 255), 2)
     cv2.line(frame, ptC, ptD, (255, 255, 255), 2)
@@ -202,20 +200,7 @@ def draw_tagframe(frame,tag):
 
 # This simply outputs some information about the results returned by `process_apriltag`.
 # It prints some info to the console and draws a circle around the detected center of the tag
-def draw_tag(frame, result):
-    assert frame is not None
-    assert result is not None
-    tag_id, pose, center, tag = result
-    frame = draw_tagframe(frame, tag)
-    frame = draw_tagid(frame, tag)
-    frame = draw_tagpose(frame, pose, tag)
-    if tag_id not in [1,2,3,6,7,8]:
-        return
-    #frame = draw_cube(frame, result)
-    #frame = project_gamepiece_locations(roi_map,frame,result,)
-    return frame
-
-def project_gamepiece_locations(roi_map, frame, result,cal)->list:
+def project_gamepiece_locations(roi_map, frame, result, cal, draw_roi=(0,205,205)):
     """
     Function that transforms roi rectangles based on
     AprilTag pose and camera calibration values 
@@ -223,7 +208,10 @@ def project_gamepiece_locations(roi_map, frame, result,cal)->list:
     frame: current image being processed
     result: current AprilTag result
     cal: CameraCalibration instance
+    return: frame and transformed roi_rects as pixel coordinates
     """
+    if draw_roi == None:
+        return
     tag_id, pose, center, tag, est = result
     if tag_id not in [1,2,3,6,7,8]:
         return
@@ -239,40 +227,32 @@ def project_gamepiece_locations(roi_map, frame, result,cal)->list:
         ret.append(imgpts)
         imgpts = np.int32(imgpts).reshape(-1,2)
         
-        
         for i in range(4):
             j = (i + 1) % 4
-            frame = cv2.line(frame, tuple(imgpts[i]), tuple(imgpts[j]),(0,205,205),3)        
+            frame = cv2.line(frame, tuple(imgpts[i]), tuple(imgpts[j]), draw_roi, 2)        
     return frame,ret
 
-
-
-# #https://docs.opencv.org/4.x/d7/d53/tutorial_py_pose.html
-
-# # This function is called once for every frame captured by the Webcam. For testing, it can simply
-# # be passed a frame capture loaded from a file. (See commented-out alternative `if __name__ == main:` at bottom of file)
-# def detect_and_process_apriltag(frame, detector, estimator):
-#     if frame is None:
-#         return frame
-#     # Convert the frame to grayscale
-#     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-#     # Detect apriltag
-#     tag_info = detector.detect(gray)
-#     DETECTION_MARGIN_THRESHOLD = 100
-#     filter_tags = [tag for tag in tag_info if tag.getDecisionMargin() > DETECTION_MARGIN_THRESHOLD]
-#     results = [ process_apriltag(estimator, tag) for tag in filter_tags ]
-#     # Note that results will be empty if no apriltag is detected
-
-#     # try averaging angles
-#     #rots = Rotation3d(0,0,0)
-#     #for result in results:
-#     #    tag_id, pose, center, tag = result
-#     #    rots += pose.rotation()
-#     #rots /= len(results)
-
-#     for result in results:
-#         tag_id, pose, center, tag = result
-#         #reconstruct pose with averaged angle
-#         #pose = Transform3d(translation=pose.translation(), rotation=rots)
-#         frame = draw_tag(frame, result)
-#     return frame
+def draw_cube(frame, result, cal):
+    cube_pts = .05*np.float32([[  0,  0,  0], 
+                       [  0,  1,  0], 
+                       [  1,  1,  0], 
+                       [  1,  0,  0],
+                       [  0,  0,- 1],
+                       [  0,  1, -1],
+                       [  1,  1, -1],
+                       [  1,  0, -1] ])    
+    tag_id, pose, center, tag = result
+    tvec = np.array(pose.translation())
+    rvec = pose.rotation().getQuaternion().toRotationVector()
+    #TODO: This is working but cubes seem to always be shifted in XYZ space
+    #TODO: Check this, might be fixed -- updated cal info into AprilTags detector
+    imgpts, jac = cv2.projectPoints(cube_pts, rvec, tvec)
+    imgpts = np.int32(imgpts).reshape(-1,2)
+    # draw ground floor in green
+    #frame = cv2.drawContours(frame, [imgpts[:4]],-1,(0,255,0),-3)
+    # draw pillars in blue color
+    for i,j in zip(range(4),range(4,8)):
+        frame = cv2.line(frame, tuple(imgpts[i]), tuple(imgpts[j]),(255),3)
+    # draw top layer in red color
+    frame = cv2.drawContours(frame, [imgpts[4:]],-1,(0,0,255),3)
+    return frame

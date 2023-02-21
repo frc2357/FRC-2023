@@ -72,7 +72,7 @@ class CameraVision:
 
         if simulate: # simulate mode loads a set of images to class
             imgs = []
-            fimages = glob.glob(".\images\*.png")
+            fimages = glob.glob(".\\images\\*Angle*.png")
             print(fimages)
             for fname in fimages:
                 imgs.append(np.ascontiguousarray(cv2.imread(fname)))
@@ -167,6 +167,7 @@ class CameraVision:
         return True    
     
     def getComponents(self, cam_id=0):
+        """ get the sink and outstream for camera by index """
         return (CameraServer.getVideo(self.cameras[cam_id]), self.outstreams[cam_id])
 
     def startCamera(self, config)->None:

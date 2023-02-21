@@ -23,7 +23,7 @@ from cameravision import CameraVision
 from detect_colors import detect_colors
 from calibration import image_cal, cam0 #bandaid for now
 
-#logging.basicConfig(level="DEBUG")
+logging.basicConfig(level="DEBUG")
 
 def timeit(func):
     # This function shows the execution time of 
@@ -57,25 +57,26 @@ if __name__ == "__main__":
     
     count = 0
     avg = 0
-    
+    frame = None 
     while True:
 
         start = time.perf_counter()
         
         # grab a new frame or disk image
         if simulate:
-            frame = cam0.images[count%(len(cam0.images)-1)]
+            # make sure to make a copy of the original image
+            frame = copy.copy(cam0.images[count%(len(cam0.images)-1)])
             orig = copy.copy(frame)
         else:
             cam0.sink.grabFrame(frame)
         try:
             # trying undistort seemed to cause lockup issues
             #frame = cam0.cal.undistort(frame)
-            output = apriltagpipeline.runPipeline(frame,image_cal)
+            frame,roi_rects = apriltagpipeline.runPipeline(frame,image_cal)
             ###
             #trying to overlay detected colors
-            colors = detect_colors(orig)
-            frame = cv2.addWeighted(frame,0.7,colors,0.3,0)
+            #colors = detect_colors(orig)
+            #frame = cv2.addWeighted(frame,0.7,colors,0.3,0)
             ###
             cam0.outstream.putFrame(frame)
 
@@ -86,12 +87,9 @@ if __name__ == "__main__":
             if(count%10 == 0):
                 print(f"Processing took Avg: {avg/10.0:.4f} sec")
                 avg = 0
-                #count = 0
-            #time.sleep(0.05)
             if simulate: # the following slows down disk image processing w/out messing up web server function
-                
                 for i in range(0,30):
-                    cam0.outstream.putFrame(output)
+                    cam0.outstream.putFrame(frame)
                     time.sleep(0.01)
         except Exception as e:
             #raise(e)
