@@ -2,69 +2,163 @@
 # and then using the tranlsation and rotation pose estimations
 # to calculate locations of game pieces on the field.  This information can then be used
 # to determine if the game piece is present or not.
-# Maybe like this: https://docs.opencv.org/4.x/d4/d61/tutorial_warp_affine.html
+# 
 #
 # See the following for inspiration
+#   From https://github.com/AprilRobotics/apriltag/wiki/AprilTag-User-Guide#python
 #   From https://github.com/churrobots/vision2023/blob/main/app.py
 #   Modified to use robotbpy_apriltag Detector instead of pupil_apriltags
 #   Also see https://gist.github.com/lobrien/5d5e1b38e5fd64062c43ac752b74889c
 #
 #   https://docs.opencv.org/4.7.0/d9/d0c/group__calib3d.html
 #   projectPoints https://docs.opencv.org/4.7.0/d9/d0c/group__calib3d.html#ga1019495a2c8d1743ed5cc23fa0daff8c
-#   calibrateCamera
 
 import cv2
 import robotpy_apriltag
-from wpimath.geometry import Transform3d
+from wpimath.geometry import Transform3d,Rotation3d
 import time
 import math
 from robotpy_apriltag import AprilTagFieldLayout
 import math
 import numpy as np
-from calibration_from_opencv import image_cal, cam0 #bandaid for now
+from calibration import image_cal, cam0 #bandaid for now
+import logging
+log = logging.getLogger(__name__)
+log.addHandler(logging.NullHandler())
 
+##########
+#roi_map units = inches.  gets converted to meters in project_gamepiece_locations()
+#roi_map element is X,Y,Z,W,H
+# for some reason the coordinate system seems to be:
+# (need to verify -- document probably somewhere in FRC information)
+# X horizontal, -Y vertical, Z is distance from plane created by tag
+# W is total width of detection area (see create_roi_rect)
+# H is total height of detection area (see create_roi_rect)
+##########
+roi_map = np.float32([[ 22.00,-15.84,  8.43,  2, 2], #mid cone
+                      [-22.00,-15.84,  8.43,  2, 2], #mid cone
+                      [ 22.00,-27.84, 25.45,  2, 2], #high cone
+                      [-22.00,-27.84, 25.45,  2, 2], #high cone
+                      [ 25.62, 12.00,-12.00, 12, 4], #low cone
+                      [-25.62, 12.00,-12.00, 12, 4], #low cone
+                      [  0.00, 12.00,-12.00, 12, 4], #low cube
+                      [  0.00, -6.95,  6.00,  4, 4], #mid cube
+                      [  0.00,-18.22, 23.31,  4, 4], #high cube
+                      ])
+                      
 
-# more research needed here
-#cv2.warpAffine(src, M, dsize, dst, flags, borderMode, borderValue) 
-#
+def create_roi_rect(roi):
+    """ takes a roi row (X,Y,Z,W,H), and creates a rectangle
+        centered at X,Y,Z, having width -W and height -H
+    """
+    x,y,z,W,H= roi 
+    w = W/2.
+    h = H/2
 
-# matrix functions from https://github.com/SouthwestRoboticsProgramming/TagTracker/tree/master/src
+    return np.float32([[x-w,y-h,z],
+                       [x-w,y+h,z],
+                       [x+w,y+h,z],
+                       [x+w,y-h,z]])
 
-# This function is called once to initialize the apriltag detector and the pose estimator
-def get_apriltag_detector_and_estimator(frame_size,Fx,Fy,Cx,Cy):
-    detector = robotpy_apriltag.AprilTagDetector()
-    # FRC 2023 uses tag16h5 (game manual 5.9.2)
-    assert detector.addFamily("tag16h5")
-    #Config(tagSize: meters, fx: float, fy: float, cx: float, cy: float)
-    #From https://github.com/AprilRobotics/apriltag/wiki/AprilTag-User-Guide#python
-    #fx, fy: The camera's focal length (in pixels). For most cameras fx and fy will be equal or nearly so.
-    #cx, cy: The camera's focal center (in pixels). For most cameras this will be approximately the same as the image center.
-    # these values come from the cameramatrix when doing calibration in opencv
-    #  | Fx  0  Cx |
-    #  |  0  Fy Cy |
-    #  |  0  0  1  |
-    estimator = robotpy_apriltag.AprilTagPoseEstimator(
-    robotpy_apriltag.AprilTagPoseEstimator.Config(
-            6.0/39.37, # 6" tags for FRC2023, 39.37 inches/meter
-            Fx,#1028.90904278, #  (Fx)
-            Fy,#1028.49276415, #  (Fy)
-            Cx,#638.57001085,  #  (Cx) should be roughly 1/2 the img width
-            Cy,#337.36382032,  #  (Cy) should be roughly 1/2 the img height
-        )
-    )
-    return detector, estimator
+# CALIBRATION data from 
+#             6.0/39.37, # 6" tags for FRC2023, 39.37 inches/meter
+#             Fx,#1028.90904278, #  (Fx)
+#             Fy,#1028.49276415, #  (Fy)
+#             Cx,#638.57001085,  #  (Cx) should be roughly 1/2 the img width
+#             Cy,#337.36382032,  #  (Cy) should be roughly 1/2 the img height
+
+class AprilTagPipeline:
+    def __init__(self, frame_size, Fx,Fy,Cx,Cy):
+        """ AprilTagPipeline class 
+        """
+        self.detector = robotpy_apriltag.AprilTagDetector()
+        self.detector.addFamily("tag16h5")
+        # Notes for AprilTagPoseEstimator.Config
+        #From https://github.com/AprilRobotics/apriltag/wiki/AprilTag-User-Guide#python
+        #fx, fy: The camera's focal length (in pixels). 
+        #   For most cameras fx and fy will be equal or nearly so.
+        #cx, cy: The camera's focal center (in pixels). 
+        #   For most cameras this will be approximately the same as the image center.
+        # these values come from the 3x3 cameramatrix when doing calibration in opencv:
+        # matrix =  | Fx   0  Cx |
+        #           |  0  Fy  Cy |
+        #           |  0   0   1 |  
+        # For camera calibration information, see https://docs.opencv.org/4.x/dc/dbb/tutorial_py_calibration.html
+        # Also see cameravisionclass      
+        self.estimator_config = robotpy_apriltag.AprilTagPoseEstimator.Config(6.0/39.37,Fx,Fy,Cx,Cy)
+        self.estimator = robotpy_apriltag.AprilTagPoseEstimator(self.estimator_config)
+        self.results = []
+        self.black_frame = np.zeros(shape=(720,1280,3),dtype='uint8')
+
+    def process_apriltag(self, tag):
+        tag_id = tag.getId()
+        center = tag.getCenter()
+        hamming = tag.getHamming()
+        decision_margin = tag.getDecisionMargin()
+        est = self.estimator.estimateOrthogonalIteration(tag, 125)
+        log.debug("Hamming for {} is {} with decision margin {:0.2f}, Ambiguity {:.3f}".format(tag_id, hamming, decision_margin,est.getAmbiguity()))
+        return tag_id, est.pose1, center, tag, est
+
+    def runPipeline(self,frame, cal):#, detector, estimator, cameracalibration):
+        if frame is None:
+            log.error("runPipeline called with no frame")
+            return self.black_frame
+        try:
+            # Convert the frame to grayscale
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            # Detect apriltag
+            tag_info = self.detector.detect(gray)
+            DETECTION_MARGIN_THRESHOLD = 100
+            filter_tags = [tag for tag in tag_info if tag.getDecisionMargin() > DETECTION_MARGIN_THRESHOLD]
+            self.results = [ self.process_apriltag(tag) for tag in filter_tags ]
+            
+            for result in self.results:
+                tag_id, pose, center, tag, est = result
+                amb = est.getAmbiguity()
+                log.debug(f"Ambiguity: {amb}\tError: {est.error1}")
+                if tag_id not in [1,2,3,6,7,8]: # we only care about these tags.  We might only care about 1,2,3 or 6,7,8 depending on match        
+                    continue
+                frame = draw_tagframe(frame, tag)
+                frame = draw_tagid(frame, tag)
+                frame = draw_tagpose(frame, pose, tag)
+                #frame = draw_cube(frame, result)
+                frame,roipts = project_gamepiece_locations(roi_map, frame, result, cal)   
+                print(roipts)   
+            return frame
+        except:     
+            self.results = []
+            return self.black_frame 
+        #return frame
+
     
-# This function is called for every detected tag. It uses the `estimator` to 
-# return information about the tag, including its centerpoint. (The corners are 
-# also available.)
-def process_apriltag(estimator, tag):
-    tag_id = tag.getId()
-    center = tag.getCenter()
-    hamming = tag.getHamming()
-    decision_margin = tag.getDecisionMargin()
-    #print("Hamming for {} is {} with decision margin {}".format(tag_id, hamming, decision_margin))
-    est = estimator.estimateOrthogonalIteration(tag, 100)
-    return tag_id, est.pose1, center, tag
+# # This function is called once to initialize the apriltag detector and the pose estimator
+# def get_apriltag_detector_and_estimator(frame_size,Fx,Fy,Cx,Cy):
+#     detector = robotpy_apriltag.AprilTagDetector()
+#     # FRC 2023 uses tag16h5 (game manual 5.9.2)
+#     assert detector.addFamily("tag16h5")
+#     #Config(tagSize: meters, fx: float, fy: float, cx: float, cy: float)
+#     estimator = robotpy_apriltag.AprilTagPoseEstimator(
+#     robotpy_apriltag.AprilTagPoseEstimator.Config(
+#             6.0/39.37, # 6" tags for FRC2023, 39.37 inches/meter
+#             Fx,#1028.90904278, #  (Fx)
+#             Fy,#1028.49276415, #  (Fy)
+#             Cx,#638.57001085,  #  (Cx) should be roughly 1/2 the img width
+#             Cy,#337.36382032,  #  (Cy) should be roughly 1/2 the img height
+#         )
+#     )
+#     return detector, estimator
+    
+# # This function is called for every detected tag. It uses the `estimator` to 
+# # return information about the tag, including its centerpoint. (The corners are 
+# # also available.)
+# def process_apriltag(estimator, tag):
+#     tag_id = tag.getId()
+#     center = tag.getCenter()
+#     hamming = tag.getHamming()
+#     decision_margin = tag.getDecisionMargin()
+#     est = estimator.estimateOrthogonalIteration(tag, 125)
+#     print("Hamming for {} is {} with decision margin {:0.2f}, Ambiguity {:.3f}".format(tag_id, hamming, decision_margin,est.getAmbiguity()))
+#     return tag_id, est.pose1, center, tag
 
 # Draw the TagID and Pose of the Tag
 def draw_tagid(frame, tag):
@@ -99,7 +193,7 @@ def draw_tagframe(frame,tag):
     ptB = (int(ptB.x), int(ptB.y))
     ptC = (int(ptC.x), int(ptC.y))
     ptD = (int(ptD.x), int(ptD.y))
-    print(ptA,ptB,ptC,ptD)
+    log.debug(f"tagframe locs: {ptA},{ptB},{ptC},{ptD}")
     cv2.line(frame, ptA, ptB, (255, 255, 255), 2)
     cv2.line(frame, ptB, ptC, (255, 255, 255), 2)
     cv2.line(frame, ptC, ptD, (255, 255, 255), 2)
@@ -112,128 +206,73 @@ def draw_tag(frame, result):
     assert frame is not None
     assert result is not None
     tag_id, pose, center, tag = result
-    #print(center)
-    #cv2.circle(frame, (int(center.x), int(center.y)), 50, (255, 0, 255), 3)
     frame = draw_tagframe(frame, tag)
     frame = draw_tagid(frame, tag)
     frame = draw_tagpose(frame, pose, tag)
     if tag_id not in [1,2,3,6,7,8]:
         return
-    frame = draw_cube(frame, result)
-    frame = project_gamepiece_locations(roi_map,frame,result,)
+    #frame = draw_cube(frame, result)
+    #frame = project_gamepiece_locations(roi_map,frame,result,)
     return frame
 
-#roi_map units = inches.  gets converted to meters in project_gamepiece_locations()
-#roi_map element is X,Y,Z,W,H
-# for some reason the coordinate system seems to be:
-# X horizontal, -Y vertical, Z is distance from plane created by tag
-# W is total width of detection area
-# H is total height of detection area
-roi_map = np.float32([[ 22,-15.84,8.43,2,2], #mid cone
-                      [-22,-15.84,8.43,2,2],#mid cone
-                      [ 22,-27.84,25.45,2,2],#high cone
-                      [-22,-27.84,25.45,2,2],#high cone
-                      [ 25.625, 12,-12,12,4], #low cone
-                      [-25.625, 12,-12,12,4], #low cone
-                      ])
-                      
-
-def expand_location(roi):
-    x,y,z,W,H= roi 
-    w = W/2.
-    h = H/2
-
-    return np.float32([[x-w,y-h,z],
-                       [x-w,y+h,z],
-                       [x+w,y+h,z],
-                       [x+w,y-h,z]
-                                   ])
-
-def project_gamepiece_locations(roi_map, frame, result)->list:
+def project_gamepiece_locations(roi_map, frame, result,cal)->list:
     """
     Function that transforms roi rectangles based on
     AprilTag pose and camera calibration values 
     roi_rects: a list of 3x3 np.float32 arrays
     frame: current image being processed
     result: current AprilTag result
-    cal_factors: CameraCalibration instance
+    cal: CameraCalibration instance
     """
-    tag_id, pose, center, tag = result
+    tag_id, pose, center, tag, est = result
     if tag_id not in [1,2,3,6,7,8]:
         return
     tvec = np.array(pose.translation())
     rvec = pose.rotation().getQuaternion().toRotationVector()
     ret = []
     for roi in roi_map:
-        rect = expand_location(roi)
+        rect = create_roi_rect(roi)
         rect /=39.37
         # using the imag_cal class to automatically pull in the calibration values needed for cv2.projectPoints
         #imgpts,jac = cv2.projectPoints(rect, rvec, tvec,cal_factors.mtx, cal_factors.dst)
-        imgpts,jac = image_cal.projectPoints(rect,rvec,tvec)
+        imgpts,jac = cal.projectPoints(rect,rvec,tvec)
+        ret.append(imgpts)
         imgpts = np.int32(imgpts).reshape(-1,2)
+        
         
         for i in range(4):
             j = (i + 1) % 4
-            print("\t",i,tuple(imgpts[i]), tuple(imgpts[j]))
-            ret = cv2.line(frame, tuple(imgpts[i]), tuple(imgpts[j]),(0,205,205),3)        
-    return ret
+            frame = cv2.line(frame, tuple(imgpts[i]), tuple(imgpts[j]),(0,205,205),3)        
+    return frame,ret
 
 
-###  Draw a Cube
-def draw_cube(frame, result):
-    tag_id, pose, center, tag = result
-    axis = 3*np.float32([[ -1, -1,  0], 
-                         [ -1,  1,  0], 
-                         [  1,  1,  0], 
-                         [  1, -1,  0],
-                         [ -1, -1,  -2], 
-                         [ -1,  1,  -2], 
-                         [  1,  1,  -2], 
-                         [  1, -1,  -2], ])    
 
-    tvec = 39.37*np.array(pose.translation())
-    rvec = pose.rotation().getQuaternion().toRotationVector()
-    print(f"Translation:{tvec}\nRotation:{rvec}")
+# #https://docs.opencv.org/4.x/d7/d53/tutorial_py_pose.html
 
-    #TODO: Change back for actual camera -- Using static values for mtx/distCoeff for field images
-    #mtx = np.float32([1000, 0, 1280/2,0,1000,720/2,0,0,1]).reshape(3,3)
-    imgpts,jac = image_cal.projectPoints(axis,rvec,tvec)
-    #imgpts, jac = cv2.projectPoints(axis, rvec, tvec, mtx, np.float32([0,0,0,0]))
-    imgpts = np.int32(imgpts).reshape(-1,2)
-    # draw ground floor in green
-    frame = cv2.drawContours(frame, [imgpts[:4]],-1,(0,255,0),-3)
-    # draw pillars in blue color
-    for i,j in zip(range(4),range(4,8)):
-        frame = cv2.line(frame, tuple(imgpts[i]), tuple(imgpts[j]),(255),3)
-    # draw top layer in red color
-    frame = cv2.drawContours(frame, [imgpts[4:]],-1,(0,0,255),3)
-    return frame
+# # This function is called once for every frame captured by the Webcam. For testing, it can simply
+# # be passed a frame capture loaded from a file. (See commented-out alternative `if __name__ == main:` at bottom of file)
+# def detect_and_process_apriltag(frame, detector, estimator):
+#     if frame is None:
+#         return frame
+#     # Convert the frame to grayscale
+#     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+#     # Detect apriltag
+#     tag_info = detector.detect(gray)
+#     DETECTION_MARGIN_THRESHOLD = 100
+#     filter_tags = [tag for tag in tag_info if tag.getDecisionMargin() > DETECTION_MARGIN_THRESHOLD]
+#     results = [ process_apriltag(estimator, tag) for tag in filter_tags ]
+#     # Note that results will be empty if no apriltag is detected
 
-#https://docs.opencv.org/4.x/d7/d53/tutorial_py_pose.html
-#def draw_cube(img, imgpts):
-#    # project 3D points to image plane
-#    imgpts, jac = cv2.projectPoints(axis, rvecs, tvecs, mtx, dist)    
-#    imgpts = np.int32(imgpts).reshape(-1,2)
-#    # draw pillars in blue color
-#    for i,j in zip(range(4),range(4,8)):
-#        img = cv2.line(img, tuple(imgpts[i]), tuple(imgpts[j]),(255),3)
-#    # draw top layer in red color
-#    img = cv2.drawContours(img, [imgpts[4:]],-1,(0,0,255),3)
-#    return img
+#     # try averaging angles
+#     #rots = Rotation3d(0,0,0)
+#     #for result in results:
+#     #    tag_id, pose, center, tag = result
+#     #    rots += pose.rotation()
+#     #rots /= len(results)
 
-
-# This function is called once for every frame captured by the Webcam. For testing, it can simply
-# be passed a frame capture loaded from a file. (See commented-out alternative `if __name__ == main:` at bottom of file)
-def detect_and_process_apriltag(frame, detector, estimator):
-    assert frame is not None
-    # Convert the frame to grayscale
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    # Detect apriltag
-    tag_info = detector.detect(gray)
-    DETECTION_MARGIN_THRESHOLD = 100
-    filter_tags = [tag for tag in tag_info if tag.getDecisionMargin() > DETECTION_MARGIN_THRESHOLD]
-    results = [ process_apriltag(estimator, tag) for tag in filter_tags ]
-    # Note that results will be empty if no apriltag is detected
-    for result in results:
-        frame = draw_tag(frame, result)
-    return frame
+#     for result in results:
+#         tag_id, pose, center, tag = result
+#         #reconstruct pose with averaged angle
+#         #pose = Transform3d(translation=pose.translation(), rotation=rots)
+#         frame = draw_tag(frame, result)
+#     return frame

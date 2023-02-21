@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from dataclass import dataclass
+from dataclasses import dataclass
 
 import glob
 import json
@@ -11,7 +11,8 @@ import numpy as np
 
 from cscore import CameraServer, VideoSource, UsbCamera, MjpegServer
 from ntcore import NetworkTableInstance, EventFlags
-from calibration_from_opencv import cam0, image_cal
+from calibration import cam0, image_cal
+
 
 class CameraConfig: pass
 
@@ -28,23 +29,27 @@ def list_cameras():
         print(cam.getConfigJsonObject())
     return cams
 
+
 class CameraObject:
-    """ a lightweight class for cameras """
-    """ c.camera = None
-            c.config = camConfig 
-            c.sink = None
-            c.outstream = CameraServer.putVideo("VideoStream", camConfig["width"], camConfig["height"])
-            c.images = imgs
-            c.cal """
+    #team: int
+    #config: dict 
+    #camera: object
+    #sink: object
+    #outstream: object
+    #images: list 
+    #cal: dict     
     pass
+
+    
 
 class CameraVision:
     """
     A consolidated class to configure and start cameras, for use on wpilipbi / opencv
     """
     
-    # the following are singletons - i.e. we don't want to create more instances
-    #__slots__ = ["configFile","team","server","cameraConfigs","cameras","sinks","outstreams"]
+    # the following are singletons
+    # by defining them here, all instances of CameraVision will share these
+    # variables
     configFile = None
     team = None
     server = False 
@@ -54,12 +59,7 @@ class CameraVision:
 
     def __init__(self, configFile=".\\pc.json", simulate=False):
         self.configFile = configFile 
-        #self.team = None
-        #self.server = False
-        #self.cameraConfigs = []
-        #self.cameras = []
-        #self.outstreams = []
-        self.readConfig(configFile)
+        self.readConfig(configFile) # sets team, server, cameraConfigs[]
         ntinst = NetworkTableInstance.getDefault()
         if self.server:
             print("Setting up NetworkTables server")
@@ -70,16 +70,17 @@ class CameraVision:
             ntinst.setServerTeam(self.team)
             ntinst.startDSClient()
 
-        if simulate:
+        if simulate: # simulate mode loads a set of images to class
             imgs = []
             fimages = glob.glob(".\images\*.png")
             print(fimages)
             for fname in fimages:
                 imgs.append(np.ascontiguousarray(cv2.imread(fname)))
             camConfig = dict()
-            camConfig['width'] = imgs[0].shape[1]
+            camConfig['width'] = imgs[0].shape[1] #all images should be same dimensions!!!
             camConfig["height"] = imgs[0].shape[0]    
             self.cameraConfigs.append(camConfig)   
+
             c = CameraObject()
             c.camera = None
             c.config = camConfig 
@@ -87,6 +88,7 @@ class CameraVision:
             c.outstream = CameraServer.putVideo("VideoStream", camConfig["width"], camConfig["height"])
             c.images = imgs
             c.cal = image_cal  #bandaid for now
+
             self.cameras.append(c)
         else:
             for config in self.cameraConfigs:
