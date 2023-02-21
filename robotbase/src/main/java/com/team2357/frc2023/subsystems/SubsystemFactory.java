@@ -6,6 +6,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
+import com.team2357.lib.subsystems.LimelightSubsystem;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -82,16 +83,16 @@ public class SubsystemFactory {
         }
 
         public WristSubsystem CreateWristSubsystem() {
-                Solenoid wristSolenoid = new Solenoid(Constants.CAN_ID.PNEUMATICS_HUB_ID,
-                                PneumaticsModuleType.REVPH, Constants.PH_ID.WRIST_SOLENOID_CHANNEL);
+                DoubleSolenoid wristSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH,
+                                Constants.PH_ID.WRIST_FORWARD_SOLENOID_CHANNEL, Constants.PH_ID.WRIST_REVERSE_SOLENOID_CHANNEL);
                 WristSubsystem subsystem = new WristSubsystem(wristSolenoid);
                 subsystem.configure(Constants.WRIST.GET_WRIST_CONFIG());
                 return subsystem;
         }
 
         public ClawSubsystem CreateClawSubsystem() {
-                Solenoid clawSolenoid = new Solenoid(Constants.CAN_ID.PNEUMATICS_HUB_ID,
-                                PneumaticsModuleType.REVPH, Constants.PH_ID.CLAW_SOLENOID_CHANNEL);
+                DoubleSolenoid clawSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH,
+                                Constants.PH_ID.CLAW_FORWARD_SOLENOID_CHANNEL, Constants.PH_ID.CLAW_REVERSE_SOLENOID_CHANNEL);
 
                 ClawSubsystem subsystem = new ClawSubsystem(clawSolenoid);
                 subsystem.configure(Constants.CLAW.GET_CLAW_CONFIG());
@@ -125,6 +126,10 @@ public class SubsystemFactory {
 
                 ElevatorSubsystem subsystem = new ElevatorSubsystem(masterMotor, followerMotor);
                 subsystem.configure(Constants.ELEVATOR.GET_ELEVATOR_CONFIG());
+                return subsystem;
+        }
+        public LimelightSubsystem CreateLimelightSubsystem(){
+                LimelightSubsystem subsystem = new LimelightSubsystem();
                 return subsystem;
         }
 }

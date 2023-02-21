@@ -1,11 +1,10 @@
 package com.team2357.frc2023.controls;
 
-import com.team2357.frc2023.commands.AutoBalanceCommand;
-import com.team2357.frc2023.commands.ReverseIntakeCommand;
-import com.team2357.frc2023.commands.RunIntakeCommand;
-import com.team2357.frc2023.subsystems.IntakeRollerSubsystem;
+import com.team2357.frc2023.commands.intake.ReverseIntakeCommand;
+import com.team2357.frc2023.commands.intake.RunIntakeCommand;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.lib.util.XboxRaw;
+
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -26,10 +25,10 @@ public class SwerveDriveControls {
         m_rightBumper = new JoystickButton(m_controller, XboxRaw.BumperRight.value);
         m_leftBumper = new JoystickButton(m_controller, XboxRaw.BumperLeft.value);
 
-        m_backButton.onTrue(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().zeroGyroscope()));
-
+        m_backButton.whileTrue(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().zeroGyroscope()));
         m_rightBumper.whileTrue(new RunIntakeCommand());
         m_leftBumper.whileTrue(new ReverseIntakeCommand());
+
     }
 
     public double getX() {

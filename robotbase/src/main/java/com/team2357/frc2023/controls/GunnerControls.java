@@ -4,6 +4,7 @@ import com.team2357.lib.triggers.AxisThresholdTrigger;
 import com.team2357.lib.util.Utility;
 import com.team2357.lib.util.XboxRaw;
 import com.team2357.frc2023.controls.AxisInterface;
+import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
@@ -12,13 +13,20 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import static com.team2357.frc2023.Constants.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.team2357.frc2023.Constants.CONTROLLER;
+import com.team2357.frc2023.commands.auto.TranslateToTargetCommand;
+import com.team2357.frc2023.commands.auto.TranslateToTargetCommandGroup;
 import com.team2357.frc2023.commands.human.panic.ArmExtenderCommand;
 import com.team2357.frc2023.commands.human.panic.ArmRotationCommand;
 import com.team2357.frc2023.commands.human.panic.ClawToggleCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeArmToggleCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeAxisRollerCommand;
 import com.team2357.frc2023.commands.human.panic.WristToggleCommand;
-
+import com.team2357.frc2023.commands.scoring.AutoScoreHighCommand;
+import com.team2357.frc2023.commands.scoring.AutoScoreLowCommand;
+import com.team2357.frc2023.commands.scoring.AutoScoreMidCommand;
+import com.team2357.frc2023.commands.scoring.TranslateToColumnCommand;
 
 /**
  * These are the controls for the gunner.
@@ -30,6 +38,7 @@ public class GunnerControls {
 
     // Triggers
     public AxisThresholdTrigger m_leftTrigger;
+    public AxisThresholdTrigger m_rightTrigger;
 
     // Buttons
     public JoystickButton m_leftStickButton;
@@ -61,6 +70,7 @@ public class GunnerControls {
 
         // Triggers
         m_leftTrigger = new AxisThresholdTrigger(controller, Axis.kLeftTrigger, .1);
+        m_rightTrigger = new AxisThresholdTrigger(controller, Axis.kRightTrigger, .1);
 
         // Buttons
         m_leftStickButton = new JoystickButton(controller, XboxRaw.StickPressLeft.value);
@@ -105,18 +115,16 @@ public class GunnerControls {
                 && m_downDPad.getAsBoolean() && m_leftDPad.getAsBoolean()).negate();
 
         Trigger noLetterButtons = m_aButton.and(m_bButton).and(m_xButton).and(m_yButton).negate();
-
         Trigger upDPadOnly = m_upDPad.and(noLetterButtons);
         Trigger downDPadOnly = m_downDPad.and(noLetterButtons);
         Trigger leftDPadOnly = m_leftDPad.and(noLetterButtons);
         Trigger rightDPadOnly = m_rightDPad.and(noLetterButtons);
-        
-        Trigger upDPadAndA = m_upDPad.and(m_aButton);
 
+        Trigger upDPadAndA = m_upDPad.and(m_aButton);
         Trigger upDPadAndX = m_upDPad.and(m_xButton);
         Trigger upDPadAndY = m_upDPad.and(m_yButton);
         Trigger upDPadAndB = m_upDPad.and(m_bButton);
-        
+
         Trigger downDPadAndA = m_downDPad.and(m_aButton);
         Trigger downDPadAndX = m_downDPad.and(m_xButton);
         Trigger downDPadAndY = m_downDPad.and(m_yButton);
@@ -141,7 +149,17 @@ public class GunnerControls {
         leftDPadOnly.whileTrue(new ArmExtenderCommand(axisRightStickY));
         leftDPadAndA.onTrue(new WristToggleCommand());
         leftDPadAndB.onTrue(new ClawToggleCommand());
-        rightDPadOnly.whileTrue(new IntakeAxisRollerCommand(axisRightStickY));
+        m_rightTrigger.whileTrue(new TranslateToTargetCommand(-1));
+        m_rightBumper.whileTrue(new TranslateToTargetCommandGroup(-1));
         rightDPadAndA.onTrue(new IntakeArmToggleCommand());
+        rightDPadOnly.whileTrue(new IntakeAxisRollerCommand(axisRightStickY));
+
+        downDPadAndX.onTrue(new TranslateToColumnCommand(SwerveDriveSubsystem.ColumnSetpoints.LEFT));
+        downDPadAndA.onTrue(new TranslateToColumnCommand(SwerveDriveSubsystem.ColumnSetpoints.MIDDLE));
+        downDPadAndB.onTrue(new TranslateToColumnCommand(SwerveDriveSubsystem.ColumnSetpoints.RIGHT));
+
+        m_yButton.onTrue(new AutoScoreHighCommand());
+        m_xButton.onTrue(new AutoScoreMidCommand());
+        m_aButton.onTrue(new AutoScoreLowCommand());
     }
 }

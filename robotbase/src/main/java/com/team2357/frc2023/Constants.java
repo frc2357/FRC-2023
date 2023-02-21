@@ -16,6 +16,7 @@ import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.frc2023.subsystems.WristSubsystem;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -75,9 +76,11 @@ public final class Constants {
 
     public static final class PH_ID {
 
-        public static final int WRIST_SOLENOID_CHANNEL = 0;
+        public static final int WRIST_FORWARD_SOLENOID_CHANNEL = 0;
+        public static final int WRIST_REVERSE_SOLENOID_CHANNEL = 1;
         
-        public static final int CLAW_SOLENOID_CHANNEL = 2;
+        public static final int CLAW_FORWARD_SOLENOID_CHANNEL = 2;
+        public static final int CLAW_REVERSE_SOLENOID_CHANNEL = 3;
 
         public static final int INTAKE_SOLENOID_FORWARD_CHANNEL = 4;
         public static final int INTAKE_SOLENOID_REVERSE_CHANNEL = 5;
@@ -108,6 +111,24 @@ public final class Constants {
             config.m_sensorPositionCoefficient = 2.0 * Math.PI / Constants.DRIVE.TICKS_PER_ROTATION
                     * SdsModuleConfigurations.MK4I_L2.getSteerReduction();
 
+            config.m_translateXMaxSpeedMeters = 0.25;
+            config.m_translateYMaxSpeedMeters = 0.25;
+
+            config.m_translateXToleranceMeters = 0.05;
+            config.m_translateYToleranceMeters = 0.05;
+
+            config.m_defaultXAngleSetpoint = DRIVE.DEFAULT_X_ANGLE_SETPOINT;
+            config.m_defaultYAngleSetpoint = DRIVE.DEFAULT_Y_ANGLE_SETPOINT;
+
+            config.m_leftColXAngleSetpoint = DRIVE.LEFT_COL_X_ANGLE_SETPOINT;
+            config.m_midColXAngleSetpoint = DRIVE.MID_COL_X_ANGLE_SETPOINT;
+            config.m_rightColXAngleSetpoint = DRIVE.RIGHT_COL_X_ANGLE_SETPOINT;
+
+            config.m_translateXController = new PIDController(0.5, 0, 0);
+            config.m_translateYController = new PIDController(0.05, 0, 0);
+
+            config.m_openLoopRampRateSeconds = 1;
+
             return config;
         }
 
@@ -137,10 +158,25 @@ public final class Constants {
 
         public static final double ENCODER_SYNC_ACCURACY_RADIANS = 0.05;
 
-        public static final PIDController ROTATE_TO_TARGET_CONTROLLER = new PIDController(0.009, 0, 0);
+        public static final PIDController ROTATE_TO_TARGET_CONTROLLER = new PIDController(0.1, 0, 0);
 
-        public static final double ROTATE_MAX_SPEED = .45;
+        public static final double ROTATE_MAXSPEED_RADIANS_PER_SECOND = 0.91;
         public static final double SYNC_ENCODER_LIMIT_MS = 10000;
+
+
+        public static final double DEFAULT_Y_ANGLE_SETPOINT = 0;
+        public static final double DEFAULT_X_ANGLE_SETPOINT = -9;
+
+        public static final double LEFT_COL_X_ANGLE_SETPOINT = -10;
+        public static final double MID_COL_X_ANGLE_SETPOINT = -9;
+        public static final double RIGHT_COL_X_ANGLE_SETPOINT = -8;
+
+        public static final double DEAD_RECKONING_TRANSLATION_METERS_PER_SECOND = 1;
+        public static final double DEAD_RECKONING_ROTATION_RADIANS_PER_SECOND = 0.1;
+
+        public static final ChassisSpeeds DEAD_RECKONING_X_CHASSIS_SPEEDS = new ChassisSpeeds(DEAD_RECKONING_TRANSLATION_METERS_PER_SECOND, 0, 0);
+        public static final ChassisSpeeds DEAD_RECKONING_Y_CHASSIS_SPEEDS = new ChassisSpeeds(0, DEAD_RECKONING_TRANSLATION_METERS_PER_SECOND, 0);
+        public static final ChassisSpeeds DEAD_RECKONING_ROTATION_CHASSIS_SPEEDS = new ChassisSpeeds(0, 0, DEAD_RECKONING_ROTATION_RADIANS_PER_SECOND);
     }
 
     public static final class INTAKE_ROLLER {
@@ -316,6 +352,13 @@ public final class Constants {
 
         public static final double AUTO_SCORE_MID_ROTATIONS = 0;
         public static final double AUTO_SCORE_HIGH_ROTATIONS = 0;
+    }
+
+    public static final class BUTTONBOARD {
+        public static final String BUTTONBOARD_TABLE_NAME = "buttonboard";
+        public static final String ROW_TOPIC_NAME = "row";
+        public static final String COLUMN_TOPIC_NAME = "col";
+    
     }
 
     public static final class CONTROLLER {
