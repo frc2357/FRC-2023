@@ -102,7 +102,7 @@ class AprilTagPipeline:
             tag_id, pose, center, tag, est = result
             tvec = pose.translation()
             rqua = pose.rotation().getQuaternion()
-            
+
             ret = ret_list[tag_id]
             ret['pose']['translation']= {'x':tvec.x,'y':tvec.y,'z':tvec.z}
             ret['pose']['rotation']['quaternion'] = {'W':rqua.W(),'X':rqua.X(),'Y':rqua.Y(),'Z':rqua.Z()}
@@ -110,6 +110,10 @@ class AprilTagPipeline:
         return {'timestamp':0.0,'tags':ret_list}
             
     def process_apriltag(self, tag):
+        """
+            process a single tag, including estimating pose
+            returns id, pose(Transform3d), tag center (pixels), tag object, pose estimate object
+        """
         tag_id = tag.getId()
         center = tag.getCenter()
         hamming = tag.getHamming()
@@ -118,7 +122,17 @@ class AprilTagPipeline:
         est = self.estimator.estimateOrthogonalIteration(tag, EST_ITERATIONS)
         return tag_id, est.pose1, center, tag, est
 
-    def runPipeline(self, frame, cal):#, detector, estimator, cameracalibration):
+    def runPipeline(self, frame, cal):
+        """
+            this function should be called by main loop for AprilTags processing
+            results are stored in self.results list
+            inputs:
+                frame: raw image from camera
+                cal: CameraCalibration object
+            returns:
+                frame: image with drawn features added
+                roipts: projected locations of gamepieces based on tag pose
+        """
         roipts = []
         if frame is None:
             log.error("runPipeline called with no frame")
@@ -149,40 +163,10 @@ class AprilTagPipeline:
             log.error(e,)
             self.results = []
             return self.black_frame,[]
-        #return frame
-
-    
-# # This function is called once to initialize the apriltag detector and the pose estimator
-# def get_apriltag_detector_and_estimator(frame_size,Fx,Fy,Cx,Cy):
-#     detector = robotpy_apriltag.AprilTagDetector()
-#     # FRC 2023 uses tag16h5 (game manual 5.9.2)
-#     assert detector.addFamily("tag16h5")
-#     #Config(tagSize: meters, fx: float, fy: float, cx: float, cy: float)
-#     estimator = robotpy_apriltag.AprilTagPoseEstimator(
-#     robotpy_apriltag.AprilTagPoseEstimator.Config(
-#             6.0/39.37, # 6" tags for FRC2023, 39.37 inches/meter
-#             Fx,#1028.90904278, #  (Fx)
-#             Fy,#1028.49276415, #  (Fy)
-#             Cx,#638.57001085,  #  (Cx) should be roughly 1/2 the img width
-#             Cy,#337.36382032,  #  (Cy) should be roughly 1/2 the img height
-#         )
-#     )
-#     return detector, estimator
-    
-# # This function is called for every detected tag. It uses the `estimator` to 
-# # return information about the tag, including its centerpoint. (The corners are 
-# # also available.)
-# def process_apriltag(estimator, tag):
-#     tag_id = tag.getId()
-#     center = tag.getCenter()
-#     hamming = tag.getHamming()
-#     decision_margin = tag.getDecisionMargin()
-#     est = estimator.estimateOrthogonalIteration(tag, 125)
-#     print("Hamming for {} is {} with decision margin {:0.2f}, Ambiguity {:.3f}".format(tag_id, hamming, decision_margin,est.getAmbiguity()))
-#     return tag_id, est.pose1, center, tag
 
 # Draw the TagID and Pose of the Tag
 def draw_tagid(frame, tag):
+    """ draw the tagId and pose of the tag on the image"""
     tagId = tag.getId()
     ptA = tag.getCorner(0)
     ptA = (int(ptA.x),int(ptA.y))
@@ -192,6 +176,7 @@ def draw_tagid(frame, tag):
     return frame
 
 def draw_tagpose(frame, pose, tag):
+    """ draw XYZ, Roll,Pitch,Yaw on the image"""
     ptA = tag.getCorner(0)
     ptA = (int(ptA.x),int(ptA.y))   
     t = pose.translation()  # convert to inches
@@ -207,8 +192,8 @@ def draw_tagpose(frame, pose, tag):
         cv2.putText(frame,m,(ptA[0]+100, (ptA[1] - 120) + 20*(idx)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)    
     return frame
 
-# Draw a Frame to outline the Tag
 def draw_tagframe(frame,tag):
+    """ draw tag outline on the image"""
     ptA,ptB,ptC,ptD = tag.getCorner(0),tag.getCorner(1),tag.getCorner(2),tag.getCorner(3)
     ptA = (int(ptA.x), int(ptA.y))
     ptB = (int(ptB.x), int(ptB.y))
@@ -220,17 +205,17 @@ def draw_tagframe(frame,tag):
     cv2.line(frame, ptD, ptA, (255, 255, 255), 2)      
     return frame
 
-# This simply outputs some information about the results returned by `process_apriltag`.
-# It prints some info to the console and draws a circle around the detected center of the tag
 def project_gamepiece_locations(roi_map, frame, result, cal, draw_roi=(0,205,205)):
     """
-    Function that transforms roi rectangles based on
-    AprilTag pose and camera calibration values 
-    roi_rects: a list of 3x3 np.float32 arrays
-    frame: current image being processed
-    result: current AprilTag result
-    cal: CameraCalibration instance
-    return: frame and transformed roi_rects as pixel coordinates
+    Function that transforms roi rectangles based on AprilTag pose and camera calibration values 
+    inputs:
+        roi_rects: a list of 3x3 np.float32 arrays
+        frame: current image being processed
+        result: current AprilTag result
+        cal: CameraCalibration object
+    returns: 
+        frame: image
+        roi_rects: transformed roi_map in pixel coordinates
     """
     if draw_roi == None:
         return
@@ -255,6 +240,7 @@ def project_gamepiece_locations(roi_map, frame, result, cal, draw_roi=(0,205,205
     return frame,ret
 
 def draw_cube(frame, result, cal):
+    """ draws a 3d cube over the apriltag to visually show pose """
     cube_pts = .05*np.float32([[  0,  0,  0], 
                        [  0,  1,  0], 
                        [  1,  1,  0], 
@@ -266,8 +252,6 @@ def draw_cube(frame, result, cal):
     tag_id, pose, center, tag = result
     tvec = np.array(pose.translation())
     rvec = pose.rotation().getQuaternion().toRotationVector()
-    #TODO: This is working but cubes seem to always be shifted in XYZ space
-    #TODO: Check this, might be fixed -- updated cal info into AprilTags detector
     imgpts, jac = cv2.projectPoints(cube_pts, rvec, tvec)
     imgpts = np.int32(imgpts).reshape(-1,2)
     # draw ground floor in green
