@@ -21,7 +21,8 @@ import detect_colors
 # class used to encapsulate Camera + Calibration information
 from cameravision import CameraVision
 from detect_colors import detect_colors
-from calibration import image_cal, cam0 #bandaid for now
+from calibration import image_cal, cam0 #bandaid for 
+from pprint import pprint
 
 logging.basicConfig(level="INFO")
 
@@ -68,11 +69,21 @@ if __name__ == "__main__":
             frame = copy.copy(cam0.images[count%(len(cam0.images)-1)])
             orig = copy.copy(frame)
         else:
+            #TODO: do I grab multiple cameras manually here, or iterate through cameras in camvis.cameras?
+            #      perhaps even storing the frame in the CameraObject?
             cam0.sink.grabFrame(frame)
+        #TODO: grab server time from networks table here
         try:
-            # trying undistort seemed to cause lockup issues
+            # trying undistort seemed to cause lockup issues???
             #frame = cam0.cal.undistort(frame)
+            #TODO: do we care if image is undistorted -- asked another way --> is AprilTags using the camera matrix values to 
+            #      undistort?  Answer is assumed to be YES, which means doing the undistort() call above is a bad idea
             frame,roi_rects = apriltagpipeline.runPipeline(frame,image_cal)
+            try:
+                j = apriltagpipeline.to_json()
+                pprint(j)
+            except Exception as e:
+                print(e)
             ###
             #trying to overlay detected colors
             #colors = detect_colors(orig)
