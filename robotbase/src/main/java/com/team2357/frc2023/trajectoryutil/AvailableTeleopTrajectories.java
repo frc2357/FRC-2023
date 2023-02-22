@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
+import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.util.DriverStationAllianceGetter;
 import com.team2357.lib.util.Utility;
 
@@ -25,14 +26,14 @@ public class AvailableTeleopTrajectories {
         addTrajectory("enterCommunity 4.85");
 
         // Load hashmap keys into sorted array for efficient searching
-        yVals = (Double[]) trajMap.keySet().toArray();
+        yVals = new Double[trajMap.keySet().size()];
+        trajMap.keySet().toArray(yVals);
         Arrays.sort(yVals);
     }
 
     private static void addTrajectory(String fileName) {
         PathPlannerTrajectory trajectory = TrajectoryUtil.createPathPlannerTrajectory(fileName);
         Command TrajCmd = TrajectoryUtil.createDrivePathCommand(trajectory, false);
-
         PathPlannerState initialState = PathPlannerTrajectory.transformStateForAlliance(trajectory.getInitialState(),
                 DriverStationAllianceGetter.getAlliance());
         double yVal = initialState.poseMeters.getY();
@@ -48,7 +49,7 @@ public class AvailableTeleopTrajectories {
      * @return A command to run to get to column
      */
     public static Command BuildTrajectory(int col, Pose2d pose) {
-        double startKey = getStartTrajectoryKey(pose);
+        double startKey = getTrajectoryKey(pose);
         Command startCommand = trajMap.get(startKey);
         return new WaitCommand(0);
     }
@@ -58,16 +59,16 @@ public class AvailableTeleopTrajectories {
      * @param pose The robot's current position
      * @return The key for the start trajectory
      */
-    public static double getStartTrajectoryKey(Pose2d pose) {
+    public static double getTrajectoryKey(Pose2d pose) {
 
         // Robot pose values we are trying to match to.
         double robotYPos = pose.getY();
         double robotXPos = pose.getX();
 
         // Binary search setup
-        int high = yVals.length;
+        int high = yVals.length-1;
         int low = 0, mid = 0;
-        boolean isGreaterThan = false;
+        boolean isRobotGreaterThan = false;
 
         // Resulting key for hashmap
         double key = -1.0;
@@ -77,10 +78,10 @@ public class AvailableTeleopTrajectories {
 
             if (yVals[mid] < robotYPos) {
                 low = mid + 1;
-                isGreaterThan = false;
+                isRobotGreaterThan = true;
             } else if (yVals[mid] > robotYPos) {
                 high = mid - 1;
-                isGreaterThan = true;
+                isRobotGreaterThan = false;
             } else if (yVals[mid] == robotYPos) {
                 key = yVals[mid];
                 break;
@@ -88,22 +89,22 @@ public class AvailableTeleopTrajectories {
         }
 
         try {
-            double nextClosest = yVals[mid + (isGreaterThan ? 1 : -1)];
+            double nextClosest = yVals[mid + (isRobotGreaterThan ? 1 : -1)];
 
             if (Math.abs(nextClosest - robotYPos) < Math.abs(yVals[mid] - robotYPos)) {
                 key = nextClosest;
             } else {
                 key = yVals[mid];
             }
+
         } catch (ArrayIndexOutOfBoundsException e) {
             // Means next closest element does not exist, use current mid value
             key = yVals[mid];
         }
 
-        // TODO: Remove magic number
-        // If too far away
-        if (!Utility.isWithinTolerance(robotYPos, key, 0.1)
-                || Utility.isWithinTolerance(robotXPos, xMap.get(key), 0.1)) {
+        // If too far away, return -1
+        if (!Utility.isWithinTolerance(robotYPos, key, Constants.DRIVE.TRAJECTORY_MAP_TOLERANCE_METERS)
+                || !Utility.isWithinTolerance(robotXPos, xMap.get(key), Constants.DRIVE.TRAJECTORY_MAP_TOLERANCE_METERS)) {
             return -1.0;
         }
 
