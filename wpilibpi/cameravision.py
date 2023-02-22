@@ -56,7 +56,9 @@ class CameraVision:
     def __init__(self, configFile=".\\pc.json", simulate=False):
         self.configFile = configFile 
         self.readConfig(configFile) # sets team, server, cameraConfigs[]
-        self.ntinst = ntinst = NetworkTableInstance.getDefault()
+        self.ntinst = ntinst = NetworkTableInstance.getDefault()      
+        # TODO: define networks table variable for passing json
+        # this might be a good start: https://docs.wpilib.org/en/stable/docs/software/networktables/client-side-program.html 
         if self.server:
             print("Setting up NetworkTables server")
             ntinst.startServer()
