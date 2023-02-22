@@ -97,14 +97,13 @@ class AprilTagPipeline:
             TODO: Is it possible that both cameras see the same tag, and therefore we
                   need to chose the tag pose with lower ambiguity?
         """
-        ret_list = [{'ID':idx,'ambiguity':0.0,'pose':{'translation':{'x':0,'y':0,'z':0},'rotation':{'quarternion':{'W':0.0,'X':0.0,'Y':0.0,'Z':0.0}}}} for idx in range(1,8+1)]
+        ret_list = [{'ID':idx,'ambiguity':0.0,'pose':{'translation':{'x':0,'y':0,'z':0},'rotation':{'quaternion':{'W':0.0,'X':0.0,'Y':0.0,'Z':0.0}}}} for idx in range(1,8+1)]
         for result in self.results:
             tag_id, pose, center, tag, est = result
             tvec = pose.translation()
             rqua = pose.rotation().getQuaternion()
+            
             ret = ret_list[tag_id]
-            amb = est.getAmbiguity()
-            tvec = pose.translation()
             ret['pose']['translation']= {'x':tvec.x,'y':tvec.y,'z':tvec.z}
             ret['pose']['rotation']['quaternion'] = {'W':rqua.W(),'X':rqua.X(),'Y':rqua.Y(),'Z':rqua.Z()}
             ret['ambiguity'] = est.getAmbiguity()
