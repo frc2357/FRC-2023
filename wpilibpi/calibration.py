@@ -1,5 +1,5 @@
-
-# code from https://docs.opencv.org/4.x/dc/dbb/tutorial_py_calibration.html
+# json cal info from calibration performed at https://www.calibdb.net/
+# some code from https://docs.opencv.org/4.x/dc/dbb/tutorial_py_calibration.html
 import numpy as np
 import cv2
 import glob
@@ -92,12 +92,10 @@ def load_cal_json(jstr):
     mtx= np.array(j['camera_matrix']['data']).reshape(3,3)
     dst= np.array(j['distortion_coefficients']['data'])
     img_size = j['img_size']['data']
-    # See https://docs.opencv.org/4.x/dc/dbb/tutorial_py_calibration.html
     newmtx,roi= cv2.getOptimalNewCameraMatrix(mtx,dst,img_size,1,img_size)
-    return CameraCalibration(mtx, dst, img_size, newmtx,roi)
+    return CameraCalibration(mtx, dst, img_size, newmtx, roi)
 
-# create imag_cal and cam0 CameraCalibration instances on import
-# If USB camera, you can use calibdb.net to calibrate the camera and 
+# create image_cal and cam0 CameraCalibration instances on import
 image_cal = CameraCalibration(mtx = np.array([1000, 0, 1280/2,0,1000,720/2,0,0,1]).reshape(3,3),dst=np.float32([0,0,0,0]))
 cam0 = load_cal_json(jsonstr) # load calibration data in CameraCalibration class
 
