@@ -38,16 +38,27 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	public static enum ColumnSetpoints {
-		LEFT(Constants.DRIVE.LEFT_COL_X_ANGLE_SETPOINT),
-		MIDDLE(Constants.DRIVE.MID_COL_X_ANGLE_SETPOINT),
-		RIGHT(Constants.DRIVE.RIGHT_COL_X_ANGLE_SETPOINT),
-		DEFAULT(Constants.DRIVE.DEFAULT_X_ANGLE_SETPOINT);
+		LEFT(Constants.DRIVE.LEFT_COL_X_ANGLE_SETPOINT, 0),
+		MIDDLE(Constants.DRIVE.MID_COL_X_ANGLE_SETPOINT, 1),
+		RIGHT(Constants.DRIVE.RIGHT_COL_X_ANGLE_SETPOINT, 2),
+		DEFAULT(Constants.DRIVE.DEFAULT_X_ANGLE_SETPOINT, -1);
 
 		public final double setpoint;
+		public final int index;
 
-		private ColumnSetpoints(double setpoint) {
+		private ColumnSetpoints(double setpoint, int index) {
 			this.setpoint = setpoint;
+			this.index = index;
 		}
+	}
+
+	public static ColumnSetpoints getSetpoint(int val) {
+		for (ColumnSetpoints setpoint : ColumnSetpoints.values()) {
+			if (val == setpoint.index) {
+				return setpoint;
+			}
+		}
+		return ColumnSetpoints.DEFAULT;
 	}
 
 	private SwerveDriveKinematics m_kinematics;
