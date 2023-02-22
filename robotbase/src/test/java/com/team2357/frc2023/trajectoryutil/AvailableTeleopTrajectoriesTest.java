@@ -65,6 +65,5 @@ public class AvailableTeleopTrajectoriesTest {
 
         testPose = new Pose2d(3.5, 4.85+0.09, Rotation2d.fromDegrees(0));
         assertEquals(AvailableTeleopTrajectories.getTrajectoryKey(testPose), 4.85, 0.001);
-}
-    
+    }
 }
