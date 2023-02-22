@@ -11,6 +11,7 @@
 #   Calibration: https://docs.opencv.org/4.7.0/d9/d0c/group__calib3d.html
 #   projectPoints: https://docs.opencv.org/4.7.0/d9/d0c/group__calib3d.html#ga1019495a2c8d1743ed5cc23fa0daff8c
 
+from collections import OrderedDict
 import cv2
 import robotpy_apriltag
 from wpimath.geometry import Transform3d,Rotation3d
@@ -65,6 +66,8 @@ def create_roi_rect(roi):
 #             Cx,#638.57001085,  #  (Cx) should be roughly 1/2 the img width
 #             Cy,#337.36382032,  #  (Cy) should be roughly 1/2 the img height
 
+
+
 class AprilTagPipeline:
     def __init__(self, frame_size, Fx,Fy,Cx,Cy):
         """ AprilTagPipeline class 
@@ -88,12 +91,32 @@ class AprilTagPipeline:
         self.results = []
         self.black_frame = np.zeros(shape=(720,1280,3),dtype='uint8')
 
+    def to_json(self):
+        """
+            Format AprilTags to json
+            TODO: Is it possible that both cameras see the same tag, and therefore we
+                  need to chose the tag pose with lower ambiguity?
+        """
+        ret_list = [{'ID':idx,'ambiguity':0.0,'pose':{'translation':{'x':0,'y':0,'z':0},'rotation':{'quarternion':{'W':0.0,'X':0.0,'Y':0.0,'Z':0.0}}}} for idx in range(1,8+1)]
+        for result in self.results:
+            tag_id, pose, center, tag, est = result
+            tvec = pose.translation()
+            rqua = pose.rotation().getQuaternion()
+            ret = ret_list[tag_id]
+            amb = est.getAmbiguity()
+            tvec = pose.translation()
+            ret['pose']['translation']= {'x':tvec.x,'y':tvec.y,'z':tvec.z}
+            ret['pose']['rotation']['quaternion'] = {'W':rqua.W(),'X':rqua.X(),'Y':rqua.Y(),'Z':rqua.Z()}
+            ret['ambiguity'] = est.getAmbiguity()
+        return {'timestamp':0.0,'tags':ret_list}
+            
     def process_apriltag(self, tag):
         tag_id = tag.getId()
         center = tag.getCenter()
         hamming = tag.getHamming()
         decision_margin = tag.getDecisionMargin()
-        est = self.estimator.estimateOrthogonalIteration(tag, 125)
+        EST_ITERATIONS = 125
+        est = self.estimator.estimateOrthogonalIteration(tag, EST_ITERATIONS)
         return tag_id, est.pose1, center, tag, est
 
     def runPipeline(self, frame, cal):#, detector, estimator, cameracalibration):
@@ -120,7 +143,7 @@ class AprilTagPipeline:
                 frame = draw_tagframe(frame, tag)
                 frame = draw_tagid(frame, tag)
                 #frame = draw_tagpose(frame, pose, tag)
-                frame,roipts = project_gamepiece_locations(roi_map, frame, result, cal)   
+                frame ,roipts = project_gamepiece_locations(roi_map, frame, result, cal)   
                 #log.debug(roipts)   
             return frame,roipts
         except Exception as e:
