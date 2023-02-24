@@ -12,6 +12,9 @@ import com.pathplanner.lib.PathConstraints;
 import com.swervedrivespecialties.swervelib.AbsoluteEncoder;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
+import com.team2357.frc2023.commands.scoring.AutoScoreHighCommand;
+import com.team2357.frc2023.commands.scoring.AutoScoreLowCommand;
+import com.team2357.frc2023.commands.scoring.AutoScoreMidCommand;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 import com.team2357.lib.subsystems.LimelightSubsystem;
 
@@ -27,6 +30,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 
 public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	private static SwerveDriveSubsystem instance = null;
@@ -60,6 +64,23 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		}
 		return ColumnSetpoints.DEFAULT;
 	}
+
+	/**
+     * @param row row to score on (low: 0, mid: 1, high: 2)
+     * @return Auto score command to run
+     */
+    public static Command getAutoScoreCommands(int row) {
+        switch (row) {
+            case 0:
+                return new AutoScoreLowCommand();
+            case 1:
+                return new AutoScoreMidCommand();
+            case 2:
+                return new AutoScoreHighCommand();
+            default:
+                return new AutoScoreLowCommand();
+        }
+    }
 
 	private SwerveDriveKinematics m_kinematics;
 
