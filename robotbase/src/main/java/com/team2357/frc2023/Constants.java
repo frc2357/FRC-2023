@@ -179,6 +179,9 @@ public final class Constants {
         public static final ChassisSpeeds DEAD_RECKONING_X_CHASSIS_SPEEDS = new ChassisSpeeds(DEAD_RECKONING_TRANSLATION_METERS_PER_SECOND, 0, 0);
         public static final ChassisSpeeds DEAD_RECKONING_Y_CHASSIS_SPEEDS = new ChassisSpeeds(0, DEAD_RECKONING_TRANSLATION_METERS_PER_SECOND, 0);
         public static final ChassisSpeeds DEAD_RECKONING_ROTATION_CHASSIS_SPEEDS = new ChassisSpeeds(0, 0, DEAD_RECKONING_ROTATION_RADIANS_PER_SECOND);
+    
+        // Tolerance for out-of-range poses on auto-mapping
+        public static final double TRAJECTORY_MAP_TOLERANCE_METERS = 0.1;
     }
 
     public static final class INTAKE_ROLLER {
@@ -386,10 +389,6 @@ public final class Constants {
     public static final class COMPRESSOR {
         public static final int MIN_PRESSURE_PSI = 90;
         public static final int MAX_PRESSURE_PSI = 120;
-    }
-
-    public static final class SHUFFLEBOARD {
-        public static final ShuffleboardTab PID_TUNER_TAB = Shuffleboard.getTab("PID's");
     }
 
 }
