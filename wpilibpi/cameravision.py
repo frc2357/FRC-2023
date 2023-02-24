@@ -14,7 +14,11 @@ from cscore import CameraServer, VideoSource, UsbCamera, MjpegServer
 from ntcore import NetworkTableInstance, EventFlags
 from calibration import cam0, image_cal
 
-class CameraConfig: pass
+class CameraConfig:
+    #name: str
+    #path: str
+    #config: dict
+    pass
 
 class CameraObject:
     #team: int
@@ -42,6 +46,11 @@ def list_cameras():
 class CameraVision:
     """
     A consolidated class to configure and start cameras, for use on wpilipbi / opencv
+
+    Reads and processes a config file (json) to create CameraObject instances.  
+    Creates a networks table (client or server depending on config file).  
+    
+    Can also be used in simulate mode to read images from disk in place of a Camera
     """
     
     # the following are singleton -  by defining them here, all instances of 
@@ -51,7 +60,6 @@ class CameraVision:
     server = False 
     cameraConfigs = []
     cameras = []
-    outstreams = []
 
     def __init__(self, configFile=".\\pc.json", simulate=False):
         self.configFile = configFile 
@@ -70,8 +78,9 @@ class CameraVision:
 
         if simulate: # simulate mode loads a set of images into the camera class
             imgs = []
-            fimages = glob.glob(".\\images\\*Angle*.png")
+            fimages = glob.glob(".\\images\\*.png")
             print(fimages)
+            
             for fname in fimages:
                 imgs.append(np.ascontiguousarray(cv2.imread(fname)))
             camConfig = dict()
@@ -95,7 +104,7 @@ class CameraVision:
         """Report parse error."""
         print("config error in '" + self.configFile + "': " + str, file=sys.stderr)
     
-    def readCameraConfig(self, config)->None:
+    def readCameraConfig(self, config)->bool:
         """Read single camera configuration."""
         cam = CameraConfig()
         # name
@@ -165,10 +174,20 @@ class CameraVision:
     
     def getComponents(self, cam_id=0):
         """ get the sink and outstream for camera by index """
-        return (CameraServer.getVideo(self.cameras[cam_id]), self.outstreams[cam_id])
+        return (self.cameras[cam_id].sink, self.cameras[cam_id].outstream)
 
-    def startCamera(self, config)->None:
-        """Start running the camera."""
+    def startCamera(self, config:CameraConfig)->CameraObject:
+        """Start running the camera.
+
+            creates a connection to the camera, starts the CameraServer and
+            references to the sink and outputstream.  
+
+            Args:
+                config: CameraConfig class or dictionary
+            
+            Returns:
+                configured CameraObject
+        """
         
         print("Starting camera '{}' on {}".format(config.name, config.path))
         camera = UsbCamera(config.name, config.path)
