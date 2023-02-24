@@ -1,4 +1,4 @@
-package com.team2357.frc2023.util;
+package com.team2357.frc2023.trajectoryutil;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
