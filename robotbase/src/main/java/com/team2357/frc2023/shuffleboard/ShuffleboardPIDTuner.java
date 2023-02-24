@@ -2,12 +2,11 @@ package com.team2357.frc2023.shuffleboard;
 
 import java.util.Map;
 
-import com.team2357.frc2023.Constants;
-
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
@@ -46,8 +45,7 @@ public class ShuffleboardPIDTuner {
     private double m_iDefault;
     private double m_dDefault;
     private NetworkTable m_table;
-    private ShuffleboardTab m_tab;
-    private SimpleWidget pWidget;
+    private final ShuffleboardTab m_tab;
 
     /**
      * @param subsystemName The name of the subsystem, used to give the widgts and
@@ -65,13 +63,13 @@ public class ShuffleboardPIDTuner {
     public ShuffleboardPIDTuner(String subsystemName, double pRange, double iRange, double dRange, double pDefault,
             double iDefault, double dDefault) {
         m_subsystemName = subsystemName;
-        m_tab = Constants.SHUFFLEBOARD.PID_TUNER_TAB;
         m_pRange = pRange;
         m_iRange = iRange;
         m_dRange = dRange;
         m_pDefault = pDefault;
         m_iDefault = iDefault;
         m_dDefault = dDefault;
+        m_tab = Shuffleboard.getTab("PID's");
         m_table = NetworkTableInstance.getDefault().getTable("Shuffleboard");
         makePIDWidgets();
     }
@@ -82,12 +80,14 @@ public class ShuffleboardPIDTuner {
     public double getPValue() {
         return m_table.getEntry(m_subsystemName + " P").getDouble(0);
     }
+
     /**
      * @return The I value of the PID this instance controls.
      */
     public double getIValue() {
         return m_table.getEntry(m_subsystemName + " I").getDouble(0);
     }
+
     /**
      * @return The D value of the PID this instance controls.
      */
@@ -120,5 +120,15 @@ public class ShuffleboardPIDTuner {
             return true;
         }
         return false;
+    }
+
+    /**
+     * This is to close the entries that this instance has made, which should clean it up. 
+     * This should not need to be called usually.
+     */
+    public void closePIDTunerEntries() {
+        m_table.getEntry(m_subsystemName + " P").close();
+        m_table.getEntry(m_subsystemName + " I").close();
+        m_table.getEntry(m_subsystemName + " D").close();
     }
 }
