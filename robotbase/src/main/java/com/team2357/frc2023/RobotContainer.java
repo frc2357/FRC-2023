@@ -30,7 +30,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final SwerveDriveSubsystem m_drivetrainSubsystem;
-  //private final Compressor m_compressor;
+  private final Compressor m_compressor;
 
   private AutoCommandChooser m_autoCommandChooser;
 
@@ -62,9 +62,9 @@ public class RobotContainer {
         driveControls));
 
     // Setup compressor
-   // m_compressor = new Compressor(Constants.CAN_ID.PNEUMATICS_HUB_ID, PneumaticsModuleType.REVPH);
-   // m_compressor.enableAnalog(Constants.COMPRESSOR.MIN_PRESSURE_PSI, Constants.COMPRESSOR.MAX_PRESSURE_PSI);
-
+   m_compressor = new Compressor(Constants.CAN_ID.PNEUMATICS_HUB_ID, PneumaticsModuleType.REVPH);
+   // m_compressor.enableAnalog(0,1);//Constants.COMPRESSOR.MIN_PRESSURE_PSI, Constants.COMPRESSOR.MAX_PRESSURE_PSI);
+m_compressor.disable();
     // Build trajectory paths
     AvailableTrajectories.generateTrajectories();
     AvailableTrajectoryCommands.generateTrajectories();

@@ -44,7 +44,7 @@ public final class Constants {
          */
         public static final String DRIVE_CANBUS = "CANivore";
 
-        public static final int PNEUMATICS_HUB_ID = 2;
+        public static final int PNEUMATICS_HUB_ID = 1;
 
         public static final int PIGEON_ID = 5;
 
@@ -82,7 +82,7 @@ public final class Constants {
         public static final int WRIST_REVERSE_SOLENOID_CHANNEL = 1;
         
         public static final int CLAW_FORWARD_SOLENOID_CHANNEL = 2;
-        public static final int CLAW_REVERSE_SOLENOID_CHANNEL = 3;
+        public static final int CLAW_REVERSE_SOLENOID_CHANNEL = 4;
 
         public static final int INTAKE_SOLENOID_FORWARD_CHANNEL = 3;
         public static final int INTAKE_SOLENOID_REVERSE_CHANNEL = 5;
