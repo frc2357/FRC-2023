@@ -32,7 +32,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
         public double m_rotationMotorP;
         public double m_rotationMotorI;
         public double m_rotationMotorD;
-        
+
         public double m_rotationMotorIZone;
         public double m_rotationMotorFF;
         public double m_rotationMotorMaxOutput;
@@ -52,6 +52,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
     private SparkMaxPIDController m_pidController;
     private double m_targetRotations;
     private ShuffleboardPIDTuner m_shuffleboardPIDTuner;
+
     public ArmRotationSubsystem(CANSparkMax masterRotationMotor, CANSparkMax followerRotationMotor) {
         instance = this;
         m_masterRotationMotor = masterRotationMotor;
@@ -60,7 +61,9 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
 
     public void configure(Configuration config) {
         m_config = config;
-        m_shuffleboardPIDTuner = new ShuffleboardPIDTuner("Arm Rotation",0.2,0.2,0.2,m_config.m_rotationMotorP,m_config.m_rotationMotorI,m_config.m_rotationMotorD);
+        m_shuffleboardPIDTuner = new ShuffleboardPIDTuner("Arm Rotation", config.m_shuffleboardTunerPRange,
+                m_config.m_shuffleboardTunerIRange, m_config.m_shuffleboardTunerDRange, m_config.m_rotationMotorP,
+                m_config.m_rotationMotorI, m_config.m_rotationMotorD);
         configureRotationMotor(m_masterRotationMotor);
         configureRotationMotor(m_followerRotationMotor);
 
@@ -90,7 +93,8 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
         pidController.setSmartMotionMaxVelocity(m_config.m_rotationMotorMaxVel, m_config.m_smartMotionSlot);
         pidController.setSmartMotionMinOutputVelocity(m_config.m_rotationMotorMinVel, m_config.m_smartMotionSlot);
         pidController.setSmartMotionMaxAccel(m_config.m_rotationMotorMaxAcc, m_config.m_smartMotionSlot);
-        pidController.setSmartMotionAllowedClosedLoopError(m_config.m_rotationMotorAllowedError, m_config.m_smartMotionSlot);
+        pidController.setSmartMotionAllowedClosedLoopError(m_config.m_rotationMotorAllowedError,
+                m_config.m_smartMotionSlot);
     }
 
     public void setRotatorRotations(double rotations) {
@@ -116,9 +120,10 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
 
         m_masterRotationMotor.set(motorSpeed);
     }
-    //Method for the panic mode to rotate the arms
+
+    // Method for the panic mode to rotate the arms
     public void manualRotate(double sensorUnits) {
-        m_masterRotationMotor.set(sensorUnits*m_config.m_maxSpeedPercent);
+        m_masterRotationMotor.set(sensorUnits * m_config.m_maxSpeedPercent);
     }
 
     // Method to stop the motors
@@ -138,17 +143,19 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
     public double getFollowerMotorRotations() {
         return m_followerRotationMotor.getEncoder().getPosition();
     }
+
     public void updatePID() {
         m_pidController.setP(m_shuffleboardPIDTuner.getPValue());
         m_pidController.setI(m_shuffleboardPIDTuner.getIValue());
         m_pidController.setD(m_shuffleboardPIDTuner.getDValue());
     }
+
     @Override
     public void periodic() {
         if (isClosedLoopEnabled() && isRotatorAtRotations()) {
             setClosedLoopEnabled(false);
         }
-        if(m_shuffleboardPIDTuner.arePIDsUpdated()){
+        if (m_shuffleboardPIDTuner.arePIDsUpdated()) {
             updatePID();
         }
     }

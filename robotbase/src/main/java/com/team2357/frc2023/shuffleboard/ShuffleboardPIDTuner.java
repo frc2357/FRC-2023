@@ -13,11 +13,6 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 
 public class ShuffleboardPIDTuner {
-    private static ShuffleboardPIDTuner instance = null;
-
-    public ShuffleboardPIDTuner getInstance() {
-        return instance;
-    }
 
     /**
      * The name of the subsystem PID that this instance will control.
@@ -57,9 +52,9 @@ public class ShuffleboardPIDTuner {
     /**
      * @param subsystemName The name of the subsystem, used to give the widgts and
      *                      layout their names.
-     * @param pRange        How far the p slider can go to adjust the P value.
-     * @param iRange        How far the i slider can go to adjust the I value.
-     * @param dRange        How far teh d slider can go to adjust the D value.
+     * @param pRange        How far the P slider can go to adjust the P value.
+     * @param iRange        How far the I slider can go to adjust the I value.
+     * @param dRange        How far the D slider can go to adjust the D value.
      * @param pDefault      the default P value, should be a config or from the PID
      *                      controller itself.
      * @param iDefault      the default I value, should be a config or from the PID
@@ -79,7 +74,6 @@ public class ShuffleboardPIDTuner {
         m_dDefault = dDefault;
         m_table = NetworkTableInstance.getDefault().getTable("Shuffleboard");
         makePIDWidgets();
-        instance = this;
     }
 
     /**
