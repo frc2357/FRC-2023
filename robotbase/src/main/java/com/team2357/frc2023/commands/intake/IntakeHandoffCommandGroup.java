@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 public class IntakeHandoffCommandGroup extends SequentialCommandGroup {
     public IntakeHandoffCommandGroup() {
         // Get arm into position
-        addCommands(new IntakeArmStowCommand());
         addCommands(new RotateArmToPositionCommand(Constants.ARM_ROTATION.INTAKE_HANDOFF_ROTATIONS));
 
         // Grab the game piece

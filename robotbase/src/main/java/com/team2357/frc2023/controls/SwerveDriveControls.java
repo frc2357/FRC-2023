@@ -1,8 +1,9 @@
 package com.team2357.frc2023.controls;
 
+import com.team2357.frc2023.commands.intake.IntakeDeployCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakeRollerReverseCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
-import com.team2357.frc2023.subsystems.IntakeRollerSubsystem;
+import com.team2357.frc2023.commands.intake.IntakeStowCommandGroup;
 import com.team2357.frc2023.commands.scoring.teleopAutoScore.TeleopAutoScoreCommandGroup;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.lib.triggers.AxisThresholdTrigger;
@@ -50,7 +51,8 @@ public class SwerveDriveControls {
         m_leftBumper.whileTrue(new IntakeRollerReverseCommand());
 
         // Intake deploy/stow
-
+        m_leftTrigger.whileTrue(new IntakeDeployCommandGroup());
+        m_leftTrigger.onFalse(new IntakeStowCommandGroup());
 
         // Teleop auto
         m_rightTrigger.whileTrue(new TeleopAutoScoreCommandGroup());
