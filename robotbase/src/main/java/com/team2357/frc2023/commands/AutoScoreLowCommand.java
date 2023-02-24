@@ -20,7 +20,7 @@ public class AutoScoreLowCommand extends SequentialCommandGroup {
         addCommands(new DeployIntakeCommand());
 
         addCommands(new ParallelRaceGroup(
-            new ReverseIntakeCommand(),
+            new IntakeReverseCommand(),
             new WaitCommand(Constants.INTAKE_ROLLER.AUTO_SCORE_LOW_REVERSE_TIME)
         ));
     }

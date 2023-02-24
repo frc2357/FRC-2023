@@ -1,12 +1,15 @@
 package com.team2357.frc2023.controls;
 
 import com.team2357.frc2023.commands.AutoBalanceCommand;
-import com.team2357.frc2023.commands.ReverseIntakeCommand;
-import com.team2357.frc2023.commands.RunIntakeCommand;
+import com.team2357.frc2023.commands.IntakeDeployCommandGroup;
+import com.team2357.frc2023.commands.IntakeReverseCommand;
+import com.team2357.frc2023.commands.IntakeRunCommand;
 import com.team2357.frc2023.subsystems.IntakeRollerSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
+import com.team2357.lib.triggers.AxisThresholdTrigger;
 import com.team2357.lib.util.XboxRaw;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
@@ -17,6 +20,9 @@ public class SwerveDriveControls {
     private JoystickButton m_rightBumper;
     private JoystickButton m_leftBumper;
 
+    private AxisThresholdTrigger m_leftTrigger;
+    private AxisThresholdTrigger m_rightTrigger;
+
     public static boolean isFlipped;
 
     public SwerveDriveControls(XboxController controller, double deadband) {
@@ -26,10 +32,15 @@ public class SwerveDriveControls {
         m_rightBumper = new JoystickButton(m_controller, XboxRaw.BumperRight.value);
         m_leftBumper = new JoystickButton(m_controller, XboxRaw.BumperLeft.value);
 
+        m_leftTrigger = new AxisThresholdTrigger(controller, Axis.kLeftTrigger, .1);
+        m_rightTrigger = new AxisThresholdTrigger(controller, Axis.kLeftTrigger, .1);
+
         m_backButton.onTrue(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().zeroGyroscope()));
 
-        m_rightBumper.whileTrue(new RunIntakeCommand());
-        m_leftBumper.whileTrue(new ReverseIntakeCommand());
+        m_rightBumper.whileTrue(new IntakeRunCommand());
+        m_leftBumper.whileTrue(new IntakeReverseCommand());
+
+        m_rightTrigger.whileTrue(new IntakeDeployCommandGroup());
     }
 
     public double getX() {

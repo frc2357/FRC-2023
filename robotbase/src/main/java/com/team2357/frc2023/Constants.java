@@ -79,7 +79,7 @@ public final class Constants {
         
         public static final int CLAW_SOLENOID_CHANNEL = 2;
 
-        public static final int INTAKE_SOLENOID_FORWARD_CHANNEL = 4;
+        public static final int INTAKE_SOLENOID_FORWARD_CHANNEL = 3;
         public static final int INTAKE_SOLENOID_REVERSE_CHANNEL = 5;
     }
 

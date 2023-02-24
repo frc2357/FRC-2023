@@ -54,6 +54,12 @@ public class IntakeRollerSubsystem extends SubsystemBase {
         m_masterIntakeMotor.configPeakCurrentLimit(m_config.m_peakCurrentLimit);
         m_masterIntakeMotor.configPeakCurrentDuration(m_config.m_peakCurrentDuration);
         m_masterIntakeMotor.configContinuousCurrentLimit(m_config.m_continuousCurrentLimit);
+
+        m_followerIntakeMotor.setNeutralMode(NeutralMode.Brake);
+        m_followerIntakeMotor.enableCurrentLimit(true);
+        m_followerIntakeMotor.configPeakCurrentLimit(m_config.m_peakCurrentLimit);
+        m_followerIntakeMotor.configPeakCurrentDuration(m_config.m_peakCurrentDuration);
+        m_followerIntakeMotor.configContinuousCurrentLimit(m_config.m_continuousCurrentLimit);
     }
 
     public void runIntake(boolean reverse) {

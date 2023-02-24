@@ -14,7 +14,7 @@ public class AutoScoreMidCommand extends SequentialCommandGroup {
         // Pull game piece away from intake
         addCommands(new ParallelRaceGroup(
             new ExtendArmToPositionCommand(Constants.ARM_EXTENSION.RETRACTED_ROTATIONS),
-            new ReverseIntakeCommand()
+            new IntakeReverseCommand()
         ));
 
         // Extend to node

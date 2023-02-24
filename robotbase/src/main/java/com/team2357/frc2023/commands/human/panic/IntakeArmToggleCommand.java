@@ -18,6 +18,7 @@ public class IntakeArmToggleCommand extends CommandBase{
         }else{
             m_arm.deploy();
         }
+        System.out.println("Arm called");
     }
     @Override
     public boolean isFinished(){
