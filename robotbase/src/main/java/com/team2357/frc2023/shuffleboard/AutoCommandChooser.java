@@ -1,9 +1,9 @@
 package com.team2357.frc2023.shuffleboard;
 
-import com.team2357.frc2023.commands.ZeroDriveCommand;
 import com.team2357.frc2023.commands.auto.blue.grid3.BlueGridThreeTwoConeAutoCommand;
-import com.team2357.frc2023.util.AvailableTrajectoryCommands;
-import com.team2357.frc2023.util.TrajectoryUtil;
+import com.team2357.frc2023.commands.drive.ZeroDriveCommand;
+import com.team2357.frc2023.trajectoryutil.AvailableTrajectoryCommands;
+import com.team2357.frc2023.trajectoryutil.TrajectoryUtil;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;

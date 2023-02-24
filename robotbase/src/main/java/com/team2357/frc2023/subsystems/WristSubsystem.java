@@ -2,6 +2,7 @@ package com.team2357.frc2023.subsystems;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class WristSubsystem extends SubsystemBase {
@@ -20,12 +21,12 @@ public class WristSubsystem extends SubsystemBase {
 
     private enum WristState { Unknown, Extended, Retracted };
 
-    private Solenoid m_wristeSolenoid;
+    private DoubleSolenoid m_wristeSolenoid;
     private WristState m_currentState;
     private WristState m_desiredState;
     private long m_lastActionMillis;
 
-    public WristSubsystem(Solenoid wristSolenoid) {
+    public WristSubsystem(DoubleSolenoid wristSolenoid) {
         m_wristeSolenoid = wristSolenoid;
 
         instance = this;
@@ -78,9 +79,10 @@ public class WristSubsystem extends SubsystemBase {
         long now = System.currentTimeMillis();
 
         if (m_lastActionMillis == 0) {
-            m_wristeSolenoid.set(true);
+            m_wristeSolenoid.set(Value.kForward);
             m_lastActionMillis = now;
         } else if (now > m_lastActionMillis + m_config.m_extendMilliseconds) {
+            m_wristeSolenoid.set(Value.kOff);
             m_currentState = WristState.Extended;
             m_lastActionMillis = 0;
         }
@@ -90,9 +92,10 @@ public class WristSubsystem extends SubsystemBase {
         long now = System.currentTimeMillis();
 
         if (m_lastActionMillis == 0) {
-            m_wristeSolenoid.set(false);
+            m_wristeSolenoid.set(Value.kReverse);
             m_lastActionMillis = now;
         } else if (now > m_lastActionMillis + m_config.m_extendMilliseconds) {
+            m_wristeSolenoid.set(Value.kOff);
             m_currentState = WristState.Retracted;
             m_lastActionMillis = 0;
         }

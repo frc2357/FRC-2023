@@ -3,6 +3,7 @@ package com.team2357.frc2023.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
+import com.team2357.frc2023.shuffleboard.ShuffleboardPIDTuner;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 import com.team2357.lib.util.Utility;
 
@@ -24,6 +25,10 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
         public boolean m_isInverted = false;
 
         public int m_extendGrippedAmps;
+
+        public double m_shuffleboardTunerPRange;
+        public double m_shuffleboardTunerIRange;
+        public double m_shuffleboardTunerDRange;
 
         // smart motion config
         public double m_extendMotorP;
@@ -49,15 +54,19 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
     private CANSparkMax m_extendMotor;
     private SparkMaxPIDController m_pidcontroller;
     private double m_targetRotations;
+    private ShuffleboardPIDTuner m_shuffleboardPIDTuner;
 
     public ArmExtensionSubsystem(CANSparkMax extender) {
         m_extendMotor = extender;
         instance = this;
+
     }
 
     public void configure(Configuration config) {
         m_config = config;
-
+        m_shuffleboardPIDTuner = new ShuffleboardPIDTuner("Arm Extension", m_config.m_shuffleboardTunerPRange,
+                m_config.m_shuffleboardTunerIRange, m_config.m_shuffleboardTunerDRange, m_config.m_extendMotorP,
+                m_config.m_extendMotorI, m_config.m_extendMotorD);
         m_extendMotor.setIdleMode(m_config.m_extendMotorIdleMode);
         m_extendMotor.setSmartCurrentLimit(m_config.m_extendMotorStallLimitAmps, m_config.m_extendMotorFreeLimitAmps);
         m_pidcontroller = m_extendMotor.getPIDController();
@@ -67,9 +76,10 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
         m_extendMotor.setOpenLoopRampRate(m_config.m_extendMotorRampRate);
 
     }
-    //Mehtod for the panic mode to extend the arms
+
+    // Mehtod for the panic mode to extend the arms
     public void manualExtend(double sensorUnits) {
-        m_extendMotor.set(sensorUnits*m_config.m_maxSpeedPercent);
+        m_extendMotor.set(sensorUnits * m_config.m_maxSpeedPercent);
     }
 
     private void configureExtenderPID(SparkMaxPIDController pidController) {
@@ -85,7 +95,8 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
         pidController.setSmartMotionMaxVelocity(m_config.m_extendMotorMaxVel, m_config.m_smartMotionSlot);
         pidController.setSmartMotionMinOutputVelocity(m_config.m_extendMotorMinVel, m_config.m_smartMotionSlot);
         pidController.setSmartMotionMaxAccel(m_config.m_extendMotorMaxAcc, m_config.m_smartMotionSlot);
-        pidController.setSmartMotionAllowedClosedLoopError(m_config.m_extendMotorAllowedError, m_config.m_smartMotionSlot);
+        pidController.setSmartMotionAllowedClosedLoopError(m_config.m_extendMotorAllowedError,
+                m_config.m_smartMotionSlot);
     }
 
     public void stopExtensionMotors() {
@@ -102,6 +113,7 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
         m_targetRotations = rotations;
         m_pidcontroller.setReference(m_targetRotations, CANSparkMax.ControlType.kSmartMotion);
     }
+
     /**
      * @return Is the Extender arm motor at the setpoint set by m_targetRotations
      */
@@ -115,8 +127,17 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
         return m_extendMotor.getEncoder().getPosition();
     }
 
+    public void updatePID() {
+        m_pidcontroller.setP(m_shuffleboardPIDTuner.getPValue());
+        m_pidcontroller.setI(m_shuffleboardPIDTuner.getIValue());
+        m_pidcontroller.setD(m_shuffleboardPIDTuner.getDValue());
+    }
+
     @Override
     public void periodic() {
+        if (m_shuffleboardPIDTuner.arePIDsUpdated()) {
+            updatePID();
+        }
         if (isClosedLoopEnabled() && isExtenderRotatorAtRotations()) {
             setClosedLoopEnabled(false);
         }
