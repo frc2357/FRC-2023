@@ -34,10 +34,10 @@ log.addHandler(logging.NullHandler())
 # W is total width of detection area (see create_roi_rect)
 # H is total height of detection area (see create_roi_rect)
 ##########
-roi_map = np.float32([[ 22.00,-15.84,  8.43,  2, 2], #mid cone
-                      [-22.00,-15.84,  8.43,  2, 2], #mid cone
-                      [ 22.00,-27.84, 25.45,  2, 2], #high cone
-                      [-22.00,-27.84, 25.45,  2, 2], #high cone
+roi_map = np.float32([[ 22.00,-15.84+6,  8.43,  2, 2], #mid cone
+                      [-22.00,-15.84+6,  8.43,  2, 2], #mid cone
+                      [ 22.00,-27.84+6, 25.45,  2, 2], #high cone
+                      [-22.00,-27.84+6, 25.45,  2, 2], #high cone
                       [ 25.62, 12.00,-12.00, 12, 4], #low cone
                       [-25.62, 12.00,-12.00, 12, 4], #low cone
                       [  0.00, 12.00,-12.00, 12, 4], #low cube
@@ -112,7 +112,16 @@ class AprilTagPipeline:
     def process_apriltag(self, tag):
         """
             process a single tag, including estimating pose
-            returns id, pose(Transform3d), tag center (pixels), tag object, pose estimate object
+
+            Args:
+                tag: AprilTagDetection object
+
+            Returns:
+              id
+              pose(Transform3d)
+              tag center (pixels)
+              tag object
+              pose estimate object
         """
         tag_id = tag.getId()
         center = tag.getCenter()
@@ -125,11 +134,13 @@ class AprilTagPipeline:
     def runPipeline(self, frame, cal):
         """
             this function should be called by main loop for AprilTags processing
+
             results are stored in self.results list
-            inputs:
+
+            Args:
                 frame: raw image from camera
                 cal: CameraCalibration object
-            returns:
+            Returns:
                 frame: image with drawn features added
                 roipts: projected locations of gamepieces based on tag pose
         """
@@ -151,12 +162,13 @@ class AprilTagPipeline:
                 tag_id, pose, center, tag, est = result
                 amb = est.getAmbiguity()
                 log.debug(f"Result[{idx}]\tAmbiguity: {amb:0.4f}\tError: {est.error1:3f}")
-                if tag_id not in [1,2,3,6,7,8]: # we only care about these tags.  We might only care about 1,2,3 or 6,7,8 depending on match        
-                    continue
+
                 frame = draw_tagframe(frame, tag)
                 frame = draw_tagid(frame, tag)
                 #frame = draw_tagpose(frame, pose, tag)
-                frame ,roipts = project_gamepiece_locations(roi_map, frame, result, cal)   
+                if tag_id not in [1,2,3,6,7,8]: # we only care about these tags.  We might only care about 1,2,3 or 6,7,8 depending on match        
+                    continue                
+                frame, roipts = project_gamepiece_locations(roi_map, frame, result, cal)   
                 #log.debug(roipts)   
             return frame,roipts
         except Exception as e:
@@ -205,15 +217,18 @@ def draw_tagframe(frame,tag):
     cv2.line(frame, ptD, ptA, (255, 255, 255), 2)      
     return frame
 
-def project_gamepiece_locations(roi_map, frame, result, cal, draw_roi=(0,205,205)):
+def project_gamepiece_locations(roi_map, frame, result, cal, draw_roi=(0,255,0)):
     """
     Function that transforms roi rectangles based on AprilTag pose and camera calibration values 
-    inputs:
-        roi_rects: a list of 3x3 np.float32 arrays
+    
+    Args:
+        roi_map: a list of 3x3 np.float32 arrays
         frame: current image being processed
         result: current AprilTag result
         cal: CameraCalibration object
-    returns: 
+        draw_roi_color: color to use for roi rectangles.
+                    If None, rectangle are not drawn
+    Returns: 
         frame: image
         roi_rects: transformed roi_map in pixel coordinates
     """
@@ -231,9 +246,8 @@ def project_gamepiece_locations(roi_map, frame, result, cal, draw_roi=(0,205,205
         # using the imag_cal class to automatically pull in the calibration values needed for cv2.projectPoints
         #imgpts,jac = cv2.projectPoints(rect, rvec, tvec,cal_factors.mtx, cal_factors.dst)
         imgpts,jac = cal.projectPoints(rect,rvec,tvec)
-        ret.append(imgpts)
         imgpts = np.int32(imgpts).reshape(-1,2)
-        
+        ret.append([*imgpts[0],*imgpts[2]])        
         for i in range(4):
             j = (i + 1) % 4
             frame = cv2.line(frame, tuple(imgpts[i]), tuple(imgpts[j]), draw_roi, 2)        
