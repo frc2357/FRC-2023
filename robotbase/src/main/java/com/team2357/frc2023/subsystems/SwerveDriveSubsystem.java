@@ -12,6 +12,9 @@ import com.pathplanner.lib.PathConstraints;
 import com.swervedrivespecialties.swervelib.AbsoluteEncoder;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
+import com.team2357.frc2023.commands.scoring.AutoScoreHighCommand;
+import com.team2357.frc2023.commands.scoring.AutoScoreLowCommand;
+import com.team2357.frc2023.commands.scoring.AutoScoreMidCommand;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 import com.team2357.lib.subsystems.LimelightSubsystem;
 
@@ -27,6 +30,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 
 public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	private static SwerveDriveSubsystem instance = null;
@@ -38,17 +42,45 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	public static enum ColumnSetpoints {
-		LEFT(Constants.DRIVE.LEFT_COL_X_ANGLE_SETPOINT),
-		MIDDLE(Constants.DRIVE.MID_COL_X_ANGLE_SETPOINT),
-		RIGHT(Constants.DRIVE.RIGHT_COL_X_ANGLE_SETPOINT),
-		DEFAULT(Constants.DRIVE.DEFAULT_X_ANGLE_SETPOINT);
+		LEFT(Constants.DRIVE.LEFT_COL_X_ANGLE_SETPOINT, 0),
+		MIDDLE(Constants.DRIVE.MID_COL_X_ANGLE_SETPOINT, 1),
+		RIGHT(Constants.DRIVE.RIGHT_COL_X_ANGLE_SETPOINT, 2),
+		DEFAULT(Constants.DRIVE.DEFAULT_X_ANGLE_SETPOINT, -1);
 
 		public final double setpoint;
+		public final int index;
 
-		private ColumnSetpoints(double setpoint) {
+		private ColumnSetpoints(double setpoint, int index) {
 			this.setpoint = setpoint;
+			this.index = index;
 		}
 	}
+
+	public static ColumnSetpoints getSetpoint(int val) {
+		for (ColumnSetpoints setpoint : ColumnSetpoints.values()) {
+			if (val == setpoint.index) {
+				return setpoint;
+			}
+		}
+		return ColumnSetpoints.DEFAULT;
+	}
+
+	/**
+     * @param row row to score on (low: 0, mid: 1, high: 2)
+     * @return Auto score command to run
+     */
+    public static Command getAutoScoreCommands(int row) {
+        switch (row) {
+            case 0:
+                return new AutoScoreLowCommand();
+            case 1:
+                return new AutoScoreMidCommand();
+            case 2:
+                return new AutoScoreHighCommand();
+            default:
+                return new AutoScoreLowCommand();
+        }
+    }
 
 	private SwerveDriveKinematics m_kinematics;
 
