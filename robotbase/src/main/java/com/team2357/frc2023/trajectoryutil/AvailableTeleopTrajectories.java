@@ -15,31 +15,85 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 public class AvailableTeleopTrajectories {
 
-    private static HashMap<Double, Command> trajMap = new HashMap<Double, Command>();
+    private enum CONVERGENCE_POINT {
+        OPPOSING_LOADING_STATION(0),
+        CHARGE_STATION(1),
+        CABLE_BUMP(2);
+
+        int index;
+
+        CONVERGENCE_POINT(int index) {
+            this.index = index;
+        }
+    }
+
+    /*
+     * key: y-value of start point
+     * value: command from start point to convergence point
+     */
+    private static HashMap<Double, Command> startToConvergenceTrajMao = new HashMap<Double, Command>();
+
+    /*
+     * key: y-value of start point
+     * value: x-value of start point 
+     */
     private static HashMap<Double, Double> xMap = new HashMap<Double, Double>();
+
+    /*
+     * key: y-value of start point
+     * value: convergence point
+     */
+    private static HashMap<Double, CONVERGENCE_POINT> yToConvergenceMap = new HashMap<Double, CONVERGENCE_POINT>();
+
+    private static int numberColumns = 3;
+    /*
+     * row: convergence point index
+     * col: corresponding auto to get to grid column
+     */
+    private static Command[][] convergenceToColumnTraj;
+
+    // Array of starting y values of start point
     private static Double[] yVals;
 
     public static void generateTrajectories() {
-        // Add all teleop start point trajectories
-        addTrajectory("enterCommunity 4.5");
-        addTrajectory("enterCommunity 4.65");
-        addTrajectory("enterCommunity 4.85");
+        /*
+         * Add all teleop start point trajectories, can be in any order. 
+         * To add another start to convergence trajectory simply do
+         * addStartTrajectory(fileName, CONVERGENCE_POINT)
+        */ 
+        addStartTrajectory("enterCommunity 4.5", CONVERGENCE_POINT.OPPOSING_LOADING_STATION);
+        addStartTrajectory("enterCommunity 4.65", CONVERGENCE_POINT.OPPOSING_LOADING_STATION);
+        addStartTrajectory("enterCommunity 4.85", CONVERGENCE_POINT.OPPOSING_LOADING_STATION);
+
+        // Add all convergence to column trajectories
+
 
         // Load hashmap keys into sorted array for efficient searching
-        yVals = new Double[trajMap.keySet().size()];
-        trajMap.keySet().toArray(yVals);
+        yVals = new Double[startToConvergenceTrajMao.keySet().size()];
+        startToConvergenceTrajMao.keySet().toArray(yVals);
         Arrays.sort(yVals);
     }
 
-    private static void addTrajectory(String fileName) {
+    private static void addStartTrajectory(String fileName, CONVERGENCE_POINT toConvergencePoint) {
         PathPlannerTrajectory trajectory = TrajectoryUtil.createPathPlannerTrajectory(fileName);
         Command TrajCmd = TrajectoryUtil.createDrivePathCommand(trajectory, false);
         PathPlannerState initialState = PathPlannerTrajectory.transformStateForAlliance(trajectory.getInitialState(),
                 DriverStationAllianceGetter.getAlliance());
         double yVal = initialState.poseMeters.getY();
 
-        trajMap.put(yVal, TrajCmd);
+        startToConvergenceTrajMao.put(yVal, TrajCmd);
         xMap.put(yVal, initialState.poseMeters.getX());
+        yToConvergenceMap.put(yVal, toConvergencePoint);
+    }
+
+    private static void addConvergenceToColumnTrajectory(String fileName, CONVERGENCE_POINT fromConvergencePoint) {
+        PathPlannerTrajectory trajectory = TrajectoryUtil.createPathPlannerTrajectory(fileName);
+        Command TrajCmd = TrajectoryUtil.createDrivePathCommand(trajectory, false);
+        PathPlannerState initialState = PathPlannerTrajectory.transformStateForAlliance(trajectory.getInitialState(),
+                DriverStationAllianceGetter.getAlliance());
+        double yVal = initialState.poseMeters.getY();
+
+        
     }
 
     /**
@@ -50,7 +104,7 @@ public class AvailableTeleopTrajectories {
      */
     public static Command BuildTrajectory(int col, Pose2d pose) {
         double startKey = getTrajectoryKey(pose);
-        Command startCommand = trajMap.get(startKey);
+        Command startCommand = startToConvergenceTrajMao.get(startKey);
         return new WaitCommand(0);
     }
 
@@ -73,6 +127,7 @@ public class AvailableTeleopTrajectories {
         // Resulting key for hashmap
         double key = -1.0;
 
+        // Binary search to find two closest keys
         while (low <= high) {
             mid = low + ((high - low) / 2);
 
