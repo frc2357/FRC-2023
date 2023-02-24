@@ -1,7 +1,7 @@
 package com.team2357.frc2023.controls;
 
-import com.team2357.frc2023.commands.intake.IntakeReverseCommand;
-import com.team2357.frc2023.commands.intake.IntakeRunCommand;
+import com.team2357.frc2023.commands.intake.IntakeRollerReverseCommand;
+import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
 import com.team2357.frc2023.subsystems.IntakeRollerSubsystem;
 import com.team2357.frc2023.commands.scoring.teleopAutoScore.TeleopAutoScoreCommandGroup;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
@@ -35,9 +35,9 @@ public class SwerveDriveControls {
         m_leftBumper = new JoystickButton(m_controller, XboxRaw.BumperLeft.value);
 
         m_rightTrigger = new AxisThresholdTrigger(controller, Axis.kRightTrigger, 0.1);
+        m_leftTrigger = new AxisThresholdTrigger(controller, Axis.kRightTrigger, 0.1);
 
         mapControls();
-
     }
 
     public void mapControls() {
@@ -45,8 +45,12 @@ public class SwerveDriveControls {
         m_backButton.whileTrue(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().zeroGyroscope()));
         
         // Intake commands
-        m_rightBumper.whileTrue(new IntakeRunCommand());
-        m_leftBumper.whileTrue(new IntakeReverseCommand());
+        // TODO: Remove these bindings
+        m_rightBumper.whileTrue(new IntakeRollerRunCommand());
+        m_leftBumper.whileTrue(new IntakeRollerReverseCommand());
+
+        // Intake deploy/stow
+
 
         // Teleop auto
         m_rightTrigger.whileTrue(new TeleopAutoScoreCommandGroup());

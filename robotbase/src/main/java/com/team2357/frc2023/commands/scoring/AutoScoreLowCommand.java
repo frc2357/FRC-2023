@@ -1,8 +1,8 @@
 package com.team2357.frc2023.commands.scoring;
 
 import com.team2357.frc2023.Constants;
-import com.team2357.frc2023.commands.intake.DeployIntakeCommand;
-import com.team2357.frc2023.commands.intake.IntakeReverseCommand;
+import com.team2357.frc2023.commands.intake.IntakeArmDeployCommand;
+import com.team2357.frc2023.commands.intake.IntakeRollerReverseCommand;
 import com.team2357.frc2023.commands.scoring.util.ExtendArmToPositionCommand;
 import com.team2357.frc2023.commands.scoring.util.OpenClawCommand;
 
@@ -18,10 +18,10 @@ public class AutoScoreLowCommand extends SequentialCommandGroup {
             new ExtendArmToPositionCommand(Constants.ARM_EXTENSION.RETRACTED_ROTATIONS),
             new WaitCommand(Constants.ARM_EXTENSION.AUTO_SCORE_LOW_RETRACT_WAIT_TIME)
         ));
-        addCommands(new DeployIntakeCommand());
+        addCommands(new IntakeArmDeployCommand());
 
         addCommands(new ParallelRaceGroup(
-            new IntakeReverseCommand(),
+            new IntakeRollerReverseCommand(),
             new WaitCommand(Constants.INTAKE_ROLLER.AUTO_SCORE_LOW_REVERSE_TIME)
         ));
     }

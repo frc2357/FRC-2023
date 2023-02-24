@@ -3,8 +3,8 @@ package com.team2357.frc2023.commands.intake;
 import com.team2357.frc2023.subsystems.IntakeRollerSubsystem;
 import com.team2357.lib.commands.CommandLoggerBase;
 
-public class IntakeRunCommand extends CommandLoggerBase {
-    public IntakeRunCommand() {
+public class IntakeRollerRunCommand extends CommandLoggerBase {
+    public IntakeRollerRunCommand() {
         addRequirements(IntakeRollerSubsystem.getInstance());
     }
 

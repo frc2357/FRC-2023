@@ -4,9 +4,9 @@ import com.team2357.frc2023.subsystems.IntakeArmSubsystem;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class IntakeStowCommand extends CommandBase {
+public class IntakeArmStowCommand extends CommandBase {
 
-    public IntakeStowCommand() {
+    public IntakeArmStowCommand() {
         addRequirements(IntakeArmSubsystem.getInstance());
     }
 
