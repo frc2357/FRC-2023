@@ -16,7 +16,7 @@ public class SwerveDriveControls {
     private JoystickButton m_backButton;
     private JoystickButton m_rightBumper;
     private JoystickButton m_leftBumper;
-    private JoystickButton m_aButton;
+    private JoystickButton m_rightTrigger;
 
     public static boolean isFlipped;
 
@@ -29,7 +29,7 @@ public class SwerveDriveControls {
         m_rightBumper = new JoystickButton(m_controller, XboxRaw.BumperRight.value);
         m_leftBumper = new JoystickButton(m_controller, XboxRaw.BumperLeft.value);
 
-        m_aButton = new JoystickButton(m_controller, XboxRaw.A.value);
+        m_rightTrigger = new JoystickButton(m_controller, XboxRaw.TriggerRight.value);
 
         mapControls();
 
@@ -44,7 +44,7 @@ public class SwerveDriveControls {
         m_leftBumper.whileTrue(new ReverseIntakeCommand());
 
         // Teleop auto
-        m_aButton.onTrue(new TeleopAutoScoreCommandGroup());
+        m_rightTrigger.whileTrue(new TeleopAutoScoreCommandGroup());
     }
 
     public double getX() {
