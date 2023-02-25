@@ -108,9 +108,8 @@ public class SubsystemFactory {
                 return subsystem;
         }
         public ArmRotationSubsystem CreateArmRotationSubsystem(){
-                CANSparkMax masterMotor = new CANSparkMax(Constants.CAN_ID.MASTER_ROTATION_MOTOR, MotorType.kBrushless);
-                CANSparkMax followMotor = new CANSparkMax(Constants.CAN_ID.FOLLOWER_ROTATION_MOTOR, MotorType.kBrushless);
-                ArmRotationSubsystem subsystem = new ArmRotationSubsystem(masterMotor, followMotor);
+                CANSparkMax rotationMotor = new CANSparkMax(Constants.CAN_ID.ROTATION_MOTOR, MotorType.kBrushless);
+                ArmRotationSubsystem subsystem = new ArmRotationSubsystem(rotationMotor);
                 subsystem.configure(Constants.ARM_ROTATION.GET_ROTATION_CONFIG());
                 return subsystem;
         }
@@ -118,14 +117,6 @@ public class SubsystemFactory {
                 CANSparkMax extender = new CANSparkMax(Constants.CAN_ID.ARM_EXTENSION_MOTOR, MotorType.kBrushless);
                 ArmExtensionSubsystem subsystem = new ArmExtensionSubsystem(extender);
                 subsystem.configure(Constants.ARM_EXTENSION.GET_EXTENSION_CONFIG());
-                return subsystem;
-        }
-        public ElevatorSubsystem createElevatorSubsystem() {
-                CANSparkMax masterMotor = new CANSparkMax(Constants.CAN_ID.LEFT_ELEVATOR_MOTOR, MotorType.kBrushless);
-                CANSparkMax followerMotor = new CANSparkMax(Constants.CAN_ID.RIGHT_ELEVATOR_MOTOR, MotorType.kBrushless);
-
-                ElevatorSubsystem subsystem = new ElevatorSubsystem(masterMotor, followerMotor);
-                subsystem.configure(Constants.ELEVATOR.GET_ELEVATOR_CONFIG());
                 return subsystem;
         }
         public LimelightSubsystem CreateLimelightSubsystem(){
