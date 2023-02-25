@@ -5,6 +5,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import com.team2357.frc2023.Constants;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -22,7 +24,7 @@ public class AprilTagPose {
         return m_instance;
     }
 
-    private NetworkTable m_table = NetworkTableInstance.getDefault().getTable("apriltag");
+    private NetworkTable m_table = NetworkTableInstance.getDefault().getTable(Constants.APRILTAG_POSE.APRILTAG_TABLE_NAME);
 
     private StringSubscriber m_poseSub;
 
@@ -31,7 +33,7 @@ public class AprilTagPose {
     private AprilTagPose() {
         NetworkTableInstance inst = NetworkTableInstance.getDefault();
 
-        m_poseSub = m_table.getStringTopic("pose").subscribe("");
+        m_poseSub = m_table.getStringTopic(Constants.APRILTAG_POSE.POSE_TOPIC_NAME).subscribe("");
 
         m_instance = this;
     }
