@@ -46,47 +46,21 @@ public class AprilTagPoseTest {
     }
 
     @Test
-    public void testGetRotation1() {
+    public void testGetRotation() {
         assertEquals(AprilTagPose.getInstance().getRotation(testObj, 0).getDegrees(), 180, 0.1);
-    }
 
-    @Test
-    public void testGetRotation2() {
         assertEquals(AprilTagPose.getInstance().getRotation(testObj, 1).getDegrees(), 90, 0.1);
-    }
 
-    @Test
-    public void testGetRotation3() {
         assertEquals(AprilTagPose.getInstance().getRotation(testObj, 2).getDegrees(), 30, 0.01);
-    }
 
-    @Test
-    public void testGetRotation4() {
-        System.out.println(AprilTagPose.getInstance().getRotation(testObj, 3).getDegrees());
         assertEquals(AprilTagPose.getInstance().getRotation(testObj, 3).getDegrees(), 270, 0.01);
-    }
 
-    @Test
-    public void testGetRotation5() {
-        System.out.println(AprilTagPose.getInstance().getRotation(testObj, 4).getDegrees());
         assertEquals(AprilTagPose.getInstance().getRotation(testObj, 4).getDegrees(), 286, 0.01);
-    }
 
-    @Test
-    public void testGetRotation6() {
-        System.out.println(AprilTagPose.getInstance().getRotation(testObj, 5).getDegrees());
         assertEquals(AprilTagPose.getInstance().getRotation(testObj, 5).getDegrees(), 6, 0.01);
-    }
 
-    @Test
-    public void testGetRotation7() {
-        System.out.println(AprilTagPose.getInstance().getRotation(testObj, 6).getDegrees());
         assertEquals(AprilTagPose.getInstance().getRotation(testObj, 6).getDegrees(), 127, 0.01);
-    }
-
-    @Test
-    public void testGetRotation8() {
-        System.out.println(AprilTagPose.getInstance().getRotation(testObj, 7).getDegrees());
+        
         assertEquals(AprilTagPose.getInstance().getRotation(testObj, 7).getDegrees(), 339, 0.01);
     }
 
