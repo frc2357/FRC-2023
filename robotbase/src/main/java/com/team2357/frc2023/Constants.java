@@ -364,6 +364,11 @@ public final class Constants {
         public static final double AUTO_SCORE_HIGH_ROTATIONS = 0;
     }
 
+    public static final class LIMELIGHT {
+        public static final String LEFT_LIMELIGHT_NAME = "leftLimelight";
+        public static final String RIGHT_LIMELIGHT_NAME = "rightLimelight";
+    }
+
     public static final class BUTTONBOARD {
         public static final String BUTTONBOARD_TABLE_NAME = "buttonboard";
         public static final String ROW_TOPIC_NAME = "row";

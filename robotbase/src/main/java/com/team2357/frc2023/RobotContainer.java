@@ -48,7 +48,7 @@ public class RobotContainer {
     subsystemFactory.CreateWristSubsystem();
     subsystemFactory.CreateArmRotationSubsystem();
     subsystemFactory.CreateArmExtensionSubsystem();
-    subsystemFactory.CreateLimelightSubsystem();
+    subsystemFactory.CreateLimelightSubsystems();
 
     m_drivetrainSubsystem = subsystemFactory.CreateSwerveDriveSubsystem();
 
