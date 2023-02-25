@@ -85,9 +85,29 @@ class CameraCalibration:
     def projectPoints(self, pts, rvec=[0, 0, 0], tvec=[0, 0, 0] ):
         #cv.projectPoints(	objectPoints, rvec, tvec, cameraMatrix, distCoeffs[, imagePoints[, jacobian[, aspectRatio]]]	) ->	imagePoints, jacobian
         return cv2.projectPoints(pts, rvec, tvec, self.mtx, self.dst)
+    
+    def to_json(self):
+        return json.dumps({"mtx":self.mtx.ravel(),
+                "dst":self.dst.ravel(),
+                "img_size":[1280,720],
+                "newmtx":self.newmtx.ravel(),
+                "roi": self.roi})
 
     @staticmethod
-    def load_cal_json(jstr):
+    def load_cal_json(jfile):
+        """ json calibration file parser
+            this is a direct json import based on to_json format
+        """
+        j = json.loads(open(jfile,'r').read())
+        mtx = np.array(j['mtx']).reshape(3,3)
+        dst = np.array(j['dst'])
+        img_size = j['image_size']
+        newmtx = np.array(j['newmtx']).reshape(3,3)
+        roi = j['roi']
+        return CameraCalibration(mtx,dst,img_size,newmtx,roi)
+
+    @staticmethod
+    def load_cal_json_calibdb(jstr):
         """  calibdb.net json output parser
             
             Args:
