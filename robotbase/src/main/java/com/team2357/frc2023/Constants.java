@@ -9,7 +9,6 @@ import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.team2357.frc2023.subsystems.ArmExtensionSubsystem;
 import com.team2357.frc2023.subsystems.ArmRotationSubsystem;
 import com.team2357.frc2023.subsystems.ClawSubsystem;
-import com.team2357.frc2023.subsystems.ElevatorSubsystem;
 import com.team2357.frc2023.subsystems.IntakeArmSubsystem;
 import com.team2357.frc2023.subsystems.IntakeRollerSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
@@ -66,9 +65,6 @@ public final class Constants {
 
         public static final int LEFT_INTAKE_MOTOR = 23;
         public static final int RIGHT_INTAKE_MOTOR = 24;
-
-        public static final int LEFT_ELEVATOR_MOTOR = 29;
-        public static final int RIGHT_ELEVATOR_MOTOR = 30;
 
         public static final int ROTATION_MOTOR = 25;
 
@@ -221,22 +217,6 @@ public final class Constants {
 
             config.m_extendMilliseconds = 1000;
             config.m_retractMilliseconds = 1000;
-
-            return config;
-        }
-    }
-
-    public static final class ELEVATOR {
-        public static ElevatorSubsystem.Configuration GET_ELEVATOR_CONFIG() {
-            ElevatorSubsystem.Configuration config = new ElevatorSubsystem.Configuration();
-
-            config.m_elevatorAxisMaxSpeed = 1;
-
-            config.m_elevatorMotorIdleMode = IdleMode.kBrake;
-            config.m_elevatorMotorStallLimitAmps = 30;
-            config.m_elevatorMotorFreeLimitAmps = 30;
-
-            //TODO: Figure out smart motion constants
 
             return config;
         }

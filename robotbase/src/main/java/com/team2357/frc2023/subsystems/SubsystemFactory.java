@@ -119,14 +119,6 @@ public class SubsystemFactory {
                 subsystem.configure(Constants.ARM_EXTENSION.GET_EXTENSION_CONFIG());
                 return subsystem;
         }
-        public ElevatorSubsystem createElevatorSubsystem() {
-                CANSparkMax masterMotor = new CANSparkMax(Constants.CAN_ID.LEFT_ELEVATOR_MOTOR, MotorType.kBrushless);
-                CANSparkMax followerMotor = new CANSparkMax(Constants.CAN_ID.RIGHT_ELEVATOR_MOTOR, MotorType.kBrushless);
-
-                ElevatorSubsystem subsystem = new ElevatorSubsystem(masterMotor, followerMotor);
-                subsystem.configure(Constants.ELEVATOR.GET_ELEVATOR_CONFIG());
-                return subsystem;
-        }
         public LimelightSubsystem CreateLimelightSubsystem(){
                 LimelightSubsystem subsystem = new LimelightSubsystem();
                 return subsystem;
