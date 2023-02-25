@@ -3,7 +3,6 @@ package com.team2357.frc2023.controls;
 import com.team2357.lib.triggers.AxisThresholdTrigger;
 import com.team2357.lib.util.Utility;
 import com.team2357.lib.util.XboxRaw;
-import com.team2357.frc2023.controls.AxisInterface;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 
 import edu.wpi.first.wpilibj.XboxController;
@@ -11,9 +10,6 @@ import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import static com.team2357.frc2023.Constants.*;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.team2357.frc2023.Constants.CONTROLLER;
 import com.team2357.frc2023.commands.auto.TranslateToTargetCommand;
 import com.team2357.frc2023.commands.auto.TranslateToTargetCommandGroup;
@@ -23,6 +19,8 @@ import com.team2357.frc2023.commands.human.panic.ClawToggleCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeArmToggleCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeAxisRollerCommand;
 import com.team2357.frc2023.commands.human.panic.WristToggleCommand;
+import com.team2357.frc2023.commands.intake.IntakeArmDeployCommand;
+import com.team2357.frc2023.commands.intake.IntakeArmStowCommand;
 import com.team2357.frc2023.commands.scoring.AutoScoreHighCommand;
 import com.team2357.frc2023.commands.scoring.AutoScoreLowCommand;
 import com.team2357.frc2023.commands.scoring.AutoScoreMidCommand;
@@ -111,10 +109,10 @@ public class GunnerControls {
             return getRightYAxis();
         };
 
-        Trigger noDPad = new Trigger(() -> m_upDPad.getAsBoolean() && m_rightDPad.getAsBoolean()
-                && m_downDPad.getAsBoolean() && m_leftDPad.getAsBoolean()).negate();
+        Trigger noDPad = new Trigger(() -> m_upDPad.getAsBoolean() || m_rightDPad.getAsBoolean()
+                || m_downDPad.getAsBoolean() || m_leftDPad.getAsBoolean()).negate();
 
-        Trigger noLetterButtons = m_aButton.and(m_bButton).and(m_xButton).and(m_yButton).negate();
+        Trigger noLetterButtons = m_aButton.or(m_bButton).or(m_xButton).or(m_yButton).negate();
         Trigger upDPadOnly = m_upDPad.and(noLetterButtons);
         Trigger downDPadOnly = m_downDPad.and(noLetterButtons);
         Trigger leftDPadOnly = m_leftDPad.and(noLetterButtons);
@@ -147,10 +145,13 @@ public class GunnerControls {
 
         upDPadOnly.whileTrue(new ArmRotationCommand(axisRightStickY));
         leftDPadOnly.whileTrue(new ArmExtenderCommand(axisRightStickY));
+
         leftDPadAndA.onTrue(new WristToggleCommand());
         leftDPadAndB.onTrue(new ClawToggleCommand());
+
         m_rightTrigger.whileTrue(new TranslateToTargetCommand(-1));
         m_rightBumper.whileTrue(new TranslateToTargetCommandGroup(-1));
+
         rightDPadAndA.onTrue(new IntakeArmToggleCommand());
         rightDPadOnly.whileTrue(new IntakeAxisRollerCommand(axisRightStickY));
 
@@ -158,8 +159,8 @@ public class GunnerControls {
         downDPadAndA.onTrue(new TranslateToColumnCommand(SwerveDriveSubsystem.ColumnSetpoints.MIDDLE));
         downDPadAndB.onTrue(new TranslateToColumnCommand(SwerveDriveSubsystem.ColumnSetpoints.RIGHT));
 
-        m_yButton.onTrue(new AutoScoreHighCommand());
-        m_xButton.onTrue(new AutoScoreMidCommand());
-        m_aButton.onTrue(new AutoScoreLowCommand());
+        yButton.onTrue(new AutoScoreHighCommand());
+        xButton.onTrue(new AutoScoreMidCommand());
+        aButton.onTrue(new AutoScoreLowCommand());
     }
 }

@@ -63,8 +63,8 @@ public final class Constants {
         public static final int BACK_RIGHT_MODULE_STEER_MOTOR_ID = 18;
         public static final int BACK_RIGHT_MODULE_STEER_ENCODER_ID = 22;
 
-        public static final int LEFT_INTAKE_MOTOR = 23;
-        public static final int RIGHT_INTAKE_MOTOR = 24;
+        public static final int MASTER_INTAKE_MOTOR = 23;
+        public static final int FOLLOWER_INTAKE_MOTOR = 24;
 
         public static final int ROTATION_MOTOR = 25;
 
@@ -76,10 +76,10 @@ public final class Constants {
         public static final int WRIST_FORWARD_SOLENOID_CHANNEL = 0;
         public static final int WRIST_REVERSE_SOLENOID_CHANNEL = 1;
         
-        public static final int CLAW_FORWARD_SOLENOID_CHANNEL = 2;
-        public static final int CLAW_REVERSE_SOLENOID_CHANNEL = 3;
+        public static final int CLAW_FORWARD_SOLENOID_CHANNEL = 3;
+        public static final int CLAW_REVERSE_SOLENOID_CHANNEL = 4;
 
-        public static final int INTAKE_SOLENOID_FORWARD_CHANNEL = 4;
+        public static final int INTAKE_SOLENOID_FORWARD_CHANNEL = 2;
         public static final int INTAKE_SOLENOID_REVERSE_CHANNEL = 5;
     }
 
@@ -183,16 +183,19 @@ public final class Constants {
         public static IntakeRollerSubsystem.Configuration GET_INTAKE_CONFIG() {
             IntakeRollerSubsystem.Configuration config = new IntakeRollerSubsystem.Configuration();
 
-            config.m_runPercentOutput = 0.5;
-            config.m_reversePercentOutput = -0.3;
+            config.m_runPercentOutput = 0.6;
+            config.m_reversePercentOutput = -0.5;
 
-            config.m_rampRate = 1;
-            config.m_currentLimit = 30;
             config.m_rollerAxisMaxSpeed = 1;
 
-            // TODO: Make sure these are correct
-            config.m_rightInverted = false;
-            config.m_leftInverted = true;
+            config.m_rampRate = 1;
+
+            config.m_peakCurrentLimit = 40;
+            config.m_peakCurrentDuration = 0;
+            config.m_continuousCurrentLimit = 40;
+
+            config.m_masterInverted = true;
+            config.m_followerInverted = false;
 
             return config;
         }
@@ -370,7 +373,7 @@ public final class Constants {
 
     public static final class COMPRESSOR {
         public static final int MIN_PRESSURE_PSI = 90;
-        public static final int MAX_PRESSURE_PSI = 120;
+        public static final int MAX_PRESSURE_PSI = 100;
     }
 
 }
