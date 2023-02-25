@@ -17,22 +17,21 @@ repositories {
 }
 
 dependencies {
-    // Use JUnit Jupiter for testing.
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.2'
 
     // This dependency is used by the application.
     implementation 'com.google.guava:guava:30.1.1-jre'
+
+    implementation "org.kie.modules:org-apache-commons-net:6.5.0.Final"
 
 }
 
 application {
     // Define the main class for the application.
     mainClass = 'org.apache.commons.net.App'
-    implementation "org.apache.commons.net:commons-net:3.9.0"
+        implementation "org.kie.modules:org-apache-commons-net:6.5.0.Final"
+
 
 }
 
 tasks.named('test') {
-    // Use JUnit Platform for unit tests.
-    useJUnitPlatform()
 }
