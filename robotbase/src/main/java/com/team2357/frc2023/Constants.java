@@ -9,7 +9,6 @@ import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.team2357.frc2023.subsystems.ArmExtensionSubsystem;
 import com.team2357.frc2023.subsystems.ArmRotationSubsystem;
 import com.team2357.frc2023.subsystems.ClawSubsystem;
-import com.team2357.frc2023.subsystems.ElevatorSubsystem;
 import com.team2357.frc2023.subsystems.IntakeArmSubsystem;
 import com.team2357.frc2023.subsystems.IntakeRollerSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
@@ -67,11 +66,7 @@ public final class Constants {
         public static final int LEFT_INTAKE_MOTOR = 23;
         public static final int RIGHT_INTAKE_MOTOR = 24;
 
-        public static final int LEFT_ELEVATOR_MOTOR = 29;
-        public static final int RIGHT_ELEVATOR_MOTOR = 30;
-
-        public static final int MASTER_ROTATION_MOTOR = 25;
-        public static final int FOLLOWER_ROTATION_MOTOR = 26;
+        public static final int ROTATION_MOTOR = 25;
 
         public static final int ARM_EXTENSION_MOTOR = 27;
     }
@@ -227,22 +222,6 @@ public final class Constants {
         }
     }
 
-    public static final class ELEVATOR {
-        public static ElevatorSubsystem.Configuration GET_ELEVATOR_CONFIG() {
-            ElevatorSubsystem.Configuration config = new ElevatorSubsystem.Configuration();
-
-            config.m_elevatorAxisMaxSpeed = 1;
-
-            config.m_elevatorMotorIdleMode = IdleMode.kBrake;
-            config.m_elevatorMotorStallLimitAmps = 30;
-            config.m_elevatorMotorFreeLimitAmps = 30;
-
-            //TODO: Figure out smart motion constants
-
-            return config;
-        }
-    }
-
     public static final class CLAW {
         public static ClawSubsystem.Configuration GET_CLAW_CONFIG() {
             ClawSubsystem.Configuration config = new ClawSubsystem.Configuration();
@@ -312,7 +291,7 @@ public final class Constants {
             config.m_rotationMotorStallLimitAmps = 0;
             config.m_rotationMotorFreeLimitAmps = 0;
 
-            config.m_isFollowerInverted = false;
+            config.m_isInverted = false;
 
             config.m_shuffleboardTunerPRange = 0.2;
             config.m_shuffleboardTunerIRange = 0.2;
@@ -338,8 +317,6 @@ public final class Constants {
 
             config.m_rotationMotorStallLimitAmps = 0;
             config.m_rotationMotorFreeLimitAmps = 0;
-
-            config.m_isFollowerInverted = false;
 
             // smart motion config
             config.m_rotationMotorP = 0;
