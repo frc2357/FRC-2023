@@ -17,10 +17,12 @@ import apriltag_funcs
 # class used to encapsulate Camera + Calibration information
 from cameravision import CameraVision
 
-from detect_colors import detect_colors_roi,detect_colors
+import detect_colors
 from calibration import image_cal, cam0 #bandaid for 
 from pprint import pprint
 
+log = logging.getLogger(__name__)
+log.addHandler(logging.NullHandler())
 logging.basicConfig(level="DEBUG")
 
 def timeit(func):
@@ -30,7 +32,7 @@ def timeit(func):
         t1 = time.perf_counter()
         result = func(*args, **kwargs)
         t2 = time.perf_counter()
-        print(f'Function {func.__name__!r} executed in {(t2-t1):.4f}s')
+        log.debug(f'Function {func.__name__!r} executed in {(t2-t1):.4f}s')
         return result
     return wrap_func
 
@@ -45,7 +47,10 @@ if __name__ == "__main__":
         simulate = True
     camvis = CameraVision(cfgfile, simulate=True) # this class automatically creates all camera + calibration objects
     cam0 = camvis.cameras[0]
-    print(f'Camera width = {cam0.config["width"]}, {cam0.config["height"]}')
+    nt_table = camvis.ntinst.getTable("wpiblipi")
+    apriltag_js = nt_table.getStringTopic("apriltag_js").publish()
+    gamepiece_js = nt_table.getStringTopic("gamepiece_js").publish()
+    log.info(f'Camera width = {cam0.config["width"]}, {cam0.config["height"]}')
     frame = np.zeros(shape=(cam0.config["height"], cam0.config["width"], 3), dtype=np.uint8)
     # retrieve the camera calibration information needed by apriltags
     Fx = cam0.cal.mtx[0,0]
@@ -72,8 +77,7 @@ if __name__ == "__main__":
             ftime,frame= cam0.sink.grabFrame()
 
         #get server time for which last frame was captured
-        #timeoffset = camvis.ntinst.getServerTimeOffset()
-        timeoffset = 0.1234
+        timeoffset = camvis.ntinst.getServerTimeOffset()
 
         try:
             # trying undistort seemed to cause lockup issues???
@@ -87,15 +91,16 @@ if __name__ == "__main__":
             try:
                 #frame = detect_colors(orig,orig)
                 for r in roi_rects:
-                    detect_colors_roi(orig, r)
+                    detect_colors.runPipeline(orig, r)
                 j = apriltagpipeline.to_json()
                 j['timestamp'] = timeoffset 
-                print(timeoffset)
+                log.debug(f"Timestamp: {j['timestamp']}")
+                log.debug(f"{str(j)}")
+                apriltag_js.set(str(j)) # send data to networkstable
             except Exception as e:
-                print(e)
+                log.error(e)
             ###
             #trying to overlay detected colors
-            #colors = detect_colors(orig)
             frame = cv2.addWeighted(frame,0.5,orig,0.5,0)
             ###
             cam0.outstream.putFrame(frame)
@@ -113,6 +118,6 @@ if __name__ == "__main__":
                     time.sleep(0.03)
         except Exception as e:
             #raise(e)
-            #print(f"ERROR: {e}")
+            log.error(f"ERROR: {e}")
             pass
             
