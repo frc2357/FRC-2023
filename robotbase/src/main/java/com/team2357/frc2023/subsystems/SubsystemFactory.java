@@ -108,9 +108,8 @@ public class SubsystemFactory {
                 return subsystem;
         }
         public ArmRotationSubsystem CreateArmRotationSubsystem(){
-                CANSparkMax masterMotor = new CANSparkMax(Constants.CAN_ID.MASTER_ROTATION_MOTOR, MotorType.kBrushless);
-                CANSparkMax followMotor = new CANSparkMax(Constants.CAN_ID.FOLLOWER_ROTATION_MOTOR, MotorType.kBrushless);
-                ArmRotationSubsystem subsystem = new ArmRotationSubsystem(masterMotor, followMotor);
+                CANSparkMax rotationMotor = new CANSparkMax(Constants.CAN_ID.ROTATION_MOTOR, MotorType.kBrushless);
+                ArmRotationSubsystem subsystem = new ArmRotationSubsystem(rotationMotor);
                 subsystem.configure(Constants.ARM_ROTATION.GET_ROTATION_CONFIG());
                 return subsystem;
         }

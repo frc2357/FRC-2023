@@ -70,8 +70,7 @@ public final class Constants {
         public static final int LEFT_ELEVATOR_MOTOR = 29;
         public static final int RIGHT_ELEVATOR_MOTOR = 30;
 
-        public static final int MASTER_ROTATION_MOTOR = 25;
-        public static final int FOLLOWER_ROTATION_MOTOR = 26;
+        public static final int ROTATION_MOTOR = 25;
 
         public static final int ARM_EXTENSION_MOTOR = 27;
     }
@@ -312,7 +311,7 @@ public final class Constants {
             config.m_rotationMotorStallLimitAmps = 0;
             config.m_rotationMotorFreeLimitAmps = 0;
 
-            config.m_isFollowerInverted = false;
+            config.m_isInverted = false;
 
             config.m_shuffleboardTunerPRange = 0.2;
             config.m_shuffleboardTunerIRange = 0.2;
@@ -338,8 +337,6 @@ public final class Constants {
 
             config.m_rotationMotorStallLimitAmps = 0;
             config.m_rotationMotorFreeLimitAmps = 0;
-
-            config.m_isFollowerInverted = false;
 
             // smart motion config
             config.m_rotationMotorP = 0;
