@@ -19,6 +19,8 @@ import com.team2357.frc2023.commands.human.panic.ClawToggleCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeArmToggleCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeAxisRollerCommand;
 import com.team2357.frc2023.commands.human.panic.WristToggleCommand;
+import com.team2357.frc2023.commands.intake.IntakeArmDeployCommand;
+import com.team2357.frc2023.commands.intake.IntakeArmStowCommand;
 import com.team2357.frc2023.commands.scoring.AutoScoreHighCommand;
 import com.team2357.frc2023.commands.scoring.AutoScoreLowCommand;
 import com.team2357.frc2023.commands.scoring.AutoScoreMidCommand;
@@ -107,10 +109,10 @@ public class GunnerControls {
             return getRightYAxis();
         };
 
-        Trigger noDPad = new Trigger(() -> m_upDPad.getAsBoolean() && m_rightDPad.getAsBoolean()
-                && m_downDPad.getAsBoolean() && m_leftDPad.getAsBoolean()).negate();
+        Trigger noDPad = new Trigger(() -> m_upDPad.getAsBoolean() || m_rightDPad.getAsBoolean()
+                || m_downDPad.getAsBoolean() || m_leftDPad.getAsBoolean()).negate();
 
-        Trigger noLetterButtons = m_aButton.and(m_bButton).and(m_xButton).and(m_yButton).negate();
+        Trigger noLetterButtons = m_aButton.or(m_bButton).or(m_xButton).or(m_yButton).negate();
         Trigger upDPadOnly = m_upDPad.and(noLetterButtons);
         Trigger downDPadOnly = m_downDPad.and(noLetterButtons);
         Trigger leftDPadOnly = m_leftDPad.and(noLetterButtons);

@@ -81,10 +81,10 @@ public final class Constants {
         public static final int WRIST_FORWARD_SOLENOID_CHANNEL = 0;
         public static final int WRIST_REVERSE_SOLENOID_CHANNEL = 1;
         
-        public static final int CLAW_FORWARD_SOLENOID_CHANNEL = 2;
+        public static final int CLAW_FORWARD_SOLENOID_CHANNEL = 3;
         public static final int CLAW_REVERSE_SOLENOID_CHANNEL = 4;
 
-        public static final int INTAKE_SOLENOID_FORWARD_CHANNEL = 3;
+        public static final int INTAKE_SOLENOID_FORWARD_CHANNEL = 2;
         public static final int INTAKE_SOLENOID_REVERSE_CHANNEL = 5;
     }
 
@@ -195,12 +195,12 @@ public final class Constants {
 
             config.m_rampRate = 1;
 
-            config.m_peakCurrentLimit = 5;
+            config.m_peakCurrentLimit = 40;
             config.m_peakCurrentDuration = 0;
-            config.m_continuousCurrentLimit = 5;
+            config.m_continuousCurrentLimit = 40;
 
-            config.m_masterInverted = false;
-            config.m_followerInverted = true;
+            config.m_masterInverted = true;
+            config.m_followerInverted = false;
 
             return config;
         }
@@ -391,7 +391,7 @@ public final class Constants {
 
     public static final class COMPRESSOR {
         public static final int MIN_PRESSURE_PSI = 90;
-        public static final int MAX_PRESSURE_PSI = 120;
+        public static final int MAX_PRESSURE_PSI = 100;
     }
 
 }

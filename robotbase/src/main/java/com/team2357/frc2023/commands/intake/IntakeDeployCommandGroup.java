@@ -1,6 +1,7 @@
 package com.team2357.frc2023.commands.intake;
 
 import com.team2357.frc2023.Constants;
+import com.team2357.frc2023.commands.scoring.util.AlertCommand;
 import com.team2357.frc2023.commands.scoring.util.ExtendArmToPositionCommand;
 import com.team2357.frc2023.commands.scoring.util.OpenClawCommand;
 
@@ -10,7 +11,7 @@ public class IntakeDeployCommandGroup extends ParallelCommandGroup {
     public IntakeDeployCommandGroup() {
         addCommands(new IntakeArmDeployCommand());
         addCommands(new IntakeRollerRunCommand());
-        addCommands(new ExtendArmToPositionCommand(Constants.ARM_EXTENSION.RETRACTED_ROTATIONS));
-        addCommands(new OpenClawCommand());
+        // addCommands(new ExtendArmToPositionCommand(Constants.ARM_EXTENSION.RETRACTED_ROTATIONS));
+        // addCommands(new OpenClawCommand());
     }
 }
