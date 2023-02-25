@@ -2,6 +2,7 @@ package com.team2357.frc2023.controls;
 
 import com.team2357.frc2023.commands.intake.ReverseIntakeCommand;
 import com.team2357.frc2023.commands.intake.RunIntakeCommand;
+import com.team2357.frc2023.commands.scoring.teleopAutoScore.TeleopAutoScoreCommandGroup;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.lib.util.XboxRaw;
 
@@ -15,20 +16,35 @@ public class SwerveDriveControls {
     private JoystickButton m_backButton;
     private JoystickButton m_rightBumper;
     private JoystickButton m_leftBumper;
+    private JoystickButton m_rightTrigger;
 
     public static boolean isFlipped;
 
     public SwerveDriveControls(XboxController controller, double deadband) {
         m_controller = controller;
         m_deadband = deadband;
+
         m_backButton = new JoystickButton(m_controller, XboxRaw.Back.value);
+        
         m_rightBumper = new JoystickButton(m_controller, XboxRaw.BumperRight.value);
         m_leftBumper = new JoystickButton(m_controller, XboxRaw.BumperLeft.value);
 
+        m_rightTrigger = new JoystickButton(m_controller, XboxRaw.TriggerRight.value);
+
+        mapControls();
+
+    }
+
+    public void mapControls() {
+        // Zero swerve drive
         m_backButton.whileTrue(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().zeroGyroscope()));
+        
+        // Intake commands
         m_rightBumper.whileTrue(new RunIntakeCommand());
         m_leftBumper.whileTrue(new ReverseIntakeCommand());
 
+        // Teleop auto
+        m_rightTrigger.whileTrue(new TeleopAutoScoreCommandGroup());
     }
 
     public double getX() {

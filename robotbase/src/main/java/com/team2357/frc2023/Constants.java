@@ -16,6 +16,8 @@ import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.frc2023.subsystems.WristSubsystem;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 /**
@@ -177,6 +179,9 @@ public final class Constants {
         public static final ChassisSpeeds DEAD_RECKONING_X_CHASSIS_SPEEDS = new ChassisSpeeds(DEAD_RECKONING_TRANSLATION_METERS_PER_SECOND, 0, 0);
         public static final ChassisSpeeds DEAD_RECKONING_Y_CHASSIS_SPEEDS = new ChassisSpeeds(0, DEAD_RECKONING_TRANSLATION_METERS_PER_SECOND, 0);
         public static final ChassisSpeeds DEAD_RECKONING_ROTATION_CHASSIS_SPEEDS = new ChassisSpeeds(0, 0, DEAD_RECKONING_ROTATION_RADIANS_PER_SECOND);
+    
+        // Tolerance for out-of-range poses on auto-mapping
+        public static final double TRAJECTORY_MAP_TOLERANCE_METERS = 0.1;
     }
 
     public static final class INTAKE_ROLLER {
@@ -265,6 +270,10 @@ public final class Constants {
 
             config.m_extendMotorRampRate = 0;
 
+            config.m_shuffleboardTunerPRange = 0.2;
+            config.m_shuffleboardTunerIRange = 0.2;
+            config.m_shuffleboardTunerDRange = 0.2;
+
             // smart motion config
             config.m_extendMotorP = 0;
             config.m_extendMotorI = 0;
@@ -304,6 +313,10 @@ public final class Constants {
             config.m_rotationMotorFreeLimitAmps = 0;
 
             config.m_isFollowerInverted = false;
+
+            config.m_shuffleboardTunerPRange = 0.2;
+            config.m_shuffleboardTunerIRange = 0.2;
+            config.m_shuffleboardTunerDRange = 0.2;
 
             // smart motion config
             config.m_rotationMotorP = 0;

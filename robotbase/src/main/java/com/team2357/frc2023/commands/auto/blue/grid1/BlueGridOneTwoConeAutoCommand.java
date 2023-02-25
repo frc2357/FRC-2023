@@ -1,6 +1,6 @@
 package com.team2357.frc2023.commands.auto.blue.grid1;
 
-import com.team2357.frc2023.util.TrajectoryUtil;
+import com.team2357.frc2023.trajectoryutil.TrajectoryUtil;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
