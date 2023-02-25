@@ -10,6 +10,7 @@ import com.team2357.frc2023.controls.SwerveDriveControls;
 import com.team2357.frc2023.shuffleboard.AutoCommandChooser;
 import com.team2357.frc2023.subsystems.SubsystemFactory;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
+import com.team2357.frc2023.trajectoryutil.AvailableTeleopTrajectories;
 import com.team2357.frc2023.trajectoryutil.AvailableTrajectories;
 import com.team2357.frc2023.trajectoryutil.AvailableTrajectoryCommands;
 
@@ -70,6 +71,7 @@ public class RobotContainer {
     // Build trajectory paths
     AvailableTrajectories.generateTrajectories();
     AvailableTrajectoryCommands.generateTrajectories();
+    AvailableTeleopTrajectories.generateTrajectories();
 
     // Configure Shuffleboard
     configureShuffleboard();
