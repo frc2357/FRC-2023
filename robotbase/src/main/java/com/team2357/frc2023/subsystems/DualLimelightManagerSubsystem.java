@@ -5,7 +5,14 @@ import com.team2357.lib.subsystems.LimelightSubsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 // Manages two limelight subsystems
-public class DualLimelightSubsystemManager {
+public class DualLimelightManagerSubsystem extends SubsystemBase {
+
+    private static DualLimelightManagerSubsystem m_instance;
+
+    public static DualLimelightManagerSubsystem getInstance() {
+        return m_instance;
+    }
+
     public enum LIMELIGHT {
         RIGHT,
         LEFT
@@ -14,9 +21,10 @@ public class DualLimelightSubsystemManager {
     private LimelightSubsystem m_leftLimelight;
     private LimelightSubsystem m_rightLimelight;
 
-    public DualLimelightSubsystemManager(String leftLimelightName, String rightLimelightName) {
+    public DualLimelightManagerSubsystem(String leftLimelightName, String rightLimelightName) {
         m_leftLimelight = new LimelightSubsystem(leftLimelightName);
         m_rightLimelight = new LimelightSubsystem(rightLimelightName);
+        m_instance = this;
     }
 
     public LimelightSubsystem getLimelight(LIMELIGHT limelight) {
@@ -27,5 +35,10 @@ public class DualLimelightSubsystemManager {
             return m_rightLimelight;
         }
         return null;
+    }
+
+    public void setAprilTagPipelineActive() {
+        m_leftLimelight.setAprilTagPipelineActive();
+        m_leftLimelight.setAprilTagPipelineActive();
     }
 }

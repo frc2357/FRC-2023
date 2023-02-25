@@ -122,8 +122,8 @@ public class SubsystemFactory {
                 return subsystem;
         }
         
-        public DualLimelightSubsystemManager CreateLimelightSubsystems(){
-                DualLimelightSubsystemManager manager = new DualLimelightSubsystemManager(
+        public DualLimelightManagerSubsystem CreateDualLimelightManagerSubsystem(){
+                DualLimelightManagerSubsystem manager = new DualLimelightManagerSubsystem(
                         Constants.LIMELIGHT.LEFT_LIMELIGHT_NAME, Constants.LIMELIGHT.RIGHT_LIMELIGHT_NAME);
                 return manager;
         }
