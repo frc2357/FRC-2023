@@ -15,7 +15,10 @@ log.addHandler(logging.NullHandler())
 # Lower HSV (15, 90,100) -- (15,136,255)
 # Upper HSV (60,255,255) -- (31,255,255)
 
-def detect_colors_roi(frame,roipts):
+def runPipeline(frame,roipts):
+    """
+    name main function runPipeline to stay consistent
+    """
     x1 = roipts[0]
     x2 = roipts[2]
     y1 = roipts[1]
