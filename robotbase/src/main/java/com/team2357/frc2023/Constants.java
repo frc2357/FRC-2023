@@ -354,6 +354,11 @@ public final class Constants {
     
     }
 
+    public static final class APRILTAG_POSE {
+        public static final String APRILTAG_TABLE_NAME = "apriltag";
+        public static final String POSE_TOPIC_NAME = "pose";
+    }
+
     public static final class CONTROLLER {
         public static final int DRIVE_CONTROLLER_PORT = 0;
         public static final int GUNNER_CONTROLLER_PORT = 1;
