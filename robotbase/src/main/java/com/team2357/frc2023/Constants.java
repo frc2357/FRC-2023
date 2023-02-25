@@ -44,7 +44,7 @@ public final class Constants {
          */
         public static final String DRIVE_CANBUS = "CANivore";
 
-        public static final int PNEUMATICS_HUB_ID = 1;
+        public static final int PNEUMATICS_HUB_ID = 2;
 
         public static final int PIGEON_ID = 5;
 
