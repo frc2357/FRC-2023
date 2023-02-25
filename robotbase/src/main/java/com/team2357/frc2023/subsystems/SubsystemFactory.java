@@ -1,5 +1,6 @@
 package com.team2357.frc2023.subsystems;
 
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -10,7 +11,6 @@ import com.team2357.lib.subsystems.LimelightSubsystem;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -77,7 +77,10 @@ public class SubsystemFactory {
         }
 
         public IntakeRollerSubsystem CreateIntakeRollerSubsystem() {
-                IntakeRollerSubsystem subsystem = new IntakeRollerSubsystem();
+                TalonSRX masterIntakeMotor = new TalonSRX(Constants.CAN_ID.MASTER_INTAKE_MOTOR);
+                TalonSRX followerIntakeMotor = new TalonSRX(Constants.CAN_ID.FOLLOWER_INTAKE_MOTOR);
+
+                IntakeRollerSubsystem subsystem = new IntakeRollerSubsystem(masterIntakeMotor, followerIntakeMotor);
                 subsystem.configure(Constants.INTAKE_ROLLER.GET_INTAKE_CONFIG());
                 return subsystem;
         }
