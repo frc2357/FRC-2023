@@ -21,6 +21,8 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
     private LimelightSubsystem m_leftLimelight;
     private LimelightSubsystem m_rightLimelight;
 
+    // Assumes limelights are configured so that the crosshair is the middle of the robot on both limelights
+    // This will allow switching 
     public DualLimelightManagerSubsystem(String leftLimelightName, String rightLimelightName) {
         m_leftLimelight = new LimelightSubsystem(leftLimelightName);
         m_rightLimelight = new LimelightSubsystem(rightLimelightName);
