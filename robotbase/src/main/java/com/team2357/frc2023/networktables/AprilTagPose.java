@@ -24,7 +24,8 @@ public class AprilTagPose {
         return m_instance;
     }
 
-    private NetworkTable m_table = NetworkTableInstance.getDefault().getTable(Constants.APRILTAG_POSE.APRILTAG_TABLE_NAME);
+    private NetworkTable m_table = NetworkTableInstance.getDefault()
+            .getTable(Constants.APRILTAG_POSE.APRILTAG_TABLE_NAME);
 
     private StringSubscriber m_poseSub;
 
@@ -47,29 +48,41 @@ public class AprilTagPose {
         try {
             obj = (JSONObject) m_parser.parse(jsonString);
         } catch (ParseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return null;
+            return new Pose2d(Double.NaN, Double.NaN, Rotation2d.fromRadians(Double.NaN));
         }
 
+        System.out.println(obj);
         Pose2d pose = new Pose2d(getTranslation(obj, 0), getRotation(obj, 0));
 
         return pose;
     }
 
     public Translation2d getTranslation(JSONObject obj, int tagIdx) {
-        double translationX, translationY;
-        JSONObject translation = (JSONObject) ((JSONObject) ((JSONObject) ((JSONArray) (obj.get("tags"))).get(tagIdx))
-                .get("pose")).get("translation");
-        translationX = (double) translation.get("x");
-        translationY = (double) translation.get("y");
+        JSONObject translation;
+        try {
+            translation = (JSONObject) ((JSONObject) ((JSONObject) ((JSONArray) (obj.get("tags"))).get(tagIdx))
+                    .get("pose")).get("translation");
+        } catch (NullPointerException e) {
+            return new Translation2d(Double.NaN, Double.NaN);
+        }
+
+        double translationX = (double) translation.get("x");
+        double translationY = (double) translation.get("y");
 
         return new Translation2d(translationX, translationY);
     }
 
     public Rotation2d getRotation(JSONObject obj, int tagIdx) {
-        JSONObject quaternion = (JSONObject) ((JSONObject) ((JSONObject) ((JSONObject) ((JSONArray) (obj.get("tags"))).get(tagIdx)).get("pose")).get("rotation")).get("quaternion");
-        double w = (double) quaternion.get("W"), x = (double) quaternion.get("X"), y = (double) quaternion.get("Y"), z = (double) quaternion.get("Z");
+        JSONObject quaternion;
+        try {
+            quaternion = (JSONObject) ((JSONObject) ((JSONObject) ((JSONObject) ((JSONArray) (obj.get("tags"))).get(tagIdx)).get("pose")).get("rotation")).get("quaternion");
+        } catch (NullPointerException e) {
+            return Rotation2d.fromRadians(Double.NaN);
+        }
+        double w = (double) quaternion.get("W");
+        double x = (double) quaternion.get("X");
+        double y = (double) quaternion.get("Y");
+        double z = (double) quaternion.get("Z");
 
         double rotation = Math.atan2(2 * (w*z + x*y), 1 - 2*(Math.pow(y, 2) + Math.pow(z, 2)));
         rotation += rotation < 0 ? 2 * Math.PI : 0;
