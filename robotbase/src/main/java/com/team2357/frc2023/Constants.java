@@ -65,9 +65,9 @@ public final class Constants {
 
         public static final int MASTER_INTAKE_MOTOR_ID = 23;
         public static final int FOLLOWER_INTAKE_MOTOR_ID = 24;
-        public static final int INTAKE_WINCH_MOTOR_ID = -1;
+        public static final int INTAKE_WINCH_MOTOR_ID = 25;
 
-        public static final int ROTATION_MOTOR_ID = 25;
+        public static final int ROTATION_MOTOR_ID = 26;
 
         public static final int ARM_EXTENSION_MOTOR_ID = 27;
     }

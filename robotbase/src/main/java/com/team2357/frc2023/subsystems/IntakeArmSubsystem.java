@@ -208,14 +208,13 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
     private void deployPeriodic() {
         long now = System.currentTimeMillis();
 
-        if (m_lastActionMillis == 0) {
+        if (!isWinchAtRotations()) {
             m_intakeSolenoid.set(DoubleSolenoid.Value.kForward);
             setWinchRotation(m_config.m_winchDeployRotations);
             m_lastActionMillis = now;
-        } else if (now > m_lastActionMillis + m_config.m_deployMilliseconds) {
+        } else if (isWinchAtRotations()) {
             m_intakeSolenoid.set(DoubleSolenoid.Value.kOff);
             m_currentState = ArmState.Deployed;
-            stopWinchMotors();
             m_lastActionMillis = 0;
         }
     }
@@ -223,14 +222,13 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
     private void stowPeriodic() {
         long now = System.currentTimeMillis();
 
-        if (m_lastActionMillis == 0) {
+        if (!isWinchAtRotations()) {
             m_intakeSolenoid.set(DoubleSolenoid.Value.kReverse);
             setWinchRotation(m_config.m_winchStowRotations);
             m_lastActionMillis = now;
-        } else if (now > m_lastActionMillis + m_config.m_stowMilliseconds) {
+        } else if (isWinchAtRotations()) {
             m_intakeSolenoid.set(DoubleSolenoid.Value.kOff);
             m_currentState = ArmState.Stowed;
-            stopWinchMotors();
             m_lastActionMillis = 0;
         }
     }
