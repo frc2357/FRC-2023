@@ -78,4 +78,17 @@ public class IntakeRollerSubsystem extends SubsystemBase {
     public void stopIntake() {
         m_masterIntakeMotor.set(ControlMode.PercentOutput, 0.0);
     }
+
+    public double lastcur = 0.0;
+    @Override
+    public void periodic(){
+        if(lastcur==0){
+            lastcur=m_masterIntakeMotor.getStatorCurrent();
+        }else{
+            if(m_masterIntakeMotor.getStatorCurrent()>lastcur+10){
+                IntakeArmSubsystem.getInstance().stow();
+            }
+            lastcur=m_masterIntakeMotor.getStatorCurrent();
+        }
+    }
 }
