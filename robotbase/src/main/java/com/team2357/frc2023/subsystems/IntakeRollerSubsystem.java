@@ -1,8 +1,5 @@
 package com.team2357.frc2023.subsystems;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -33,6 +30,9 @@ public class IntakeRollerSubsystem extends SubsystemBase {
         
         public boolean m_masterInverted;
         public boolean m_followerInverted;
+
+        public double m_spikeAmount;
+        public double m_waitTime;
     }
 
     public Configuration m_config;
