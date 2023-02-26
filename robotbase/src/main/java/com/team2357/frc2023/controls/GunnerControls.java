@@ -155,9 +155,9 @@ public class GunnerControls {
         rightDPadAndA.onTrue(new IntakeArmToggleCommand());
         rightDPadOnly.whileTrue(new IntakeAxisRollerCommand(axisRightStickY));
 
-        downDPadAndX.onTrue(new TranslateToColumnCommand(SwerveDriveSubsystem.ColumnSetpoints.LEFT));
-        downDPadAndA.onTrue(new TranslateToColumnCommand(SwerveDriveSubsystem.ColumnSetpoints.MIDDLE));
-        downDPadAndB.onTrue(new TranslateToColumnCommand(SwerveDriveSubsystem.ColumnSetpoints.RIGHT));
+        downDPadAndX.onTrue(new TranslateToColumnCommand(SwerveDriveSubsystem.COLUMN_SETPOINT.LEFT));
+        downDPadAndA.onTrue(new TranslateToColumnCommand(SwerveDriveSubsystem.COLUMN_SETPOINT.MIDDLE));
+        downDPadAndB.onTrue(new TranslateToColumnCommand(SwerveDriveSubsystem.COLUMN_SETPOINT.RIGHT));
 
         yButton.onTrue(new AutoScoreHighCommand());
         xButton.onTrue(new AutoScoreMidCommand());

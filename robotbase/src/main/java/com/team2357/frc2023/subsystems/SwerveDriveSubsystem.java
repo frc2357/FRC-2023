@@ -41,7 +41,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		return instance;
 	}
 
-	public static enum ColumnSetpoints {
+	public static enum COLUMN_SETPOINT {
 		LEFT(Constants.DRIVE.LEFT_COL_X_ANGLE_SETPOINT, 0),
 		MIDDLE(Constants.DRIVE.MID_COL_X_ANGLE_SETPOINT, 1),
 		RIGHT(Constants.DRIVE.RIGHT_COL_X_ANGLE_SETPOINT, 2),
@@ -50,19 +50,19 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		public final double setpoint;
 		public final int index;
 
-		private ColumnSetpoints(double setpoint, int index) {
+		private COLUMN_SETPOINT(double setpoint, int index) {
 			this.setpoint = setpoint;
 			this.index = index;
 		}
 	}
 
-	public static ColumnSetpoints getSetpoint(int val) {
-		for (ColumnSetpoints setpoint : ColumnSetpoints.values()) {
+	public static COLUMN_SETPOINT getSetpoint(int val) {
+		for (COLUMN_SETPOINT setpoint : COLUMN_SETPOINT.values()) {
 			if (val == setpoint.index) {
 				return setpoint;
 			}
 		}
-		return ColumnSetpoints.DEFAULT;
+		return COLUMN_SETPOINT.DEFAULT;
 	}
 
 	/**
