@@ -10,6 +10,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.pathplanner.lib.PathConstraints;
 import com.swervedrivespecialties.swervelib.AbsoluteEncoder;
+import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.commands.scoring.AutoScoreHighCommand;
@@ -28,6 +29,9 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -67,21 +71,21 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	/**
-     * @param row row to score on (low: 0, mid: 1, high: 2)
-     * @return Auto score command to run
-     */
-    public static Command getAutoScoreCommands(int row) {
-        switch (row) {
-            case 0:
-                return new AutoScoreLowCommand();
-            case 1:
-                return new AutoScoreMidCommand();
-            case 2:
-                return new AutoScoreHighCommand();
-            default:
-                return new AutoScoreLowCommand();
-        }
-    }
+	 * @param row row to score on (low: 0, mid: 1, high: 2)
+	 * @return Auto score command to run
+	 */
+	public static Command getAutoScoreCommands(int row) {
+		switch (row) {
+			case 0:
+				return new AutoScoreLowCommand();
+			case 1:
+				return new AutoScoreMidCommand();
+			case 2:
+				return new AutoScoreHighCommand();
+			default:
+				return new AutoScoreLowCommand();
+		}
+	}
 
 	private SwerveDriveKinematics m_kinematics;
 
@@ -201,15 +205,59 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	}
 
-	public SwerveDriveSubsystem(WPI_Pigeon2 pigeon, SwerveModule frontLeft, SwerveModule frontRight,
-			SwerveModule backLeft, SwerveModule backRight) {
-		m_pigeon = pigeon;
-		
-		m_frontLeftModule = frontLeft;
-		m_frontRightModule = frontRight;
-		m_backLeftModule = backLeft;
-		m_backRightModule = backRight;
+	public SwerveDriveSubsystem(int pigeonId, int[] frontLeftIds, int[] frontRightIds,
+			int[] backLeftIds, int[] backRightIds, String canbus, String shuffleboardTab) {
+		ShuffleboardTab tab = Shuffleboard.getTab(shuffleboardTab);
 
+		m_pigeon = new WPI_Pigeon2(pigeonId, canbus);
+
+		m_frontLeftModule = Mk4iSwerveModuleHelper.createFalcon500(
+			tab.getLayout("Front Left Module", BuiltInLayouts.kList)
+							.withSize(2, 4)
+							.withPosition(0, 0),
+			Mk4iSwerveModuleHelper.GearRatio.L2,
+			frontLeftIds[0],
+			frontLeftIds[1],
+			frontLeftIds[2],
+			canbus,
+			0 // Offsets are set manually so this parameter is unnecessary
+		);
+
+		m_frontRightModule = Mk4iSwerveModuleHelper.createFalcon500(
+			tab.getLayout("Front Right Module", BuiltInLayouts.kList)
+							.withSize(2, 4)
+							.withPosition(2, 0),
+			Mk4iSwerveModuleHelper.GearRatio.L2,
+			frontRightIds[0],
+			frontRightIds[1],
+			frontRightIds[2],
+			canbus,
+			0 // Offsets are set manually so this parameter is unnecessary
+		);
+
+		m_backLeftModule = Mk4iSwerveModuleHelper.createFalcon500(
+			tab.getLayout("Back Left Module", BuiltInLayouts.kList)
+							.withSize(2, 4)
+							.withPosition(4, 0),
+			Mk4iSwerveModuleHelper.GearRatio.L2,
+			backLeftIds[0],
+			backLeftIds[1],
+			backLeftIds[2],
+			canbus,
+			0 // Offsets are set manually so this parameter is unnecessary
+		);
+
+		m_backRightModule = Mk4iSwerveModuleHelper.createFalcon500(
+			tab.getLayout("Back Right Module", BuiltInLayouts.kList)
+							.withSize(2, 4)
+							.withPosition(6, 0),
+			Mk4iSwerveModuleHelper.GearRatio.L2,
+			backRightIds[0],
+			backRightIds[1],
+			backRightIds[2],
+			canbus,
+			0 // Offsets are set manually so this parameter is unnecessary
+		);
 
 		instance = this;
 	}
@@ -259,7 +307,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	public PathConstraints getPathConstraints() {
 		return m_pathConstraints;
 	}
-	
+
 	public void syncEncoders() {
 		syncEncoder(m_frontLeftModule);
 		syncEncoder(m_frontRightModule);
@@ -375,7 +423,6 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
 		SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxVelocityMetersPerSecond);
 
-
 		m_frontLeftModule.set(
 				states[0].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
 				states[0].angle.getRadians());
@@ -435,7 +482,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		drive(power, 0, 0);
 	}
 
-	public void enableOpenLoopRamp(){
+	public void enableOpenLoopRamp() {
 		WPI_TalonFX motor = (WPI_TalonFX) m_backRightModule.getDriveMotor();
 		motor.configOpenloopRamp(m_config.m_openLoopRampRateSeconds);
 		motor = (WPI_TalonFX) m_backLeftModule.getDriveMotor();
@@ -477,7 +524,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	public boolean isAtTarget() {
 		// System.out.println(isAtXTarget() && isAtYTarget());
-		//return isAtXTarget();
+		// return isAtXTarget();
 		// return isAtYTarget();
 		return isAtXTarget() && isAtYTarget() && !m_isSeeking;
 	}
@@ -523,7 +570,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	public double calculateXMetersPerSecond() {
 		double outputMetersPerSecond = m_translateXController.calculate(DualLimelightManagerSubsystem.getInstance().getTY());
 		outputMetersPerSecond = outputMetersPerSecond * -1; // Invert output
-		outputMetersPerSecond = MathUtil.clamp(outputMetersPerSecond, m_config.m_translateXMaxSpeedMeters*-1, m_config.m_translateXMaxSpeedMeters);
+		outputMetersPerSecond = MathUtil.clamp(outputMetersPerSecond, m_config.m_translateXMaxSpeedMeters * -1,
+				m_config.m_translateXMaxSpeedMeters);
 		return outputMetersPerSecond;
 	}
 
@@ -553,7 +601,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		}
 
 		// drive(new ChassisSpeeds(0, calculateYMetersPerSecond(), 0));
-		//drive(new ChassisSpeeds(calculateX(), 0, 0));
+		// drive(new ChassisSpeeds(calculateX(), 0, 0));
 		drive(new ChassisSpeeds(calculateXMetersPerSecond(), calculateYMetersPerSecond(), 0));
 	}
 
@@ -569,11 +617,11 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	@Override
 	public void periodic() {
-	    m_odometry.update(getGyroscopeRotation(),
-		 new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
-		 m_frontRightModule.getPosition(),
-		 m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
-		//setOdemetryFromApriltag();
+		m_odometry.update(getGyroscopeRotation(),
+				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
+						m_frontRightModule.getPosition(),
+						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
+		// setOdemetryFromApriltag();
 
 		SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
 
@@ -582,7 +630,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		// SmartDashboard.putNumber("Yaw", m_pigeon.getYaw());
 		// SmartDashboard.putNumber("Pose X", m_odometry.getPoseMeters().getX());
 		// SmartDashboard.putNumber("Pose Y", m_odometry.getPoseMeters().getY());
-		// SmartDashboard.putNumber("Pose Angle", m_odometry.getPoseMeters().getRotation().getDegrees());
+		// SmartDashboard.putNumber("Pose Angle",
+		// m_odometry.getPoseMeters().getRotation().getDegrees());
 
 		Logger.getInstance().recordOutput("Robot Pose", m_odometry.getPoseMeters());
 
@@ -592,11 +641,15 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	public void printEncoderVals() {
-		SmartDashboard.putNumber("front left encoder count", ((WPI_TalonFX) (m_frontLeftModule.getDriveMotor())).getSelectedSensorPosition(0));
-	
-		SmartDashboard.putNumber("front right encoder count", ((WPI_TalonFX) (m_frontRightModule.getDriveMotor())).getSelectedSensorPosition(0));
-		SmartDashboard.putNumber("back left module encoder count", ((WPI_TalonFX) (m_backLeftModule.getDriveMotor())).getSelectedSensorPosition(0));
-		SmartDashboard.putNumber("back right module encoder count", ((WPI_TalonFX) (m_backRightModule.getDriveMotor())).getSelectedSensorPosition(0));
+		SmartDashboard.putNumber("front left encoder count",
+				((WPI_TalonFX) (m_frontLeftModule.getDriveMotor())).getSelectedSensorPosition(0));
+
+		SmartDashboard.putNumber("front right encoder count",
+				((WPI_TalonFX) (m_frontRightModule.getDriveMotor())).getSelectedSensorPosition(0));
+		SmartDashboard.putNumber("back left module encoder count",
+				((WPI_TalonFX) (m_backLeftModule.getDriveMotor())).getSelectedSensorPosition(0));
+		SmartDashboard.putNumber("back right module encoder count",
+				((WPI_TalonFX) (m_backRightModule.getDriveMotor())).getSelectedSensorPosition(0));
 
 	}
 }

@@ -3,6 +3,7 @@ package com.team2357.frc2023.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxPIDController;
 import com.team2357.frc2023.shuffleboard.ShuffleboardPIDTuner;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
@@ -90,9 +91,9 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
     private double m_targetRotations;
     private ShuffleboardPIDTuner m_shuffleboardPIDTuner;
 
-    public ArmRotationSubsystem(CANSparkMax rotationMotor) {
+    public ArmRotationSubsystem(int motorId) {
         instance = this;
-        m_rotationMotor = rotationMotor;
+        m_rotationMotor = new CANSparkMax(motorId, MotorType.kBrushless);
     }
 
     public void configure(Configuration config) {
