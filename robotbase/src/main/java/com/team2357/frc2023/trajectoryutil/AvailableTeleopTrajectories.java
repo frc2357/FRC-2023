@@ -140,6 +140,10 @@ public class AvailableTeleopTrajectories {
      */
     public static Command BuildTrajectory(int col, Pose2d pose) {
         double startKey = getTrajectoryKey(pose);
+        
+        if(startKey == -1) {
+            return null;
+        }
         Command startCommand = startToConvergenceTrajMap.get(startKey);
 
         CONVERGENCE_POINT convergencePoint = yToConvergenceMap.get(startKey);
