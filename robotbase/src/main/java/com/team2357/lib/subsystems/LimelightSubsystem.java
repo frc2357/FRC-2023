@@ -64,31 +64,46 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
 
   private Configuration m_Configuration = new Configuration();
 
-  protected NetworkTable m_Table = NetworkTableInstance
-      .getDefault()
-      .getTable("limelight");
+  protected NetworkTable m_table;
 
-  private IntegerPublisher m_streamPub = m_Table.getIntegerTopic("stream").publish();
-  private DoublePublisher m_pipelinePub = m_Table.getDoubleTopic("pipeline").publish();
-  private DoubleSubscriber m_pipelineSub = m_Table.getDoubleTopic("pipeline").subscribe(Double.NaN);
-  private DoubleSubscriber m_TvSub = m_Table.getDoubleTopic("tv").subscribe(m_Configuration.m_DefaultReturnValue);
-  private DoubleSubscriber m_TxSub = m_Table.getDoubleTopic("tx").subscribe(m_Configuration.m_DefaultReturnValue);
-  private DoubleSubscriber m_TySub = m_Table.getDoubleTopic("ty").subscribe(m_Configuration.m_DefaultReturnValue);
-  private DoubleSubscriber m_TaSub = m_Table.getDoubleTopic("ta").subscribe(m_Configuration.m_DefaultReturnValue);
-  private DoubleSubscriber m_TsSub = m_Table.getDoubleTopic("ts").subscribe(m_Configuration.m_DefaultReturnValue);
-  private DoubleSubscriber m_ThorSub = m_Table.getDoubleTopic("thor").subscribe(m_Configuration.m_DefaultReturnValue);
-  private DoubleSubscriber m_TvertSub = m_Table.getDoubleTopic("tvert").subscribe(m_Configuration.m_DefaultReturnValue);
+  private IntegerPublisher m_streamPub; 
+  private DoublePublisher m_pipelinePub; 
+  private DoubleSubscriber m_pipelineSub;
+  private DoubleSubscriber m_TvSub;
+  private DoubleSubscriber m_TxSub;
+  private DoubleSubscriber m_TySub;
+  private DoubleSubscriber m_TaSub;
+  private DoubleSubscriber m_TsSub;
+  private DoubleSubscriber m_ThorSub;
+  private DoubleSubscriber m_TvertSub;
 
-  private DoubleArrayTopic m_limelightPoseInfo = m_Table.getDoubleArrayTopic("botpose");
-  private DoubleArraySubscriber m_limelightPoseInfoSub = m_limelightPoseInfo.subscribe(null,
-      PubSubOption.keepDuplicates(true));
+  private DoubleArraySubscriber m_limelightPoseInfoSub;
 
   /**
    * Sets the camera stream.
-   *
-   * @param isLimelightPrimary True if the limelight is primary, false if not.
+   * 
+   * @param limelightName Name of the desired limelight's shuffleboard table
    */
-  public LimelightSubsystem() {
+  public LimelightSubsystem(String limelightName) {
+    m_table = NetworkTableInstance
+        .getDefault()
+        .getTable(limelightName);
+
+    m_streamPub = m_table.getIntegerTopic("stream").publish();
+    m_pipelinePub = m_table.getDoubleTopic("pipeline").publish();
+    m_pipelineSub = m_table.getDoubleTopic("pipeline").subscribe(Double.NaN);
+    m_TvSub = m_table.getDoubleTopic("tv").subscribe(m_Configuration.m_DefaultReturnValue);
+    m_TxSub = m_table.getDoubleTopic("tx").subscribe(m_Configuration.m_DefaultReturnValue);
+    m_TySub = m_table.getDoubleTopic("ty").subscribe(m_Configuration.m_DefaultReturnValue);
+    m_TaSub = m_table.getDoubleTopic("ta").subscribe(m_Configuration.m_DefaultReturnValue);
+    m_TsSub = m_table.getDoubleTopic("ts").subscribe(m_Configuration.m_DefaultReturnValue);
+    m_ThorSub = m_table.getDoubleTopic("thor").subscribe(m_Configuration.m_DefaultReturnValue);
+    m_TvertSub = m_table.getDoubleTopic("tvert").subscribe(m_Configuration.m_DefaultReturnValue);
+
+    DoubleArrayTopic limelightPoseInfo = m_table.getDoubleArrayTopic("botpose");
+    m_limelightPoseInfoSub = limelightPoseInfo.subscribe(null,
+    PubSubOption.keepDuplicates(true));
+
     instance = this;
   }
 

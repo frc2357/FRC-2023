@@ -9,7 +9,6 @@ import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.team2357.frc2023.subsystems.ArmExtensionSubsystem;
 import com.team2357.frc2023.subsystems.ArmRotationSubsystem;
 import com.team2357.frc2023.subsystems.ClawSubsystem;
-import com.team2357.frc2023.subsystems.ElevatorSubsystem;
 import com.team2357.frc2023.subsystems.IntakeArmSubsystem;
 import com.team2357.frc2023.subsystems.IntakeRollerSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
@@ -64,14 +63,10 @@ public final class Constants {
         public static final int BACK_RIGHT_MODULE_STEER_MOTOR_ID = 18;
         public static final int BACK_RIGHT_MODULE_STEER_ENCODER_ID = 22;
 
-        public static final int LEFT_INTAKE_MOTOR = 23;
-        public static final int RIGHT_INTAKE_MOTOR = 24;
+        public static final int MASTER_INTAKE_MOTOR = 23;
+        public static final int FOLLOWER_INTAKE_MOTOR = 24;
 
-        public static final int LEFT_ELEVATOR_MOTOR = 29;
-        public static final int RIGHT_ELEVATOR_MOTOR = 30;
-
-        public static final int MASTER_ROTATION_MOTOR = 25;
-        public static final int FOLLOWER_ROTATION_MOTOR = 26;
+        public static final int ROTATION_MOTOR = 25;
 
         public static final int ARM_EXTENSION_MOTOR = 27;
     }
@@ -81,10 +76,10 @@ public final class Constants {
         public static final int WRIST_FORWARD_SOLENOID_CHANNEL = 0;
         public static final int WRIST_REVERSE_SOLENOID_CHANNEL = 1;
         
-        public static final int CLAW_FORWARD_SOLENOID_CHANNEL = 2;
-        public static final int CLAW_REVERSE_SOLENOID_CHANNEL = 3;
+        public static final int CLAW_FORWARD_SOLENOID_CHANNEL = 3;
+        public static final int CLAW_REVERSE_SOLENOID_CHANNEL = 4;
 
-        public static final int INTAKE_SOLENOID_FORWARD_CHANNEL = 4;
+        public static final int INTAKE_SOLENOID_FORWARD_CHANNEL = 2;
         public static final int INTAKE_SOLENOID_REVERSE_CHANNEL = 5;
     }
 
@@ -179,6 +174,8 @@ public final class Constants {
         public static final ChassisSpeeds DEAD_RECKONING_X_CHASSIS_SPEEDS = new ChassisSpeeds(DEAD_RECKONING_TRANSLATION_METERS_PER_SECOND, 0, 0);
         public static final ChassisSpeeds DEAD_RECKONING_Y_CHASSIS_SPEEDS = new ChassisSpeeds(0, DEAD_RECKONING_TRANSLATION_METERS_PER_SECOND, 0);
         public static final ChassisSpeeds DEAD_RECKONING_ROTATION_CHASSIS_SPEEDS = new ChassisSpeeds(0, 0, DEAD_RECKONING_ROTATION_RADIANS_PER_SECOND);
+
+        public static final String SWERVE_MODULE_SHUFFLEBOARD_TAB_NAME = "Drivetrain";
     
         // Tolerance for out-of-range poses on auto-mapping
         public static final double TRAJECTORY_MAP_TOLERANCE_METERS = 0.1;
@@ -188,16 +185,19 @@ public final class Constants {
         public static IntakeRollerSubsystem.Configuration GET_INTAKE_CONFIG() {
             IntakeRollerSubsystem.Configuration config = new IntakeRollerSubsystem.Configuration();
 
-            config.m_runPercentOutput = 0.5;
-            config.m_reversePercentOutput = -0.3;
+            config.m_runPercentOutput = 0.6;
+            config.m_reversePercentOutput = -0.5;
 
-            config.m_rampRate = 1;
-            config.m_currentLimit = 30;
             config.m_rollerAxisMaxSpeed = 1;
 
-            // TODO: Make sure these are correct
-            config.m_rightInverted = false;
-            config.m_leftInverted = true;
+            config.m_rampRate = 1;
+
+            config.m_peakCurrentLimit = 40;
+            config.m_peakCurrentDuration = 0;
+            config.m_continuousCurrentLimit = 40;
+
+            config.m_masterInverted = true;
+            config.m_followerInverted = false;
 
             return config;
         }
@@ -222,22 +222,6 @@ public final class Constants {
 
             config.m_extendMilliseconds = 1000;
             config.m_retractMilliseconds = 1000;
-
-            return config;
-        }
-    }
-
-    public static final class ELEVATOR {
-        public static ElevatorSubsystem.Configuration GET_ELEVATOR_CONFIG() {
-            ElevatorSubsystem.Configuration config = new ElevatorSubsystem.Configuration();
-
-            config.m_elevatorAxisMaxSpeed = 1;
-
-            config.m_elevatorMotorIdleMode = IdleMode.kBrake;
-            config.m_elevatorMotorStallLimitAmps = 30;
-            config.m_elevatorMotorFreeLimitAmps = 30;
-
-            //TODO: Figure out smart motion constants
 
             return config;
         }
@@ -312,7 +296,7 @@ public final class Constants {
             config.m_rotationMotorStallLimitAmps = 0;
             config.m_rotationMotorFreeLimitAmps = 0;
 
-            config.m_isFollowerInverted = false;
+            config.m_isInverted = false;
 
             config.m_shuffleboardTunerPRange = 0.2;
             config.m_shuffleboardTunerIRange = 0.2;
@@ -339,8 +323,6 @@ public final class Constants {
             config.m_rotationMotorStallLimitAmps = 0;
             config.m_rotationMotorFreeLimitAmps = 0;
 
-            config.m_isFollowerInverted = false;
-
             // smart motion config
             config.m_rotationMotorP = 0;
             config.m_rotationMotorI = 0;
@@ -357,6 +339,23 @@ public final class Constants {
             config.m_maxSpeedPercent = 0.4;
             config.m_smartMotionSlot = 0;
 
+            // Static gain, will likely be zero
+            config.m_feedforwardKs = 0;
+
+            // TODO: Calculated
+            // Gravity gain, should be the gain required to keep the arm parallel with the floor
+            config.m_feedforwardKg = 0;
+
+            // Velocity gain, will be zero
+            config.m_feedforwardKv = 0;
+
+            // Acceleration gain, will be zero
+            config.m_feedforwardKa = 0;
+
+            // TODO: Calculate
+            config.m_armHorizontalRotations = 0;
+            config.m_rotationsPerRadian = 114.55 / (2 * Math.PI);
+
             return config;
         }
 
@@ -367,11 +366,24 @@ public final class Constants {
         public static final double AUTO_SCORE_HIGH_ROTATIONS = 0;
     }
 
+    public static final class LIMELIGHT {
+        public static final String LEFT_LIMELIGHT_NAME = "leftLimelight";
+        public static final String RIGHT_LIMELIGHT_NAME = "rightLimelight";
+        
+        public static final double LEFT_LIMELIGHT_TX_SETPOINT = Double.NaN;
+        public static final double RIGHT_LIMELIGHT_TX_SETPOINT = Double.NaN;
+    }
+
     public static final class BUTTONBOARD {
         public static final String BUTTONBOARD_TABLE_NAME = "buttonboard";
         public static final String ROW_TOPIC_NAME = "row";
         public static final String COLUMN_TOPIC_NAME = "col";
     
+    }
+
+    public static final class APRILTAG_POSE {
+        public static final String APRILTAG_TABLE_NAME = "apriltag";
+        public static final String POSE_TOPIC_NAME = "pose";
     }
 
     public static final class CONTROLLER {
@@ -388,7 +400,7 @@ public final class Constants {
 
     public static final class COMPRESSOR {
         public static final int MIN_PRESSURE_PSI = 90;
-        public static final int MAX_PRESSURE_PSI = 120;
+        public static final int MAX_PRESSURE_PSI = 100;
     }
 
 }
