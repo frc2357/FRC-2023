@@ -32,8 +32,6 @@ public class AprilTagPose {
     private JSONParser m_parser = new JSONParser();
 
     private AprilTagPose() {
-        NetworkTableInstance inst = NetworkTableInstance.getDefault();
-
         m_poseSub = m_table.getStringTopic(Constants.APRILTAG_POSE.POSE_TOPIC_NAME).subscribe("");
 
         m_instance = this;

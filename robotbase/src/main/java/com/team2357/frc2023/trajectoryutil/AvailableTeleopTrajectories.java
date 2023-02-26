@@ -138,7 +138,7 @@ public class AvailableTeleopTrajectories {
      * @param pose Current robot pose
      * @return A command to run to get to column
      */
-    public static Command BuildTrajectory(int col, Pose2d pose) {
+    public static Command buildTrajectory(int col, Pose2d pose) {
         double startKey = getTrajectoryKey(pose);
         
         if(startKey == -1) {
