@@ -26,12 +26,27 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
     private LimelightSubsystem m_primaryLimelight;
     private LimelightSubsystem m_secondaryLimelight;
 
-    public DualLimelightManagerSubsystem(String leftLimelightName, String rightLimelightName) {
+    private double m_leftLimelightTXSetpoint;
+    private double m_rightLimelightTXSetpoint;
+    private double m_primaryLimelightTXSetpoint;
+
+    /**
+     * 
+     * @param leftLimelightName Name of the left side limelight
+     * @param rightLimelightName Name ofr the right side limelight
+     * @param leftLimelightTXSetpoint Value of the X angle of the right limelight to get the left limelight in view
+     * @param rightLimelightTXSetpoint  Value of the X angle of the left limelight to get the right limelight in view
+     */
+    public DualLimelightManagerSubsystem(String leftLimelightName, String rightLimelightName,
+            double leftLimelightTXSetpoint, double rightLimelightTXSetpoint) {
         m_leftLimelight = new LimelightSubsystem(leftLimelightName);
         m_rightLimelight = new LimelightSubsystem(rightLimelightName);
 
         m_primaryLimelight = m_leftLimelight;
         m_secondaryLimelight = m_rightLimelight;
+
+        m_leftLimelightTXSetpoint = leftLimelightTXSetpoint;
+        m_rightLimelightTXSetpoint = rightLimelightTXSetpoint;
 
         m_instance = this;
     }
@@ -51,9 +66,11 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
             case LEFT:
                 m_primaryLimelight = m_leftLimelight;
                 m_secondaryLimelight = m_rightLimelight;
+                m_primaryLimelightTXSetpoint = m_leftLimelightTXSetpoint;
             case RIGHT:
                 m_primaryLimelight = m_rightLimelight;
                 m_secondaryLimelight = m_leftLimelight;
+                m_primaryLimelightTXSetpoint = m_rightLimelightTXSetpoint;
         }
     }
 
@@ -73,6 +90,13 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
 
     public boolean isHumanPipelineActive() {
         return m_leftLimelight.isHumanPipelineActive() && m_rightLimelight.isHumanPipelineActive();
+    }
+
+    /**
+     * @return The tX angle setpoint on the opposing camera to get the primary camera in view
+     */
+    public double getPrimaryTXSetpoint() {
+        return m_primaryLimelightTXSetpoint;
     }
 
     public boolean validTargetExists() {

@@ -502,6 +502,12 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		m_translateYController.setTolerance(m_config.m_translateYToleranceMeters);
 	}
 
+	public void getPrimaryLimelightToTarget() {
+		if () {
+			
+		}
+	}
+
 	public double calculateXMetersPerSecond() {
 		double outputMetersPerSecond = m_translateXController.calculate(DualLimelightManagerSubsystem.getInstance().getTY());
 		outputMetersPerSecond = outputMetersPerSecond * -1; // Invert output
@@ -527,12 +533,12 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		System.out.println(isTracking());
 
 		if(!limelightManager.validTargetExistsOnPrimary()) {
-			
+			getPrimaryLimelightToTarget();
+		} else {
+			// drive(new ChassisSpeeds(0, calculateYMetersPerSecond(), 0));
+			//drive(new ChassisSpeeds(calculateX(), 0, 0));
+			drive(new ChassisSpeeds(calculateXMetersPerSecond(), calculateYMetersPerSecond(), 0));
 		}
-
-		// drive(new ChassisSpeeds(0, calculateYMetersPerSecond(), 0));
-		//drive(new ChassisSpeeds(calculateX(), 0, 0));
-		drive(new ChassisSpeeds(calculateXMetersPerSecond(), calculateYMetersPerSecond(), 0));
 	}
 
 	public void stopTracking() {
