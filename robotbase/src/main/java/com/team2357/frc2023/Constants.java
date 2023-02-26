@@ -337,6 +337,23 @@ public final class Constants {
             config.m_maxSpeedPercent = 0.4;
             config.m_smartMotionSlot = 0;
 
+            // Static gain, will likely be zero
+            config.m_feedforwardKs = 0;
+
+            // TODO: Calculated
+            // Gravity gain, should be the gain required to keep the arm parallel with the floor
+            config.m_feedforwardKg = 0;
+
+            // Velocity gain, will be zero
+            config.m_feedforwardKv = 0;
+
+            // Acceleration gain, will be zero
+            config.m_feedforwardKa = 0;
+
+            // TODO: Calculate
+            config.m_armHorizontalRotations = 0;
+            config.m_rotationsPerRadian = 0 / (2 * Math.PI);
+
             return config;
         }
 
