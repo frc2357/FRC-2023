@@ -352,7 +352,7 @@ public final class Constants {
 
             // TODO: Calculate
             config.m_armHorizontalRotations = 0;
-            config.m_rotationsPerRadian = 0 / (2 * Math.PI);
+            config.m_rotationsPerRadian = 114.55 / (2 * Math.PI);
 
             return config;
         }
