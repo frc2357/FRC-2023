@@ -42,16 +42,18 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	public static enum COLUMN_SETPOINT {
-		LEFT(Constants.DRIVE.LEFT_COL_X_ANGLE_SETPOINT, 0),
-		MIDDLE(Constants.DRIVE.MID_COL_X_ANGLE_SETPOINT, 1),
-		RIGHT(Constants.DRIVE.RIGHT_COL_X_ANGLE_SETPOINT, 2),
-		DEFAULT(Constants.DRIVE.DEFAULT_X_ANGLE_SETPOINT, -1);
+		LEFT(Constants.DRIVE.LEFT_COL_X_ANGLE_SETPOINT, DualLimelightManagerSubsystem.LIMELIGHT.RIGHT, 0),
+		MIDDLE(Constants.DRIVE.MID_COL_X_ANGLE_SETPOINT,  DualLimelightManagerSubsystem.LIMELIGHT.LEFT, 1),
+		RIGHT(Constants.DRIVE.RIGHT_COL_X_ANGLE_SETPOINT, DualLimelightManagerSubsystem.LIMELIGHT.LEFT, 2),
+		DEFAULT(Constants.DRIVE.DEFAULT_X_ANGLE_SETPOINT, DualLimelightManagerSubsystem.LIMELIGHT.LEFT, -1);
 
 		public final double setpoint;
 		public final int index;
+		public final DualLimelightManagerSubsystem.LIMELIGHT primaryLimelight;
 
-		private COLUMN_SETPOINT(double setpoint, int index) {
+		private COLUMN_SETPOINT(double setpoint, DualLimelightManagerSubsystem.LIMELIGHT primaryLimelight, int index) {
 			this.setpoint = setpoint;
+			this.primaryLimelight = primaryLimelight;
 			this.index = index;
 		}
 	}
@@ -106,6 +108,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	private PIDController m_translateYController;
 
 	private boolean m_isTracking;
+	private double m_trackingSetpoint;
 	public static class Configuration {
 		/**
 		 * The left-to-right distance between the drivetrain wheels (measured from
@@ -492,9 +495,10 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		m_translateXController.setTolerance(m_config.m_translateXToleranceMeters);
 	}
 
-	public void trackYTarget(double setPoint) {
+	public void trackYTarget(double setpoint) {
+		m_trackingSetpoint = setpoint;
 		m_translateYController.reset();
-		m_translateYController.setSetpoint(setPoint);
+		m_translateYController.setSetpoint(m_trackingSetpoint);
 		m_translateYController.setTolerance(m_config.m_translateYToleranceMeters);
 	}
 
@@ -512,14 +516,19 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	public void trackingPeriodic() {
-		DualLimelightManagerSubsystem limelight = DualLimelightManagerSubsystem.getInstance();
+		DualLimelightManagerSubsystem limelightManager = DualLimelightManagerSubsystem.getInstance();
 		// System.out.println(m_translateXController.getSetpoint());
 		// System.out.println("TY "+limelight.getTY());
-		if (!limelight.validTargetExists()) {
+		if (!limelightManager.validTargetExists()) {
 			setClosedLoopEnabled(false);
 			return;
 		}
+
 		System.out.println(isTracking());
+
+		if(!limelightManager.validTargetExistsOnPrimary()) {
+			
+		}
 
 		// drive(new ChassisSpeeds(0, calculateYMetersPerSecond(), 0));
 		//drive(new ChassisSpeeds(calculateX(), 0, 0));
