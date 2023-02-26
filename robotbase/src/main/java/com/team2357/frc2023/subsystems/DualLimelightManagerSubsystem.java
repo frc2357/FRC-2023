@@ -145,4 +145,12 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
             return Double.NaN;
         }
     }
+
+    public double getPrimaryTX() {
+        return m_primaryLimelight.getTX();
+    }
+
+    public double getSecondaryTX() {
+        return m_secondaryLimelight.getTX();
+    }
 }
