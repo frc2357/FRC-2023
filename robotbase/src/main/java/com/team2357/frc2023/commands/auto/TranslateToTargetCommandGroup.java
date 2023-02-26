@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 public class TranslateToTargetCommandGroup extends SequentialCommandGroup {
-    public TranslateToTargetCommandGroup(SwerveDriveSubsystem.COLUMN_SETPOINT column) {
+    public TranslateToTargetCommandGroup(SwerveDriveSubsystem.COLUMN_TARGET column) {
 
         // Enable the april tag close range pipeline
         this.addCommands(new InstantCommand(() -> DualLimelightManagerSubsystem.getInstance().setAprilTagPipelineActive()));

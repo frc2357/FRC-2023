@@ -41,7 +41,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		return instance;
 	}
 
-	public static enum COLUMN_SETPOINT {
+	public static enum COLUMN_TARGET {
 		LEFT(Constants.DRIVE.LEFT_COL_X_ANGLE_SETPOINT, DualLimelightManagerSubsystem.LIMELIGHT.RIGHT, 0),
 		MIDDLE(Constants.DRIVE.MID_COL_X_ANGLE_SETPOINT,  DualLimelightManagerSubsystem.LIMELIGHT.LEFT, 1),
 		RIGHT(Constants.DRIVE.RIGHT_COL_X_ANGLE_SETPOINT, DualLimelightManagerSubsystem.LIMELIGHT.LEFT, 2),
@@ -51,20 +51,20 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		public final int index;
 		public final DualLimelightManagerSubsystem.LIMELIGHT primaryLimelight;
 
-		private COLUMN_SETPOINT(double setpoint, DualLimelightManagerSubsystem.LIMELIGHT primaryLimelight, int index) {
+		private COLUMN_TARGET(double setpoint, DualLimelightManagerSubsystem.LIMELIGHT primaryLimelight, int index) {
 			this.setpoint = setpoint;
 			this.primaryLimelight = primaryLimelight;
 			this.index = index;
 		}
 	}
 
-	public static COLUMN_SETPOINT getSetpoint(int val) {
-		for (COLUMN_SETPOINT setpoint : COLUMN_SETPOINT.values()) {
+	public static COLUMN_TARGET getSetpoint(int val) {
+		for (COLUMN_TARGET setpoint : COLUMN_TARGET.values()) {
 			if (val == setpoint.index) {
 				return setpoint;
 			}
 		}
-		return COLUMN_SETPOINT.DEFAULT;
+		return COLUMN_TARGET.DEFAULT;
 	}
 
 	/**
@@ -481,7 +481,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		return isAtXTarget() && isAtYTarget();
 	}
 
-	public void trackTarget(SwerveDriveSubsystem.COLUMN_SETPOINT column) {
+	public void trackTarget(SwerveDriveSubsystem.COLUMN_TARGET column) {
 		System.out.println("track target");
 		m_isTracking = true;
 		trackXTarget();
