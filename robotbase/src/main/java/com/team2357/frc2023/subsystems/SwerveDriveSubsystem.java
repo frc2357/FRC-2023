@@ -481,11 +481,11 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		return isAtXTarget() && isAtYTarget();
 	}
 
-	public void trackTarget(double setpoint) {
+	public void trackTarget(SwerveDriveSubsystem.COLUMN_SETPOINT column) {
 		System.out.println("track target");
 		m_isTracking = true;
 		trackXTarget();
-		trackYTarget(setpoint);
+		trackYTarget(column.setpoint);
 		enableOpenLoopRamp();
 	}
 
@@ -503,9 +503,6 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	public void getPrimaryLimelightToTarget() {
-		if () {
-			
-		}
 	}
 
 	public double calculateXMetersPerSecond() {

@@ -5,17 +5,17 @@ import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class TranslateToTargetCommand extends CommandBase {
-    private double m_xSetpoint;
+    private SwerveDriveSubsystem.COLUMN_SETPOINT m_targetCol;
 
-    public TranslateToTargetCommand(double xSetpoint) {
-        m_xSetpoint = xSetpoint;
+    public TranslateToTargetCommand(SwerveDriveSubsystem.COLUMN_SETPOINT targetCol) {
+        m_targetCol = targetCol;
         addRequirements(SwerveDriveSubsystem.getInstance());
     }
 
     @Override
     public void initialize() {
         SwerveDriveSubsystem.getInstance().setClosedLoopEnabled(true);
-        SwerveDriveSubsystem.getInstance().trackTarget(m_xSetpoint);
+        SwerveDriveSubsystem.getInstance().trackTarget(m_targetCol);
     }
 
     @Override

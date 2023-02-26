@@ -1,6 +1,7 @@
 package com.team2357.frc2023.commands.auto;
 
 import com.team2357.frc2023.subsystems.DualLimelightManagerSubsystem;
+import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.lib.subsystems.LimelightSubsystem;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -8,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 public class TranslateToTargetCommandGroup extends SequentialCommandGroup {
-    public TranslateToTargetCommandGroup(double xSetpoint) {
+    public TranslateToTargetCommandGroup(SwerveDriveSubsystem.COLUMN_SETPOINT column) {
 
         // Enable the april tag close range pipeline
         this.addCommands(new InstantCommand(() -> DualLimelightManagerSubsystem.getInstance().setAprilTagPipelineActive()));
@@ -20,6 +21,6 @@ public class TranslateToTargetCommandGroup extends SequentialCommandGroup {
         this.addCommands(new WaitCommand(0.1));
 
         // Translate to the target in the X and Y axis
-        this.addCommands(new TranslateToTargetCommand(xSetpoint));
+        this.addCommands(new TranslateToTargetCommand(column));
     }
 }
