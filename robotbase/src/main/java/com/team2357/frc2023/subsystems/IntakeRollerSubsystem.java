@@ -1,5 +1,8 @@
 package com.team2357.frc2023.subsystems;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -79,16 +82,23 @@ public class IntakeRollerSubsystem extends SubsystemBase {
         m_masterIntakeMotor.set(ControlMode.PercentOutput, 0.0);
     }
 
-    public double lastcur = 0.0;
+    public List<Double> currents = new ArrayList<>();
     @Override
     public void periodic(){
-        if(lastcur==0){
-            lastcur=m_masterIntakeMotor.getStatorCurrent();
-        }else{
-            if(m_masterIntakeMotor.getStatorCurrent()>lastcur+10){
-                IntakeArmSubsystem.getInstance().stow();
+        if(IntakeArmSubsystem.getInstance().isDeployed()){
+            if(currents.size()<50){
+                currents.add(m_masterIntakeMotor.getStatorCurrent());
+            }else{
+                int sum = 0;
+                for(int i = 0;i<currents.size();i++){
+                    sum+=currents.get(i);
+                }
+                sum=sum/currents.size();
+                if(sum>10){
+                    IntakeArmSubsystem.getInstance().stow();
+                }
+                currents.clear();
             }
-            lastcur=m_masterIntakeMotor.getStatorCurrent();
         }
     }
 }
