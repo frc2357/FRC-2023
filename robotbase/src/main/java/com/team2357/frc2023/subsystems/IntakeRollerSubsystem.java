@@ -85,6 +85,4 @@ public class IntakeRollerSubsystem extends SubsystemBase {
     public void stopIntake() {
         m_masterIntakeMotor.set(ControlMode.PercentOutput, 0.0);
     }
-
-    public List<Double> currents = new ArrayList<>();
 }
