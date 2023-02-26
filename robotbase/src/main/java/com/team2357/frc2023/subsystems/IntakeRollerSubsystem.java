@@ -78,27 +78,13 @@ public class IntakeRollerSubsystem extends SubsystemBase {
         m_masterIntakeMotor.set(ControlMode.PercentOutput, motorSpeed);
     }
 
+    public double getCurrent(){
+        return m_masterIntakeMotor.getStatorCurrent();
+    }
+
     public void stopIntake() {
         m_masterIntakeMotor.set(ControlMode.PercentOutput, 0.0);
     }
 
     public List<Double> currents = new ArrayList<>();
-    @Override
-    public void periodic(){
-        if(IntakeArmSubsystem.getInstance().isDeployed()){
-            if(currents.size()<50){
-                currents.add(m_masterIntakeMotor.getStatorCurrent());
-            }else{
-                int sum = 0;
-                for(int i = 0;i<currents.size();i++){
-                    sum+=currents.get(i);
-                }
-                sum=sum/currents.size();
-                if(sum>10){
-                    IntakeArmSubsystem.getInstance().stow();
-                }
-                currents.clear();
-            }
-        }
-    }
 }
