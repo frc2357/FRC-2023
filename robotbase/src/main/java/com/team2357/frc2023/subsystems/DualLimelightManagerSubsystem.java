@@ -23,12 +23,16 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
     private LimelightSubsystem m_leftLimelight;
     private LimelightSubsystem m_rightLimelight;
 
-    // Assumes limelights are configured so that the crosshair is the middle of the
-    // robot on both limelights
-    // This will allow switching
+    private LimelightSubsystem m_primaryLimelight;
+    private LimelightSubsystem m_secondaryLimelight;
+
     public DualLimelightManagerSubsystem(String leftLimelightName, String rightLimelightName) {
         m_leftLimelight = new LimelightSubsystem(leftLimelightName);
         m_rightLimelight = new LimelightSubsystem(rightLimelightName);
+
+        m_primaryLimelight = m_leftLimelight;
+        m_secondaryLimelight = m_rightLimelight;
+
         m_instance = this;
     }
 
@@ -40,6 +44,17 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
                 return m_rightLimelight;
         }
         return null;
+    }
+
+    public void setPrimary(LIMELIGHT limelight) {
+        switch (limelight) {
+            case LEFT:
+                m_primaryLimelight = m_leftLimelight;
+                m_secondaryLimelight = m_rightLimelight;
+            case RIGHT:
+                m_primaryLimelight = m_rightLimelight;
+                m_secondaryLimelight = m_leftLimelight;
+        }
     }
 
     public void setAprilTagPipelineActive() {
@@ -60,9 +75,12 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
         return m_leftLimelight.isHumanPipelineActive() && m_rightLimelight.isHumanPipelineActive();
     }
 
-
     public boolean validTargetExists() {
         return m_leftLimelight.validTargetExists() || m_rightLimelight.validTargetExists();
+    }
+
+    public boolean validTargetExistsOnPrimary() {
+        return m_primaryLimelight.validTargetExists();
     }
 
     public Pose2d getLimelightPose2d() {
@@ -85,20 +103,20 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
     }
 
     public double getTY() {
-        if(m_rightLimelight.validTargetExists()) {
-            return m_rightLimelight.getTY();
-        } else if (m_leftLimelight.validTargetExists()){
-            return m_leftLimelight.getTY();
+        if (m_primaryLimelight.validTargetExists()) {
+            return m_primaryLimelight.getTY();
+        } else if (m_secondaryLimelight.validTargetExists()) {
+            return m_secondaryLimelight.getTY();
         } else {
             return Double.NaN;
         }
     }
 
     public double getTX() {
-        if(m_rightLimelight.validTargetExists()) {
-            return m_rightLimelight.getTX();
-        } else if (m_leftLimelight.validTargetExists()){
-            return m_leftLimelight.getTX();
+        if (m_primaryLimelight.validTargetExists()) {
+            return m_primaryLimelight.getTX();
+        } else if (m_secondaryLimelight.validTargetExists()) {
+            return m_secondaryLimelight.getTX();
         } else {
             return Double.NaN;
         }

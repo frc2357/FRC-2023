@@ -99,7 +99,10 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	private PathConstraints m_pathConstraints;
 
+	// Controller for robot movement along the y-axis
 	private PIDController m_translateXController;
+
+	// Controller for robot movement along the x-axis
 	private PIDController m_translateYController;
 
 	private boolean m_isTracking;
@@ -478,20 +481,20 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	public void trackTarget(double setpoint) {
 		System.out.println("track target");
 		m_isTracking = true;
-		trackXTarget(setpoint);
-		trackYTarget();
+		trackXTarget();
+		trackYTarget(setpoint);
 		enableOpenLoopRamp();
 	}
 
-	public void trackXTarget(double setpoint) {
+	public void trackXTarget() {
 		m_translateXController.reset();
-		m_translateXController.setSetpoint(setpoint);
+		m_translateXController.setSetpoint(m_config.m_defaultYAngleSetpoint);
 		m_translateXController.setTolerance(m_config.m_translateXToleranceMeters);
 	}
 
-	public void trackYTarget() {
+	public void trackYTarget(double setPoint) {
 		m_translateYController.reset();
-		m_translateYController.setSetpoint(m_config.m_defaultYAngleSetpoint);
+		m_translateYController.setSetpoint(setPoint);
 		m_translateYController.setTolerance(m_config.m_translateYToleranceMeters);
 	}
 
