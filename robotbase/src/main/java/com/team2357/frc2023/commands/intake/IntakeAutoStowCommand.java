@@ -13,7 +13,7 @@ public class IntakeAutoStowCommand extends CommandLoggerBase{
     public IntakeStowCommandGroup m_stowgrroup;
     public boolean done = false;
 
-    public IntakeAutoStowCommand()
+    public IntakeAutoStowCommand(){
         m_deploygroup = new IntakeDeployCommandGroup();
         m_stowgrroup = new IntakeStowCommandGroup();
     }
@@ -54,4 +54,5 @@ public class IntakeAutoStowCommand extends CommandLoggerBase{
         m_deploygroup.cancel();
         m_stowgrroup.schedule();
     }
+
 }
