@@ -174,6 +174,8 @@ public final class Constants {
         public static final ChassisSpeeds DEAD_RECKONING_X_CHASSIS_SPEEDS = new ChassisSpeeds(DEAD_RECKONING_TRANSLATION_METERS_PER_SECOND, 0, 0);
         public static final ChassisSpeeds DEAD_RECKONING_Y_CHASSIS_SPEEDS = new ChassisSpeeds(0, DEAD_RECKONING_TRANSLATION_METERS_PER_SECOND, 0);
         public static final ChassisSpeeds DEAD_RECKONING_ROTATION_CHASSIS_SPEEDS = new ChassisSpeeds(0, 0, DEAD_RECKONING_ROTATION_RADIANS_PER_SECOND);
+
+        public static final String SWERVE_MODULE_SHUFFLEBOARD_TAB_NAME = "Drivetrain";
     
         // Tolerance for out-of-range poses on auto-mapping
         public static final double TRAJECTORY_MAP_TOLERANCE_METERS = 0.1;

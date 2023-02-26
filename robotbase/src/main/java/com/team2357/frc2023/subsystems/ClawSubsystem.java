@@ -1,6 +1,7 @@
 package com.team2357.frc2023.subsystems;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -25,8 +26,8 @@ public class ClawSubsystem extends SubsystemBase {
     private ClawState m_desiredState;
     private long m_lastActionMillis;
     
-    public ClawSubsystem(DoubleSolenoid clawSolenoid) {
-        m_clawSolenoid = clawSolenoid;
+    public ClawSubsystem(int forwardChannel, int reverseChannel) {
+        m_clawSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, forwardChannel, reverseChannel);
         instance = this;
     }
 

@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
 public class SubsystemFactory {
         public SwerveDriveSubsystem CreateSwerveDriveSubsystem() {
-                ShuffleboardTab tab = Shuffleboard.getTab("Drivetrain");
+                ShuffleboardTab tab = Shuffleboard.getTab(Constants.DRIVE.SWERVE_MODULE_SHUFFLEBOARD_TAB_NAME);
 
                 WPI_Pigeon2 pigeon = new WPI_Pigeon2(Constants.CAN_ID.PIGEON_ID, Constants.CAN_ID.DRIVE_CANBUS);
 
@@ -76,48 +76,41 @@ public class SubsystemFactory {
         }
 
         public IntakeRollerSubsystem CreateIntakeRollerSubsystem() {
-                TalonSRX masterIntakeMotor = new TalonSRX(Constants.CAN_ID.MASTER_INTAKE_MOTOR);
-                TalonSRX followerIntakeMotor = new TalonSRX(Constants.CAN_ID.FOLLOWER_INTAKE_MOTOR);
-
-                IntakeRollerSubsystem subsystem = new IntakeRollerSubsystem(masterIntakeMotor, followerIntakeMotor);
+                IntakeRollerSubsystem subsystem = new IntakeRollerSubsystem(Constants.CAN_ID.MASTER_INTAKE_MOTOR,
+                                Constants.CAN_ID.FOLLOWER_INTAKE_MOTOR);
                 subsystem.configure(Constants.INTAKE_ROLLER.GET_INTAKE_CONFIG());
                 return subsystem;
         }
 
         public WristSubsystem CreateWristSubsystem() {
-                DoubleSolenoid wristSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH,
-                                Constants.PH_ID.WRIST_FORWARD_SOLENOID_CHANNEL, Constants.PH_ID.WRIST_REVERSE_SOLENOID_CHANNEL);
-                WristSubsystem subsystem = new WristSubsystem(wristSolenoid);
+                WristSubsystem subsystem = new WristSubsystem(Constants.PH_ID.WRIST_FORWARD_SOLENOID_CHANNEL,
+                                Constants.PH_ID.WRIST_REVERSE_SOLENOID_CHANNEL);
                 subsystem.configure(Constants.WRIST.GET_WRIST_CONFIG());
                 return subsystem;
         }
 
         public ClawSubsystem CreateClawSubsystem() {
-                DoubleSolenoid clawSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH,
-                                Constants.PH_ID.CLAW_FORWARD_SOLENOID_CHANNEL, Constants.PH_ID.CLAW_REVERSE_SOLENOID_CHANNEL);
-
-                ClawSubsystem subsystem = new ClawSubsystem(clawSolenoid);
+                ClawSubsystem subsystem = new ClawSubsystem(Constants.PH_ID.CLAW_FORWARD_SOLENOID_CHANNEL,
+                                Constants.PH_ID.CLAW_REVERSE_SOLENOID_CHANNEL);
                 subsystem.configure(Constants.CLAW.GET_CLAW_CONFIG());
                 return subsystem;
         }
 
         public IntakeArmSubsystem CreateIntakeArmSubsystem() {
-                DoubleSolenoid intakeSolenoid = new DoubleSolenoid(Constants.CAN_ID.PNEUMATICS_HUB_ID,
-                                PneumaticsModuleType.REVPH, Constants.PH_ID.INTAKE_SOLENOID_FORWARD_CHANNEL,
+                IntakeArmSubsystem subsystem = new IntakeArmSubsystem(Constants.PH_ID.INTAKE_SOLENOID_FORWARD_CHANNEL,
                                 Constants.PH_ID.INTAKE_SOLENOID_REVERSE_CHANNEL);
-                IntakeArmSubsystem subsystem = new IntakeArmSubsystem(intakeSolenoid);
                 subsystem.configure(Constants.INTAKE_ARM.GET_INTAKE_ARM_CONFIG());
                 return subsystem;
         }
-        public ArmRotationSubsystem CreateArmRotationSubsystem(){
-                CANSparkMax rotationMotor = new CANSparkMax(Constants.CAN_ID.ROTATION_MOTOR, MotorType.kBrushless);
-                ArmRotationSubsystem subsystem = new ArmRotationSubsystem(rotationMotor);
+
+        public ArmRotationSubsystem CreateArmRotationSubsystem() {
+                ArmRotationSubsystem subsystem = new ArmRotationSubsystem(Constants.CAN_ID.ROTATION_MOTOR);
                 subsystem.configure(Constants.ARM_ROTATION.GET_ROTATION_CONFIG());
                 return subsystem;
         }
-        public ArmExtensionSubsystem CreateArmExtensionSubsystem(){
-                CANSparkMax extender = new CANSparkMax(Constants.CAN_ID.ARM_EXTENSION_MOTOR, MotorType.kBrushless);
-                ArmExtensionSubsystem subsystem = new ArmExtensionSubsystem(extender);
+
+        public ArmExtensionSubsystem CreateArmExtensionSubsystem() {
+                ArmExtensionSubsystem subsystem = new ArmExtensionSubsystem(Constants.CAN_ID.ARM_EXTENSION_MOTOR);
                 subsystem.configure(Constants.ARM_EXTENSION.GET_EXTENSION_CONFIG());
                 return subsystem;
         }

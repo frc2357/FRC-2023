@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
+import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IntakeRollerSubsystem extends SubsystemBase {
@@ -34,9 +35,9 @@ public class IntakeRollerSubsystem extends SubsystemBase {
 
     public Configuration m_config;
 
-    public IntakeRollerSubsystem(TalonSRX masterIntakeMotor, TalonSRX followerIntakeMotor) {
-        m_masterIntakeMotor = masterIntakeMotor;
-        m_followerIntakeMotor = followerIntakeMotor;
+    public IntakeRollerSubsystem(int masterIntakeMotorId, int followerIntakeMotorId) {
+        m_masterIntakeMotor = new TalonSRX(masterIntakeMotorId);
+        m_followerIntakeMotor = new TalonSRX(followerIntakeMotorId);
 
         instance = this;
     }
