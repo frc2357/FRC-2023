@@ -78,35 +78,35 @@ public class AvailableTeleopTrajectories {
         // Add all convergence to column trajectories
         convergenceToColumnTraj = new Command[CONVERGENCE_POINT.values().length][numberColumns];
 
-        addConvergenceToColumnTrajectory("NEAR to node0", CONVERGENCE_POINT.NEAR, 0);
-        addConvergenceToColumnTrajectory("NEAR to node1", CONVERGENCE_POINT.NEAR, 1);
-        addConvergenceToColumnTrajectory("NEAR to node2", CONVERGENCE_POINT.NEAR, 2);
-        addConvergenceToColumnTrajectory("NEAR to node3", CONVERGENCE_POINT.NEAR, 3);
-        addConvergenceToColumnTrajectory("NEAR to node4", CONVERGENCE_POINT.NEAR, 4);
-        addConvergenceToColumnTrajectory("NEAR to node5", CONVERGENCE_POINT.NEAR, 5);
-        addConvergenceToColumnTrajectory("NEAR to node6", CONVERGENCE_POINT.NEAR, 6);
-        addConvergenceToColumnTrajectory("NEAR to node7", CONVERGENCE_POINT.NEAR, 7);
-        addConvergenceToColumnTrajectory("NEAR to node8", CONVERGENCE_POINT.NEAR, 8);
+        addConvergenceToColumnTrajectory("NEAR to node 0", CONVERGENCE_POINT.NEAR, 0);
+        addConvergenceToColumnTrajectory("NEAR to node 1", CONVERGENCE_POINT.NEAR, 1);
+        addConvergenceToColumnTrajectory("NEAR to node 2", CONVERGENCE_POINT.NEAR, 2);
+        addConvergenceToColumnTrajectory("NEAR to node 3", CONVERGENCE_POINT.NEAR, 3);
+        addConvergenceToColumnTrajectory("NEAR to node 4", CONVERGENCE_POINT.NEAR, 4);
+        addConvergenceToColumnTrajectory("NEAR to node 5", CONVERGENCE_POINT.NEAR, 5);
+        addConvergenceToColumnTrajectory("NEAR to node 6", CONVERGENCE_POINT.NEAR, 6);
+        addConvergenceToColumnTrajectory("NEAR to node 7", CONVERGENCE_POINT.NEAR, 7);
+        addConvergenceToColumnTrajectory("NEAR to node 8", CONVERGENCE_POINT.NEAR, 8);
 
-        addConvergenceToColumnTrajectory("MIDDLE to node0", CONVERGENCE_POINT.MIDDLE, 0);
-        addConvergenceToColumnTrajectory("MIDDLE to node1", CONVERGENCE_POINT.MIDDLE, 1);
-        addConvergenceToColumnTrajectory("MIDDLE to node2", CONVERGENCE_POINT.MIDDLE, 2);
-        addConvergenceToColumnTrajectory("MIDDLE to node3", CONVERGENCE_POINT.MIDDLE, 3);
-        addConvergenceToColumnTrajectory("MIDDLE to node4", CONVERGENCE_POINT.MIDDLE, 4);
-        addConvergenceToColumnTrajectory("MIDDLE to node5", CONVERGENCE_POINT.MIDDLE, 5);
-        addConvergenceToColumnTrajectory("MIDDLE to node6", CONVERGENCE_POINT.MIDDLE, 6);
-        addConvergenceToColumnTrajectory("MIDDLE to node7", CONVERGENCE_POINT.MIDDLE, 7);
-        addConvergenceToColumnTrajectory("MIDDLE to node8", CONVERGENCE_POINT.MIDDLE, 8);
+        addConvergenceToColumnTrajectory("MIDDLE to node 0", CONVERGENCE_POINT.MIDDLE, 0);
+        addConvergenceToColumnTrajectory("MIDDLE to node 1", CONVERGENCE_POINT.MIDDLE, 1);
+        addConvergenceToColumnTrajectory("MIDDLE to node 2", CONVERGENCE_POINT.MIDDLE, 2);
+        addConvergenceToColumnTrajectory("MIDDLE to node 3", CONVERGENCE_POINT.MIDDLE, 3);
+        addConvergenceToColumnTrajectory("MIDDLE to node 4", CONVERGENCE_POINT.MIDDLE, 4);
+        addConvergenceToColumnTrajectory("MIDDLE to node 5", CONVERGENCE_POINT.MIDDLE, 5);
+        addConvergenceToColumnTrajectory("MIDDLE to node 6", CONVERGENCE_POINT.MIDDLE, 6);
+        addConvergenceToColumnTrajectory("MIDDLE to node 7", CONVERGENCE_POINT.MIDDLE, 7);
+        addConvergenceToColumnTrajectory("MIDDLE to node 8", CONVERGENCE_POINT.MIDDLE, 8);
 
-        addConvergenceToColumnTrajectory("FAR to node0", CONVERGENCE_POINT.MIDDLE, 0);
-        addConvergenceToColumnTrajectory("FAR to node1", CONVERGENCE_POINT.MIDDLE, 1);
-        addConvergenceToColumnTrajectory("FAR to node2", CONVERGENCE_POINT.MIDDLE, 2);
-        addConvergenceToColumnTrajectory("FAR to node3", CONVERGENCE_POINT.MIDDLE, 3);
-        addConvergenceToColumnTrajectory("FAR to node4", CONVERGENCE_POINT.MIDDLE, 4);
-        addConvergenceToColumnTrajectory("FAR to node5", CONVERGENCE_POINT.MIDDLE, 5);
-        addConvergenceToColumnTrajectory("FAR to node6", CONVERGENCE_POINT.MIDDLE, 6);
-        addConvergenceToColumnTrajectory("FAR to node7", CONVERGENCE_POINT.MIDDLE, 7);
-        addConvergenceToColumnTrajectory("FAR to node8", CONVERGENCE_POINT.MIDDLE, 8);
+        addConvergenceToColumnTrajectory("FAR to node 0", CONVERGENCE_POINT.MIDDLE, 0);
+        addConvergenceToColumnTrajectory("FAR to node 1", CONVERGENCE_POINT.MIDDLE, 1);
+        addConvergenceToColumnTrajectory("FAR to node 2", CONVERGENCE_POINT.MIDDLE, 2);
+        addConvergenceToColumnTrajectory("FAR to node 3", CONVERGENCE_POINT.MIDDLE, 3);
+        addConvergenceToColumnTrajectory("FAR to node 4", CONVERGENCE_POINT.MIDDLE, 4);
+        addConvergenceToColumnTrajectory("FAR to node 5", CONVERGENCE_POINT.MIDDLE, 5);
+        addConvergenceToColumnTrajectory("FAR to node 6", CONVERGENCE_POINT.MIDDLE, 6);
+        addConvergenceToColumnTrajectory("FAR to node 7", CONVERGENCE_POINT.MIDDLE, 7);
+        addConvergenceToColumnTrajectory("FAR to node 8", CONVERGENCE_POINT.MIDDLE, 8);
 
         // Load hashmap keys into sorted array for efficient searching
         yVals = new Double[startToConvergenceTrajMap.keySet().size()];
