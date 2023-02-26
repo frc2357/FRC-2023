@@ -7,7 +7,6 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
-import com.team2357.lib.subsystems.LimelightSubsystem;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -122,8 +121,11 @@ public class SubsystemFactory {
                 subsystem.configure(Constants.ARM_EXTENSION.GET_EXTENSION_CONFIG());
                 return subsystem;
         }
-        public LimelightSubsystem CreateLimelightSubsystem(){
-                LimelightSubsystem subsystem = new LimelightSubsystem();
-                return subsystem;
+        
+        public DualLimelightManagerSubsystem CreateDualLimelightManagerSubsystem(){
+                DualLimelightManagerSubsystem manager = new DualLimelightManagerSubsystem(
+                        Constants.LIMELIGHT.LEFT_LIMELIGHT_NAME, Constants.LIMELIGHT.RIGHT_LIMELIGHT_NAME,
+                        Constants.LIMELIGHT.LEFT_LIMELIGHT_TX_SETPOINT, Constants.LIMELIGHT.RIGHT_LIMELIGHT_TX_SETPOINT);
+                return manager;
         }
 }

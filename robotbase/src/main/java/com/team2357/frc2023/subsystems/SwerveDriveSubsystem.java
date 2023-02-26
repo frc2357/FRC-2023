@@ -16,7 +16,6 @@ import com.team2357.frc2023.commands.scoring.AutoScoreHighCommand;
 import com.team2357.frc2023.commands.scoring.AutoScoreLowCommand;
 import com.team2357.frc2023.commands.scoring.AutoScoreMidCommand;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
-import com.team2357.lib.subsystems.LimelightSubsystem;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -41,28 +40,30 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		return instance;
 	}
 
-	public static enum ColumnSetpoints {
-		LEFT(Constants.DRIVE.LEFT_COL_X_ANGLE_SETPOINT, 0),
-		MIDDLE(Constants.DRIVE.MID_COL_X_ANGLE_SETPOINT, 1),
-		RIGHT(Constants.DRIVE.RIGHT_COL_X_ANGLE_SETPOINT, 2),
-		DEFAULT(Constants.DRIVE.DEFAULT_X_ANGLE_SETPOINT, -1);
+	public static enum COLUMN_TARGET {
+		LEFT(Constants.DRIVE.LEFT_COL_X_ANGLE_SETPOINT, DualLimelightManagerSubsystem.LIMELIGHT.RIGHT, 0),
+		MIDDLE(Constants.DRIVE.MID_COL_X_ANGLE_SETPOINT,  DualLimelightManagerSubsystem.LIMELIGHT.LEFT, 1),
+		RIGHT(Constants.DRIVE.RIGHT_COL_X_ANGLE_SETPOINT, DualLimelightManagerSubsystem.LIMELIGHT.LEFT, 2),
+		NONE(Double.NaN, DualLimelightManagerSubsystem.LIMELIGHT.LEFT, -1);
 
 		public final double setpoint;
 		public final int index;
+		public final DualLimelightManagerSubsystem.LIMELIGHT primaryLimelight;
 
-		private ColumnSetpoints(double setpoint, int index) {
+		private COLUMN_TARGET(double setpoint, DualLimelightManagerSubsystem.LIMELIGHT primaryLimelight, int index) {
 			this.setpoint = setpoint;
+			this.primaryLimelight = primaryLimelight;
 			this.index = index;
 		}
 	}
 
-	public static ColumnSetpoints getSetpoint(int val) {
-		for (ColumnSetpoints setpoint : ColumnSetpoints.values()) {
+	public static COLUMN_TARGET getSetpoint(int val) {
+		for (COLUMN_TARGET setpoint : COLUMN_TARGET.values()) {
 			if (val == setpoint.index) {
 				return setpoint;
 			}
 		}
-		return ColumnSetpoints.DEFAULT;
+		return COLUMN_TARGET.NONE;
 	}
 
 	/**
@@ -99,10 +100,16 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	private PathConstraints m_pathConstraints;
 
+	// Controller for robot movement along the y-axis
 	private PIDController m_translateXController;
+
+	// Controller for robot movement along the x-axis
 	private PIDController m_translateYController;
 
-	private boolean m_isTracking;
+	private COLUMN_TARGET m_targetColumn;
+	// Whether or not the robot is seeking to get the primary limelight camera in view
+	private boolean m_isSeeking;
+
 	public static class Configuration {
 		/**
 		 * The left-to-right distance between the drivetrain wheels (measured from
@@ -386,8 +393,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	public void setOdemetryFromApriltag() {
-		if (LimelightSubsystem.getInstance().validTargetExists()) {
-			Pose2d p2d = LimelightSubsystem.getInstance().getLimelightPose2d();
+		if (DualLimelightManagerSubsystem.getInstance().validTargetExists()) {
+			Pose2d p2d = DualLimelightManagerSubsystem.getInstance().getLimelightPose2d();
 			resetOdometry(p2d);
 		} else {
 			DriverStation.reportError("No AprilTag target", false);
@@ -451,7 +458,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	public boolean isTracking() {
-		return m_isTracking;
+		return m_targetColumn != COLUMN_TARGET.NONE;
 	}
 
 	public boolean isAtXTarget() {
@@ -472,51 +479,78 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		// System.out.println(isAtXTarget() && isAtYTarget());
 		//return isAtXTarget();
 		// return isAtYTarget();
-		return isAtXTarget() && isAtYTarget();
+		return isAtXTarget() && isAtYTarget() && !m_isSeeking;
 	}
 
-	public void trackTarget(double setpoint) {
+	public void trackTarget(SwerveDriveSubsystem.COLUMN_TARGET column) {
 		System.out.println("track target");
-		m_isTracking = true;
-		trackXTarget(setpoint);
-		trackYTarget();
+		setClosedLoopEnabled(true);
+
+		DualLimelightManagerSubsystem limelightManager = DualLimelightManagerSubsystem.getInstance();
+		m_targetColumn = column;
+
+		limelightManager.setPrimary(m_targetColumn.primaryLimelight);
+		limelightManager.setAprilTagPipelineActive();
+
+		trackXTarget();
+		trackYTarget(column.setpoint);
 		enableOpenLoopRamp();
 	}
 
-	public void trackXTarget(double setpoint) {
+	public void trackXTarget() {
 		m_translateXController.reset();
-		m_translateXController.setSetpoint(setpoint);
+		m_translateXController.setSetpoint(m_config.m_defaultYAngleSetpoint);
 		m_translateXController.setTolerance(m_config.m_translateXToleranceMeters);
 	}
 
-	public void trackYTarget() {
+	public void trackYTarget(double setpoint) {
 		m_translateYController.reset();
-		m_translateYController.setSetpoint(m_config.m_defaultYAngleSetpoint);
+		m_translateYController.setSetpoint(setpoint);
 		m_translateYController.setTolerance(m_config.m_translateYToleranceMeters);
 	}
 
+	private void configureSeeking() {
+		m_isSeeking = true;
+		DualLimelightManagerSubsystem limelightManager = DualLimelightManagerSubsystem.getInstance();
+		trackYTarget(limelightManager.getPrimaryTXSetpoint());
+	}
+
+	private void stopSeeking() {
+		m_isSeeking = false;
+		trackYTarget(m_targetColumn.setpoint);
+	}
+
 	public double calculateXMetersPerSecond() {
-		double outputMetersPerSecond = m_translateXController.calculate(LimelightSubsystem.getInstance().getTY());
+		double outputMetersPerSecond = m_translateXController.calculate(DualLimelightManagerSubsystem.getInstance().getTY());
 		outputMetersPerSecond = outputMetersPerSecond * -1; // Invert output
 		outputMetersPerSecond = MathUtil.clamp(outputMetersPerSecond, m_config.m_translateXMaxSpeedMeters*-1, m_config.m_translateXMaxSpeedMeters);
 		return outputMetersPerSecond;
 	}
 
 	public double calculateYMetersPerSecond() {
-		double outputMetersPerSecond = m_translateYController.calculate(LimelightSubsystem.getInstance().getTX());
+		DualLimelightManagerSubsystem limelightManager = DualLimelightManagerSubsystem.getInstance();
+		double errorAngle = m_isSeeking ? limelightManager.getPrimaryTX() : limelightManager.getSecondaryTX();
+		double outputMetersPerSecond = m_translateYController.calculate(errorAngle);
 		outputMetersPerSecond = MathUtil.clamp(outputMetersPerSecond, m_config.m_translateYMaxSpeedMeters*-1, m_config.m_translateYMaxSpeedMeters);
 		return outputMetersPerSecond;
 	}
 
 	public void trackingPeriodic() {
-		LimelightSubsystem limelight = LimelightSubsystem.getInstance();
+		DualLimelightManagerSubsystem limelightManager = DualLimelightManagerSubsystem.getInstance();
 		// System.out.println(m_translateXController.getSetpoint());
 		// System.out.println("TY "+limelight.getTY());
-		if (!limelight.validTargetExists()) {
+		if (!limelightManager.validTargetExists()) {
 			setClosedLoopEnabled(false);
 			return;
 		}
+
 		System.out.println(isTracking());
+
+		if(!limelightManager.validTargetExistsOnPrimary() && !m_isSeeking) { // If the primary limelight has no target, and has not been set to seek
+			configureSeeking();
+		} else if (limelightManager.validTargetExistsOnPrimary() && m_isSeeking) {
+			stopSeeking();
+		}
 
 		// drive(new ChassisSpeeds(0, calculateYMetersPerSecond(), 0));
 		//drive(new ChassisSpeeds(calculateX(), 0, 0));
@@ -525,7 +559,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	public void stopTracking() {
 		setClosedLoopEnabled(false);
-		m_isTracking = false;
+		m_targetColumn = COLUMN_TARGET.NONE;
+		m_isSeeking = false;
 
 		System.out.println("Ending Tracking -----------------");
 		disableOpenLoopRamp();

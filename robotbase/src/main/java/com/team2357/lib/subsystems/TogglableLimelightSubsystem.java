@@ -41,7 +41,7 @@ public class TogglableLimelightSubsystem extends LimelightSubsystem {
     }
   }
 
-  private DoubleSubscriber m_stream = super.m_Table.getDoubleTopic("stream").subscribe(1.0);
+  private DoubleSubscriber m_stream = super.m_table.getDoubleTopic("stream").subscribe(1.0);
 
   /**
    * Sets the camera stream.
@@ -49,6 +49,7 @@ public class TogglableLimelightSubsystem extends LimelightSubsystem {
    * @param isLimelightPrimary True if the limelight is primary, false if not.
    */
   public TogglableLimelightSubsystem(boolean isLimelightPrimary) {
+    super("limelight");
     setStream(isLimelightPrimary);
     setPipeline(PipelineIndex.HUMAN_VIEW);
   }
