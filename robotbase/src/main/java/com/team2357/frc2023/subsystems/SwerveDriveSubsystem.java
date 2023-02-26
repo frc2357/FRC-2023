@@ -386,8 +386,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	public void setOdemetryFromApriltag() {
-		if (LimelightSubsystem.getInstance().validTargetExists()) {
-			Pose2d p2d = LimelightSubsystem.getInstance().getLimelightPose2d();
+		if (DualLimelightManagerSubsystem.getInstance().validTargetExists()) {
+			Pose2d p2d = DualLimelightManagerSubsystem.getInstance().getLimelightPose2d();
 			resetOdometry(p2d);
 		} else {
 			DriverStation.reportError("No AprilTag target", false);
@@ -496,20 +496,20 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	public double calculateXMetersPerSecond() {
-		double outputMetersPerSecond = m_translateXController.calculate(LimelightSubsystem.getInstance().getTY());
+		double outputMetersPerSecond = m_translateXController.calculate(DualLimelightManagerSubsystem.getInstance().getTY());
 		outputMetersPerSecond = outputMetersPerSecond * -1; // Invert output
 		outputMetersPerSecond = MathUtil.clamp(outputMetersPerSecond, m_config.m_translateXMaxSpeedMeters*-1, m_config.m_translateXMaxSpeedMeters);
 		return outputMetersPerSecond;
 	}
 
 	public double calculateYMetersPerSecond() {
-		double outputMetersPerSecond = m_translateYController.calculate(LimelightSubsystem.getInstance().getTX());
+		double outputMetersPerSecond = m_translateYController.calculate(DualLimelightManagerSubsystem.getInstance().getTX());
 		outputMetersPerSecond = MathUtil.clamp(outputMetersPerSecond, m_config.m_translateYMaxSpeedMeters*-1, m_config.m_translateYMaxSpeedMeters);
 		return outputMetersPerSecond;
 	}
 
 	public void trackingPeriodic() {
-		LimelightSubsystem limelight = LimelightSubsystem.getInstance();
+		DualLimelightManagerSubsystem limelight = DualLimelightManagerSubsystem.getInstance();
 		// System.out.println(m_translateXController.getSetpoint());
 		// System.out.println("TY "+limelight.getTY());
 		if (!limelight.validTargetExists()) {

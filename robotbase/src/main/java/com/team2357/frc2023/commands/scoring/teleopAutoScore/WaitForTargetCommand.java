@@ -12,6 +12,6 @@ public class WaitForTargetCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return LimelightSubsystem.getInstance().validTargetExists();
+        return DualLimelightManagerSubsystem.getInstance().validTargetExists();
     }
 }
