@@ -2,10 +2,13 @@ package com.team2357.frc2023.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
 import com.revrobotics.SparkMaxPIDController;
 import com.team2357.frc2023.shuffleboard.ShuffleboardPIDTuner;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 import com.team2357.lib.util.Utility;
+
+import edu.wpi.first.math.controller.ArmFeedforward;
 
 public class ArmRotationSubsystem extends ClosedLoopSubsystem {
     private static ArmRotationSubsystem instance = null;
@@ -44,11 +47,46 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
         public double m_rotationMotorAllowedError;
         public double m_maxSpeedPercent;
         public int m_smartMotionSlot;
+
+        // Arm Feedforward
+
+        /**
+         * Static gain for feed forward
+         */
+        public double m_feedforwardKs;
+
+        /**
+         * Gravity gain for feed forward
+         */
+        public double m_feedforwardKg;
+
+        /**
+         * Velocity gain for feed forward
+         */
+        public double m_feedforwardKv;
+
+        /**
+         * Acceleration gain for feed forward
+         */
+        public double m_feedforwardKa;
+
+        /**
+         * Number of rotations the arm is at when parallel with the floor
+         */
+        public double m_armHorizontalRotations;
+        
+        /**
+         * How many motor rotations = 1 radian
+         */
+        public double m_rotationsPerRadian;
     }
 
     private Configuration m_config;
     private CANSparkMax m_rotationMotor;
+
     private SparkMaxPIDController m_pidController;
+    private ArmFeedforward m_feedforward;
+
     private double m_targetRotations;
     private ShuffleboardPIDTuner m_shuffleboardPIDTuner;
 
@@ -68,6 +106,9 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
         configureRotationPID(m_pidController);
 
         m_rotationMotor.setInverted(m_config.m_isInverted);
+
+        m_feedforward = new ArmFeedforward(m_config.m_feedforwardKs, m_config.m_feedforwardKv,
+         m_config.m_feedforwardKs, m_config.m_feedforwardKa);
     }
 
     private void configureRotationMotor(CANSparkMax motor) {
@@ -96,7 +137,20 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
     public void setRotatorRotations(double rotations) {
         setClosedLoopEnabled(true);
         m_targetRotations = rotations;
-        m_pidController.setReference(m_targetRotations, CANSparkMax.ControlType.kSmartMotion);
+
+        double feedforwardVolts = m_feedforward.calculate(calculateFeedforwardRadians(rotations), 0);
+        m_pidController.setReference(m_targetRotations, CANSparkMax.ControlType.kSmartMotion, 0,
+        feedforwardVolts, ArbFFUnits.kVoltage);
+    }
+
+    /**
+     * 
+     * @param rotations The rotation setpoint
+     * @return The radians to input into feed forward calculation
+     */
+    public double calculateFeedforwardRadians(double rotations) {
+
+        return (rotations - m_config.m_armHorizontalRotations) / m_config.m_rotationsPerRadian;
     }
 
     public boolean isRotatorAtRotations() {
