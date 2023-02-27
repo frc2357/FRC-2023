@@ -30,6 +30,8 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
     private double m_rightLimelightTXSetpoint;
     private double m_primaryLimelightTXSetpoint;
 
+    private int m_targetAprilTag;
+
     /**
      * 
      * @param leftLimelightName Name of the left side limelight
@@ -74,6 +76,10 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
         }
     }
 
+    public void setTargetAprilTag(int id) {
+        m_targetAprilTag = id;
+    }
+
     public void setAprilTagPipelineActive() {
         m_leftLimelight.setAprilTagPipelineActive();
         m_rightLimelight.setAprilTagPipelineActive();
@@ -100,11 +106,11 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
     }
 
     public boolean validTargetExists() {
-        return m_leftLimelight.validTargetExists() || m_rightLimelight.validTargetExists();
+        return m_leftLimelight.validAprilTagTargetExists(m_targetAprilTag) || m_rightLimelight.validAprilTagTargetExists(m_targetAprilTag);
     }
 
     public boolean validTargetExistsOnPrimary() {
-        return m_primaryLimelight.validTargetExists();
+        return m_primaryLimelight.validAprilTagTargetExists(m_targetAprilTag);
     }
 
     public Pose2d getLimelightPose2d() {
