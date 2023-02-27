@@ -101,7 +101,7 @@ class CameraCalibration:
         j = json.loads(open(jfile,'r').read())
         mtx = np.array(j['mtx']).reshape(3,3)
         dst = np.array(j['dst'])
-        img_size = j['image_size']
+        img_size = j['img_size']
         newmtx = np.array(j['newmtx']).reshape(3,3)
         roi = j['roi']
         return CameraCalibration(mtx,dst,img_size,newmtx,roi)
@@ -125,6 +125,6 @@ class CameraCalibration:
 
 # create image_cal and cam0 CameraCalibration instances on import
 image_cal = CameraCalibration(mtx = np.array([1000, 0, 1280/2,0,1000,720/2,0,0,1]).reshape(3,3),dst=np.float32([0,0,0,0]))
-cam0 = CameraCalibration.load_cal_json(cam0_json) # load calibration data in CameraCalibration class
+cam0 = CameraCalibration.load_cal_json("left_camera_cal.json") # load calibration data in CameraCalibration class
 
    
