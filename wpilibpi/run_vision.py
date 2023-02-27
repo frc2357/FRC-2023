@@ -4,6 +4,7 @@
 # Open Source Software; you can modify and/or share it under the terms of
 # the WPILib BSD license file in the root directory of this project.
 import copy
+import json
 import logging
 import sys
 import time
@@ -25,18 +26,6 @@ log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
 logging.basicConfig(level="DEBUG")
 
-def timeit(func):
-    # This function shows the execution time of 
-    # the function object passed
-    def wrap_func(*args, **kwargs):
-        t1 = time.perf_counter()
-        result = func(*args, **kwargs)
-        t2 = time.perf_counter()
-        log.debug(f'Function {func.__name__!r} executed in {(t2-t1):.4f}s')
-        return result
-    return wrap_func
-
-
 if __name__ == "__main__":
     cfgfile = "/boot/frc.json"
     simulate = False
@@ -45,11 +34,11 @@ if __name__ == "__main__":
         cfgfile = str(sys.argv[1])
     if len(sys.argv) > 2:
         simulate = True
-    camvis = CameraVision(cfgfile, simulate=True) # this class automatically creates all camera + calibration objects
+    camvis = CameraVision(cfgfile, simulate=simulate) # this class automatically creates all camera + calibration objects
     cam0 = camvis.cameras[0]
     nt_table = camvis.ntinst.getTable("wpiblipi")
-    apriltag_js = nt_table.getStringTopic("apriltag_js").publish()
-    gamepiece_js = nt_table.getStringTopic("gamepiece_js").publish()
+    apriltag_json_NT = nt_table.getStringTopic("apriltag_js").publish()
+    gamepiece_json_NT = nt_table.getStringTopic("gamepiece_js").publish()
     log.info(f'Camera width = {cam0.config["width"]}, {cam0.config["height"]}')
     frame = np.zeros(shape=(cam0.config["height"], cam0.config["width"], 3), dtype=np.uint8)
     # retrieve the camera calibration information needed by apriltags
@@ -57,11 +46,11 @@ if __name__ == "__main__":
     Fy = cam0.cal.mtx[1,1]
     Cx = cam0.cal.mtx[0,2]
     Cy = cam0.cal.mtx[1,2]
-    apriltagpipeline = apriltag_funcs.AprilTagPipeline((1280,720),Fx,Fy,Cx,Cy)
+    apriltag = apriltag_funcs.AprilTagPipeline((1280,720),Fx,Fy,Cx,Cy)
+    gamepiece = detect_colors.GamePieceDetector()
     
     count = 0
     avg = 0
-    frame = None 
     while True:
 
         start = time.perf_counter()
@@ -70,39 +59,36 @@ if __name__ == "__main__":
         if simulate:
             # make sure to make a copy of the original image
             frame = copy.copy(cam0.images[count%(len(cam0.images))])
-            orig = copy.copy(frame)
         else:
             #TODO: do I grab multiple cameras manually here, or iterate through cameras in camvis.cameras?
             #      perhaps even storing the frame in the CameraObject?
-            ftime,frame= cam0.sink.grabFrame()
-
+            cam0.sink.grabFrame(frame)
+        
         #get server time for which last frame was captured
         timeoffset = camvis.ntinst.getServerTimeOffset()
-
+        orig = copy.copy(frame) # create a copy for color detection
         try:
             # trying undistort seemed to cause lockup issues???
             #frame = cam0.cal.undistort(frame)
             #TODO: do we care if image is undistorted -- asked another way --> is AprilTags using the camera matrix values to 
             #      undistort?  Answer is assumed to be YES, which means doing the undistort() call above is a bad idea
-            frame,roi_rects = apriltagpipeline.runPipeline(frame,image_cal)
             #if simulate:
             #    frame = cv2.putText(frame,count%(len(cam0.images)),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,0), 3)
 
             try:
-                #frame = detect_colors(orig,orig)
-                for r in roi_rects:
-                    detect_colors.runPipeline(orig, r)
-                j = apriltagpipeline.to_json()
+                i = 0
+                frame,roi_rects = apriltag.runPipeline(frame,image_cal)
+                orig, yel_pct, vio_pct = gamepiece.runPipeline(orig, roi_rects, colorize=True)
+                j = apriltag.to_json()
                 j['timestamp'] = timeoffset 
                 log.debug(f"Timestamp: {j['timestamp']}")
-                log.debug(f"{str(j)}")
-                apriltag_js.set(str(j)) # send data to networkstable
+                apriltag_json_NT.set(json.dumps(j,separators=(',',':')))                # send data to networks table
+                gamepiece_json_NT.set(gamepiece.to_json())  # send data to networks table
             except Exception as e:
-                log.error(e)
+                log.exception(e)
             ###
             #trying to overlay detected colors
             frame = cv2.addWeighted(frame,0.5,orig,0.5,0)
-            ###
             cam0.outstream.putFrame(frame)
 
             # track processing time.  
@@ -118,6 +104,6 @@ if __name__ == "__main__":
                     time.sleep(0.03)
         except Exception as e:
             #raise(e)
-            log.error(f"ERROR: {e}")
+            log.exception(f"ERROR: {e}")
             pass
             
