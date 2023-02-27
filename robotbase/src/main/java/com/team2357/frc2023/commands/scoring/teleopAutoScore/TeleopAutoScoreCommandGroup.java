@@ -1,16 +1,59 @@
 package com.team2357.frc2023.commands.scoring.teleopAutoScore;
 
 import com.team2357.frc2023.commands.auto.TranslateToTargetCommandGroup;
+import com.team2357.frc2023.networktables.AprilTagPose;
 import com.team2357.frc2023.networktables.Buttonboard;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
+import com.team2357.frc2023.trajectoryutil.AvailableTeleopTrajectories;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
-public class TeleopAutoScoreCommandGroup extends SequentialCommandGroup {
-    public TeleopAutoScoreCommandGroup() {
-        addCommands(new WaitForTargetCommand());
-        // TODO: Find a way to select an april tag to base this off of
-        addCommands(new TranslateToTargetCommandGroup((SwerveDriveSubsystem.getSetpoint(Buttonboard.getInstance().getColValue()))));
-        addCommands(SwerveDriveSubsystem.getAutoScoreCommands(Buttonboard.getInstance().getRowValue()));
+public class TeleopAutoScoreCommandGroup extends CommandBase {
+
+    private SequentialCommandGroup m_teleopCommand;
+
+    private boolean m_hasScored;
+
+    @Override
+    public void initialize() {
+        m_hasScored = false;
+        m_teleopCommand = null;
+    }
+
+    @Override
+    public void execute() {
+        if (m_teleopCommand == null) {
+            Pose2d currentPose = AprilTagPose.getInstance().getPose();
+            int col = Buttonboard.getInstance().getColValue();
+            Command teleopTrajectory = AvailableTeleopTrajectories.buildTrajectory(col, currentPose);
+
+            if (teleopTrajectory != null) {
+                Command autoScore = SwerveDriveSubsystem.getAutoScoreCommands(Buttonboard.getInstance().getRowValue());
+                Command translate = new TranslateToTargetCommandGroup(SwerveDriveSubsystem.getSetpoint(col % 3));
+                
+                m_teleopCommand = new SequentialCommandGroup();
+                m_teleopCommand.addCommands(teleopTrajectory);
+                m_teleopCommand.addCommands(translate);
+                m_teleopCommand.addCommands(autoScore);
+                m_teleopCommand.addCommands(new InstantCommand(() -> {
+                    m_hasScored = true;
+                }));
+                m_teleopCommand.schedule();
+            }
+        }
+    }
+
+    @Override
+    public boolean isFinished() {
+        return m_hasScored;
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        m_teleopCommand.cancel();
     }
 }
