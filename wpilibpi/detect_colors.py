@@ -70,18 +70,17 @@ class GamePieceDetector:
         return json.dumps({'cone':self.gamepiece_results[:,:,0].tolist(),
                 'cube':self.gamepiece_results[:,:,1].tolist()},separators=(',',':'))
     
-    def runPipeline(self, frame:ndarray, roi_result:list, colorize:float=0.5):
+    def runPipeline(self, frame:ndarray, roi_result:list, colorize:float=0.0):
         """ main function used for color detection
 
             Args:
                 frame: ndarray (image)
-                roi_rects: list of [x1,y1,x2,y2] roi regions in pixel coordinates
+                roi_result: tuple of (tag_id, roi_rects), where roi_rects is a list of [x1,y1,x2,y2] roi regions in pixel coordinates
                 colorize: float used to add colored frames. 0.0 = do not colorize, > 0.0 -- threshold for 'detection' 
         """
         yel_pct = -1.0
         vio_pct = -1.0
-        #idx=0
-        # FIXME: this isn't right
+        # TODO: need to rework this
         for tag_id, roi_rects in roi_result:
             for idx,roi in enumerate(roi_rects):
                 try:
@@ -100,22 +99,22 @@ class GamePieceDetector:
 
     def detect_colors(self, frame:ndarray, roi:list)->tuple:
         
-        # Convert the imageFrame in
-        # BGR(RGB color space) to
-        # HSV(hue-saturation-value)
-        # color space
         yel_pct = -1.0
         vio_pct = -1.0
         try:
+            # grab the region of interest, convert color space from RGB to HSV
+            # literature informs that color separation is easier in HSV
             hsvFrame = cv2.cvtColor(frame[roi[0]:roi[1],roi[2]:roi[3],:], cv2.COLOR_BGR2HSV)
              
-            # Filter the image and get the binary mask, where white represents 
-            # your target color
+            # Filter the image and get a binary mask, where white (255) is a match, black (0) is not a match
+            # use test_findcolor.py to find lower/upper values to use
             mask_yel = cv2.inRange(hsvFrame, self._yel_lower, self._yel_upper)
             mask_vio = cv2.inRange(hsvFrame, self._vio_lower, self._vio_upper)
         
+            #calculate the area that matched, converted to a percentage of total area
             yel_pct = np.count_nonzero(mask_yel)/np.product(mask_yel.shape)
             vio_pct  = np.count_nonzero(mask_vio)/np.product(mask_vio.shape)
+
             if yel_pct > 0.1 or vio_pct > 0.1:
                 log.debug(f"^Y={yel_pct:0.2f}\t%V={vio_pct:0.2f}")
         except Exception as e:
