@@ -1,5 +1,6 @@
 package com.team2357.frc2023.commands.scoring.teleopAutoScore;
 
+import com.team2357.frc2023.commands.auto.TranslateToTargetCommandGroup;
 import com.team2357.frc2023.networktables.AprilTagPose;
 import com.team2357.frc2023.networktables.Buttonboard;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
@@ -27,14 +28,16 @@ public class TeleopAutoScoreCommandGroup extends CommandBase {
     public void execute() {
         if (m_teleopCommand == null) {
             Pose2d currentPose = AprilTagPose.getInstance().getPose();
-            int col = Buttonboard.getInstance().getColValue() % 3;
+            int col = Buttonboard.getInstance().getColValue();
             Command teleopTrajectory = AvailableTeleopTrajectories.buildTrajectory(col, currentPose);
 
             if (teleopTrajectory != null) {
                 Command autoScore = SwerveDriveSubsystem.getAutoScoreCommands(Buttonboard.getInstance().getRowValue());
-               
+                Command translate = new TranslateToTargetCommandGroup(SwerveDriveSubsystem.getSetpoint(col % 3));
+                
                 m_teleopCommand = new SequentialCommandGroup();
                 m_teleopCommand.addCommands(teleopTrajectory);
+                m_teleopCommand.addCommands(translate);
                 m_teleopCommand.addCommands(autoScore);
                 m_teleopCommand.addCommands(new InstantCommand(() -> {
                     m_hasScored = true;
