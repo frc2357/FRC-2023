@@ -1,7 +1,6 @@
 package com.team2357.frc2023.commands.human.panic;
 
 import com.team2357.frc2023.subsystems.IntakeArmSubsystem;
-import com.team2357.frc2023.subsystems.IntakeRollerSubsystem;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
