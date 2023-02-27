@@ -27,7 +27,7 @@ public class TeleopAutoScoreCommandGroup extends CommandBase {
     public void execute() {
         if (m_teleopCommand == null) {
             Pose2d currentPose = AprilTagPose.getInstance().getPose();
-            int col = Buttonboard.getInstance().getColValue();
+            int col = Buttonboard.getInstance().getColValue() % 3;
             Command teleopTrajectory = AvailableTeleopTrajectories.buildTrajectory(col, currentPose);
 
             if (teleopTrajectory != null) {
