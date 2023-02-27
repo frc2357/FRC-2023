@@ -78,7 +78,7 @@ class CameraVision:
 
         if simulate: # simulate mode loads a set of images into the camera class
             imgs = []
-            fimages = glob.glob(".\\images\\*.png")
+            fimages = glob.glob("./images/*.png")
             print(fimages)
             
             for fname in fimages:
@@ -209,5 +209,6 @@ class CameraVision:
         c.config = camConfig 
         c.outstream = outputStream 
         c.sink = CameraServer.getVideo(camera)
+        c.cal = image_cal
         return c
 
