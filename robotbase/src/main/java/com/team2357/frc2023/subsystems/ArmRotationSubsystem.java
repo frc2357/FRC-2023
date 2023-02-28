@@ -2,10 +2,14 @@ package com.team2357.frc2023.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxPIDController;
 import com.team2357.frc2023.shuffleboard.ShuffleboardPIDTuner;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 import com.team2357.lib.util.Utility;
+
+import edu.wpi.first.math.controller.ArmFeedforward;
 
 public class ArmRotationSubsystem extends ClosedLoopSubsystem {
     private static ArmRotationSubsystem instance = null;
@@ -22,7 +26,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
         public int m_rotationMotorStallLimitAmps;
         public int m_rotationMotorFreeLimitAmps;
 
-        public boolean m_isFollowerInverted;
+        public boolean m_isInverted;
 
         public double m_shuffleboardTunerPRange;
         public double m_shuffleboardTunerIRange;
@@ -44,19 +48,52 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
         public double m_rotationMotorAllowedError;
         public double m_maxSpeedPercent;
         public int m_smartMotionSlot;
+
+        // Arm Feedforward
+
+        /**
+         * Static gain for feed forward
+         */
+        public double m_feedforwardKs;
+
+        /**
+         * Gravity gain for feed forward
+         */
+        public double m_feedforwardKg;
+
+        /**
+         * Velocity gain for feed forward
+         */
+        public double m_feedforwardKv;
+
+        /**
+         * Acceleration gain for feed forward
+         */
+        public double m_feedforwardKa;
+
+        /**
+         * Number of rotations the arm is at when parallel with the floor
+         */
+        public double m_armHorizontalRotations;
+        
+        /**
+         * How many motor rotations = 1 radian
+         */
+        public double m_rotationsPerRadian;
     }
 
     private Configuration m_config;
-    private CANSparkMax m_masterRotationMotor;
-    private CANSparkMax m_followerRotationMotor;
+    private CANSparkMax m_rotationMotor;
+
     private SparkMaxPIDController m_pidController;
+    private ArmFeedforward m_feedforward;
+
     private double m_targetRotations;
     private ShuffleboardPIDTuner m_shuffleboardPIDTuner;
 
-    public ArmRotationSubsystem(CANSparkMax masterRotationMotor, CANSparkMax followerRotationMotor) {
+    public ArmRotationSubsystem(int motorId) {
         instance = this;
-        m_masterRotationMotor = masterRotationMotor;
-        m_followerRotationMotor = followerRotationMotor;
+        m_rotationMotor = new CANSparkMax(motorId, MotorType.kBrushless);
     }
 
     public void configure(Configuration config) {
@@ -64,14 +101,15 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
         m_shuffleboardPIDTuner = new ShuffleboardPIDTuner("Arm Rotation", config.m_shuffleboardTunerPRange,
                 m_config.m_shuffleboardTunerIRange, m_config.m_shuffleboardTunerDRange, m_config.m_rotationMotorP,
                 m_config.m_rotationMotorI, m_config.m_rotationMotorD);
-        configureRotationMotor(m_masterRotationMotor);
-        configureRotationMotor(m_followerRotationMotor);
+        configureRotationMotor(m_rotationMotor);
 
-        m_pidController = m_masterRotationMotor.getPIDController();
+        m_pidController = m_rotationMotor.getPIDController();
         configureRotationPID(m_pidController);
 
-        m_masterRotationMotor.setInverted(!m_config.m_isFollowerInverted);
-        m_followerRotationMotor.follow(m_masterRotationMotor, m_config.m_isFollowerInverted);
+        m_rotationMotor.setInverted(m_config.m_isInverted);
+
+        m_feedforward = new ArmFeedforward(m_config.m_feedforwardKs, m_config.m_feedforwardKv,
+         m_config.m_feedforwardKs, m_config.m_feedforwardKa);
     }
 
     private void configureRotationMotor(CANSparkMax motor) {
@@ -100,11 +138,24 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
     public void setRotatorRotations(double rotations) {
         setClosedLoopEnabled(true);
         m_targetRotations = rotations;
-        m_pidController.setReference(m_targetRotations, CANSparkMax.ControlType.kSmartMotion);
+
+        double feedforwardVolts = m_feedforward.calculate(calculateFeedforwardRadians(rotations), 0);
+        m_pidController.setReference(m_targetRotations, CANSparkMax.ControlType.kSmartMotion, 0,
+        feedforwardVolts, ArbFFUnits.kVoltage);
+    }
+
+    /**
+     * 
+     * @param rotations The rotation setpoint
+     * @return The radians to input into feed forward calculation
+     */
+    public double calculateFeedforwardRadians(double rotations) {
+
+        return (rotations - m_config.m_armHorizontalRotations) / m_config.m_rotationsPerRadian;
     }
 
     public boolean isRotatorAtRotations() {
-        return isMotorAtRotations(m_masterRotationMotor) && isMotorAtRotations(m_followerRotationMotor);
+        return isMotorAtRotations(m_rotationMotor);
     }
 
     public boolean isMotorAtRotations(CANSparkMax motor) {
@@ -118,30 +169,26 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
 
         double motorSpeed = (-axisSpeed) * m_config.m_rotationAxisMaxSpeed;
 
-        m_masterRotationMotor.set(motorSpeed);
+        m_rotationMotor.set(motorSpeed);
     }
 
     // Method for the panic mode to rotate the arms
     public void manualRotate(double sensorUnits) {
-        m_masterRotationMotor.set(sensorUnits * m_config.m_maxSpeedPercent);
+        m_rotationMotor.set(sensorUnits * m_config.m_maxSpeedPercent);
     }
 
     // Method to stop the motors
     public void stopRotationMotors() {
         setClosedLoopEnabled(false);
-        m_masterRotationMotor.set(0);
+        m_rotationMotor.set(0);
     }
 
     public void resetEncoders() {
-        m_masterRotationMotor.getEncoder().setPosition(0);
+        m_rotationMotor.getEncoder().setPosition(0);
     }
 
-    public double getMasterMotorRotations() {
-        return m_masterRotationMotor.getEncoder().getPosition();
-    }
-
-    public double getFollowerMotorRotations() {
-        return m_followerRotationMotor.getEncoder().getPosition();
+    public double getMotorRotations() {
+        return m_rotationMotor.getEncoder().getPosition();
     }
 
     public void updatePID() {
