@@ -75,22 +75,28 @@ Picture the robot traveling from left to right for orientation
    - Push button to toggle activation
  - Intake Rotation Knob
    - Controls intake winch, clockwise is out, counterclockwise is stowed
+ - Intake Rotation Indicator
+   - Indicates current status of intake rotation
  - Intake Speed Knob
    - Controls intake speed, clockwise is faster, counterclockwise is slower
+ - Intake Speed Indicator
+   - Indicates current speed of intake rollers
 
 #### Arm Controls
  - Arm Rotation Knob
    - Turn knob to rotate arm, clockwise is down, counterclockwise is up
+ - Arm Rotation Indicator
+   - Indicates current rotational position of arm rotation
  - Arm Extension Knob
    - Turn knob to extend arm, clockwise is out, counterclockwise is in
+ - Arm Extension Indicator
+   - Indicates current linear position of arm extension
 
 #### Claw Controls
  - Wrist button
-   - Yellow button, when illuminated, indicates cylinder is active for wrist to contract, push to contract
-   - Yellow button, when illuminated, indicates cylinder is active for wrist to extend, push to extend
+   - Yellow button, push to extend/contract, illuminated when extended
  - Claw button
-   - Blue button, when illuminated, indicates cylinder is active for claw to open, push to open
-   - Blue button, when illuminated, indicates cylinder is active for claw to extend, push to close
+   - Orange button, push to open/close, illuminated when closed
 
 ## Driver Monitor
 - Device Name: "drivermonitor"
