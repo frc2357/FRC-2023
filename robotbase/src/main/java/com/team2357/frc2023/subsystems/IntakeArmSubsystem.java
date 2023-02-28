@@ -75,7 +75,6 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
 
     private ArmState m_currentState;
     private ArmState m_desiredState;
-    private long m_lastActionMillis;
 
     private ShuffleboardPIDTuner m_shuffleboardPIDTuner;
 
@@ -179,14 +178,12 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
         m_currentState = ArmState.Unknown;
         m_desiredState = ArmState.Deployed;
         setWinchRotation(m_config.m_winchDeployRotations);
-        m_lastActionMillis = 0;
     }
 
     public void stow() {
         m_currentState = ArmState.Unknown;
         m_desiredState = ArmState.Stowed;
         setWinchRotation(m_config.m_winchStowRotations);
-        m_lastActionMillis = 0;
     }
 
     @Override
@@ -210,26 +207,22 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
     private void deployPeriodic() {
         long now = System.currentTimeMillis();
 
-        if (m_lastActionMillis == 0) {
+        if (!isWinchAtRotations()) {
             m_intakeSolenoid.set(DoubleSolenoid.Value.kForward);
-            m_lastActionMillis = now;
         } else if (isWinchAtRotations()) {
             m_intakeSolenoid.set(DoubleSolenoid.Value.kOff);
             m_currentState = ArmState.Deployed;
-            m_lastActionMillis = 0;
         }
     }
 
     private void stowPeriodic() {
         long now = System.currentTimeMillis();
 
-        if (m_lastActionMillis == 0) {
+        if (!isWinchAtRotations()) {
             m_intakeSolenoid.set(DoubleSolenoid.Value.kReverse);
-            m_lastActionMillis = now;
         } else if (isWinchAtRotations()) {
             m_intakeSolenoid.set(DoubleSolenoid.Value.kOff);
             m_currentState = ArmState.Stowed;
-            m_lastActionMillis = 0;
         }
     }
 }
