@@ -16,6 +16,7 @@ import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.commands.scoring.AutoScoreHighCommand;
 import com.team2357.frc2023.commands.scoring.AutoScoreLowCommand;
 import com.team2357.frc2023.commands.scoring.AutoScoreMidCommand;
+import com.team2357.frc2023.util.Utility;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 
 import edu.wpi.first.math.MathUtil;
@@ -537,6 +538,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		m_targetColumn = column;
 
 		limelightManager.setPrimary(m_targetColumn.primaryLimelight);
+		limelightManager.setTargetAprilTag(Utility.gridColumnToAprilTagID(column.index));
 		limelightManager.setAprilTagPipelineActive();
 
 		trackXTarget();

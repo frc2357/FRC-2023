@@ -17,6 +17,7 @@ import edu.wpi.first.networktables.DoubleArrayTopic;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.IntegerPublisher;
+import edu.wpi.first.networktables.IntegerSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.PubSubOption;
@@ -76,7 +77,7 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
   private DoubleSubscriber m_TsSub;
   private DoubleSubscriber m_ThorSub;
   private DoubleSubscriber m_TvertSub;
-
+  private IntegerSubscriber m_Tid;
   private DoubleArraySubscriber m_limelightPoseInfoSub;
 
   /**
@@ -99,6 +100,7 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
     m_TsSub = m_table.getDoubleTopic("ts").subscribe(m_Configuration.m_DefaultReturnValue);
     m_ThorSub = m_table.getDoubleTopic("thor").subscribe(m_Configuration.m_DefaultReturnValue);
     m_TvertSub = m_table.getDoubleTopic("tvert").subscribe(m_Configuration.m_DefaultReturnValue);
+    m_Tid = m_table.getIntegerTopic("tid").subscribe(-1);
 
     DoubleArrayTopic limelightPoseInfo = m_table.getDoubleArrayTopic("botpose");
     m_limelightPoseInfoSub = limelightPoseInfo.subscribe(null,
@@ -117,6 +119,15 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
 
   public boolean validTargetExists() {
     return 0 < getTV();
+  }
+
+  /**
+   * 
+   * @param id Id of the desired april tag
+   * @return If the limelight sees the april tag
+   */
+  public boolean validAprilTagTargetExists(int id) {
+    return id == m_Tid.get();
   }
 
   public boolean isHumanPipelineActive() {
