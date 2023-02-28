@@ -197,6 +197,8 @@ public final class Constants {
             config.m_masterInverted = true;
             config.m_followerInverted = false;
 
+            config.m_spikeAmount = 10;
+
             return config;
         }
 

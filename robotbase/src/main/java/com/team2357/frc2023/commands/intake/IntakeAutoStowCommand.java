@@ -5,14 +5,14 @@ import com.team2357.lib.commands.CommandLoggerBase;
 
 public class IntakeAutoStowCommand extends CommandLoggerBase{
 
-    public IntakeDeployCommandGroup m_deploygroup;
-    public IntakeStowCommandGroup m_stowgrroup;
+    public IntakeDeployCommandGroup m_deployGroup;
+    public IntakeStowCommandGroup m_stowGroup;
     public boolean m_spiked = false;
     public long m_initializedAt;
 
     public IntakeAutoStowCommand(){
-        m_deploygroup = new IntakeDeployCommandGroup();
-        m_stowgrroup = new IntakeStowCommandGroup();
+        m_deployGroup = new IntakeDeployCommandGroup();
+        m_stowGroup = new IntakeStowCommandGroup();
         m_initializedAt = System.currentTimeMillis();
     }
 
@@ -27,7 +27,7 @@ public class IntakeAutoStowCommand extends CommandLoggerBase{
 
     @Override
     public void initialize(){
-        m_deploygroup.schedule();
+        m_deployGroup.schedule();
     }
 
     @Override
@@ -37,8 +37,8 @@ public class IntakeAutoStowCommand extends CommandLoggerBase{
     
     @Override
     public void end(boolean interrupted){
-        m_deploygroup.cancel();
-        m_stowgrroup.schedule();
+        m_deployGroup.cancel();
+        m_stowGroup.schedule();
     }
 
 }
