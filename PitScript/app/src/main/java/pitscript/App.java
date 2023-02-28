@@ -13,13 +13,13 @@ import org.apache.commons.net.ftp.*;
 
 public class App {
     public static void main(String[] args) {
-        String server = "172.22.11.2";
+        String server = "10.23.57.2";
         int port = 22;
         String user = "lvuser";
         String pass = "";
         int i=0;
         FTPClient ftpClient = new FTPClient();
-        while(i>3){
+        while(i<3){
         try {
             // connect and login to the server
             ftpClient.connect(server, port);
