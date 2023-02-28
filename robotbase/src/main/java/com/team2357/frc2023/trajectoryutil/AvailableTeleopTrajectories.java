@@ -138,8 +138,12 @@ public class AvailableTeleopTrajectories {
      * @param pose Current robot pose
      * @return A command to run to get to column
      */
-    public static Command BuildTrajectory(int col, Pose2d pose) {
+    public static Command buildTrajectory(int col, Pose2d pose) {
         double startKey = getTrajectoryKey(pose);
+        
+        if(startKey == -1) {
+            return null;
+        }
         Command startCommand = startToConvergenceTrajMap.get(startKey);
 
         CONVERGENCE_POINT convergencePoint = yToConvergenceMap.get(startKey);
