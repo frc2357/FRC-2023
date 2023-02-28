@@ -8,7 +8,7 @@ import buttonboard.ArduinoUSB;
 import buttonboard.NetworkTablesClient;
 import buttonboard.NetworkTablesServer;
 
-public class App {
+public class ButtonboardConnect {
     private static final String ARG_TEST_ARDUINO = "test:arduino";
     private static final String ARG_TEST_NTCLIENT = "test:ntclient";
     private static final String ARG_TEST_NTSERVER = "test:ntserver";
