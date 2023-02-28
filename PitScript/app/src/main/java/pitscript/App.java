@@ -10,16 +10,16 @@ import java.io.OutputStream;
 
 import org.apache.commons.net.ftp.*;
 
-public class App {
 
+public class App {
     public static void main(String[] args) {
-        String server = "(roboRIO-2357-frc.local";
+        String server = "172.22.11.2";
         int port = 22;
         String user = "lvuser";
         String pass = "";
-
+        int i=0;
         FTPClient ftpClient = new FTPClient();
-
+        while(i>3){
         try {
             // connect and login to the server
             ftpClient.connect(server, port);
@@ -33,7 +33,7 @@ public class App {
             String remoteDirPath = "/home/lvuser";
             String saveDirPath = "C:\\Logs";
 
-            downloadDirectory(ftpClient, remoteDirPath, "/home/lvuser/Logs", saveDirPath);
+            downloadDirectory(ftpClient, remoteDirPath, "/logs", saveDirPath);
 
             // log out and disconnect from the server
             ftpClient.logout();
@@ -43,7 +43,8 @@ public class App {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-
+        i+=1;
+    }
     }
 
     /**
@@ -60,7 +61,8 @@ File downloadFile = new File(savePath);
 
 File parentDir = downloadFile.getParentFile();
 if (!parentDir.exists()) {
-parentDir.mkdir();
+    
+    parentDir.mkdir();
 }
 
 OutputStream outputStream = new BufferedOutputStream(
