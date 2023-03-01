@@ -530,7 +530,13 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		return isAtXTarget() && isAtYTarget() && !m_isSeeking;
 	}
 
-	public void trackTarget(SwerveDriveSubsystem.COLUMN_TARGET column) {
+	/**
+	 * 
+	 * @param column The target column relative to the selected april tag (RIGHT, MIDDLE, LEFT)
+	 * @param targetAprilTag The target AprilTag for the limelight to track, 
+	 * -1 will cause the limelight to track the primary in view AprilTag
+	 */
+	public void trackTarget(SwerveDriveSubsystem.COLUMN_TARGET column, int targetAprilTag) {
 		System.out.println("track target");
 		setClosedLoopEnabled(true);
 
@@ -538,7 +544,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		m_targetColumn = column;
 
 		limelightManager.setPrimary(m_targetColumn.primaryLimelight);
-		limelightManager.setTargetAprilTag(Utility.gridColumnToAprilTagID(column.index));
+		limelightManager.setTargetAprilTag(targetAprilTag);
 		limelightManager.setAprilTagPipelineActive();
 
 		trackXTarget();
@@ -609,6 +615,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	public void stopTracking() {
 		setClosedLoopEnabled(false);
+		DualLimelightManagerSubsystem.getInstance().setTargetAprilTag(-1);
 		m_targetColumn = COLUMN_TARGET.NONE;
 		m_isSeeking = false;
 
