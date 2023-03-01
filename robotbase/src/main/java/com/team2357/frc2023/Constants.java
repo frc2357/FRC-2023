@@ -213,7 +213,7 @@ public final class Constants {
             config.m_deployMilliseconds = 1000;
             config.m_stowMilliseconds = 1000;
 
-            config.m_winchAxisMaxSpeed = 0;
+            config.m_winchAxisMaxSpeed = 0.4;
 
             config.m_winchMotorIdleMode = IdleMode.kBrake;
 
