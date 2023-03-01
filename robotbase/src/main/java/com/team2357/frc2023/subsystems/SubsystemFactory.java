@@ -35,8 +35,8 @@ public class SubsystemFactory {
         }
 
         public IntakeRollerSubsystem CreateIntakeRollerSubsystem() {
-                IntakeRollerSubsystem subsystem = new IntakeRollerSubsystem(Constants.CAN_ID.MASTER_INTAKE_MOTOR,
-                                Constants.CAN_ID.FOLLOWER_INTAKE_MOTOR);
+                IntakeRollerSubsystem subsystem = new IntakeRollerSubsystem(Constants.CAN_ID.MASTER_INTAKE_MOTOR_ID,
+                                Constants.CAN_ID.FOLLOWER_INTAKE_MOTOR_ID);
                 subsystem.configure(Constants.INTAKE_ROLLER.GET_INTAKE_CONFIG());
                 return subsystem;
         }
@@ -57,19 +57,19 @@ public class SubsystemFactory {
 
         public IntakeArmSubsystem CreateIntakeArmSubsystem() {
                 IntakeArmSubsystem subsystem = new IntakeArmSubsystem(Constants.PH_ID.INTAKE_SOLENOID_FORWARD_CHANNEL,
-                                Constants.PH_ID.INTAKE_SOLENOID_REVERSE_CHANNEL);
+                                Constants.PH_ID.INTAKE_SOLENOID_REVERSE_CHANNEL, Constants.CAN_ID.INTAKE_WINCH_MOTOR_ID);
                 subsystem.configure(Constants.INTAKE_ARM.GET_INTAKE_ARM_CONFIG());
                 return subsystem;
         }
 
         public ArmRotationSubsystem CreateArmRotationSubsystem() {
-                ArmRotationSubsystem subsystem = new ArmRotationSubsystem(Constants.CAN_ID.ROTATION_MOTOR);
+                ArmRotationSubsystem subsystem = new ArmRotationSubsystem(Constants.CAN_ID.ROTATION_MOTOR_ID);
                 subsystem.configure(Constants.ARM_ROTATION.GET_ROTATION_CONFIG());
                 return subsystem;
         }
 
         public ArmExtensionSubsystem CreateArmExtensionSubsystem() {
-                ArmExtensionSubsystem subsystem = new ArmExtensionSubsystem(Constants.CAN_ID.ARM_EXTENSION_MOTOR);
+                ArmExtensionSubsystem subsystem = new ArmExtensionSubsystem(Constants.CAN_ID.ARM_EXTENSION_MOTOR_ID);
                 subsystem.configure(Constants.ARM_EXTENSION.GET_EXTENSION_CONFIG());
                 return subsystem;
         }

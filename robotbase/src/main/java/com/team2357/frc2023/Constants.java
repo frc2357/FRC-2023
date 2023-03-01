@@ -63,12 +63,13 @@ public final class Constants {
         public static final int BACK_RIGHT_MODULE_STEER_MOTOR_ID = 18;
         public static final int BACK_RIGHT_MODULE_STEER_ENCODER_ID = 22;
 
-        public static final int MASTER_INTAKE_MOTOR = 23;
-        public static final int FOLLOWER_INTAKE_MOTOR = 24;
+        public static final int MASTER_INTAKE_MOTOR_ID = 23;
+        public static final int FOLLOWER_INTAKE_MOTOR_ID = 24;
+        public static final int INTAKE_WINCH_MOTOR_ID = 25;
 
-        public static final int ROTATION_MOTOR = 25;
+        public static final int ROTATION_MOTOR_ID = 26;
 
-        public static final int ARM_EXTENSION_MOTOR = 27;
+        public static final int ARM_EXTENSION_MOTOR_ID = 27;
     }
 
     public static final class PH_ID {
@@ -212,6 +213,32 @@ public final class Constants {
             config.m_deployMilliseconds = 1000;
             config.m_stowMilliseconds = 1000;
 
+            config.m_winchAxisMaxSpeed = 0;
+
+            config.m_winchMotorIdleMode = IdleMode.kBrake;
+
+            config.m_winchMotorStallLimitAmps = 0;
+            config.m_winchMotorFreeLimitAmps = 0;
+
+            // smart motion config
+            config.m_winchMotorP = 0;
+            config.m_winchMotorI = 0;
+            config.m_winchMotorD = 0;
+            config.m_winchMotorIZone = 0;
+            config.m_winchMotorFF = 0;
+            config.m_winchMotorMaxOutput = 0;
+            config.m_winchMotorMinOutput = 0;
+            config.m_winchMotorMaxRPM = 0;
+            config.m_winchMotorMaxVel = 0;
+            config.m_winchMotorMinVel = 0;
+            config.m_winchMotorMaxAcc = 0;
+            config.m_winchMotorAllowedError = 0;
+            config.m_maxSpeedPercent = 0.4;
+            config.m_smartMotionSlot = 0;
+
+            config.m_winchDeployRotations = 0.0;
+            config.m_winchStowRotations = 0.0;
+
             return config;
         }
     }
@@ -289,33 +316,7 @@ public final class Constants {
     public static final class ARM_ROTATION {
         public static ArmRotationSubsystem.Configuration GET_ROTATION_CONFIG() {
             ArmRotationSubsystem.Configuration config = new ArmRotationSubsystem.Configuration();
-            config.m_rotationAxisMaxSpeed = 0;
 
-            config.m_rotationMotorIdleMode = IdleMode.kBrake;
-
-            config.m_rotationMotorStallLimitAmps = 0;
-            config.m_rotationMotorFreeLimitAmps = 0;
-
-            config.m_isInverted = false;
-
-            config.m_shuffleboardTunerPRange = 0.2;
-            config.m_shuffleboardTunerIRange = 0.2;
-            config.m_shuffleboardTunerDRange = 0.2;
-
-            // smart motion config
-            config.m_rotationMotorP = 0;
-            config.m_rotationMotorI = 0;
-            config.m_rotationMotorD = 0;
-            config.m_rotationMotorIZone = 0;
-            config.m_rotationMotorFF = 0;
-            config.m_rotationMotorMaxOutput = 0;
-            config.m_rotationMotorMinOutput = 0;
-            config.m_rotationMotorMaxRPM = 0;
-            config.m_rotationMotorMaxVel = 0;
-            config.m_rotationMotorMinVel = 0;
-            config.m_rotationMotorMaxAcc = 0;
-            config.m_rotationMotorAllowedError = 0;
-            config.m_maxSpeedPercent = 0.4;
             config.m_rotationAxisMaxSpeed = 0;
 
             config.m_rotationMotorIdleMode = IdleMode.kBrake;
