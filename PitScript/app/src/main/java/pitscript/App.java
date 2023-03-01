@@ -8,150 +8,43 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.apache.commons.net.ftp.*;
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
+import com.jcraft.jsch.SftpException;
+
 
 
 public class App {
-    public static void main(String[] args) {
-        String server = "172.22.11.2";
-        int port = 22;
-        String user = "lvuser";
-        String pass = "";
-        int i=0;
-        FTPClient ftpClient = new FTPClient();
-        while(i>3){
-        try {
-            // connect and login to the server
-            ftpClient.connect(server, port);
-            ftpClient.login(user, pass);
-
-            // use local passive mode to pass firewall
-            ftpClient.enterLocalPassiveMode();
-
-            System.out.println("Connected");
-
-            String remoteDirPath = "/home/lvuser";
-            String saveDirPath = "C:\\Logs";
-
-            downloadDirectory(ftpClient, remoteDirPath, "/logs", saveDirPath);
-
-            // log out and disconnect from the server
-            ftpClient.logout();
-            ftpClient.disconnect();
-
-            System.out.println("Disconnected");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        i+=1;
-    }
-    }
-
-    /**
- * Download a single file from the FTP server
- * @param ftpClient an instance of org.apache.commons.net.ftp.FTPClient class.
- * @param remoteFilePath path of the file on the server
- * @param savePath path of directory where the file will be stored
- * @return true if the file was downloaded successfully, false otherwise
- * @throws IOException if any network or IO error occurred.
- */
-public static boolean downloadSingleFile(FTPClient ftpClient,
-String remoteFilePath, String savePath) throws IOException {
-File downloadFile = new File(savePath);
-
-File parentDir = downloadFile.getParentFile();
-if (!parentDir.exists()) {
     
-    parentDir.mkdir();
-}
-
-OutputStream outputStream = new BufferedOutputStream(
-    new FileOutputStream(downloadFile));
-try {
-ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-return ftpClient.retrieveFile(remoteFilePath, outputStream);
-} catch (IOException ex) {
-throw ex;
-} finally {
-if (outputStream != null) {
-    outputStream.close();
-}
-}
-}
-    /**
- * Download a whole directory from a FTP server.
- * @param ftpClient an instance of org.apache.commons.net.ftp.FTPClient class.
- * @param parentDir Path of the parent directory of the current directory being
- * downloaded.
- * @param currentDir Path of the current directory being downloaded.
- * @param saveDir path of directory where the whole remote directory will be
- * downloaded and saved.
- * @throws IOException if any network or IO error occurred.
- */
-public static void downloadDirectory(FTPClient ftpClient, String parentDir,
-String currentDir, String saveDir) throws IOException {
-String dirToList = parentDir;
-if (!currentDir.equals("")) {
-dirToList += "/" + currentDir;
-}
-
-FTPFile[] subFiles = ftpClient.listFiles(dirToList);
-
-if (subFiles != null && subFiles.length > 0) {
-for (FTPFile aFile : subFiles) {
-    String currentFileName = aFile.getName();
-    if (currentFileName.equals(".") || currentFileName.equals("..")) {
-        // skip parent directory and the directory itself
-        continue;
-    }
-    String filePath = parentDir + "/" + currentDir + "/"
-            + currentFileName;
-    if (currentDir.equals("")) {
-        filePath = parentDir + "/" + currentFileName;
-    }
-
-    String newDirPath = saveDir + parentDir + File.separator
-            + currentDir + File.separator + currentFileName;
-    if (currentDir.equals("")) {
-        newDirPath = saveDir + parentDir + File.separator
-                  + currentFileName;
-    }
-
-    if (aFile.isDirectory()) {
-        // create the directory in saveDir
-        File newDir = new File(newDirPath);
-        boolean created = newDir.mkdirs();
-        if (created) {
-            System.out.println("CREATED the directory: " + newDirPath);
-        } else {
-            System.out.println("COULD NOT create the directory: " + newDirPath);
-        }
-
-        // download the sub directory
-        downloadDirectory(ftpClient, dirToList, currentFileName,
-                saveDir);
-    } else {
-        // download the file
-        boolean success = downloadSingleFile(ftpClient, filePath,
-                newDirPath);
-        if (success) {
-            System.out.println("DOWNLOADED the file: " + filePath);
-        } else {
-            System.out.println("COULD NOT download the file: "
-                    + filePath);
-        }
+    public static String remoteHost = "10.223.57.2";
+public static String username = "lvuser";
+public static String password = "";
+    public static void main(String[] args) {
+        System.out.println("it started");
         try {
-            boolean deleted = ftpClient.deleteFile(filePath);
-            if (deleted) {
-                System.out.println("The file was deleted successfully.");
-            } else {
-                System.out.println("Could not delete the file.");
-            }
-        } catch (IOException ex) {
-            System.out.println("error downloading file: " + ex.getMessage());
+            downloadFile();
+        } catch (JSchException | SftpException e ) {
+            e.printStackTrace();
         }
     }
-}
-}
+    private static ChannelSftp setupJsch() throws JSchException {
+        JSch jsch = new JSch();
+        Session jschSession = jsch.getSession(username, remoteHost);
+        jschSession.setPassword(password);
+        jschSession.connect();
+        return (ChannelSftp) jschSession.openChannel("sftp");
+    }
+    public static void downloadFile() throws JSchException, SftpException {
+    ChannelSftp channelSftp = setupJsch();
+    channelSftp.connect();
+ 
+    String remoteFile = "";
+    String localDir = "/home/lvuser/logs";
+ 
+    channelSftp.get(remoteFile, localDir);
+    System.out.println("it worked :)");
+    channelSftp.exit();
 }
 }
