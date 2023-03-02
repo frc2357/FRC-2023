@@ -50,11 +50,8 @@ static JschSocketFactory m_socketFactory = new pitscript.JschSocketFactory().get
         String localDir = "C:\\Logs";
     
     ChannelSftp channelSftp = setupJsch();
-    channelSftp.connect();
 
-    List<String>fileList = m_fileLister.getFileList("/root"+remoteFile,channelSftp);
-    System.out.println("it got the list, setting up Jsch now --------");
-    System.out.println("Jsch set up and connected --------");
+    List<String>fileList = m_fileLister.getFileList(remoteFile,channelSftp);
         for(String filePath : fileList){
         channelSftp.get(filePath, localDir);
         }
