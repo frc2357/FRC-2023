@@ -15,7 +15,7 @@ public class TranslateToTargetCommand extends CommandBase {
 
     public TranslateToTargetCommand(SwerveDriveSubsystem.COLUMN_TARGET targetColumn, int aprilTagId) {
         m_targetColumn = targetColumn;
-        m_aprilTagId = -1;
+        m_aprilTagId = aprilTagId;
         addRequirements(SwerveDriveSubsystem.getInstance());
     }
 
