@@ -3,12 +3,18 @@
  */
 package pitscript;
 import java.io.IOException;
+import java.net.Socket;
+import java.util.List;
+
+import javax.net.SocketFactory;
 
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
+
+import net.schmizz.sshj.sftp.RemoteResourceInfo;
 
 
 
@@ -18,8 +24,8 @@ public class App {
 public String username = "lvuser";
 public String password = "";
 static App m_main;
-static SocketFactoryWithTimeout m_socketFactory = new pitscript.SocketFactoryWithTimeout().getInstance();
-static SftpListFiles m_fileLister = new pitscript.SftpListFiles().getInstance();
+static MakeFileList m_fileLister = new pitscript.MakeFileList().getInstance();
+static JschSocketFactory m_socketFactory = new pitscript.JschSocketFactory().getInstance();
     public static void main(String[] args) {
         System.out.println("it started");
         App main = new App();
@@ -27,37 +33,34 @@ static SftpListFiles m_fileLister = new pitscript.SftpListFiles().getInstance();
         try {
             main.downloadFile();
         } catch (JSchException | SftpException e ) {
+            System.out.println("it didnt download the file");
             e.printStackTrace();
         }
     }
     private ChannelSftp setupJsch() throws JSchException {
         JSch jsch = new JSch();
-        try {
-            m_main.m_socketFactory.createSocket(remoteHost,23);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         Session jschSession = jsch.getSession(username, remoteHost);
         jschSession.setPassword(password);
         jschSession.connect();
+        jschSession.setSocketFactory(m_socketFactory);
         return (ChannelSftp) jschSession.openChannel("sftp");
     }
     public void downloadFile() throws JSchException, SftpException{
+        String remoteFile = "/home/lvuser/logs";
+        String localDir = "C:\\Logs";
+    
     ChannelSftp channelSftp = setupJsch();
     channelSftp.connect();
-    String remoteFile = "/home/lvuser/logs";
-    
- 
-    String localDir = "C:\\Logs";
-    try {
-        channelSftp.get(remoteFile + (m_fileLister.getFileName(remoteHost,remoteFile)), localDir);
-    } catch (IOException e) {
-        System.out.println("It coudnt get the file name or the file.");
-        e.printStackTrace();
-    }
+
+    List<String>fileList = m_fileLister.getFileList("/root"+remoteFile,channelSftp);
+    System.out.println("it got the list, setting up Jsch now --------");
+    System.out.println("Jsch set up and connected --------");
+        for(String filePath : fileList){
+        channelSftp.get(filePath, localDir);
+        }
     System.out.println("it worked :)");
     channelSftp.exit();
-    
 }
+
 }
     

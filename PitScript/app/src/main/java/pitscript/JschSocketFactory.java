@@ -9,9 +9,9 @@ import java.net.UnknownHostException;
 
 import com.jcraft.jsch.SocketFactory;
 
-public class SocketFactoryWithTimeout implements SocketFactory {
-  SocketFactoryWithTimeout instance = null;
-  public SocketFactoryWithTimeout getInstance(){
+public class JschSocketFactory implements SocketFactory {
+  JschSocketFactory instance = null;
+  public JschSocketFactory getInstance(){
     instance = this;
     return instance;
   }
