@@ -1,4 +1,4 @@
-package com.team2357.frc2023.commands.scoring.util;
+package com.team2357.frc2023.commands.util;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 

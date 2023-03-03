@@ -296,21 +296,33 @@ public final class Constants {
             config.m_shuffleboardTunerDRange = 0.2;
 
             // smart motion config
-            config.m_extendMotorP = 0;
-            config.m_extendMotorI = 0;
-            config.m_extendMotorD = 0;
-            config.m_extendMotorIZone = 0;
-            config.m_extendMotorFF = 0;
-            config.m_extendMotorMaxOutput = 0;
-            config.m_extendMotorMinOutput = 0;
-            config.m_extendMotorMaxRPM = 0;
-            config.m_extendMotorMaxVel = 0;
-            config.m_extendMotorMinVel = 0;
-            config.m_extendMotorMaxAcc = 0;
-            config.m_extendMotorAllowedError = 0;
-            config.m_rotationMotorAllowedError = 0;
+
+            // extend PID
+            config.m_extendP = 0;
+            config.m_extendI = 0;
+            config.m_extendD = 0;
+            config.m_extendIZone = 0;
+            config.m_extendFF = 0;
+            config.m_extendPidSlot = 0;
+
+            // retract PID
+            config.m_retractP = 0;
+            config.m_retractI = 0;
+            config.m_retractD = 0;
+            config.m_retractIZone = 0;
+            config.m_retractFF = 0;
+            config.m_retractPidSlot = 1;
+
+            // Smart motion
+            config.m_pidMaxOutput = 0;
+            config.m_pidMinOutput = 0;
+            config.m_smartMotionMaxVelRPM = 0;
+            config.m_smartMotionMinVelRPM = 0;
+            config.m_smartMotionMaxAccRPM = 0;
+            config.m_smartMotionRotationAllowedError = 0;
+            config.m_rotationAllowedError = 0;
+
             config.m_maxSpeedPercent = 0.4;
-            config.m_smartMotionSlot = 0;
             return config;
         }
 
@@ -375,6 +387,10 @@ public final class Constants {
 
         public static final double AUTO_SCORE_MID_ROTATIONS = 0;
         public static final double AUTO_SCORE_HIGH_ROTATIONS = 0;
+    }
+
+    public static final class AUTO_SCORE_TIMINGS {
+        public static final int SECONDS_BEFORE_RETURNING_TO_STARTING_POSITION = 0;
     }
 
     public static final class LIMELIGHT {
