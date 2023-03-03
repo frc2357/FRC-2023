@@ -213,20 +213,22 @@ public final class Constants {
             config.m_deployMilliseconds = 1000;
             config.m_stowMilliseconds = 1000;
 
+            config.m_isInverted = true;
+
             config.m_winchAxisMaxSpeed = 0.4;
 
             config.m_winchMotorIdleMode = IdleMode.kBrake;
 
-            config.m_winchMotorStallLimitAmps = 0;
-            config.m_winchMotorFreeLimitAmps = 0;
+            config.m_winchMotorStallLimitAmps = 30;
+            config.m_winchMotorFreeLimitAmps = 30;
 
             // smart motion config
             // extend PID
-            config.m_winchDeployP = 0;
+            config.m_winchDeployP = 0.0001;
             config.m_winchDeployI = 0;
             config.m_winchDeployD = 0;
             config.m_winchDeployIZone = 0;
-            config.m_winchDeployFF = 0;
+            config.m_winchDeployFF = 0.00007;
             config.m_winchDeployPidSlot = 0;
 
             // retract PID
@@ -234,19 +236,19 @@ public final class Constants {
             config.m_winchStowI = 0;
             config.m_winchStowD = 0;
             config.m_winchStowIZone = 0;
-            config.m_winchStowFF = 0;
+            config.m_winchStowFF = 0.00003;
             config.m_winchStowPidSlot = 1;
 
             // Smart motion
-            config.m_pidMaxOutput = 0;
-            config.m_pidMinOutput = 0;
-            config.m_smartMotionMaxVelRPM = 0;
+            config.m_pidMaxOutput = 1;
+            config.m_pidMinOutput = -1;
+            config.m_smartMotionMaxVelRPM = 8000;
             config.m_smartMotionMinVelRPM = 0;
-            config.m_smartMotionMaxAccRPM = 0;
-            config.m_smartMotionRotationAllowedError = 0;
+            config.m_smartMotionMaxAccRPM = 90000;
+            config.m_smartMotionRotationAllowedError = 2;
 
-            config.m_winchMotorAllowedError = 0.0;
-            config.m_winchDeployRotations = 0.0;
+            config.m_winchMotorAllowedError = 2;
+            config.m_winchDeployRotations = 146;
             config.m_winchStowRotations = 0.0;
 
             return config;

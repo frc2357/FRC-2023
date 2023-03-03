@@ -10,6 +10,7 @@ import com.team2357.lib.util.Utility;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class IntakeArmSubsystem extends ClosedLoopSubsystem {
     private static IntakeArmSubsystem instance = null;
@@ -221,6 +222,8 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
         if (m_shuffleboardPIDTuner.arePIDsUpdated()) {
             updatePID();
         }
+
+        SmartDashboard.putNumber("Arm rotations", m_winchMotor.getEncoder().getPosition());
     }
 
     private void deployPeriodic() {

@@ -3,10 +3,12 @@ package com.team2357.frc2023.controls;
 import com.team2357.lib.triggers.AxisThresholdTrigger;
 import com.team2357.lib.util.Utility;
 import com.team2357.lib.util.XboxRaw;
+import com.team2357.frc2023.subsystems.IntakeArmSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -157,8 +159,11 @@ public class GunnerControls {
         downDPadAndA.onTrue(new TranslateToTargetCommandGroup(SwerveDriveSubsystem.COLUMN_TARGET.MIDDLE));
         downDPadAndB.onTrue(new TranslateToTargetCommandGroup(SwerveDriveSubsystem.COLUMN_TARGET.RIGHT));
 
-        yButton.onTrue(new AutoScoreHighCommandGroup());
-        xButton.onTrue(new AutoScoreMidCommandGroup());
-        aButton.onTrue(new AutoScoreLowCommandGroup());
+        // yButton.onTrue(new AutoScoreHighCommandGroup());
+        // xButton.onTrue(new AutoScoreMidCommandGroup());
+        // aButton.onTrue(new AutoScoreLowCommandGroup());
+        yButton.onTrue(new InstantCommand(() -> {
+            IntakeArmSubsystem.getInstance().resetEncoders();
+        }));
     }
 }
