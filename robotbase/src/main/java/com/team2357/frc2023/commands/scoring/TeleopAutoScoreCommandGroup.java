@@ -1,4 +1,4 @@
-package com.team2357.frc2023.commands.scoring.teleopAutoScore;
+package com.team2357.frc2023.commands.scoring;
 
 import com.team2357.frc2023.commands.auto.TranslateToTargetCommandGroup;
 import com.team2357.frc2023.networktables.AprilTagPose;

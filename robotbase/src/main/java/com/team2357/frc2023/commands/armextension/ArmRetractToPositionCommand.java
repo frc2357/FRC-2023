@@ -1,4 +1,4 @@
-package com.team2357.frc2023.commands.scoring.util;
+package com.team2357.frc2023.commands.armextension;
 
 import com.team2357.frc2023.subsystems.ArmExtensionSubsystem;
 import edu.wpi.first.wpilibj2.command.CommandBase;

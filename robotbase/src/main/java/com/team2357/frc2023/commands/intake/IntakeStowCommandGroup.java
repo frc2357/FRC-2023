@@ -1,6 +1,6 @@
 package com.team2357.frc2023.commands.intake;
 
-import com.team2357.frc2023.commands.scoring.util.CloseClawCommand;
+import com.team2357.frc2023.commands.claw.CloseClawCommand;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;

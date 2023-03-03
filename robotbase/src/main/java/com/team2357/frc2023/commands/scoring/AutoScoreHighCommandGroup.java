@@ -1,12 +1,11 @@
 package com.team2357.frc2023.commands.scoring;
 
 import com.team2357.frc2023.Constants;
+import com.team2357.frc2023.commands.armextension.ArmExtendToPositionCommand;
+import com.team2357.frc2023.commands.armrotation.ArmRotateToPositionCommand;
+import com.team2357.frc2023.commands.claw.ClawOpenCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerReverseCommand;
-import com.team2357.frc2023.commands.scoring.util.ArmExtendToPositionCommand;
-import com.team2357.frc2023.commands.scoring.util.ArmReturnToStartCommandGroup;
-import com.team2357.frc2023.commands.scoring.util.WristExtendCommand;
-import com.team2357.frc2023.commands.scoring.util.ClawOpenCommand;
-import com.team2357.frc2023.commands.scoring.util.ArmRotateToPositionCommand;
+import com.team2357.frc2023.commands.wrist.WristExtendCommand;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
