@@ -8,6 +8,7 @@ import com.jcraft.jsch.SftpException;
 
 
     public class MakeFileList {
+        App m_app = new App();
         MakeFileList instance = null;
         public MakeFileList getInstance() {
             instance = this;
@@ -20,6 +21,7 @@ import com.jcraft.jsch.SftpException;
                     System.out.println("the channelSftp variable did not work. -------");
                     e.printStackTrace();
                 }
+                m_app.sendKeepAliveMsg();
             try{
                 
                 
@@ -28,6 +30,7 @@ import com.jcraft.jsch.SftpException;
                     System.out.println(fileVector.get(i).toString());
                     fileList.add(fileVector.get(i).toString());
                 }
+                m_app.sendKeepAliveMsg();
                 return fileList;
             }catch(Exception ex){
                 System.out.println("it didnt get the stuff for the file or someting, the file lister broke :( ------------");
