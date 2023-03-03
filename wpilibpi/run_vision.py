@@ -36,6 +36,7 @@ if __name__ == "__main__":
         simulate = True
     camvis = CameraVision(cfgfile, simulate=simulate) # this class automatically creates all camera + calibration objects
     cam0 = camvis.cameras[0]
+    #configure networks tables
     nt_table = camvis.ntinst.getTable("wpiblipi")
     apriltag_json_NT = nt_table.getStringTopic("apriltag_js").publish()
     gamepiece_json_NT = nt_table.getStringTopic("gamepiece_js").publish()
@@ -78,7 +79,7 @@ if __name__ == "__main__":
             try:
                 i = 0
                 frame,roi_rects = apriltag.runPipeline(frame,image_cal)
-                orig, yel_pct, vio_pct = gamepiece.runPipeline(orig, roi_rects, colorize=True)
+                orig = gamepiece.runPipeline(orig, roi_rects, colorize=0.5)
                 j = apriltag.to_json()
                 j['timestamp'] = timeoffset 
                 log.debug(f"Timestamp: {j['timestamp']}")
