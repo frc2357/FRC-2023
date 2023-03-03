@@ -131,16 +131,18 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
         m_extendMotor.getEncoder().setPosition(0);
     }
 
-    public void setExtensionRotations(double rotations) {
+    private void setMotorRotations(double rotations, int pidSlot) {
         setClosedLoopEnabled(true);
         m_targetRotations = rotations;
-        m_pidcontroller.setReference(m_targetRotations, CANSparkMax.ControlType.kSmartMotion, m_config.m_extendPidSlot);
+        m_pidcontroller.setReference(m_targetRotations, CANSparkMax.ControlType.kSmartMotion, pidSlot);
+    }
+
+    public void setExtensionRotations(double rotations) {
+        setMotorRotations(rotations, m_config.m_extendPidSlot);
     }
 
     public void setRetractionRotations(double rotations) {
-        setClosedLoopEnabled(true);
-        m_targetRotations = rotations;
-        m_pidcontroller.setReference(m_targetRotations, CANSparkMax.ControlType.kSmartMotion, m_config.m_retractPidSlot);
+        setMotorRotations(rotations, m_config.m_retractPidSlot);
     }
 
     /**
