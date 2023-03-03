@@ -6,6 +6,10 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 public class TranslateToTargetCommandGroup extends SequentialCommandGroup {
     public TranslateToTargetCommandGroup(SwerveDriveSubsystem.COLUMN_TARGET targetColumn) {
+        this(targetColumn, -1);
+    }
+
+    public TranslateToTargetCommandGroup(SwerveDriveSubsystem.COLUMN_TARGET targetColumn, int aprilTagId) {
         // Rotate to a heading of 0
         this.addCommands(new RotateToDegreeCommand(0));
 
@@ -13,6 +17,6 @@ public class TranslateToTargetCommandGroup extends SequentialCommandGroup {
         this.addCommands(new WaitCommand(0.1));
 
         // Translate to the target in the X and Y axis
-        this.addCommands(new TranslateToTargetCommand(targetColumn));
+        this.addCommands(new TranslateToTargetCommand(targetColumn, aprilTagId));
     }
 }
