@@ -26,6 +26,6 @@ public class IntakeWinchCommand extends CommandBase{
 
     @Override
     public void end(boolean inter){
-        IntakeArmSubsystem.getInstance().stopWinchMotors();
+        IntakeArmSubsystem.getInstance().stopWinchMotor();
     }
 }

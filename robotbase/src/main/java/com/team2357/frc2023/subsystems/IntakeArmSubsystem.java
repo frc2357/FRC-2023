@@ -1,7 +1,5 @@
 package com.team2357.frc2023.subsystems;
 
-import org.ejml.data.MatrixType;
-
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
@@ -12,7 +10,6 @@ import com.team2357.lib.util.Utility;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IntakeArmSubsystem extends ClosedLoopSubsystem {
     private static IntakeArmSubsystem instance = null;
@@ -41,22 +38,32 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
         public double m_shuffleboardTunerDRange;
 
         // smart motion config
-        public double m_winchMotorP;
-        public double m_winchMotorI;
-        public double m_winchMotorD;
+        // Deploy PID
+        public double m_winchDeployP;
+        public double m_winchDeployI;
+        public double m_winchDeployD;
+        public double m_winchDeployIZone;
+        public double m_winchDeployFF;
+        public int m_winchDeployPidSlot;
 
-        public double m_winchMotorIZone;
-        public double m_winchMotorFF;
-        public double m_winchMotorMaxOutput;
-        public double m_winchMotorMinOutput;
-        public double m_winchMotorMaxRPM;
-        public double m_winchMotorMaxVel;
-        public double m_winchMotorMinVel;
-        public double m_winchMotorMaxAcc;
+        // Stow PID
+        public double m_winchStowP;
+        public double m_winchStowI;
+        public double m_winchStowD;
+        public double m_winchStowIZone;
+        public double m_winchStowFF;
+        public int m_winchStowPidSlot;
+
+        // Smart motion
+        public double m_pidMaxOutput;
+        public double m_pidMinOutput;
+        public double m_smartMotionMaxVelRPM;
+        public double m_smartMotionMinVelRPM;
+        public double m_smartMotionMaxAccRPM;
+        public double m_smartMotionRotationAllowedError;
+
         public double m_winchMotorAllowedError;
-        public double m_maxSpeedPercent;
-        public int m_smartMotionSlot;
-
+        
         public double m_winchDeployRotations;
         public double m_winchStowRotations;
     }
@@ -89,8 +96,8 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
         m_config = config;
 
         m_shuffleboardPIDTuner = new ShuffleboardPIDTuner("Intake Arm", config.m_shuffleboardTunerPRange,
-                config.m_shuffleboardTunerIRange, config.m_shuffleboardTunerDRange, config.m_winchMotorP,
-                config.m_winchMotorI, config.m_winchMotorD);
+                config.m_shuffleboardTunerIRange, config.m_shuffleboardTunerDRange, config.m_winchDeployP,
+                config.m_winchDeployI, config.m_winchDeployD);
 
         configureWinchMotor(m_winchMotor);
 
@@ -106,26 +113,38 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
     }
 
     private void configureWinchPID(SparkMaxPIDController pidController) {
-        // PID
-        pidController.setP(m_config.m_winchMotorP);
-        pidController.setI(m_config.m_winchMotorI);
-        pidController.setD(m_config.m_winchMotorD);
-        pidController.setIZone(m_config.m_winchMotorIZone);
-        pidController.setFF(m_config.m_winchMotorFF);
-        pidController.setOutputRange(m_config.m_winchMotorMinOutput, m_config.m_winchMotorMaxOutput);
+       // set PID coefficients for extension
+       pidController.setP(m_config.m_winchDeployP, m_config.m_winchDeployPidSlot);
+       pidController.setI(m_config.m_winchDeployI, m_config.m_winchDeployPidSlot);
+       pidController.setD(m_config.m_winchDeployD, m_config.m_winchDeployPidSlot);
+       pidController.setIZone(m_config.m_winchDeployIZone, m_config.m_winchDeployPidSlot);
+       pidController.setFF(m_config.m_winchDeployFF, m_config.m_winchDeployPidSlot);
+
+       // Set PID coefficeints for retraction
+       pidController.setP(m_config.m_winchStowP, m_config.m_winchStowPidSlot);
+       pidController.setI(m_config.m_winchStowI, m_config.m_winchStowPidSlot);
+       pidController.setD(m_config.m_winchStowD, m_config.m_winchStowPidSlot);
+       pidController.setIZone(m_config.m_winchStowIZone, m_config.m_winchStowPidSlot);
+       pidController.setFF(m_config.m_winchStowFF, m_config.m_winchStowPidSlot);
 
         // smart motion
-        pidController.setSmartMotionMaxVelocity(m_config.m_winchMotorMaxVel, m_config.m_smartMotionSlot);
-        pidController.setSmartMotionMinOutputVelocity(m_config.m_winchMotorMinVel, m_config.m_smartMotionSlot);
-        pidController.setSmartMotionMaxAccel(m_config.m_winchMotorMaxAcc, m_config.m_smartMotionSlot);
-        pidController.setSmartMotionAllowedClosedLoopError(m_config.m_winchMotorAllowedError,
-                m_config.m_smartMotionSlot);
+        configureSmartMotion(pidController, m_config.m_winchDeployPidSlot);
+        configureSmartMotion(pidController, m_config.m_winchStowPidSlot);
     }
 
-    public void setWinchRotation(double rotations) {
+    public void configureSmartMotion(SparkMaxPIDController pidController, int pidSlot) {
+        pidController.setOutputRange(m_config.m_pidMinOutput, m_config.m_pidMaxOutput, pidSlot);
+        pidController.setSmartMotionMaxVelocity(m_config.m_smartMotionMaxVelRPM, pidSlot);
+        pidController.setSmartMotionMinOutputVelocity(m_config.m_smartMotionMinVelRPM, pidSlot);
+        pidController.setSmartMotionMaxAccel(m_config.m_smartMotionMaxAccRPM, pidSlot);
+        pidController.setSmartMotionAllowedClosedLoopError(m_config.m_smartMotionRotationAllowedError,
+                pidSlot);
+    }
+
+    public void setWinchRotation(double rotations, int pidSlot) {
         setClosedLoopEnabled(true);
         m_targetRotations = rotations;
-        m_winchPIDController.setReference(m_targetRotations, CANSparkMax.ControlType.kSmartMotion);
+        m_winchPIDController.setReference(m_targetRotations, CANSparkMax.ControlType.kSmartMotion, pidSlot);
     }
 
     public void setWinchAxisSpeed(double axisSpeed) {
@@ -134,7 +153,7 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
         m_winchMotor.set(motorSpeed);
     }
 
-    public void stopWinchMotors() {
+    public void stopWinchMotor() {
         setClosedLoopEnabled(false);
         m_winchMotor.set(0);
     }
@@ -177,13 +196,13 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
     public void deploy() {
         m_currentState = ArmState.Unknown;
         m_desiredState = ArmState.Deployed;
-        setWinchRotation(m_config.m_winchDeployRotations);
+        setWinchRotation(m_config.m_winchDeployRotations, m_config.m_winchDeployPidSlot);
     }
 
     public void stow() {
         m_currentState = ArmState.Unknown;
         m_desiredState = ArmState.Stowed;
-        setWinchRotation(m_config.m_winchStowRotations);
+        setWinchRotation(m_config.m_winchStowRotations, m_config.m_winchStowPidSlot);
     }
 
     @Override
@@ -205,8 +224,6 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
     }
 
     private void deployPeriodic() {
-        long now = System.currentTimeMillis();
-
         if (!isWinchAtRotations()) {
             m_intakeSolenoid.set(DoubleSolenoid.Value.kForward);
         } else if (isWinchAtRotations()) {
@@ -216,8 +233,6 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
     }
 
     private void stowPeriodic() {
-        long now = System.currentTimeMillis();
-
         if (!isWinchAtRotations()) {
             m_intakeSolenoid.set(DoubleSolenoid.Value.kReverse);
         } else if (isWinchAtRotations()) {

@@ -221,21 +221,31 @@ public final class Constants {
             config.m_winchMotorFreeLimitAmps = 0;
 
             // smart motion config
-            config.m_winchMotorP = 0;
-            config.m_winchMotorI = 0;
-            config.m_winchMotorD = 0;
-            config.m_winchMotorIZone = 0;
-            config.m_winchMotorFF = 0;
-            config.m_winchMotorMaxOutput = 0;
-            config.m_winchMotorMinOutput = 0;
-            config.m_winchMotorMaxRPM = 0;
-            config.m_winchMotorMaxVel = 0;
-            config.m_winchMotorMinVel = 0;
-            config.m_winchMotorMaxAcc = 0;
-            config.m_winchMotorAllowedError = 0;
-            config.m_maxSpeedPercent = 0.4;
-            config.m_smartMotionSlot = 0;
+            // extend PID
+            config.m_winchDeployP = 0;
+            config.m_winchDeployI = 0;
+            config.m_winchDeployD = 0;
+            config.m_winchDeployIZone = 0;
+            config.m_winchDeployFF = 0;
+            config.m_winchDeployPidSlot = 0;
 
+            // retract PID
+            config.m_winchStowP = 0;
+            config.m_winchStowI = 0;
+            config.m_winchStowD = 0;
+            config.m_winchStowIZone = 0;
+            config.m_winchStowFF = 0;
+            config.m_winchStowPidSlot = 1;
+
+            // Smart motion
+            config.m_pidMaxOutput = 0;
+            config.m_pidMinOutput = 0;
+            config.m_smartMotionMaxVelRPM = 0;
+            config.m_smartMotionMinVelRPM = 0;
+            config.m_smartMotionMaxAccRPM = 0;
+            config.m_smartMotionRotationAllowedError = 0;
+
+            config.m_winchMotorAllowedError = 0.0;
             config.m_winchDeployRotations = 0.0;
             config.m_winchStowRotations = 0.0;
 
