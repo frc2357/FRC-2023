@@ -13,9 +13,9 @@ import com.swervedrivespecialties.swervelib.AbsoluteEncoder;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
-import com.team2357.frc2023.commands.scoring.AutoScoreHighCommand;
-import com.team2357.frc2023.commands.scoring.AutoScoreLowCommand;
-import com.team2357.frc2023.commands.scoring.AutoScoreMidCommand;
+import com.team2357.frc2023.commands.scoring.AutoScoreHighCommandGroup;
+import com.team2357.frc2023.commands.scoring.AutoScoreLowCommandGroup;
+import com.team2357.frc2023.commands.scoring.AutoScoreMidCommandGroup;
 import com.team2357.frc2023.util.Utility;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 
@@ -78,13 +78,13 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	public static Command getAutoScoreCommands(int row) {
 		switch (row) {
 			case 0:
-				return new AutoScoreLowCommand();
+				return new AutoScoreLowCommandGroup();
 			case 1:
-				return new AutoScoreMidCommand();
+				return new AutoScoreMidCommandGroup();
 			case 2:
-				return new AutoScoreHighCommand();
+				return new AutoScoreHighCommandGroup();
 			default:
-				return new AutoScoreLowCommand();
+				return new AutoScoreLowCommandGroup();
 		}
 	}
 
