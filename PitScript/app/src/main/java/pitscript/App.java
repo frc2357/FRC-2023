@@ -15,8 +15,8 @@ import com.jcraft.jsch.SftpException;
 
 public class App {
     
-    public String remoteHost = "10.223.57.2";
-public String username = "admin";
+    public String remoteHost = "10.23.57.2";
+public String username = "lvuser";
 public String password = "";
 static App m_main;
 static MakeFileList m_fileLister = new pitscript.MakeFileList().getInstance();
@@ -28,7 +28,7 @@ static Session m_jSession;
         try {
             ChannelSftp channelSftp = m_main.setupJsch();
             try {
-                channelSftp.get("/lvuser/logs/","C:\\Logs");
+                channelSftp.get("/home/lvuser/logs","C:\\Logs");
             } catch (SftpException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -37,12 +37,12 @@ static Session m_jSession;
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        // try {
-        //     main.downloadFile();
-        // } catch (JSchException | SftpException e ) {
-        //     System.out.println("it didnt download the file");
-        //     e.printStackTrace();
-        // }
+        try {
+             main.downloadFile();
+        } catch (JSchException | SftpException e ) {
+             System.out.println("it didnt download the file");
+             e.printStackTrace();
+        }
     }
     private ChannelSftp setupJsch() throws JSchException {
         JSch jsch = new JSch();
