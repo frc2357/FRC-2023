@@ -389,6 +389,10 @@ public final class Constants {
         public static final double AUTO_SCORE_HIGH_ROTATIONS = 0;
     }
 
+    public static final class AUTO_SCORE_TIMINGS {
+        public static final int SECONDS_BEFORE_RETURNING_TO_STARTING_POSITION = 0;
+    }
+
     public static final class LIMELIGHT {
         public static final String LEFT_LIMELIGHT_NAME = "leftLimelight";
         public static final String RIGHT_LIMELIGHT_NAME = "rightLimelight";

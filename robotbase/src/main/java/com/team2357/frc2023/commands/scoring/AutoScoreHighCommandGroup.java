@@ -3,9 +3,10 @@ package com.team2357.frc2023.commands.scoring;
 import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.commands.intake.IntakeRollerReverseCommand;
 import com.team2357.frc2023.commands.scoring.util.ArmExtendToPositionCommand;
-import com.team2357.frc2023.commands.scoring.util.ExtendWristCommand;
-import com.team2357.frc2023.commands.scoring.util.OpenClawCommand;
-import com.team2357.frc2023.commands.scoring.util.RotateArmToPositionCommand;
+import com.team2357.frc2023.commands.scoring.util.ArmReturnToStartCommandGroup;
+import com.team2357.frc2023.commands.scoring.util.WristExtendCommand;
+import com.team2357.frc2023.commands.scoring.util.ClawOpenCommand;
+import com.team2357.frc2023.commands.scoring.util.ArmRotateToPositionCommand;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
@@ -23,12 +24,16 @@ public class AutoScoreHighCommandGroup extends ParallelCommandGroup {
 
         addCommands(new SequentialCommandGroup(
             // Extend to node 
-            new RotateArmToPositionCommand(Constants.ARM_ROTATION.AUTO_SCORE_HIGH_ROTATIONS),
+            new ArmRotateToPositionCommand(Constants.ARM_ROTATION.AUTO_SCORE_HIGH_ROTATIONS),
             new ArmExtendToPositionCommand(Constants.ARM_EXTENSION.AUTO_SCORE_HIGH_ROTATIONS),
 
             // Release the game piece
-            new ExtendWristCommand(),
-            new OpenClawCommand()
+            new WristExtendCommand(),
+            new ClawOpenCommand(),
+
+            // Return to starting position
+            new WaitCommand(Constants.AUTO_SCORE_TIMINGS.SECONDS_BEFORE_RETURNING_TO_STARTING_POSITION),
+            new ArmReturnToStartCommandGroup()
         ));
     }
 }
