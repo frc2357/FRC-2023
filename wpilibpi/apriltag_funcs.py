@@ -12,39 +12,46 @@
 #   projectPoints: https://docs.opencv.org/4.7.0/d9/d0c/group__calib3d.html#ga1019495a2c8d1743ed5cc23fa0daff8c
 
 from collections import OrderedDict
+import json
 import cv2
 import robotpy_apriltag
 from wpimath.geometry import Transform3d,Rotation3d
 import time
 import math
-from robotpy_apriltag import AprilTagFieldLayout
+from robotpy_apriltag import AprilTagFieldLayout,AprilTagDetection
 import math
 import numpy as np
-from calibration import image_cal, cam0 #bandaid for now
+from numpy import ndarray #for type def
+from calibration import CameraCalibration, image_cal, cam0 #bandaid for now
 import logging
+#from gamepiece_loc import GamePieceFieldResults
 log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
+
+global apriltagNT
+apriltagNT = [{'ID':idx,'ambiguity':0.0,'pose':{'translation':{'x':0,'y':0,'z':0},'rotation':{'quaternion':{'W':0.0,'X':0.0,'Y':0.0,'Z':0.0}}}} for idx in range(1,8+1)]
+
 
 ##########
 #roi_map units = inches.  gets converted to meters in project_gamepiece_locations()
 #roi_map element is X,Y,Z,W,H
 # for some reason the coordinate system seems to be:
 # (need to verify -- document probably somewhere in FRC information)
-# X horizontal, -Y vertical, Z is distance from plane created by tag
+# X horizontal, Y vertical (negative is up), Z is distance from plane created by tag
 # W is total width of detection area (see create_roi_rect)
 # H is total height of detection area (see create_roi_rect)
 ##########
-roi_map = np.float32([[ 22.00,-15.84+6,  8.43,  2, 2], #mid cone
-                      [-22.00,-15.84+6,  8.43,  2, 2], #mid cone
-                      [ 22.00,-27.84+6, 25.45,  2, 2], #high cone
-                      [-22.00,-27.84+6, 25.45,  2, 2], #high cone
-                      [ 25.62, 12.00,-12.00, 12, 4], #low cone
-                      [-25.62, 12.00,-12.00, 12, 4], #low cone
-                      [  0.00, 12.00,-12.00, 12, 4], #low cube
-                      [  0.00, -6.95,  6.00,  4, 4], #mid cube
-                      [  0.00,-18.22, 23.31,  4, 4], #high cube
+global roi_map
+roi_map = np.float32([[-25.62 ,  12.00   , -12.00, 12 ,  4], #low cone left   [0,0]
+                      [-22.00 , -15.84+6 ,   8.43,  2 ,  4], #mid cone left   [0,1]                
+                      [-22.00 , -27.84+6 ,  25.45,  2 ,  4], #high cone left  [0,2]
+                      [  0.00 ,  12.00   , -12.00, 12 ,  4], #low cube mid    [1,0]
+                      [  0.00 ,  -6.95-1 ,   6.00,  6 ,  6], #mid cube mid    [1,1]
+                      [  0.00 , -18.22-1 ,  23.31,  6 ,  6], #high cube mid   [1,2]
+                      [ 25.62 ,  12.00   , -12.00, 12 ,  4], #low cone right  [2,0]
+                      [ 22.00 , -15.84+6 ,   8.43,  2 ,  4], #mid cone right  [2,1]
+                      [ 22.00 , -27.84+6 ,  25.45,  2 ,  4], #high cone right [2,2]
                       ])
-                      
 
 def create_roi_rect(roi):
     """ takes a roi row (X,Y,Z,W,H), and creates a rectangle
@@ -66,10 +73,11 @@ def create_roi_rect(roi):
 #             Cx,#638.57001085,  #  (Cx) should be roughly 1/2 the img width
 #             Cy,#337.36382032,  #  (Cy) should be roughly 1/2 the img height
 
-
-
 class AprilTagPipeline:
-    def __init__(self, frame_size, Fx,Fy,Cx,Cy):
+    MATCH_TAGMAP = {'RED':[1,2,3],'BLUE':[6,7,8],'ALL':[1,2,3,6,7,8]}
+    DETECTION_MARGIN_THRESHOLD = 100
+    POSE_SOLVER_ITERATIONS = 200    
+    def __init__(self, frame_size, Fx,Fy,Cx,Cy, alliance='RED'):
         """ AprilTagPipeline class 
         """
         self.detector = robotpy_apriltag.AprilTagDetector()
@@ -90,6 +98,16 @@ class AprilTagPipeline:
         self.estimator = robotpy_apriltag.AprilTagPoseEstimator(self.estimator_config)
         self.results = []
         self.black_frame = np.zeros(shape=(720,1280,3),dtype='uint8')
+        self.match_tags = alliance #defined as a property vs. method
+
+    @property
+    def match_tags(self):
+        return self._match_tags 
+    
+    @match_tags.setter
+    def match_tags(self, alliance):
+        if alliance in self.MATCH_TAGMAP.keys():
+            self._match_tags = self.MATCH_TAGMAP[alliance]
 
     def to_json(self):
         """
@@ -97,19 +115,21 @@ class AprilTagPipeline:
             TODO: Is it possible that both cameras see the same tag, and therefore we
                   need to chose the tag pose with lower ambiguity?
         """
-        ret_list = [{'ID':idx,'ambiguity':0.0,'pose':{'translation':{'x':0,'y':0,'z':0},'rotation':{'quaternion':{'W':0.0,'X':0.0,'Y':0.0,'Z':0.0}}}} for idx in range(1,8+1)]
+        #gamepieceNT is defined as a global near top of this file
+        # TODO: is dataclass a better solution?
+        #gamepieceNT = [{'ID':idx,'ambiguity':0.0,'pose':{'translation':{'x':0,'y':0,'z':0},'rotation':{'quaternion':{'W':0.0,'X':0.0,'Y':0.0,'Z':0.0}}}} for idx in range(1,8+1)]
         for result in self.results:
             tag_id, pose, center, tag, est = result
             tvec = pose.translation()
             rqua = pose.rotation().getQuaternion()
-
-            ret = ret_list[tag_id]
-            ret['pose']['translation']= {'x':tvec.x,'y':tvec.y,'z':tvec.z}
-            ret['pose']['rotation']['quaternion'] = {'W':rqua.W(),'X':rqua.X(),'Y':rqua.Y(),'Z':rqua.Z()}
-            ret['ambiguity'] = est.getAmbiguity()
-        return {'timestamp':0.0,'tags':ret_list}
+            if tag_id in apriltagNT:
+                ret = apriltagNT[tag_id]
+                ret['pose']['translation']= {'x':tvec.x,'y':tvec.y,'z':tvec.z}
+                ret['pose']['rotation']['quaternion'] = {'W':rqua.W(),'X':rqua.X(),'Y':rqua.Y(),'Z':rqua.Z()}
+                ret['ambiguity'] = est.getAmbiguity()
+        return {'timestamp':0.0,'tags':apriltagNT}
             
-    def process_apriltag(self, tag):
+    def process_apriltag(self, tag:AprilTagDetection):
         """
             process a single tag, including estimating pose
 
@@ -125,17 +145,16 @@ class AprilTagPipeline:
         """
         tag_id = tag.getId()
         center = tag.getCenter()
-        hamming = tag.getHamming()
-        decision_margin = tag.getDecisionMargin()
-        EST_ITERATIONS = 125
-        est = self.estimator.estimateOrthogonalIteration(tag, EST_ITERATIONS)
+        #hamming = tag.getHamming()
+        #decision_margin = tag.getDecisionMargin()
+        est = self.estimator.estimateOrthogonalIteration(tag, self.POSE_SOLVER_ITERATIONS)
         return tag_id, est.pose1, center, tag, est
 
-    def runPipeline(self, frame, cal):
+    def runPipeline(self, frame:ndarray, cal:CameraCalibration):
         """
             this function should be called by main loop for AprilTags processing
 
-            results are stored in self.results list
+            results are stored in self.results which is a python list
 
             Args:
                 frame: raw image from camera
@@ -153,11 +172,15 @@ class AprilTagPipeline:
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             # Detect apriltag
             tag_info = self.detector.detect(gray)
-            DETECTION_MARGIN_THRESHOLD = 100
-            filter_tags = [tag for tag in tag_info if tag.getDecisionMargin() > DETECTION_MARGIN_THRESHOLD]
+            filter_tags = [tag for tag in tag_info if tag.getDecisionMargin() > self.DETECTION_MARGIN_THRESHOLD]
             log.debug(f"Num Filtered Tags={len(filter_tags)}")
             self.results = [ self.process_apriltag(tag) for tag in filter_tags ]
-            
+
+            # might be able to utilize https://docs.opencv.org/4.x/d5/d1f/calib3d_solvePnP.html to further refine the pose estimate
+            # by using the pose estimate of multiple apriltags
+            # solvePnP(	objectPoints, imagePoints, cameraMatrix, distCoeffs[, rvec[, tvec[, useExtrinsicGuess[, flags]]]]	) ->	retval, rvec, tvec
+            #_, rvec_multi, tvec_multi = cv2.SolvePNP(objpts, imgpts, flag=cv2.SOLVEPNP_SQPNP)
+
             for idx,result in enumerate(self.results):
                 tag_id, pose, center, tag, est = result
                 amb = est.getAmbiguity()
@@ -166,10 +189,11 @@ class AprilTagPipeline:
                 frame = draw_tagframe(frame, tag)
                 frame = draw_tagid(frame, tag)
                 #frame = draw_tagpose(frame, pose, tag)
-                if tag_id not in [1,2,3,6,7,8]: # we only care about these tags.  We might only care about 1,2,3 or 6,7,8 depending on match        
-                    continue                
-                frame, roipts = project_gamepiece_locations(roi_map, frame, result, cal)   
+                if tag_id in self.match_tags: # we only care about these tags for gamepiece detection.                
+                    frame, pts = project_gamepiece_locations(roi_map, frame, result, cal) 
+                    roipts.append((tag_id, pts))
                 #log.debug(roipts)   
+            log.info(roipts)
             return frame,roipts
         except Exception as e:
             log.error(e,)
@@ -177,7 +201,7 @@ class AprilTagPipeline:
             return self.black_frame,[]
 
 # Draw the TagID and Pose of the Tag
-def draw_tagid(frame, tag):
+def draw_tagid(frame:ndarray, tag:AprilTagDetection):
     """ draw the tagId and pose of the tag on the image"""
     tagId = tag.getId()
     ptA = tag.getCorner(0)
@@ -187,8 +211,14 @@ def draw_tagid(frame, tag):
     cv2.putText(frame,f"id {tagId}",(ptA[0], ptA[1] - 15),cv2.FONT_HERSHEY_SIMPLEX,1.0,(255, 255, 255),1)
     return frame
 
-def draw_tagpose(frame, pose, tag):
-    """ draw XYZ, Roll,Pitch,Yaw on the image"""
+def draw_tagpose(frame:ndarray, pose:Transform3d, tag:AprilTagDetection):
+    """ draw XYZ, Roll,Pitch,Yaw on the image
+    
+        Args:
+            frame:ndarray numpy array [width,height,3]
+            pose: Transforme3d
+            tag: AprilTagDetection
+    """
     ptA = tag.getCorner(0)
     ptA = (int(ptA.x),int(ptA.y))   
     t = pose.translation()  # convert to inches
@@ -204,7 +234,7 @@ def draw_tagpose(frame, pose, tag):
         cv2.putText(frame,m,(ptA[0]+100, (ptA[1] - 120) + 20*(idx)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)    
     return frame
 
-def draw_tagframe(frame,tag):
+def draw_tagframe(frame:ndarray,tag:AprilTagDetection):
     """ draw tag outline on the image"""
     ptA,ptB,ptC,ptD = tag.getCorner(0),tag.getCorner(1),tag.getCorner(2),tag.getCorner(3)
     ptA = (int(ptA.x), int(ptA.y))
@@ -217,7 +247,7 @@ def draw_tagframe(frame,tag):
     cv2.line(frame, ptD, ptA, (255, 255, 255), 2)      
     return frame
 
-def project_gamepiece_locations(roi_map, frame, result, cal, draw_roi=(0,255,0)):
+def project_gamepiece_locations(roi_map:ndarray, frame:ndarray, result:tuple, cal:CameraCalibration, draw_roi=(0,255,0)):
     """
     Function that transforms roi rectangles based on AprilTag pose and camera calibration values 
     
@@ -226,7 +256,7 @@ def project_gamepiece_locations(roi_map, frame, result, cal, draw_roi=(0,255,0))
         frame: current image being processed
         result: current AprilTag result
         cal: CameraCalibration object
-        draw_roi_color: color to use for roi rectangles.
+        draw_roi: color to use for roi rectangles.
                     If None, rectangle are not drawn
     Returns: 
         frame: image
@@ -240,7 +270,7 @@ def project_gamepiece_locations(roi_map, frame, result, cal, draw_roi=(0,255,0))
     tvec = np.array(pose.translation())
     rvec = pose.rotation().getQuaternion().toRotationVector()
     ret = []
-    for roi in roi_map:
+    for roi in roi_map:  #iterate over each row in the array
         rect = create_roi_rect(roi)
         rect /=39.37
         # using the imag_cal class to automatically pull in the calibration values needed for cv2.projectPoints
@@ -253,7 +283,7 @@ def project_gamepiece_locations(roi_map, frame, result, cal, draw_roi=(0,255,0))
             frame = cv2.line(frame, tuple(imgpts[i]), tuple(imgpts[j]), draw_roi, 2)        
     return frame,ret
 
-def draw_cube(frame, result, cal):
+def draw_cube(frame:ndarray, result:tuple, cal:CameraCalibration):
     """ draws a 3d cube over the apriltag to visually show pose """
     cube_pts = .05*np.float32([[  0,  0,  0], 
                        [  0,  1,  0], 
