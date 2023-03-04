@@ -15,28 +15,15 @@ import com.jcraft.jsch.SftpException;
 
 public class App {
     
-    public String remoteHost = "10.23.57.2";
-public String username = "lvuser";
+public String remoteHost = "10.23.57.2";
+public String username = "admin";
 public String password = "";
 static App m_main;
 static MakeFileList m_fileLister = new pitscript.MakeFileList().getInstance();
-static JschSocketFactory m_socketFactory = new pitscript.JschSocketFactory().getInstance();
 static Session m_jSession;
     public static void main(String[] args) {
         App main = new App();
         m_main = main;
-        try {
-            ChannelSftp channelSftp = m_main.setupJsch();
-            try {
-                channelSftp.get("/home/lvuser/logs","C:\\Logs");
-            } catch (SftpException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        } catch (JSchException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
         try {
              main.downloadFile();
         } catch (JSchException | SftpException e ) {
@@ -44,22 +31,28 @@ static Session m_jSession;
              e.printStackTrace();
         }
     }
+
     private ChannelSftp setupJsch() throws JSchException {
         JSch jsch = new JSch();
-        Session jschSession = jsch.getSession(username, remoteHost);
+        Session jschSession = jsch.getSession(username, remoteHost, 22);
+        java.util.Properties config = new java.util.Properties(); 
+        config.put("StrictHostKeyChecking", "no");
+        jschSession.setConfig(config);
+        System.out.println("Starting connection...");
+        jschSession.connect(60000);
+        if(jschSession.isConnected()){System.out.println("Created connection successfully!");}
+        else{System.out.println("didnt connect properly! expect the program to go bye bye soon.");}
+        ChannelSftp jChannel = (ChannelSftp) jschSession.openChannel("sftp");
         m_jSession = jschSession;
-        jschSession.setPassword(password);
-        jschSession.connect();
-        jschSession.setSocketFactory(m_socketFactory);
-        sendKeepAliveMsg();
-        return (ChannelSftp) jschSession.openChannel("sftp");
+        return jChannel;
     }
+
     public void downloadFile() throws JSchException, SftpException{
-        String remoteFile = "/home/lvuser/logs";
+        String remoteFile = "/home/lvuser/Logs";
         String localDir = "C:\\Logs";
     
     ChannelSftp channelSftp = setupJsch();
-
+    System.out.println(m_jSession.isConnected());
     List<String>fileList = m_fileLister.getFileList(remoteFile,channelSftp);
         for(String filePath : fileList){
         channelSftp.get(filePath, localDir);
@@ -67,14 +60,7 @@ static Session m_jSession;
     System.out.println("it worked :)");
     channelSftp.exit();
 }
-public void sendKeepAliveMsg(){
-    try {
-        m_jSession.sendKeepAliveMsg();
-    } catch (Exception e) {
-        System.out.println("didnt send the keep alive message.");
-        e.printStackTrace();
-    }
-}
+
 
 }
     
