@@ -63,12 +63,13 @@ public final class Constants {
         public static final int BACK_RIGHT_MODULE_STEER_MOTOR_ID = 18;
         public static final int BACK_RIGHT_MODULE_STEER_ENCODER_ID = 22;
 
-        public static final int MASTER_INTAKE_MOTOR = 23;
-        public static final int FOLLOWER_INTAKE_MOTOR = 24;
+        public static final int MASTER_INTAKE_MOTOR_ID = 23;
+        public static final int FOLLOWER_INTAKE_MOTOR_ID = 24;
+        public static final int INTAKE_WINCH_MOTOR_ID = 25;
 
-        public static final int ROTATION_MOTOR = 25;
+        public static final int ROTATION_MOTOR_ID = 26;
 
-        public static final int ARM_EXTENSION_MOTOR = 27;
+        public static final int ARM_EXTENSION_MOTOR_ID = 27;
     }
 
     public static final class PH_ID {
@@ -212,6 +213,42 @@ public final class Constants {
             config.m_deployMilliseconds = 1000;
             config.m_stowMilliseconds = 1000;
 
+            config.m_winchAxisMaxSpeed = 0.4;
+
+            config.m_winchMotorIdleMode = IdleMode.kBrake;
+
+            config.m_winchMotorStallLimitAmps = 0;
+            config.m_winchMotorFreeLimitAmps = 0;
+
+            // smart motion config
+            // extend PID
+            config.m_winchDeployP = 0;
+            config.m_winchDeployI = 0;
+            config.m_winchDeployD = 0;
+            config.m_winchDeployIZone = 0;
+            config.m_winchDeployFF = 0;
+            config.m_winchDeployPidSlot = 0;
+
+            // retract PID
+            config.m_winchStowP = 0;
+            config.m_winchStowI = 0;
+            config.m_winchStowD = 0;
+            config.m_winchStowIZone = 0;
+            config.m_winchStowFF = 0;
+            config.m_winchStowPidSlot = 1;
+
+            // Smart motion
+            config.m_pidMaxOutput = 0;
+            config.m_pidMinOutput = 0;
+            config.m_smartMotionMaxVelRPM = 0;
+            config.m_smartMotionMinVelRPM = 0;
+            config.m_smartMotionMaxAccRPM = 0;
+            config.m_smartMotionRotationAllowedError = 0;
+
+            config.m_winchMotorAllowedError = 0.0;
+            config.m_winchDeployRotations = 0.0;
+            config.m_winchStowRotations = 0.0;
+
             return config;
         }
     }
@@ -259,21 +296,33 @@ public final class Constants {
             config.m_shuffleboardTunerDRange = 0.2;
 
             // smart motion config
-            config.m_extendMotorP = 0;
-            config.m_extendMotorI = 0;
-            config.m_extendMotorD = 0;
-            config.m_extendMotorIZone = 0;
-            config.m_extendMotorFF = 0;
-            config.m_extendMotorMaxOutput = 0;
-            config.m_extendMotorMinOutput = 0;
-            config.m_extendMotorMaxRPM = 0;
-            config.m_extendMotorMaxVel = 0;
-            config.m_extendMotorMinVel = 0;
-            config.m_extendMotorMaxAcc = 0;
-            config.m_extendMotorAllowedError = 0;
-            config.m_rotationMotorAllowedError = 0;
+
+            // extend PID
+            config.m_extendP = 0;
+            config.m_extendI = 0;
+            config.m_extendD = 0;
+            config.m_extendIZone = 0;
+            config.m_extendFF = 0;
+            config.m_extendPidSlot = 0;
+
+            // retract PID
+            config.m_retractP = 0;
+            config.m_retractI = 0;
+            config.m_retractD = 0;
+            config.m_retractIZone = 0;
+            config.m_retractFF = 0;
+            config.m_retractPidSlot = 1;
+
+            // Smart motion
+            config.m_pidMaxOutput = 0;
+            config.m_pidMinOutput = 0;
+            config.m_smartMotionMaxVelRPM = 0;
+            config.m_smartMotionMinVelRPM = 0;
+            config.m_smartMotionMaxAccRPM = 0;
+            config.m_smartMotionRotationAllowedError = 0;
+            config.m_rotationAllowedError = 0;
+
             config.m_maxSpeedPercent = 0.4;
-            config.m_smartMotionSlot = 0;
             return config;
         }
 
@@ -289,33 +338,7 @@ public final class Constants {
     public static final class ARM_ROTATION {
         public static ArmRotationSubsystem.Configuration GET_ROTATION_CONFIG() {
             ArmRotationSubsystem.Configuration config = new ArmRotationSubsystem.Configuration();
-            config.m_rotationAxisMaxSpeed = 0;
 
-            config.m_rotationMotorIdleMode = IdleMode.kBrake;
-
-            config.m_rotationMotorStallLimitAmps = 0;
-            config.m_rotationMotorFreeLimitAmps = 0;
-
-            config.m_isInverted = false;
-
-            config.m_shuffleboardTunerPRange = 0.2;
-            config.m_shuffleboardTunerIRange = 0.2;
-            config.m_shuffleboardTunerDRange = 0.2;
-
-            // smart motion config
-            config.m_rotationMotorP = 0;
-            config.m_rotationMotorI = 0;
-            config.m_rotationMotorD = 0;
-            config.m_rotationMotorIZone = 0;
-            config.m_rotationMotorFF = 0;
-            config.m_rotationMotorMaxOutput = 0;
-            config.m_rotationMotorMinOutput = 0;
-            config.m_rotationMotorMaxRPM = 0;
-            config.m_rotationMotorMaxVel = 0;
-            config.m_rotationMotorMinVel = 0;
-            config.m_rotationMotorMaxAcc = 0;
-            config.m_rotationMotorAllowedError = 0;
-            config.m_maxSpeedPercent = 0.4;
             config.m_rotationAxisMaxSpeed = 0;
 
             config.m_rotationMotorIdleMode = IdleMode.kBrake;
@@ -364,6 +387,10 @@ public final class Constants {
 
         public static final double AUTO_SCORE_MID_ROTATIONS = 0;
         public static final double AUTO_SCORE_HIGH_ROTATIONS = 0;
+    }
+
+    public static final class AUTO_SCORE_TIMINGS {
+        public static final int SECONDS_BEFORE_RETURNING_TO_STARTING_POSITION = 0;
     }
 
     public static final class LIMELIGHT {

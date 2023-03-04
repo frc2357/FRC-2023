@@ -25,6 +25,6 @@ public class ArmExtenderCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        ArmExtensionSubsystem.getInstance().stopExtensionMotors();
+        ArmExtensionSubsystem.getInstance().stopMotor();
     }
 }

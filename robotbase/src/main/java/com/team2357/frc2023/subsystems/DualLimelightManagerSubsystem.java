@@ -106,10 +106,16 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
     }
 
     public boolean validTargetExists() {
+        if(m_targetAprilTag == -1) {
+            return m_leftLimelight.validTargetExists() || m_rightLimelight.validTargetExists();
+        }
         return m_leftLimelight.validAprilTagTargetExists(m_targetAprilTag) || m_rightLimelight.validAprilTagTargetExists(m_targetAprilTag);
     }
 
     public boolean validTargetExistsOnPrimary() {
+        if(m_targetAprilTag == -1) {
+            return m_primaryLimelight.validTargetExists();
+        }
         return m_primaryLimelight.validAprilTagTargetExists(m_targetAprilTag);
     }
 

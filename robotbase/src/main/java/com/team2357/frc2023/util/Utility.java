@@ -10,7 +10,7 @@ public class Utility {
      * @return The id of the april tag on the grid
      */
     public static int gridColumnToAprilTagID(int column) {
-        switch (column / 2) {
+        switch (column % 3) {
             case 0:
                 return DriverStationAllianceGetter.getAlliance() == Alliance.Blue ? 6 : 3;
             case 1:
