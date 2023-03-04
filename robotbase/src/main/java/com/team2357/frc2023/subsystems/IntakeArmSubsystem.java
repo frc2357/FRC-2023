@@ -106,6 +106,7 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
         configureWinchPID(m_winchPIDController);
 
         m_winchMotor.setInverted(m_config.m_isInverted);
+        resetEncoders();
     }
 
     private void configureWinchMotor(CANSparkMax motor) {

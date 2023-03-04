@@ -159,10 +159,10 @@ public class GunnerControls {
         downDPadAndA.onTrue(new TranslateToTargetCommandGroup(SwerveDriveSubsystem.COLUMN_TARGET.MIDDLE));
         downDPadAndB.onTrue(new TranslateToTargetCommandGroup(SwerveDriveSubsystem.COLUMN_TARGET.RIGHT));
 
-        // yButton.onTrue(new AutoScoreHighCommandGroup());
-        // xButton.onTrue(new AutoScoreMidCommandGroup());
-        // aButton.onTrue(new AutoScoreLowCommandGroup());
-        yButton.onTrue(new InstantCommand(() -> {
+        yButton.onTrue(new AutoScoreHighCommandGroup());
+        xButton.onTrue(new AutoScoreMidCommandGroup());
+        aButton.onTrue(new AutoScoreLowCommandGroup());
+        rightDPadAndY.onTrue(new InstantCommand(() -> {
             IntakeArmSubsystem.getInstance().resetEncoders();
         }));
     }
