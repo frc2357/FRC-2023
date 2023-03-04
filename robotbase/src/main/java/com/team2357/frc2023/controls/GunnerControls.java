@@ -18,12 +18,13 @@ import com.team2357.frc2023.commands.human.panic.ArmRotationCommand;
 import com.team2357.frc2023.commands.human.panic.ClawToggleCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeArmToggleCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeAxisRollerCommand;
+import com.team2357.frc2023.commands.human.panic.IntakeWinchCommand;
 import com.team2357.frc2023.commands.human.panic.WristToggleCommand;
 import com.team2357.frc2023.commands.intake.IntakeArmDeployCommand;
 import com.team2357.frc2023.commands.intake.IntakeArmStowCommand;
-import com.team2357.frc2023.commands.scoring.AutoScoreHighCommand;
-import com.team2357.frc2023.commands.scoring.AutoScoreLowCommand;
-import com.team2357.frc2023.commands.scoring.AutoScoreMidCommand;
+import com.team2357.frc2023.commands.scoring.AutoScoreHighCommandGroup;
+import com.team2357.frc2023.commands.scoring.AutoScoreLowCommandGroup;
+import com.team2357.frc2023.commands.scoring.AutoScoreMidCommandGroup;
 
 /**
  * These are the controls for the gunner.
@@ -147,6 +148,7 @@ public class GunnerControls {
 
         leftDPadAndA.onTrue(new WristToggleCommand());
         leftDPadAndB.onTrue(new ClawToggleCommand());
+        downDPadOnly.whileTrue(new IntakeWinchCommand(axisRightStickY));
 
         rightDPadAndA.onTrue(new IntakeArmToggleCommand());
         rightDPadOnly.whileTrue(new IntakeAxisRollerCommand(axisRightStickY));
@@ -155,8 +157,8 @@ public class GunnerControls {
         downDPadAndA.onTrue(new TranslateToTargetCommandGroup(SwerveDriveSubsystem.COLUMN_TARGET.MIDDLE));
         downDPadAndB.onTrue(new TranslateToTargetCommandGroup(SwerveDriveSubsystem.COLUMN_TARGET.RIGHT));
 
-        yButton.onTrue(new AutoScoreHighCommand());
-        xButton.onTrue(new AutoScoreMidCommand());
-        aButton.onTrue(new AutoScoreLowCommand());
+        yButton.onTrue(new AutoScoreHighCommandGroup());
+        xButton.onTrue(new AutoScoreMidCommandGroup());
+        aButton.onTrue(new AutoScoreLowCommandGroup());
     }
 }

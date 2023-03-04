@@ -4,7 +4,7 @@ import com.team2357.frc2023.commands.intake.IntakeDeployCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakeRollerReverseCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
 import com.team2357.frc2023.commands.intake.IntakeStowCommandGroup;
-import com.team2357.frc2023.commands.scoring.teleopAutoScore.TeleopAutoScoreCommandGroup;
+import com.team2357.frc2023.commands.scoring.TeleopAutoScoreCommandGroup;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.lib.triggers.AxisThresholdTrigger;
 import com.team2357.lib.util.XboxRaw;
