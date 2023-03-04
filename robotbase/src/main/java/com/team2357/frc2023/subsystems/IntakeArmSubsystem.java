@@ -10,6 +10,7 @@ import com.team2357.lib.util.Utility;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class IntakeArmSubsystem extends ClosedLoopSubsystem {
@@ -205,6 +206,14 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
         m_currentState = ArmState.Unknown;
         m_desiredState = ArmState.Stowed;
         setWinchRotation(m_config.m_winchStowRotations, m_config.m_winchStowPidSlot);
+    }
+
+    public void extendSolenoid() {
+        m_intakeSolenoid.set(Value.kForward);
+    }
+
+    public void stopSolenoid() {
+        m_intakeSolenoid.set(Value.kOff);
     }
 
     @Override

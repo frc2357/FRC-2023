@@ -253,6 +253,8 @@ public final class Constants {
 
             return config;
         }
+
+        public static final double SOLENOID_EXTEND_WAIT_MILLIS = 250;
     }
 
     public static final class WRIST {
