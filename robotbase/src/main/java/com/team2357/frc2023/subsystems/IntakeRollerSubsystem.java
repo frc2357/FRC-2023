@@ -71,6 +71,18 @@ public class IntakeRollerSubsystem extends SubsystemBase {
         }
     }
 
+    public void configureForShooting() {
+        m_masterIntakeMotor.configOpenloopRamp(0);
+    }
+
+    public void configureForIntake() {
+        m_masterIntakeMotor.configOpenloopRamp(m_config.m_rampRate);
+    }
+
+    public void setIntakeSpeed(double speed) {
+        m_masterIntakeMotor.set(ControlMode.PercentOutput, speed);
+    }
+
     public void setAxisRollerSpeed(double axisSpeed) {
         double motorSpeed = (-axisSpeed) * m_config.m_rollerAxisMaxSpeed;
         m_masterIntakeMotor.set(ControlMode.PercentOutput, motorSpeed);

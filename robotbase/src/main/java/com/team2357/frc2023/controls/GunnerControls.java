@@ -4,6 +4,7 @@ import com.team2357.lib.triggers.AxisThresholdTrigger;
 import com.team2357.lib.util.Utility;
 import com.team2357.lib.util.XboxRaw;
 import com.team2357.frc2023.subsystems.IntakeArmSubsystem;
+import com.team2357.frc2023.subsystems.IntakeRollerSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 
 import edu.wpi.first.wpilibj.XboxController;
@@ -24,6 +25,7 @@ import com.team2357.frc2023.commands.human.panic.IntakeWinchCommand;
 import com.team2357.frc2023.commands.human.panic.WristToggleCommand;
 import com.team2357.frc2023.commands.intake.IntakeArmDeployCommand;
 import com.team2357.frc2023.commands.intake.IntakeArmStowCommand;
+import com.team2357.frc2023.commands.intake.IntakeRollerShootTestCommand;
 import com.team2357.frc2023.commands.scoring.AutoScoreHighCommandGroup;
 import com.team2357.frc2023.commands.scoring.AutoScoreLowCommandGroup;
 import com.team2357.frc2023.commands.scoring.AutoScoreMidCommandGroup;
@@ -151,6 +153,7 @@ public class GunnerControls {
         leftDPadAndA.onTrue(new WristToggleCommand());
         leftDPadAndB.onTrue(new ClawToggleCommand());
         downDPadOnly.whileTrue(new IntakeWinchCommand(axisRightStickY));
+        rightDPadAndB.whileTrue(new IntakeRollerShootTestCommand());
 
         rightDPadAndA.onTrue(new IntakeArmToggleCommand());
         rightDPadOnly.whileTrue(new IntakeAxisRollerCommand(axisRightStickY));
