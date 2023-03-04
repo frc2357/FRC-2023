@@ -6,7 +6,8 @@ package com.team2357.frc2023.subsystems;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.ErrorCode;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.pathplanner.lib.PathConstraints;
 import com.swervedrivespecialties.swervelib.AbsoluteEncoder;
@@ -317,14 +318,16 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	private void syncEncoder(SwerveModule module) {
-		WPI_TalonFX steerMotor = (WPI_TalonFX) (module.getSteerMotor());
+		TalonFX steerMotor = (TalonFX) (module.getSteerMotor());
 
 		double absoluteAngle = module.getSteerEncoder().getAbsoluteAngle();
-		steerMotor.setSelectedSensorPosition(absoluteAngle / m_config.m_sensorPositionCoefficient);
+		ErrorCode error = steerMotor.setSelectedSensorPosition(absoluteAngle / m_config.m_sensorPositionCoefficient);
+		if(error != ErrorCode.OK)
+			System.out.println("Sensor position unsuccessfully set on motor "+steerMotor.getDeviceID() + ": " + error);
 	}
 
 	private boolean isEncoderSynced(SwerveModule module) {
-		WPI_TalonFX steerMotor = (WPI_TalonFX) (module.getSteerMotor());
+		TalonFX steerMotor = (TalonFX) (module.getSteerMotor());
 		AbsoluteEncoder steerEncoder = module.getSteerEncoder();
 
 		double difference = Math.abs(steerMotor.getSelectedSensorPosition() * m_config.m_sensorPositionCoefficient
@@ -420,6 +423,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 			checkEncodersSynced();
 			return;
 		}
+
 		m_chassisSpeeds = chassisSpeeds;
 		SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
 		SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxVelocityMetersPerSecond);
@@ -484,24 +488,24 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	public void enableOpenLoopRamp() {
-		WPI_TalonFX motor = (WPI_TalonFX) m_backRightModule.getDriveMotor();
+		TalonFX motor = (TalonFX) m_backRightModule.getDriveMotor();
 		motor.configOpenloopRamp(m_config.m_openLoopRampRateSeconds);
-		motor = (WPI_TalonFX) m_backLeftModule.getDriveMotor();
+		motor = (TalonFX) m_backLeftModule.getDriveMotor();
 		motor.configOpenloopRamp(m_config.m_openLoopRampRateSeconds);
-		motor = (WPI_TalonFX) m_frontLeftModule.getDriveMotor();
+		motor = (TalonFX) m_frontLeftModule.getDriveMotor();
 		motor.configOpenloopRamp(m_config.m_openLoopRampRateSeconds);
-		motor = (WPI_TalonFX) m_frontRightModule.getDriveMotor();
+		motor = (TalonFX) m_frontRightModule.getDriveMotor();
 		motor.configOpenloopRamp(m_config.m_openLoopRampRateSeconds);
 	}
 
 	public void disableOpenLoopRamp() {
-		WPI_TalonFX motor = (WPI_TalonFX) m_backRightModule.getDriveMotor();
+		TalonFX motor = (TalonFX) m_backRightModule.getDriveMotor();
 		motor.configOpenloopRamp(0);
-		motor = (WPI_TalonFX) m_backLeftModule.getDriveMotor();
+		motor = (TalonFX) m_backLeftModule.getDriveMotor();
 		motor.configOpenloopRamp(0);
-		motor = (WPI_TalonFX) m_frontLeftModule.getDriveMotor();
+		motor = (TalonFX) m_frontLeftModule.getDriveMotor();
 		motor.configOpenloopRamp(0);
-		motor = (WPI_TalonFX) m_frontRightModule.getDriveMotor();
+		motor = (TalonFX) m_frontRightModule.getDriveMotor();
 		motor.configOpenloopRamp(0);
 	}
 
@@ -651,14 +655,14 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	public void printEncoderVals() {
 		SmartDashboard.putNumber("front left encoder count",
-				((WPI_TalonFX) (m_frontLeftModule.getDriveMotor())).getSelectedSensorPosition(0));
+				((TalonFX) (m_frontLeftModule.getDriveMotor())).getSelectedSensorPosition(0));
 
 		SmartDashboard.putNumber("front right encoder count",
-				((WPI_TalonFX) (m_frontRightModule.getDriveMotor())).getSelectedSensorPosition(0));
+				((TalonFX) (m_frontRightModule.getDriveMotor())).getSelectedSensorPosition(0));
 		SmartDashboard.putNumber("back left module encoder count",
-				((WPI_TalonFX) (m_backLeftModule.getDriveMotor())).getSelectedSensorPosition(0));
+				((TalonFX) (m_backLeftModule.getDriveMotor())).getSelectedSensorPosition(0));
 		SmartDashboard.putNumber("back right module encoder count",
-				((WPI_TalonFX) (m_backRightModule.getDriveMotor())).getSelectedSensorPosition(0));
+				((TalonFX) (m_backRightModule.getDriveMotor())).getSelectedSensorPosition(0));
 
 	}
 }

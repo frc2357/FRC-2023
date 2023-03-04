@@ -219,7 +219,7 @@ public final class Constants {
 
             config.m_winchMotorIdleMode = IdleMode.kBrake;
 
-            config.m_winchMotorStallLimitAmps = 30;
+            config.m_winchMotorStallLimitAmps = 15;
             config.m_winchMotorFreeLimitAmps = 30;
 
             // smart motion config
