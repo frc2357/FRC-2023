@@ -4,21 +4,13 @@
 package pitscript;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
-import ch.ethz.ssh2.Connection;
-import ch.ethz.ssh2.SFTPv3Client;
-import ch.ethz.ssh2.ServerHostKeyVerifier;
-import ch.ethz.ssh2.sftp.*;
 
 public class App {
 
@@ -26,75 +18,40 @@ public class App {
     public static String username = "admin";
     public static String password = "";
     public static String command = "dir *.wpilog";
-    public Connection conn;
+    public static List<String> fileNames;
 
     public static void main(String[] args) {
-        boolean isWindows = System.getProperty("os.name")
-                .toLowerCase().startsWith("windows");
-        ProcessBuilder pBuilder = new ProcessBuilder();
-        try {
-            Process process = Runtime.getRuntime().exec("java");
-            sshAndDownload(remoteHost, "", username, password);
-        } catch (IOException e) {
-            System.out.println("they broke somewhere");
-            e.printStackTrace();
-            // SFTPv3Client();
-        }
-        // try {
-        // Process process = Runtime.getRuntime().exec(new SFTPv3Client());
-        // StreamGobbler streamGobbler =
-        // new StreamGobbler(process.getInputStream(), System.out::println);
-        // Future<?> future = Executors.newSingleThreadExecutor().submit(streamGobbler);
-        // int exitCode = process.waitFor();
-        // assert exitCode == 0;
-        // future.get(10, TimeUnit.SECONDS);
-        // } catch (InterruptedException | ExecutionException | TimeoutException |
-        // IOException e) {
-        // System.out.println("one of the things broke. you should make this more
-        // specific. maybe.");
-        // e.printStackTrace();
-        // }
-
-    }
-    //code below might work for the SFTPClient, once the connection can actually connect to it.
-            //System.out.println("Setting up the SFTPClient -------");
-            // SFTPv3Client sftpClient = new SFTPv3Client(conn);
-            // System.out.println("the SFTPClient was set up right --------");
-    public static void sshAndDownload(String serverIp, String command, String usernameString, String password)
-            throws IOException {
-        Consumer<String> stringConsumer = null;
-        try {
-            Connection conn = new Connection(serverIp);
-            System.out.println("Connecting");
-            conn.connect(null, 20000,20000);
-            System.out.println("Connected");
-            boolean isAuthenticated = conn.authenticateWithPassword(usernameString, password);
-            if (isAuthenticated == false)
-                throw new IOException("Authentication failed.");
-            ch.ethz.ssh2.Session sess = conn.openSession();
-            sess.execCommand(command);
-            InputStream stdout = new ch.ethz.ssh2.StreamGobbler(sess.getStdout());
-            BufferedReader br = new BufferedReader(new InputStreamReader(stdout));
-            System.out.println("the output of the command is");
-            int i =1;
-            while (true) {
-                String line = br.readLine();
-                if (line == null)
-                    break;
-                System.out.println(line);
-                String[] lineList= {line};
-                lineList[i] = line; i++;
+Runtime runtime = null;
+Process process = null;
+try {
+    runtime = Runtime.getRuntime();
+    process = runtime.exec("ssh -l lvuser 10.23.57.2");
+    process = runtime.exec("cmd /c cd /home/lvuser/logs");
+    process = runtime.exec("cmd /c ls *.wpilog");
+    watch(process, runtime);
+} catch (IOException e) {
+    System.out.println("the proccess broke, so programs gonna crash soon.");
+    e.printStackTrace();
+}
+watch(process, runtime);
+}
+    private static void watch(final Process process, Runtime runtime) {
+        new Thread() {
+            public void run() {
+                BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                String line = ""; 
+                try {
+                    while ((line = input.readLine()) != null) {
+                        System.out.println(line);
+                        System.out.println("<O><O> I see you");
+                        fileNames.add(0, line);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-            // SFTPv3Client sftpClient = new SFTPv3Client(conn);
-            System.out.println("ExitCode: " + sess.getExitStatus());
-            sess.close();
-            conn.close();
-        } catch (IOException e) {
-            e.printStackTrace(System.err);
-
-        }
-    }
-
+        }.start();
+    runtime.exit(0);}
     public static class StreamGobbler implements Runnable {
         private InputStream inputStream;
         private Consumer<String> consumer;
