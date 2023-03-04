@@ -12,7 +12,6 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import com.team2357.frc2023.commands.drive.SyncDriveEncodersCommand;
 import com.team2357.frc2023.commands.drive.ZeroDriveCommand;
-import com.team2357.frc2023.commands.intake.IntakeSolenoidExtendCommand;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -85,8 +84,6 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    new IntakeSolenoidExtendCommand().schedule();
-    
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
