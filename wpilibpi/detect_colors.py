@@ -20,9 +20,10 @@ log.addHandler(logging.NullHandler())
 class GamePieceDetector:
     #the following are all singletons
     gamepiece_results = np.zeros((3,9,2),dtype=float)
-    #TODO: gamepiece_poses = np.zeros((3,9,1),dtype=float)?
-    color_violet = (255,0,217)  #BGR
-    color_yellow = (28,215,215) #BGR
+    gamepiece_chars = np.chararray((3,9),unicode=True)
+    gamepiece_chars[:] = '-' #set default value
+    color_violet = (255,0,217)  #BGR for 'COLORIZING' game pieces
+    color_yellow = (28,215,215) #BGR for 'COLORIZING' game pieces
     _yel_lower = np.array((  5, 100, 140),'uint8') #HSV
     _yel_upper = np.array((100, 255, 237),'uint8') #HSV
     _vio_lower = np.array((118,  55,  55),'uint8') #HSV
@@ -35,6 +36,9 @@ class GamePieceDetector:
         """
         """
         pass
+
+    def set_reset_gamepieces(self):
+        self.gamepiece_chars[:] = '-' #set default value
 
     def set_yellow_range(self,low=None,upp=None):
         """ update the lower / upper ranges (HSV)! for yellow color determination
@@ -81,11 +85,14 @@ class GamePieceDetector:
         self.gamepiece_results[row, col, :]=[max(prev_yel,yel_pct), max(prev_vio,vio_pct)]
 
     def to_json(self):
-        # self.gamepiece_results[:,:,0].tolist()
-        # alternate [f"{x:0.2f}" for x in gamepiece_results[:,:,0].ravel()]
-        return json.dumps({'cone':",".join([f"{x:0.2f}" for x in self.gamepiece_results[:,:,0].ravel()]),
-                           'cube':self.gamepiece_results[:,:,1].tolist()},
-                           separators=(',',':'))
+        self.gamepiece_chars[self.gamepiece_results[:,:,0]==1] = "A"
+        self.gamepiece_chars[self.gamepiece_results[:,:,1]==1] = "O"
+        ret = "\n".join([" ".join(x) for x in self.gamepiece_chars])
+        print(ret)
+        return json.dumps({"gamepieces":["".join(x) for x in self.gamepiece_chars]})
+        #return json.dumps({'cone':",".join([f"{x:0.2f}" for x in self.gamepiece_results[:,:,0].ravel()]),
+        #                   'cube':self.gamepiece_results[:,:,1].tolist()},
+        #                   separators=(',',':'))
     
     def runPipeline(self, frame:ndarray, roi_result:list, colorize:float=0.0):
         """ main function used for color detection
@@ -97,12 +104,16 @@ class GamePieceDetector:
         """
         yel_pct = -1.0
         vio_pct = -1.0
+        w,h = frame.shape[0:2]
         # TODO: need to rework this
         for tag_id, roi_rects in roi_result:        # for a given tag, there are 9 roi_rects
             for idx,roi in enumerate(roi_rects):    # idx 0..9, roi is a tuple of (x1,y1,x2,y2) corners defining the region of interest
                 try:
+                    
                     x1,y1,x2,y2 = roi 
-                    if ((y2-y1) <= 0) and ((x2-x1) <= 0): #if area is zero, bail
+                    print(x1,x2,y1,y2,w,h)
+                    # need to bounds check that roi is within image
+                    if any((x1<0, x1>w, x2<0, x2>w, y1<0, y1>w, y2<0, y2>w)) or (x2-x1)<=0 or (y2-y1)<=0:
                         continue
                     yel_pct, vio_pct = self.detect_colors(frame, roi)
                     self.map_gamepiece_results(tag_id, idx, yel_pct, vio_pct)
@@ -122,20 +133,16 @@ class GamePieceDetector:
             # grab the region of interest, convert color space from RGB to HSV
             # literature informs that color separation is easier in HSV
             hsvFrame = cv2.cvtColor(frame[roi[1]:roi[3],roi[0]:roi[2],:], cv2.COLOR_BGR2HSV)
-             
             # Filter the image and get a binary mask, where white (255) is a match, black (0) is not a match
             # use test_findcolor.py to find lower/upper values to use
             mask_yel = cv2.inRange(hsvFrame, self._yel_lower, self._yel_upper)
             mask_vio = cv2.inRange(hsvFrame, self._vio_lower, self._vio_upper)
-        
             #calculate the area that matched, converted to a percentage of total area
             yel_pct = np.count_nonzero(mask_yel)/np.product(mask_yel.shape)
             vio_pct = np.count_nonzero(mask_vio)/np.product(mask_vio.shape)
-
-            #if yel_pct > 0.1 or vio_pct > 0.1:
-            log.debug(f"%Y={yel_pct:0.2f}\,%V={vio_pct:0.2f}")
         except Exception as e:
             log.exception(e)
+            raise(e)
         return yel_pct, vio_pct
     
     # @staticmethod
