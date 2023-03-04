@@ -22,8 +22,6 @@ dependencies {
 
     // This dependency is used by the application.
     implementation 'com.google.guava:guava:30.1.1-jre'
-    implementation 'com.jcraft:jsch:0.1.55'
-}
 
 application {
     // Define the main class for the application.
@@ -33,4 +31,4 @@ application {
 tasks.named('test') {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
-}
+}}
