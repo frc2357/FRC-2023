@@ -1,9 +1,9 @@
+import json
 import numpy as np
 import logging
 
-log = logging.getLogger()
+log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
-global gamepieces
 
 
 class GamePieceTracker:
@@ -12,9 +12,11 @@ class GamePieceTracker:
     gamepiece_chars = np.chararray((3, 9), unicode=True)
     gamepiece_chars[:] = "-"  # set default value to dash
 
-    def __init__(self):
+    def register_NT_vars(self, ntable):
         self.reset_results()
         # TODO: add NETWORK TABLES SUPPORT HERE
+        self.NTvar = ntable.getStringArrayTopic("grid").publish()
+        self.NTreset = ntable.getBooleanTopic("grid_reset").getEntry()
 
     def reset_results(self):
         self.gamepiece_results[:] = 0
@@ -41,18 +43,24 @@ class GamePieceTracker:
         prev_yel, prev_vio = self.gamepiece_results[row, col, :]
         self.gamepiece_results[row, col, :] = [max(prev_yel, yel_pct), max(prev_vio, vio_pct)]
 
-    def to_json(self):
+        self.NTvar.set(self.to_str())
+
+        if self.NTreset.getTopic():
+            self.NTreset.set(False)
+            self.reset_results()
+
+    def to_str(self):
         # convert gamepiece to characters
         self.gamepiece_chars[self.gamepiece_results[:, :, 0] == 1] = "A"
         self.gamepiece_chars[self.gamepiece_results[:, :, 1] == 1] = "O"
         ret = ["".join(x) for x in self.gamepiece_chars]
         ret.reverse()  # so that when printing, bottom row is the bottom!
         log.info("\n%s", "\n".join(ret))
-        return json.dumps(ret)
+        return ret
         # return json.dumps({"gamepieces":["".join(x) for x in self.gamepiece_chars]})
         # return json.dumps({'cone':",".join([f"{x:0.2f}" for x in self.gamepiece_results[:,:,0].ravel()]),
         #                   'cube':self.gamepiece_results[:,:,1].tolist()},
         #                   separators=(',',':'))
 
 
-gamepieces = GamePieceTracker()
+# gamepieces = GamePieceTracker()
