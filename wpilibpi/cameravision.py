@@ -7,6 +7,7 @@ import time
 import sys
 import cv2
 import numpy as np
+
 # to use on your PC vs Raspberry PI, need numpy, robotpy, opencv installed to run
 # See https://robotpy.readthedocs.io/en/stable/getting_started.html
 
@@ -14,21 +15,24 @@ from cscore import CameraServer, VideoSource, UsbCamera, MjpegServer
 from ntcore import NetworkTableInstance, EventFlags
 from calibration import cam0, image_cal
 
+
 class CameraConfig:
-    #name: str
-    #path: str
-    #config: dict
+    # name: str
+    # path: str
+    # config: dict
     pass
 
+
 class CameraObject:
-    #team: int
-    #config: dict 
-    #camera: object
-    #sink: object
-    #outstream: object
-    #images: list 
-    #cal: dict     
+    # team: int
+    # config: dict
+    # camera: object
+    # sink: object
+    # outstream: object
+    # images: list
+    # cal: dict
     pass
+
 
 def list_cameras():
     """
@@ -37,36 +41,37 @@ def list_cameras():
     """
     cams = []
     for c in UsbCamera.enumerateUsbCameras():
-        cams.append(UsbCamera(c.name,c.path))
+        cams.append(UsbCamera(c.name, c.path))
         cam = cams[-1]
-        print(c.name,f"{c.path}")
+        print(c.name, f"{c.path}")
         print(cam.getConfigJsonObject())
-    return cams 
+    return cams
+
 
 class CameraVision:
     """
     A consolidated class to configure and start cameras, for use on wpilipbi / opencv
 
-    Reads and processes a config file (json) to create CameraObject instances.  
-    Creates a networks table (client or server depending on config file).  
-    
+    Reads and processes a config file (json) to create CameraObject instances.
+    Creates a networks table (client or server depending on config file).
+
     Can also be used in simulate mode to read images from disk in place of a Camera
     """
-    
-    # the following are singleton -  by defining them here, all instances of 
+
+    # the following are singleton -  by defining them here, all instances of
     # CameraVision will share these variables
     configFile = None
     team = None
-    server = False 
+    server = False
     cameraConfigs = []
     cameras = []
 
     def __init__(self, configFile=".\\pc.json", simulate=False):
-        self.configFile = configFile 
-        self.readConfig(configFile) # sets team, server, cameraConfigs[]
-        self.ntinst = ntinst = NetworkTableInstance.getDefault()      
+        self.configFile = configFile
+        self.readConfig(configFile)  # sets team, server, cameraConfigs[]
+        self.ntinst = ntinst = NetworkTableInstance.getDefault()
         # TODO: define networks table variable for passing json
-        # this might be a good start: https://docs.wpilib.org/en/stable/docs/software/networktables/client-side-program.html 
+        # this might be a good start: https://docs.wpilib.org/en/stable/docs/software/networktables/client-side-program.html
         if self.server:
             print("Setting up NetworkTables server")
             ntinst.startServer()
@@ -76,35 +81,35 @@ class CameraVision:
             ntinst.setServerTeam(self.team)
             ntinst.startDSClient()
 
-        if simulate: # simulate mode loads a set of images into the camera class
+        if simulate:  # simulate mode loads a set of images into the camera class
             imgs = []
             fimages = glob.glob("./images/*.png")
             print(fimages)
-            
+
             for fname in fimages:
                 imgs.append(np.ascontiguousarray(cv2.imread(fname)))
             camConfig = dict()
-            camConfig['width'] = imgs[0].shape[1] #all images should be same dimensions!!!
-            camConfig["height"] = imgs[0].shape[0]    
-            self.cameraConfigs.append(camConfig)   
+            camConfig["width"] = imgs[0].shape[1]  # all images should be same dimensions!!!
+            camConfig["height"] = imgs[0].shape[0]
+            self.cameraConfigs.append(camConfig)
 
             c = CameraObject()
             c.camera = None
-            c.config = camConfig 
+            c.config = camConfig
             c.sink = None
             c.outstream = CameraServer.putVideo("VideoStream", camConfig["width"], camConfig["height"])
             c.images = imgs
-            c.cal = image_cal  #bandaid for now
+            c.cal = image_cal  # bandaid for now
             self.cameras.append(c)
         else:
             for config in self.cameraConfigs:
-                self.cameras.append(self.startCamera(config))        
+                self.cameras.append(self.startCamera(config))
 
-    def parseError(self, str)->None:
+    def parseError(self, str) -> None:
         """Report parse error."""
         print("config error in '" + self.configFile + "': " + str, file=sys.stderr)
-    
-    def readCameraConfig(self, config)->bool:
+
+    def readCameraConfig(self, config) -> bool:
         """Read single camera configuration."""
         cam = CameraConfig()
         # name
@@ -129,8 +134,8 @@ class CameraVision:
         cam.config = config
         self.cameraConfigs.append(cam)
         return True
-    
-    def readConfig(self, configFile=None)->None:
+
+    def readConfig(self, configFile=None) -> None:
         """Read configuration file (json)."""
         if configFile:
             self.configFile = configFile
@@ -170,25 +175,25 @@ class CameraVision:
         for camera in cameras:
             if not self.readCameraConfig(camera):
                 return False
-        return True    
-    
+        return True
+
     def getComponents(self, cam_id=0):
-        """ get the sink and outstream for camera by index """
+        """get the sink and outstream for camera by index"""
         return (self.cameras[cam_id].sink, self.cameras[cam_id].outstream)
 
-    def startCamera(self, config:CameraConfig)->CameraObject:
+    def startCamera(self, config: CameraConfig) -> CameraObject:
         """Start running the camera.
 
-            creates a connection to the camera, starts the CameraServer and
-            references to the sink and outputstream.  
+        creates a connection to the camera, starts the CameraServer and
+        references to the sink and outputstream.
 
-            Args:
-                config: CameraConfig class or dictionary
-            
-            Returns:
-                configured CameraObject
+        Args:
+            config: CameraConfig class or dictionary
+
+        Returns:
+            configured CameraObject
         """
-        
+
         print("Starting camera '{}' on {}".format(config.name, config.path))
         camera = UsbCamera(config.name, config.path)
         server = CameraServer.startAutomaticCapture(camera=camera)
@@ -200,15 +205,14 @@ class CameraVision:
             server.setConfigJson(json.dumps(config.streamConfig))
 
         CameraServer.enableLogging()
-        #frame = np.zeros(shape=(camConfig["height"], camConfig["width"], 3), dtype=np.uint8)
-        #blackFrame = np.zeros(shape=(camConfig["height"], camConfig["width"], 3), dtype=np.uint8)
+        # frame = np.zeros(shape=(camConfig["height"], camConfig["width"], 3), dtype=np.uint8)
+        # blackFrame = np.zeros(shape=(camConfig["height"], camConfig["width"], 3), dtype=np.uint8)
         camConfig = camera.getConfigJsonObject()
         outputStream = CameraServer.putVideo("VideoStream", camConfig["width"], camConfig["height"])
         c = CameraObject()
         c.camera = camera
-        c.config = camConfig 
-        c.outstream = outputStream 
+        c.config = camConfig
+        c.outstream = outputStream
         c.sink = CameraServer.getVideo(camera)
         c.cal = image_cal
         return c
-
