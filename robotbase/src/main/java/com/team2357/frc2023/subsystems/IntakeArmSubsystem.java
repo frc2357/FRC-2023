@@ -228,18 +228,14 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
 
     private void deployPeriodic() {
         if (!isWinchAtRotations()) {
-            m_intakeSolenoid.set(DoubleSolenoid.Value.kForward);
         } else if (isWinchAtRotations()) {
-            m_intakeSolenoid.set(DoubleSolenoid.Value.kOff);
             m_currentState = ArmState.Deployed;
         }
     }
 
     private void stowPeriodic() {
         if (!isWinchAtRotations()) {
-            m_intakeSolenoid.set(DoubleSolenoid.Value.kReverse);
         } else if (isWinchAtRotations()) {
-            m_intakeSolenoid.set(DoubleSolenoid.Value.kOff);
             m_currentState = ArmState.Stowed;
         }
     }
