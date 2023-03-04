@@ -13,9 +13,9 @@ import com.swervedrivespecialties.swervelib.AbsoluteEncoder;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
-import com.team2357.frc2023.commands.scoring.AutoScoreHighCommand;
-import com.team2357.frc2023.commands.scoring.AutoScoreLowCommand;
-import com.team2357.frc2023.commands.scoring.AutoScoreMidCommand;
+import com.team2357.frc2023.commands.scoring.AutoScoreHighCommandGroup;
+import com.team2357.frc2023.commands.scoring.AutoScoreLowCommandGroup;
+import com.team2357.frc2023.commands.scoring.AutoScoreMidCommandGroup;
 import com.team2357.frc2023.util.Utility;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 
@@ -78,13 +78,13 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	public static Command getAutoScoreCommands(int row) {
 		switch (row) {
 			case 0:
-				return new AutoScoreLowCommand();
+				return new AutoScoreLowCommandGroup();
 			case 1:
-				return new AutoScoreMidCommand();
+				return new AutoScoreMidCommandGroup();
 			case 2:
-				return new AutoScoreHighCommand();
+				return new AutoScoreHighCommandGroup();
 			default:
-				return new AutoScoreLowCommand();
+				return new AutoScoreLowCommandGroup();
 		}
 	}
 
@@ -530,7 +530,13 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		return isAtXTarget() && isAtYTarget() && !m_isSeeking;
 	}
 
-	public void trackTarget(SwerveDriveSubsystem.COLUMN_TARGET column) {
+	/**
+	 * 
+	 * @param column The target column relative to the selected april tag (RIGHT, MIDDLE, LEFT)
+	 * @param targetAprilTag The target AprilTag for the limelight to track, 
+	 * -1 will cause the limelight to track the primary in view AprilTag
+	 */
+	public void trackTarget(SwerveDriveSubsystem.COLUMN_TARGET column, int targetAprilTag) {
 		System.out.println("track target");
 		setClosedLoopEnabled(true);
 
@@ -538,7 +544,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		m_targetColumn = column;
 
 		limelightManager.setPrimary(m_targetColumn.primaryLimelight);
-		limelightManager.setTargetAprilTag(Utility.gridColumnToAprilTagID(column.index));
+		limelightManager.setTargetAprilTag(targetAprilTag);
 		limelightManager.setAprilTagPipelineActive();
 
 		trackXTarget();
@@ -609,6 +615,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	public void stopTracking() {
 		setClosedLoopEnabled(false);
+		DualLimelightManagerSubsystem.getInstance().setTargetAprilTag(-1);
 		m_targetColumn = COLUMN_TARGET.NONE;
 		m_isSeeking = false;
 

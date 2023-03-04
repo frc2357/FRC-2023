@@ -1,4 +1,4 @@
-package com.team2357.frc2023.commands.scoring.teleopAutoScore;
+package com.team2357.frc2023.commands.limelight;
 
 import com.team2357.frc2023.subsystems.DualLimelightManagerSubsystem;
 import edu.wpi.first.wpilibj2.command.CommandBase;

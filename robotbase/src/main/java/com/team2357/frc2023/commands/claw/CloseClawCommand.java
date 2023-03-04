@@ -1,4 +1,4 @@
-package com.team2357.frc2023.commands.scoring.util;
+package com.team2357.frc2023.commands.claw;
 
 import com.team2357.frc2023.subsystems.ClawSubsystem;
 

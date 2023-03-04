@@ -1,10 +1,11 @@
-package com.team2357.frc2023.commands.scoring.teleopAutoScore;
+package com.team2357.frc2023.commands.scoring;
 
 import com.team2357.frc2023.commands.auto.TranslateToTargetCommandGroup;
 import com.team2357.frc2023.networktables.AprilTagPose;
 import com.team2357.frc2023.networktables.Buttonboard;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.frc2023.trajectoryutil.AvailableTeleopTrajectories;
+import com.team2357.frc2023.util.Utility;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -33,7 +34,7 @@ public class TeleopAutoScoreCommandGroup extends CommandBase {
 
             if (teleopTrajectory != null) {
                 Command autoScore = SwerveDriveSubsystem.getAutoScoreCommands(Buttonboard.getInstance().getRowValue());
-                Command translate = new TranslateToTargetCommandGroup(SwerveDriveSubsystem.getSetpoint(col % 3));
+                Command translate = new TranslateToTargetCommandGroup(SwerveDriveSubsystem.getSetpoint(col % 3), Utility.gridColumnToAprilTagID(col));
                 
                 m_teleopCommand = new SequentialCommandGroup();
                 m_teleopCommand.addCommands(teleopTrajectory);
