@@ -318,8 +318,8 @@ public final class Constants {
             config.m_retractPidSlot = 1;
 
             // Smart motion
-            config.m_pidMaxOutput = 0;
-            config.m_pidMinOutput = 0;
+            config.m_pidMaxOutput = 1;
+            config.m_pidMinOutput = -1;
             config.m_smartMotionMaxVelRPM = 8000;
             config.m_smartMotionMinVelRPM = 0;
             config.m_smartMotionMaxAccRPM = 8000;
