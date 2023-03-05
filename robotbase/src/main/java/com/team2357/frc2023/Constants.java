@@ -326,7 +326,7 @@ public final class Constants {
             config.m_smartMotionRotationAllowedError = 0;
             config.m_rotationAllowedError = 0;
 
-            config.m_maxSpeedPercent = 0.4;
+            config.m_maxSpeedPercent = 0.7;
             return config;
         }
 
@@ -344,6 +344,7 @@ public final class Constants {
             ArmRotationSubsystem.Configuration config = new ArmRotationSubsystem.Configuration();
 
             config.m_rotationAxisMaxSpeed = 0;
+            config.m_maxSpeedPercent = 0.4;
 
             config.m_rotationMotorIdleMode = IdleMode.kBrake;
 
@@ -351,11 +352,12 @@ public final class Constants {
             config.m_rotationMotorFreeLimitAmps = 0;
 
             // smart motion config
-            config.m_rotationMotorP = 0;
+            config.m_rotationMotorP = 0.0;
             config.m_rotationMotorI = 0;
             config.m_rotationMotorD = 0;
             config.m_rotationMotorIZone = 0;
             config.m_rotationMotorFF = 0;
+
             config.m_rotationMotorMaxOutput = 0;
             config.m_rotationMotorMinOutput = 0;
             config.m_rotationMotorMaxRPM = 0;
@@ -363,7 +365,7 @@ public final class Constants {
             config.m_rotationMotorMinVel = 0;
             config.m_rotationMotorMaxAcc = 0;
             config.m_rotationMotorAllowedError = 0;
-            config.m_maxSpeedPercent = 0.4;
+
             config.m_smartMotionSlot = 0;
 
             // Static gain, will likely be zero
