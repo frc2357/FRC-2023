@@ -14,7 +14,7 @@ public class ArmRotateToPositionCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        ArmRotationSubsystem.getInstance().setRotationAxisSpeed(m_rotations);
+        ArmRotationSubsystem.getInstance().setRotations(m_rotations);
     }
 
     @Override
@@ -24,6 +24,6 @@ public class ArmRotateToPositionCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return ArmRotationSubsystem.getInstance().isRotatorAtRotations();
+        return ArmRotationSubsystem.getInstance().isAtRotations();
     }
 }
