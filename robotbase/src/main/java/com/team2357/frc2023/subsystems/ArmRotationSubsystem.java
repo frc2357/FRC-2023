@@ -136,7 +136,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
                 m_config.m_smartMotionSlot);
     }
 
-    public void setRotatorRotations(double rotations) {
+    public void setRotations(double rotations) {
         setClosedLoopEnabled(true);
         m_targetRotations = rotations;
 
@@ -155,14 +155,9 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
         return (rotations - m_config.m_armHorizontalRotations) / m_config.m_rotationsPerRadian;
     }
 
-    public boolean isRotatorAtRotations() {
-        return isMotorAtRotations(m_rotationMotor);
-    }
-
-    public boolean isMotorAtRotations(CANSparkMax motor) {
-        return Utility.isWithinTolerance(motor.getEncoder().getPosition(), m_targetRotations,
+    public boolean isAtRotations() {
+        return Utility.isWithinTolerance(m_rotationMotor.getEncoder().getPosition(), m_targetRotations,
                 m_config.m_rotationMotorAllowedError);
-
     }
 
     public void setRotationAxisSpeed(double axisSpeed) {
@@ -200,7 +195,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
 
     @Override
     public void periodic() {
-        if (isClosedLoopEnabled() && isRotatorAtRotations()) {
+        if (isClosedLoopEnabled() && isAtRotations()) {
             setClosedLoopEnabled(false);
         }
         if (m_shuffleboardPIDTuner.arePIDsUpdated()) {
