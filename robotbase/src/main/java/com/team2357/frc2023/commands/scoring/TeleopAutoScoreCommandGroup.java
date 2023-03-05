@@ -33,7 +33,7 @@ public class TeleopAutoScoreCommandGroup extends CommandBase {
             Command teleopTrajectory = AvailableTeleopTrajectories.buildTrajectory(col, currentPose);
 
             if (teleopTrajectory != null) {
-                Command autoScore = SwerveDriveSubsystem.getAutoScoreCommands(Buttonboard.getInstance().getRowValue());
+                Command autoScore = SwerveDriveSubsystem.getAutoScoreCommands(Buttonboard.getInstance().getRowValue(), Buttonboard.getInstance().getColValue());
                 Command translate = new TranslateToTargetCommandGroup(SwerveDriveSubsystem.getSetpoint(col % 3), Utility.gridColumnToAprilTagID(col));
                 
                 m_teleopCommand = new SequentialCommandGroup();

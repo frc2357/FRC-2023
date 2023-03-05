@@ -204,6 +204,12 @@ public final class Constants {
         }
 
         public static final double AUTO_SCORE_LOW_REVERSE_TIME = 1;
+
+        //TODO: Tune these
+        public static final double MID_SHOT_PERCENT_OUTPUT = 0;
+        public static final double MID_SHOT_DELAY_SECONDS = .25;
+        public static final double HIGH_SHOT_PERCENT_OUTPUT = 0;
+        public static final double HIGH_SHOT_DELAY_SECONDS = .25;
     }
 
     public static final class INTAKE_ARM {
@@ -229,7 +235,7 @@ public final class Constants {
             config.m_winchDeployD = 0;
             config.m_winchDeployIZone = 0;
             config.m_winchDeployFF = 0.0002;
-            config.m_winchDeployPidSlot = 0;
+            config.m_winchDeployPidSlot = WINCH_DEPLOY_PID_SLOT;
 
             // retract PID
             config.m_winchStowP = 0;
@@ -237,7 +243,7 @@ public final class Constants {
             config.m_winchStowD = 0;
             config.m_winchStowIZone = 0;
             config.m_winchStowFF = 0.0005;
-            config.m_winchStowPidSlot = 1;
+            config.m_winchStowPidSlot = WINCH_STOW_PID_SLOT;
 
             // Smart motion
             config.m_pidMaxOutput = 1;
@@ -255,6 +261,13 @@ public final class Constants {
         }
 
         public static final double SOLENOID_EXTEND_WAIT_MILLIS = 250;
+
+        //TODO: Tune these
+        public static final double MID_SHOT_SETPOINT_ROTATIONS = 0;
+        public static final double HIGH_SHOT_SETPOINT_ROTATIONS = 0;
+
+        public static final int WINCH_DEPLOY_PID_SLOT = 0;
+        public static final int WINCH_STOW_PID_SLOT = 1;
     }
 
     public static final class WRIST {
