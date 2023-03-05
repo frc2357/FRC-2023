@@ -43,7 +43,7 @@ public final class Constants {
          */
         public static final String DRIVE_CANBUS = "CANivore";
 
-        public static final int PNEUMATICS_HUB_ID = 2;
+        public static final int PNEUMATICS_HUB_ID = 1;
 
         public static final int PIGEON_ID = 5;
 
@@ -67,21 +67,21 @@ public final class Constants {
         public static final int FOLLOWER_INTAKE_MOTOR_ID = 24;
         public static final int INTAKE_WINCH_MOTOR_ID = 25;
 
-        public static final int ROTATION_MOTOR_ID = 26;
+        public static final int ARM_ROTATION_MOTOR_ID = 26;
 
         public static final int ARM_EXTENSION_MOTOR_ID = 27;
     }
 
     public static final class PH_ID {
 
-        public static final int WRIST_FORWARD_SOLENOID_CHANNEL = 0;
-        public static final int WRIST_REVERSE_SOLENOID_CHANNEL = 1;
+        public static final int WRIST_FORWARD_SOLENOID_CHANNEL = 3;
+        public static final int WRIST_REVERSE_SOLENOID_CHANNEL = 0;
         
-        public static final int CLAW_FORWARD_SOLENOID_CHANNEL = 3;
-        public static final int CLAW_REVERSE_SOLENOID_CHANNEL = 4;
+        public static final int CLAW_FORWARD_SOLENOID_CHANNEL = 4;
+        public static final int CLAW_REVERSE_SOLENOID_CHANNEL = 1;
 
-        public static final int INTAKE_SOLENOID_FORWARD_CHANNEL = 2;
-        public static final int INTAKE_SOLENOID_REVERSE_CHANNEL = 5;
+        public static final int INTAKE_SOLENOID_FORWARD_CHANNEL = 5;
+        public static final int INTAKE_SOLENOID_REVERSE_CHANNEL = 2;
     }
 
     public static final class DRIVE {

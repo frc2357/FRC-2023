@@ -77,7 +77,7 @@ public class ClawSubsystem extends SubsystemBase {
     private void openPeriodic() {
         long now = System.currentTimeMillis();
         if (m_lastActionMillis == 0) {
-            m_clawSolenoid.set(Value.kReverse);
+            m_clawSolenoid.set(Value.kForward);
             m_lastActionMillis = now;
         } else if (now > m_lastActionMillis + m_config.m_openMilliseconds) {
             m_clawSolenoid.set(Value.kOff);
@@ -90,7 +90,7 @@ public class ClawSubsystem extends SubsystemBase {
         long now = System.currentTimeMillis();
 
         if (m_lastActionMillis == 0) {
-            m_clawSolenoid.set(Value.kForward);
+            m_clawSolenoid.set(Value.kReverse);
             m_lastActionMillis = now;
         } else if (now > m_lastActionMillis + m_config.m_openMilliseconds) {
             m_clawSolenoid.set(Value.kOff);
