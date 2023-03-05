@@ -340,6 +340,16 @@ public final class Constants {
     }
 
     public static final class ARM_ROTATION {
+
+        
+        public static final double RETRACTED_ROTATIONS = 0;
+        public static final double INTAKE_HANDOFF_ROTATIONS = 0;
+
+        public static final double AUTO_SCORE_MID_ROTATIONS = 0;
+        public static final double AUTO_SCORE_HIGH_ROTATIONS = 51;
+
+        public static final double ARM_ROTATION_GEAR_RATIO  = 190.91;
+
         public static ArmRotationSubsystem.Configuration GET_ROTATION_CONFIG() {
             ArmRotationSubsystem.Configuration config = new ArmRotationSubsystem.Configuration();
 
@@ -348,32 +358,31 @@ public final class Constants {
 
             config.m_rotationMotorIdleMode = IdleMode.kBrake;
 
-            config.m_rotationMotorStallLimitAmps = 0;
-            config.m_rotationMotorFreeLimitAmps = 0;
+            config.m_rotationMotorStallLimitAmps = 30;
+            config.m_rotationMotorFreeLimitAmps = 30;
 
             // smart motion config
-            config.m_rotationMotorP = 0.0;
+            config.m_rotationMotorP = 0.00075;
             config.m_rotationMotorI = 0;
             config.m_rotationMotorD = 0;
             config.m_rotationMotorIZone = 0;
-            config.m_rotationMotorFF = 0;
+            config.m_rotationMotorFF = 0.001;
 
-            config.m_rotationMotorMaxOutput = 0;
-            config.m_rotationMotorMinOutput = 0;
-            config.m_rotationMotorMaxRPM = 0;
-            config.m_rotationMotorMaxVel = 0;
+            config.m_rotationMotorMaxOutput = 1;
+            config.m_rotationMotorMinOutput = -1;
+            config.m_rotationMotorMaxRPM = 5676;
+            config.m_rotationMotorMaxVel = 4600;
             config.m_rotationMotorMinVel = 0;
-            config.m_rotationMotorMaxAcc = 0;
-            config.m_rotationMotorAllowedError = 0;
+            config.m_rotationMotorMaxAcc = 4600;
+            config.m_rotationMotorAllowedError = 0.5;
 
             config.m_smartMotionSlot = 0;
 
             // Static gain, will likely be zero
             config.m_feedforwardKs = 0;
 
-            // TODO: Calculated
             // Gravity gain, should be the gain required to keep the arm parallel with the floor
-            config.m_feedforwardKg = 0;
+            config.m_feedforwardKg = 0.64;
 
             // Velocity gain, will be zero
             config.m_feedforwardKv = 0;
@@ -382,17 +391,11 @@ public final class Constants {
             config.m_feedforwardKa = 0;
 
             // TODO: Calculate
-            config.m_armHorizontalRotations = 0;
-            config.m_rotationsPerRadian = 114.55 / (2 * Math.PI);
+            config.m_armHorizontalRotations = ARM_ROTATION_GEAR_RATIO / 4; // 90 degrees
+            config.m_rotationsPerRadian = ARM_ROTATION_GEAR_RATIO / (2 * Math.PI);
 
             return config;
         }
-
-        public static final double RETRACTED_ROTATIONS = 0;
-        public static final double INTAKE_HANDOFF_ROTATIONS = 0;
-
-        public static final double AUTO_SCORE_MID_ROTATIONS = 0;
-        public static final double AUTO_SCORE_HIGH_ROTATIONS = 0;
     }
 
     public static final class AUTO_SCORE_TIMINGS {

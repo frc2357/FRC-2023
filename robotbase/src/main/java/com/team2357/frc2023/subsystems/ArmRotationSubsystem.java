@@ -126,7 +126,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
         pidController.setD(m_config.m_rotationMotorD);
         pidController.setIZone(m_config.m_rotationMotorIZone);
         pidController.setFF(m_config.m_rotationMotorFF);
-        pidController.setOutputRange(m_config.m_rotationMotorMinOutput, m_config.m_rotationMotorMinOutput);
+        pidController.setOutputRange(m_config.m_rotationMotorMinOutput, m_config.m_rotationMotorMaxOutput);
 
         // Configure smart motion
         pidController.setSmartMotionMaxVelocity(m_config.m_rotationMotorMaxVel, m_config.m_smartMotionSlot);
