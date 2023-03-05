@@ -14,6 +14,7 @@
 from collections import OrderedDict
 import json
 import cv2
+from ntcore import NetworkTableInstance
 import robotpy_apriltag
 from wpimath.geometry import Transform3d, Rotation3d, Pose3d
 import time
@@ -107,6 +108,7 @@ class AprilTagPipeline:
     DETECTION_MARGIN_THRESHOLD = 100
     POSE_SOLVER_ITERATIONS = 200
     _match_tags = []  # holds the _MATCH_TAGMAP currently in use
+    NTvar = NetworkTableInstance.getDefault().getTable("gridcam").getStringTopic("tags").publish()
 
     def __init__(self, frame_size, Fx, Fy, Cx, Cy, alliance="RED"):
         """AprilTagPipeline class
@@ -147,7 +149,7 @@ class AprilTagPipeline:
         if alliance in self._MATCH_TAGMAP.keys():
             self._match_tags = self._MATCH_TAGMAP[alliance]
 
-    def to_json(self):
+    def to_dict(self):
         """
         Format AprilTags to json
         TODO: Is it possible that both cameras see the same tag, and therefore we
@@ -166,7 +168,7 @@ class AprilTagPipeline:
                 ret["pose"]["translation"] = {"x": tvec.x, "y": tvec.y, "z": tvec.z}
                 ret["pose"]["rotation"]["quaternion"] = {"W": rqua.W(), "X": rqua.X(), "Y": rqua.Y(), "Z": rqua.Z()}
                 ret["ambiguity"] = est.getAmbiguity()
-        return {"timestamp": 0.0, "tags": apriltagNT}
+        return apriltagNT
 
     def process_apriltag(self, tag: AprilTagDetection):
         """
@@ -176,9 +178,7 @@ class AprilTagPipeline:
             tag: AprilTagDetection object
 
         Returns:
-          //id
           pose(Transform3d)
-          //tag center (pixels)
           tag object
           pose estimate object
         """
@@ -254,19 +254,18 @@ class AprilTagPipeline:
 
                 frame = draw_tagframe(frame, tag)
                 frame = draw_tagid(frame, tag)
+                frame = draw_cube(frame, result, cal)
                 # frame = draw_tagpose(frame, pose, tag)
 
                 # we only care about these tags for gamepiece detection.
-                # if tag_id in self.match_tags:
-                #    frame, pts = project_gamepiece_locations(roi_map, frame, result, cal)
-                #    roipts.append((tag_id, pts))
+                if tag_id in self.match_tags:
+                    frame, pts = project_gamepiece_locations(roi_map, frame, result, cal)
+                    roipts.append((tag_id, pts))
 
             log.info(roipts)
             return frame, roipts
         except Exception as e:
-            log.error(
-                e,
-            )
+            log.error(e)
             self.results = []
             return self.black_frame, []
 
@@ -367,13 +366,14 @@ def project_gamepiece_locations(
 
 def draw_cube(frame: ndarray, result: tuple, cal: CameraCalibration):
     """draws a 3d cube over the apriltag to visually show pose"""
-    cube_pts = 0.05 * np.float32(
-        [[0, 0, 0], [0, 1, 0], [1, 1, 0], [1, 0, 0], [0, 0, -1], [0, 1, -1], [1, 1, -1], [1, 0, -1]]
+    CUBE = np.float32(
+        [[-1, -1, 0], [-1, 1, 0], [1, 1, 0], [1, -1, 0], [-1, -1, -2], [-1, 1, -2], [1, 1, -2], [1, -1, -2]]
     )
-    tag_id, pose, center, tag = result
+    cube_pts = 3 / 39.37 * CUBE
+    pose, tag, _ = result
     tvec = np.array(pose.translation())
     rvec = pose.rotation().getQuaternion().toRotationVector()
-    imgpts, jac = cv2.projectPoints(cube_pts, rvec, tvec)
+    imgpts, jac = cv2.projectPoints(cube_pts, rvec, tvec, cal.mtx, cal.dst)
     imgpts = np.int32(imgpts).reshape(-1, 2)
     # draw ground floor in green
     # frame = cv2.drawContours(frame, [imgpts[:4]],-1,(0,255,0),-3)
