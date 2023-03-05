@@ -302,11 +302,11 @@ public final class Constants {
             // smart motion config
 
             // extend PID
-            config.m_extendP = 0;
+            config.m_extendP = 0.00025;
             config.m_extendI = 0;
             config.m_extendD = 0;
             config.m_extendIZone = 0;
-            config.m_extendFF = 0;
+            config.m_extendFF = 0.00001;
             config.m_extendPidSlot = 0;
 
             // retract PID
@@ -320,10 +320,10 @@ public final class Constants {
             // Smart motion
             config.m_pidMaxOutput = 0;
             config.m_pidMinOutput = 0;
-            config.m_smartMotionMaxVelRPM = 0;
+            config.m_smartMotionMaxVelRPM = 8000;
             config.m_smartMotionMinVelRPM = 0;
-            config.m_smartMotionMaxAccRPM = 0;
-            config.m_smartMotionRotationAllowedError = 0;
+            config.m_smartMotionMaxAccRPM = 8000;
+            config.m_smartMotionRotationAllowedError = 0.5;
             config.m_rotationAllowedError = 0;
 
             config.m_maxSpeedPercent = 0.7;
