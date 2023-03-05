@@ -10,6 +10,7 @@ import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 import com.team2357.lib.util.Utility;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class ArmRotationSubsystem extends ClosedLoopSubsystem {
     private static ArmRotationSubsystem instance = null;
@@ -75,7 +76,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
          * Number of rotations the arm is at when parallel with the floor
          */
         public double m_armHorizontalRotations;
-        
+
         /**
          * How many motor rotations = 1 radian
          */
@@ -108,8 +109,8 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
 
         m_rotationMotor.setInverted(m_config.m_isInverted);
 
-        m_feedforward = new ArmFeedforward(m_config.m_feedforwardKs, m_config.m_feedforwardKv,
-         m_config.m_feedforwardKs, m_config.m_feedforwardKa);
+        m_feedforward = new ArmFeedforward(m_config.m_feedforwardKs, m_config.m_feedforwardKg, m_config.m_feedforwardKv,
+                m_config.m_feedforwardKa);
     }
 
     private void configureRotationMotor(CANSparkMax motor) {
@@ -125,7 +126,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
         pidController.setD(m_config.m_rotationMotorD);
         pidController.setIZone(m_config.m_rotationMotorIZone);
         pidController.setFF(m_config.m_rotationMotorFF);
-        pidController.setOutputRange(m_config.m_rotationMotorMinOutput, m_config.m_rotationMotorMinOutput);
+        pidController.setOutputRange(m_config.m_rotationMotorMinOutput, m_config.m_rotationMotorMaxOutput);
 
         // Configure smart motion
         pidController.setSmartMotionMaxVelocity(m_config.m_rotationMotorMaxVel, m_config.m_smartMotionSlot);
@@ -141,7 +142,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
 
         double feedforwardVolts = m_feedforward.calculate(calculateFeedforwardRadians(rotations), 0);
         m_pidController.setReference(m_targetRotations, CANSparkMax.ControlType.kSmartMotion, 0,
-        feedforwardVolts, ArbFFUnits.kVoltage);
+                feedforwardVolts, ArbFFUnits.kVoltage);
     }
 
     /**
@@ -200,5 +201,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
         if (m_shuffleboardPIDTuner.arePIDsUpdated()) {
             updatePID();
         }
+
+        SmartDashboard.putNumber("Rotations", getMotorRotations());
     }
 }
