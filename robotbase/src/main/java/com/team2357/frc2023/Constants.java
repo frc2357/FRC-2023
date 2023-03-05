@@ -193,9 +193,9 @@ public final class Constants {
 
             config.m_rampRate = 1;
 
-            config.m_peakCurrentLimit = 40;
+            config.m_peakCurrentLimit = 200;
             config.m_peakCurrentDuration = 0;
-            config.m_continuousCurrentLimit = 40;
+            config.m_continuousCurrentLimit = 200;
 
             config.m_masterInverted = true;
             config.m_followerInverted = false;
