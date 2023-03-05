@@ -56,20 +56,25 @@ import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
  * effect of the GUI layout.
  */
 public class Robot extends TimedRobot {
-  private static final int deviceID = 26;
-  private CANSparkMax m_motor;
-  private SparkMaxPIDController m_pidController;
-  private ArmFeedforward m_armFeedforward;
-  private RelativeEncoder m_encoder;
-  public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM, maxVel, minVel, maxAcc, allowedErr, kG;
+  private static final int armRotationID = 26;
+  private CANSparkMax m_rotationMotor;
+  private SparkMaxPIDController m_rotationPidController;
+  private ArmFeedforward m_rotationFeedforward;
+  private RelativeEncoder m_rotationEncoder;
+  public double rotationKP, rotationKI, rotationKD, rotationKIz, rotationKFF, rotationKMaxOutput, rotationKMinOutput, rotationMaxRPM, rotationMaxVel, rotationMinVel, rotationMaxAcc, rotationAllowedErr, rotationKG;
+
+  private static final int extensionID = 26;
+  private CANSparkMax m_extensionMotor;
+  private SparkMaxPIDController m_extensionPidController;
+  private ArmFeedforward m_extensionFeedforward;
+  private RelativeEncoder m_extensionEncoder;
+  public double extensionKP, extensionKI, extensionKD, extensionKIz, extensionKFF, extensionKMaxOutput, extensionKMinOutput, extensionMaxRPM, extensionMaxVel, extensionMinVel, extensionMaxAcc, extensionAllowedErr, extensionKG;
 
   public double m_rotationsPerRadian = 190.91 / (2 * Math.PI);
-  // public double m_horizontalRotations = 0; // Position when the arm is parallel
-  // with the floor
-  public double m_horizontalRotations = 47.7275;
+  public double m_horizontalRotations = 47.7275; // Position when arm is parallel with floor
 
   private double intakeFloorSetpoint = 146;
-  private double armHighRotationSetpoint = 114.55 / 4;
+  private double armHighRotationSetpoint = 51;
 
   // Controller
   XboxController controller = new XboxController(1);
@@ -77,7 +82,8 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     // initialize motor
-    m_motor = new CANSparkMax(deviceID, MotorType.kBrushless);
+    m_rotationMotor = new CANSparkMax(armRotationID, MotorType.kBrushless);
+    m_extensionMotor = new CANSparkMax(extensionID, MotorType.kBrushless);
 
     /**
      * The RestoreFactoryDefaults method can be used to reset the configuration
@@ -86,45 +92,94 @@ public class Robot extends TimedRobot {
      * these
      * parameters will not persist between power cycles
      */
-    m_motor.restoreFactoryDefaults();
 
-    m_motor.setInverted(true);
-    m_motor.setSmartCurrentLimit(30, 30);
-    m_motor.setIdleMode(IdleMode.kBrake);
-    m_motor.enableVoltageCompensation(12);
+    // Arm rotation motr config
+    m_rotationMotor.restoreFactoryDefaults();
+
+    m_rotationMotor.setInverted(true);
+    m_rotationMotor.setSmartCurrentLimit(30, 30);
+    m_rotationMotor.setIdleMode(IdleMode.kBrake);
+    m_rotationMotor.enableVoltageCompensation(12);
+
+    // Arm extension motor config
+    m_extensionMotor.restoreFactoryDefaults();
+
+    m_extensionMotor.setInverted(true);
+    m_extensionMotor.setSmartCurrentLimit(30, 30);
+    m_extensionMotor.setIdleMode(IdleMode.kBrake);
+    m_extensionMotor.enableVoltageCompensation(12);
+
 
     // initialze PID controller and encoder objects
-    m_pidController = m_motor.getPIDController();
-    m_encoder = m_motor.getEncoder();
+
+    // Rotation motor
+    m_rotationPidController = m_rotationMotor.getPIDController();
+    m_rotationEncoder = m_rotationMotor.getEncoder();
+
+    // Extension motor
+    m_extensionPidController = m_rotationMotor.getPIDController();
+    m_extensionEncoder = m_rotationMotor.getEncoder();
 
     // Reset encoder
-    m_encoder.setPosition(0);
+    m_rotationEncoder.setPosition(0);
+    m_extensionEncoder.setPosition(0);
 
     // PID coefficients
-    kP = 0.00075;
-    kI = 0;
-    kD = 0;
-    kIz = 0;
-    kFF = 0.001; // 0.00007
-    kMaxOutput = 1;
-    kMinOutput = -1;
-    maxRPM = 11000; // 5676 for ne0, 11000 for neo 550
-    kG = 0.64;
+
+    // Arm rotation
+    rotationKP = 0.00075;
+    rotationKI = 0;
+    rotationKD = 0;
+    rotationKIz = 0;
+    rotationKFF = 0.001; // 0.00007
+    rotationKMaxOutput = 1;
+    rotationKMinOutput = -1;
+    rotationMaxRPM = 5676; // 5676 for ne0, 11000 for neo 550
+    rotationKG = 0.64;
+
+    // arm extension
+    extensionKP = 0.00075;
+    extensionKI = 0;
+    extensionKD = 0;
+    extensionKIz = 0;
+    extensionKFF = 0.001; // 0.00007
+    extensionKMaxOutput = 1;
+    extensionKMinOutput = -1;
+    extensionMaxRPM = 5676; // 5676 for ne0, 11000 for neo 550
+    extensionKG = 0.64;
+
 
     // Smart Motion Coefficients
-    maxVel = 4600; // rpm
-    maxAcc = 4600;
+
+    // ARm rotation
+    rotationMaxVel = 4600; // rpm
+    rotationMaxAcc = 4600;
+
+    // arm extension
+    extensionMaxVel = 4600; // rpm
+    extensionMaxAcc = 4600;
 
     // set PID coefficients
-    m_pidController.setP(kP);
-    m_pidController.setI(kI);
-    m_pidController.setD(kD);
-    m_pidController.setIZone(kIz);
-    m_pidController.setFF(kFF);
-    m_pidController.setOutputRange(kMinOutput, kMaxOutput);
+
+    // Arm rotation
+    m_rotationPidController.setP(rotationKP);
+    m_rotationPidController.setI(rotationKI);
+    m_rotationPidController.setD(rotationKD);
+    m_rotationPidController.setIZone(rotationKIz);
+    m_rotationPidController.setFF(rotationKFF);
+    m_rotationPidController.setOutputRange(rotationKMinOutput, rotationKMaxOutput);
+
+    // Arm extension
+    m_extensionPidController.setP(rotationKP);
+    m_extensionPidController.setI(rotationKI);
+    m_extensionPidController.setD(rotationKD);
+    m_extensionPidController.setIZone(rotationKIz);
+    m_extensionPidController.setFF(rotationKFF);
+    m_extensionPidController.setOutputRange(rotationKMinOutput, rotationKMaxOutput);
+
 
     // feed forward
-    m_armFeedforward = new ArmFeedforward(0, kG, 0);
+    m_rotationFeedforward = new ArmFeedforward(0, rotationKG, 0);
 
     /**
      * Smart Motion coefficients are set on a SparkMaxPIDController object
@@ -138,12 +193,24 @@ public class Robot extends TimedRobot {
      * - setSmartMotionAllowedClosedLoopError() will set the max allowed
      * error for the pid controller in Smart Motion mode
      */
+
+     // ARm rotation
     int smartMotionSlot = 0;
-    m_pidController.setSmartMotionMaxVelocity(maxVel, smartMotionSlot);
-    m_pidController.setSmartMotionMinOutputVelocity(minVel, smartMotionSlot);
-    m_pidController.setSmartMotionMaxAccel(maxAcc, smartMotionSlot);
-    allowedErr = 0.5;
-    m_pidController.setSmartMotionAllowedClosedLoopError(allowedErr, smartMotionSlot);
+    m_rotationPidController.setSmartMotionMaxVelocity(rotationMaxVel, smartMotionSlot);
+    m_rotationPidController.setSmartMotionMinOutputVelocity(rotationMinVel, smartMotionSlot);
+    m_rotationPidController.setSmartMotionMaxAccel(rotationMaxAcc, smartMotionSlot);
+    rotationAllowedErr = 0.5;
+    m_rotationPidController.setSmartMotionAllowedClosedLoopError(rotationAllowedErr, smartMotionSlot);
+
+
+    // ARm extension
+    smartMotionSlot = 0;
+    m_rotationPidController.setSmartMotionMaxVelocity(extensionMaxVel, smartMotionSlot);
+    m_rotationPidController.setSmartMotionMinOutputVelocity(extensionMinVel, smartMotionSlot);
+    m_rotationPidController.setSmartMotionMaxAccel(extensionMaxAcc, smartMotionSlot);
+    extensionAllowedErr = 0.5;
+    m_rotationPidController.setSmartMotionAllowedClosedLoopError(extensionAllowedErr, smartMotionSlot);
+
 
     // display PID coefficients on SmartDashboard
     // SmartDashboard.putNumber("P Gain", kP);
@@ -162,9 +229,9 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Set Position", 0);
     SmartDashboard.putNumber("Set Velocity", 0);
 
-    SmartDashboard.putNumber("Velocity", m_encoder.getVelocity());
-    SmartDashboard.putNumber("Current rotations", m_encoder.getPosition());
-    SmartDashboard.putNumber("Output", m_motor.getAppliedOutput());
+    SmartDashboard.putNumber("Velocity", m_rotationEncoder.getVelocity());
+    SmartDashboard.putNumber("Current rotations", m_rotationEncoder.getPosition());
+    SmartDashboard.putNumber("Output", m_rotationMotor.getAppliedOutput());
   }
 
   @Override
@@ -218,31 +285,31 @@ public class Robot extends TimedRobot {
        */
 
       double ffCalc = (setPoint - m_horizontalRotations) / m_rotationsPerRadian;
-      feedForward = m_armFeedforward.calculate(ffCalc, 0);
+      feedForward = m_rotationFeedforward.calculate(ffCalc, 0);
 
       // feedForward = m_armFeedforward.calculate(0, 0);
       //System.out.println(feedForward);
-      m_pidController.setReference(setPoint, CANSparkMax.ControlType.kSmartMotion, 0, feedForward, ArbFFUnits.kVoltage);
-      processVariable = m_encoder.getPosition();
+      m_rotationPidController.setReference(setPoint, CANSparkMax.ControlType.kSmartMotion, 0, feedForward, ArbFFUnits.kVoltage);
+      processVariable = m_rotationEncoder.getPosition();
     }
 
-    System.out.println(m_encoder.getVelocity());
-    SmartDashboard.putNumber("Velocity", m_encoder.getVelocity());
-    SmartDashboard.putNumber("Current rotations", m_encoder.getPosition());
-    SmartDashboard.putNumber("Output", m_motor.getAppliedOutput());
+    System.out.println(m_rotationEncoder.getVelocity());
+    SmartDashboard.putNumber("Velocity", m_rotationEncoder.getVelocity());
+    SmartDashboard.putNumber("Current rotations", m_rotationEncoder.getPosition());
+    SmartDashboard.putNumber("Output", m_rotationMotor.getAppliedOutput());
   }
 
   @Override
   public void testPeriodic() {
-    m_motor.set(deadband(controller.getRightY(), 0.1) * -0.4);
+    m_rotationMotor.set(deadband(controller.getRightY(), 0.1) * -0.4);
 
     if (controller.getAButtonPressed()) {
-      m_encoder.setPosition(0);
+      m_rotationEncoder.setPosition(0);
     }
 
-    SmartDashboard.putNumber("Velocity", m_encoder.getVelocity());
-    SmartDashboard.putNumber("Current rotations", m_encoder.getPosition());
-    SmartDashboard.putNumber("Output", m_motor.getAppliedOutput());
+    SmartDashboard.putNumber("Velocity", m_rotationEncoder.getVelocity());
+    SmartDashboard.putNumber("Current rotations", m_rotationEncoder.getPosition());
+    SmartDashboard.putNumber("Output", m_rotationMotor.getAppliedOutput());
   }
 
   public static double deadband(double value, double deadband) {
