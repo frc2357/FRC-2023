@@ -17,7 +17,7 @@ public class CubeAutoScoreMidCommandGroup extends SequentialCommandGroup {
                 new WaitCommand(Constants.INTAKE_ROLLER.MID_SHOT_DELAY_SECONDS),
                 new InstantCommand(() -> {
                     IntakeRollerSubsystem.getInstance()
-                            .setAxisRollerSpeed(Constants.INTAKE_ROLLER.MID_SHOT_PERCENT_OUTPUT);
+                            .manualRunIntake(Constants.INTAKE_ROLLER.MID_SHOT_PERCENT_OUTPUT);
                 })
             )
         );

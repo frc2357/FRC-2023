@@ -81,19 +81,19 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	public static Command getAutoScoreCommands(int row, int col) {
 		switch (row) {
 			case 1:
-				switch(col) {
-					case 0: case 2: case 3: case 5: case 6: case 8:
+				switch(col % 3) {
+					case 0: case 2:
 						return new ConeAutoScoreMidCommandGroup();
-					case 1: case 4: case 7:
+					case 1:
 						return new CubeAutoScoreMidCommandGroup();
 					default:
 						return new AutoScoreLowCommandGroup(); // Potentially default to ConeAutoScoreMidCommandGroup
 				}
 			case 2:
-				switch(col) {
-					case 0: case 2: case 3: case 5: case 6: case 8:
+				switch(col % 3) {
+					case 0: case 2:
 						return new ConeAutoScoreHighCommandGroup();
-					case 1: case 4: case 7:
+					case 1:
 						return new CubeAutoScoreHighCommandGroup();
 					default:
 						return new AutoScoreLowCommandGroup(); // Potentially default to ConeAutoScoreHighCommandGroup
