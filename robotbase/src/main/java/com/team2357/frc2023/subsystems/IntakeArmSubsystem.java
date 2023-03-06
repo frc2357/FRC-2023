@@ -168,6 +168,7 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
 
     public void resetEncoders() {
         m_winchMotor.getEncoder().setPosition(0);
+        m_targetRotations = 0;
     }
 
     public double getWinchRotations() {

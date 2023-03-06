@@ -184,6 +184,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
 
     public void resetEncoders() {
         m_rotationMotor.getEncoder().setPosition(0);
+        m_targetRotations = 0;
     }
 
     public double getMotorRotations() {
