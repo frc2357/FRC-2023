@@ -183,6 +183,14 @@ public final class Constants {
     }
 
     public static final class INTAKE_ROLLER {
+        public static final double AUTO_SCORE_LOW_REVERSE_TIME = 1;
+
+        //TODO: Tune these
+        public static final double MID_SHOT_PERCENT_OUTPUT = 0;
+        public static final double MID_SHOT_DELAY_SECONDS = .25;
+        public static final double HIGH_SHOT_PERCENT_OUTPUT = 0;
+        public static final double HIGH_SHOT_DELAY_SECONDS = .25;
+
         public static IntakeRollerSubsystem.Configuration GET_INTAKE_CONFIG() {
             IntakeRollerSubsystem.Configuration config = new IntakeRollerSubsystem.Configuration();
 
@@ -203,16 +211,20 @@ public final class Constants {
             return config;
         }
 
-        public static final double AUTO_SCORE_LOW_REVERSE_TIME = 1;
-
-        //TODO: Tune these
-        public static final double MID_SHOT_PERCENT_OUTPUT = 0;
-        public static final double MID_SHOT_DELAY_SECONDS = .25;
-        public static final double HIGH_SHOT_PERCENT_OUTPUT = 0;
-        public static final double HIGH_SHOT_DELAY_SECONDS = .25;
+        
     }
 
     public static final class INTAKE_ARM {
+        public static final double SOLENOID_EXTEND_WAIT_MILLIS = 250;
+
+        //TODO: Tune these
+        public static final double MID_SHOT_SETPOINT_ROTATIONS = 0;
+        public static final double HIGH_SHOT_SETPOINT_ROTATIONS = 0;
+        public static final double INTAKE_HANDOFF_WINCH_ROTATIONS = 60;
+
+        public static final int WINCH_DEPLOY_PID_SLOT = 0;
+        public static final int WINCH_STOW_PID_SLOT = 1;
+
         public static IntakeArmSubsystem.Configuration GET_INTAKE_ARM_CONFIG() {
             IntakeArmSubsystem.Configuration config = new IntakeArmSubsystem.Configuration();
 
@@ -260,14 +272,7 @@ public final class Constants {
             return config;
         }
 
-        public static final double SOLENOID_EXTEND_WAIT_MILLIS = 250;
-
-        //TODO: Tune these
-        public static final double MID_SHOT_SETPOINT_ROTATIONS = 0;
-        public static final double HIGH_SHOT_SETPOINT_ROTATIONS = 0;
-
-        public static final int WINCH_DEPLOY_PID_SLOT = 0;
-        public static final int WINCH_STOW_PID_SLOT = 1;
+       
     }
 
     public static final class WRIST {
@@ -293,6 +298,14 @@ public final class Constants {
     }
 
     public static final class ARM_EXTENSION {
+        public static final double RETRACTED_ROTATIONS = 0;
+        public static final double INTAKE_HANDOFF_ROTATIONS = 0;
+
+        public static final double AUTO_SCORE_MID_ROTATIONS = 0;
+        public static final double AUTO_SCORE_HIGH_ROTATIONS = 271;
+
+        public static final double AUTO_SCORE_LOW_RETRACT_WAIT_TIME = 1;
+
         public static ArmExtensionSubsystem.Configuration GET_EXTENSION_CONFIG() {
             ArmExtensionSubsystem.Configuration config = new ArmExtensionSubsystem.Configuration();
             config.m_extendAxisMaxSpeed = 0;
@@ -343,13 +356,7 @@ public final class Constants {
             return config;
         }
 
-        public static final double RETRACTED_ROTATIONS = 0;
-        public static final double INTAKE_HANDOFF_ROTATIONS = 0;
-
-        public static final double AUTO_SCORE_MID_ROTATIONS = 0;
-        public static final double AUTO_SCORE_HIGH_ROTATIONS = 271;
-
-        public static final double AUTO_SCORE_LOW_RETRACT_WAIT_TIME = 1;
+        
     }
 
     public static final class ARM_ROTATION {
@@ -412,7 +419,6 @@ public final class Constants {
             return config;
         }
 
-        public static final double INTAKE_HANDOFF_WINCH_ROTATIONS = 50;
     }
 
     public static final class AUTO_SCORE_TIMINGS {
