@@ -14,9 +14,11 @@ import com.swervedrivespecialties.swervelib.AbsoluteEncoder;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
-import com.team2357.frc2023.commands.scoring.AutoScoreHighCommandGroup;
 import com.team2357.frc2023.commands.scoring.AutoScoreLowCommandGroup;
-import com.team2357.frc2023.commands.scoring.AutoScoreMidCommandGroup;
+import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
+import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreMidCommandGroup;
+import com.team2357.frc2023.commands.scoring.cube.CubeAutoScoreHighCommandGroup;
+import com.team2357.frc2023.commands.scoring.cube.CubeAutoScoreMidCommandGroup;
 import com.team2357.frc2023.util.Utility;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 
@@ -76,14 +78,26 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	 * @param row row to score on (low: 0, mid: 1, high: 2)
 	 * @return Auto score command to run
 	 */
-	public static Command getAutoScoreCommands(int row) {
+	public static Command getAutoScoreCommands(int row, int col) {
 		switch (row) {
-			case 0:
-				return new AutoScoreLowCommandGroup();
 			case 1:
-				return new AutoScoreMidCommandGroup();
+				switch(col % 3) {
+					case 0: case 2:
+						return new ConeAutoScoreMidCommandGroup();
+					case 1:
+						return new CubeAutoScoreMidCommandGroup();
+					default:
+						return new AutoScoreLowCommandGroup(); // Potentially default to ConeAutoScoreMidCommandGroup
+				}
 			case 2:
-				return new AutoScoreHighCommandGroup();
+				switch(col % 3) {
+					case 0: case 2:
+						return new ConeAutoScoreHighCommandGroup();
+					case 1:
+						return new CubeAutoScoreHighCommandGroup();
+					default:
+						return new AutoScoreLowCommandGroup(); // Potentially default to ConeAutoScoreHighCommandGroup
+				}
 			default:
 				return new AutoScoreLowCommandGroup();
 		}
