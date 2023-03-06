@@ -347,7 +347,7 @@ public final class Constants {
         public static final double INTAKE_HANDOFF_ROTATIONS = 0;
 
         public static final double AUTO_SCORE_MID_ROTATIONS = 0;
-        public static final double AUTO_SCORE_HIGH_ROTATIONS = 0;
+        public static final double AUTO_SCORE_HIGH_ROTATIONS = 271;
 
         public static final double AUTO_SCORE_LOW_RETRACT_WAIT_TIME = 1;
     }
@@ -366,13 +366,15 @@ public final class Constants {
         public static ArmRotationSubsystem.Configuration GET_ROTATION_CONFIG() {
             ArmRotationSubsystem.Configuration config = new ArmRotationSubsystem.Configuration();
 
-            config.m_rotationAxisMaxSpeed = 0;
+            config.m_rotationAxisMaxSpeed = 0.4;
             config.m_maxSpeedPercent = 0.4;
 
             config.m_rotationMotorIdleMode = IdleMode.kBrake;
 
             config.m_rotationMotorStallLimitAmps = 30;
             config.m_rotationMotorFreeLimitAmps = 30;
+
+            config.m_isInverted = true;
 
             // smart motion config
             config.m_rotationMotorP = 0.00075;
@@ -409,6 +411,8 @@ public final class Constants {
 
             return config;
         }
+
+        public static final double INTAKE_HANDOFF_WINCH_ROTATIONS = 50;
     }
 
     public static final class AUTO_SCORE_TIMINGS {

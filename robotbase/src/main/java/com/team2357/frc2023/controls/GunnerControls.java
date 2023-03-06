@@ -1,10 +1,25 @@
 package com.team2357.frc2023.controls;
 
+import com.team2357.frc2023.Constants;
+import com.team2357.frc2023.Constants.CONTROLLER;
+import com.team2357.frc2023.commands.armrotation.ArmRotateToPositionCommand;
+import com.team2357.frc2023.commands.auto.TranslateToTargetCommandGroup;
+import com.team2357.frc2023.commands.human.panic.ArmExtensionAxisCommand;
+import com.team2357.frc2023.commands.human.panic.ArmRotationAxisCommand;
+import com.team2357.frc2023.commands.human.panic.ClawToggleCommand;
+import com.team2357.frc2023.commands.human.panic.IntakeArmToggleCommand;
+import com.team2357.frc2023.commands.human.panic.IntakeAxisRollerCommand;
+import com.team2357.frc2023.commands.human.panic.IntakeWinchCommand;
+import com.team2357.frc2023.commands.human.panic.WristToggleCommand;
+import com.team2357.frc2023.commands.intake.IntakeRollerReverseCommand;
+import com.team2357.frc2023.commands.scoring.AutoScoreLowCommandGroup;
+import com.team2357.frc2023.commands.scoring.AutoScoreMidCommandGroup;
+import com.team2357.frc2023.subsystems.ArmRotationSubsystem;
+import com.team2357.frc2023.subsystems.IntakeArmSubsystem;
+import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.lib.triggers.AxisThresholdTrigger;
 import com.team2357.lib.util.Utility;
 import com.team2357.lib.util.XboxRaw;
-import com.team2357.frc2023.subsystems.IntakeArmSubsystem;
-import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
@@ -145,8 +160,8 @@ public class GunnerControls {
         Trigger yButton = m_yButton.and(noDPad);
         Trigger xButton = m_xButton.and(noDPad);
 
-        upDPadOnly.whileTrue(new ArmRotationCommand(axisRightStickY));
-        leftDPadOnly.whileTrue(new ArmExtenderCommand(axisRightStickY));
+        upDPadOnly.whileTrue(new ArmRotationAxisCommand(axisRightStickY));
+        leftDPadOnly.whileTrue(new ArmExtensionAxisCommand(axisRightStickY));
 
         leftDPadAndA.onTrue(new WristToggleCommand());
         leftDPadAndB.onTrue(new ClawToggleCommand());
@@ -163,7 +178,9 @@ public class GunnerControls {
         xButton.onTrue(new ConeAutoScoreMidCommandGroup());
         aButton.onTrue(new AutoScoreLowCommandGroup());
         rightDPadAndY.onTrue(new InstantCommand(() -> {
-            IntakeArmSubsystem.getInstance().resetEncoders();
+            ArmRotationSubsystem.getInstance().resetEncoders();
         }));
+
+        rightDPadAndB.whileTrue(new IntakeRollerReverseCommand());
     }
 }

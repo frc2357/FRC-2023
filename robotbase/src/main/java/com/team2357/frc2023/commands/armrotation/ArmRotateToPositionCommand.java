@@ -14,12 +14,14 @@ public class ArmRotateToPositionCommand extends CommandBase {
 
     @Override
     public void initialize() {
+        System.out.println("start");
         ArmRotationSubsystem.getInstance().setRotations(m_rotations);
     }
 
     @Override
     public void end(boolean interrupted) {
         ArmRotationSubsystem.getInstance().stopRotationMotors();
+        System.out.println("end");
     }
 
     @Override

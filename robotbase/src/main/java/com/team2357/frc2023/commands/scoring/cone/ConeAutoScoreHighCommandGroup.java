@@ -17,23 +17,24 @@ public class ConeAutoScoreHighCommandGroup extends ParallelCommandGroup {
     public ConeAutoScoreHighCommandGroup() {
         // Pull game piece away from intake
 
-        addCommands(new ParallelRaceGroup(
-            new WaitCommand(0),
-            new IntakeRollerReverseCommand()
-        ));
+        // addCommands(new ParallelRaceGroup(
+        //     new WaitCommand(0),
+        //     new IntakeRollerReverseCommand()
+        // ));
 
+        System.out.println("AutoScoreHighCommandGroup");
         addCommands(new SequentialCommandGroup(
             // Extend to node 
-            new ArmRotateToPositionCommand(Constants.ARM_ROTATION.AUTO_SCORE_HIGH_ROTATIONS),
-            new ArmExtendToPositionCommand(Constants.ARM_EXTENSION.AUTO_SCORE_HIGH_ROTATIONS),
+            new ArmRotateToPositionCommand(Constants.ARM_ROTATION.AUTO_SCORE_HIGH_ROTATIONS)
+            // new ArmExtendToPositionCommand(Constants.ARM_EXTENSION.AUTO_SCORE_HIGH_ROTATIONS),
 
-            // Release the game piece
-            new WristExtendCommand(),
-            new ClawOpenCommand(),
+            // // Release the game piece
+            // new WristExtendCommand(),
+            // new ClawOpenCommand(),
 
-            // Return to starting position
-            new WaitCommand(Constants.AUTO_SCORE_TIMINGS.SECONDS_BEFORE_RETURNING_TO_STARTING_POSITION),
-            new ArmReturnToStartCommandGroup()
+            // // Return to starting position
+            // new WaitCommand(Constants.AUTO_SCORE_TIMINGS.SECONDS_BEFORE_RETURNING_TO_STARTING_POSITION),
+            // new ArmReturnToStartCommandGroup()
         ));
     }
 }

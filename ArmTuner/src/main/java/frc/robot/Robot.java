@@ -351,7 +351,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testPeriodic() {
-    // m_rotationMotor.set(deadband(controller.getRightY(), 0.1) * -0.4);
+    m_rotationMotor.set(deadband(controller.getRightY(), 0.1) * -0.4);
     m_extensionMotor.set(deadband(controller.getLeftY(), 0.1) * -0.4);
 
     if (controller.getAButtonPressed()) {
