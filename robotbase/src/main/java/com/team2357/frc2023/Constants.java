@@ -246,7 +246,7 @@ public final class Constants {
             config.m_winchDeployI = 0;
             config.m_winchDeployD = 0;
             config.m_winchDeployIZone = 0;
-            config.m_winchDeployFF = 0.0002;
+            config.m_winchDeployFF = 0.0001;
             config.m_winchDeployPidSlot = WINCH_DEPLOY_PID_SLOT;
 
             // retract PID
@@ -266,7 +266,7 @@ public final class Constants {
             config.m_smartMotionRotationAllowedError = 2;
 
             config.m_winchMotorAllowedError = 2;
-            config.m_winchDeployRotations = 140;
+            config.m_winchDeployRotations = 130;
             config.m_winchStowRotations = 0.0;
 
             return config;

@@ -55,7 +55,7 @@ public class SwerveDriveControls {
         m_leftTrigger.onFalse(new IntakeStowCommandGroup());
 
         // Teleop auto
-        m_rightTrigger.whileTrue(new TeleopAutoScoreCommandGroup(m_controller));
+       // m_rightTrigger.whileTrue(new TeleopAutoScoreCommandGroup(m_controller));
     }
 
     public double getX() {

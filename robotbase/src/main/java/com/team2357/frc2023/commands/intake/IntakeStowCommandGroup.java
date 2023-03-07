@@ -12,6 +12,6 @@ public class IntakeStowCommandGroup extends SequentialCommandGroup {
                         new IntakeRollerStopCommand(),
                         new IntakeArmStowCommand()));
                         
-        addCommands(new CloseClawCommand());
+       // addCommands(new CloseClawCommand());
     }
 }
