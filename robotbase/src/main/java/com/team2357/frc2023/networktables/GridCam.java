@@ -14,12 +14,12 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringSubscriber;
 
-public class AprilTagPose {
-    private static AprilTagPose m_instance;
+public class GridCam {
+    private static GridCam m_instance;
 
-    public static AprilTagPose getInstance() {
+    public static GridCam getInstance() {
         if (m_instance == null) {
-            m_instance = new AprilTagPose();
+            m_instance = new GridCam();
         }
         return m_instance;
     }
@@ -31,7 +31,7 @@ public class AprilTagPose {
 
     private JSONParser m_parser = new JSONParser();
 
-    private AprilTagPose() {
+    private GridCam() {
         m_poseSub = m_table.getStringTopic(Constants.APRILTAG_POSE.POSE_TOPIC_NAME).subscribe("");
 
         m_instance = this;
