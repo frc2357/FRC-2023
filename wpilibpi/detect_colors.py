@@ -11,7 +11,8 @@ import json
 import logging
 import numpy as np
 from numpy import ndarray
-from gamepiece import gamepieces
+from gamepiece import gamepiecetracker
+from ntcore import NetworkTableInstance, NetworkTable, EventFlags
 import cv2
 
 log = logging.getLogger(__name__)
@@ -32,10 +33,26 @@ class GamePieceDetector:
     _yel_upper = np.array((100, 255, 237), "uint8")  # HSV
     _vio_lower = np.array((118, 55, 55), "uint8")  # HSV
     _vio_upper = np.array((153, 255, 255), "uint8")  # HSV
-    # first index is row ( 0 = low, 1 = mid, 2 = high )
-    # second index is column (left most  =0 to right most = 8)
-    # third index is color (yellow = 0, violet = 1)
-    # gamepieces = GamePieceTracker()
+
+    def register_NT_vars(self, ntable: NetworkTable):
+        # first index is row ( 0 = low, 1 = mid, 2 = high )
+        # second index is column (left most  =0 to right most = 8)
+        # third index is color (yellow = 0, violet = 1)
+        # gamepieces = GamePieceTracker()
+        self.NT_yel_lower = ntable.getIntegerArrayTopic("yellow_lower_HSV").getEntry([5, 100, 140])
+        self.NT_yel_upper = ntable.getIntegerArrayTopic("yellow_upper_HSV").getEntry([100, 255, 237])
+        # NT_vio_lower = (
+        #     NetworkTableInstance.getDefault()
+        #     .getTable("gridcam")
+        #     .getIntegerArrayTopic("violet_lower_HSV")
+        #     .getEntry([118, 55, 55])
+        # )
+        # NT_vio_upper = (
+        #     NetworkTableInstance.getDefault()
+        #     .getTable("gridcam")
+        #     .getIntegerArrayTopic("violet_upper_HSV")
+        #     .getEntry([153, 255, 255])
+        # )
 
     def __init__(self):
         """ """
@@ -76,6 +93,10 @@ class GamePieceDetector:
         vio_pct = -1.0
         w, h = frame.shape[0:2]
 
+        # TODO:  this isn't yet working (see notes above where create the NT variables)
+        # self.set_yellow_range(self.NT_yel_lower.get(), self.NT_yel_upper.get())
+        # self.set_violet_range(self.NT_vio_lower.get(), self.NT_vio_upper.get())
+
         for tag_id, roi_rects in roi_result:  # for a given tag, there are 9 roi_rects
             for idx, roi in enumerate(roi_rects):
                 # idx 0..9, roi is a tuple of (x1,y1,x2,y2) corners defining the region of interest
@@ -89,7 +110,7 @@ class GamePieceDetector:
                     ):
                         continue
                     yel_pct, vio_pct = self.detect_colors(frame, roi)
-                    gamepieces.map_gamepiece_results(tag_id, idx, yel_pct, vio_pct)
+                    gamepiecetracker.map_gamepiece_results(tag_id, idx, yel_pct, vio_pct)
                     # add colorization to the image if colorize is non-zero
                     if colorize > 0.0:  # TODO: make this a class method
                         if yel_pct > colorize:
@@ -116,7 +137,6 @@ class GamePieceDetector:
             vio_pct = np.count_nonzero(mask_vio) / np.product(mask_vio.shape)
         except Exception as e:
             log.exception(e)
-            raise (e)
         return yel_pct, vio_pct
 
     # @staticmethod

@@ -87,7 +87,10 @@ class CameraVision:
             print(fimages)
 
             for fname in fimages:
-                imgs.append(np.ascontiguousarray(cv2.imread(fname)))
+                i = cv2.imread(fname)
+                cv2.putText(i, f"{fname}", (10, 20), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 0), 5)
+                cv2.putText(i, f"{fname}", (10, 20), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 255), 1)
+                imgs.append(np.ascontiguousarray(i))
             camConfig = dict()
             camConfig["width"] = imgs[0].shape[1]  # all images should be same dimensions!!!
             camConfig["height"] = imgs[0].shape[0]

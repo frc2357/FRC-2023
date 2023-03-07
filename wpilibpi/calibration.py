@@ -1,5 +1,8 @@
 # json cal info from calibration performed at https://www.calibdb.net/
+# python implementation is available here: https://github.com/paroj/pose_calib
+#
 # some code from https://docs.opencv.org/4.x/dc/dbb/tutorial_py_calibration.html
+#
 import numpy as np
 import cv2
 import glob
@@ -65,7 +68,8 @@ cam0_json = """{
 
 class CameraCalibration:
     """
-    Class to hold Calibration Coefficients and mapped undistort function
+    Class to hold Calibration Coefficients
+    Has functions (undistort / projectPoints) as instance methods to consume camera calibration values
     Can load calibration info from json file
     """
 

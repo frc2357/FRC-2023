@@ -29,11 +29,11 @@ from calibration import cam0, image_cal  # bandaid for
 
 # class used to encapsulate Camera + Calibration information
 from cameravision import CameraVision
-from gamepiece import GamePieceTracker
+from gamepiece import gamepiecetracker
 
 log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
-logging.basicConfig(level="DEBUG")
+
 
 if __name__ == "__main__":
     cfgfile = "/boot/frc.json"
@@ -43,6 +43,7 @@ if __name__ == "__main__":
         cfgfile = str(sys.argv[1])
     if len(sys.argv) > 2:
         simulate = True
+        logging.basicConfig(level="DEBUG")
     # this class automatically creates all camera + calibration objects
     camvis = CameraVision(cfgfile, simulate=simulate)
     cam0 = camvis.cameras[0]
@@ -63,7 +64,8 @@ if __name__ == "__main__":
     apriltag = apriltag_funcs.AprilTagPipeline((1280, 720), Fx, Fy, Cx, Cy)
     # apriltag.register_NT_vars(nt_table)
     gpdetector = detect_colors.GamePieceDetector()
-    gamepieces = GamePieceTracker  # this is a singleton
+    gpdetector.register_NT_vars(nt_table)
+    # gamepieces = gamepiecetracker  # this is a singleton
     # gamepieces.register_NT_vars(nt_table)
 
     count = 0
@@ -75,7 +77,7 @@ if __name__ == "__main__":
         # grab a new frame or disk image
         if simulate:
             # make sure to make a copy of the original image
-            frame = copy.copy(cam0.images[count % (len(cam0.images))])
+            frame = copy.copy(cam0.images[int(count) % (len(cam0.images))])
         else:
             # TODO: do I grab multiple cameras manually here, or iterate through cameras in camvis.cameras?
             #      perhaps even storing the frame in the CameraObject?
@@ -109,14 +111,14 @@ if __name__ == "__main__":
             # track processing time, average ten updates.
             end = time.perf_counter()
             avg += end - start
-            count += 1
+            count += 0.01
             if count % 10 == 0:
-                logging.info(f"Processing took Avg: {avg/10.0:.4f} sec")
+                print(f"Processing took Avg: {avg/10.0:.4f} sec")
                 avg = 0
-            if simulate:  # the following slows down image processing w/out messing up web server function
-                for i in range(0, 30):
-                    cam0.outstream.putFrame(frame)
-                    time.sleep(0.05)
+            # if simulate:  # the following slows down image processing w/out messing up web server function
+            #    for i in range(0, 30):
+            #        cam0.outstream.putFrame(frame)
+            #        time.sleep(0.05)
         except Exception as e:
             # raise(e)
             log.exception(f"ERROR: {e}")

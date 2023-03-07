@@ -1,5 +1,5 @@
 # The following defines the code for finding AprilTags, getting Pose estimation and then using the tranlsation and
-# rotation pose estimations to calculate locations of game pieces on the field.  This information can then be used
+# rotation of the pose estimations to calculate locations of game pieces on the field.  This information can then be used
 # to determine if the game piece is present or not.
 #
 # See the following for inspiration
@@ -10,21 +10,29 @@
 #
 #   Calibration: https://docs.opencv.org/4.7.0/d9/d0c/group__calib3d.html
 #   projectPoints: https://docs.opencv.org/4.7.0/d9/d0c/group__calib3d.html#ga1019495a2c8d1743ed5cc23fa0daff8c
+#
+#   Coordinate System:
+#   x-axis to the right, y-axis down, and z-axis into the tag
 
-from collections import OrderedDict
 import json
-import cv2
-from ntcore import NetworkTableInstance
-import robotpy_apriltag
-from wpimath.geometry import Transform3d, Rotation3d, Pose3d
-import time
-import math
-from robotpy_apriltag import AprilTagFieldLayout, AprilTagDetection
-import math
-import numpy as np
-from numpy import ndarray  # for type def
-from calibration import CameraCalibration, image_cal, cam0  # bandaid for now
 import logging
+import math
+import time
+from collections import OrderedDict
+
+import cv2
+import numpy as np
+import robotpy_apriltag
+from ntcore import NetworkTableInstance
+from numpy import ndarray  # for type def
+from robotpy_apriltag import AprilTagDetection, AprilTagFieldLayout, AprilTagField, loadAprilTagLayoutField
+from wpimath.geometry import Pose3d, Rotation3d, Transform3d, Translation3d
+
+from calibration import CameraCalibration, cam0, image_cal  # bandaid for now
+
+global field
+field = loadAprilTagLayoutField(AprilTagField.k2023ChargedUp)
+print(field)
 
 # from gamepiece_loc import GamePieceFieldResults
 log = logging.getLogger(__name__)
@@ -76,7 +84,7 @@ def create_roi_rect(roi):
     """
     x, y, z, W, H = roi
     w = W / 2.0
-    h = H / 2
+    h = H / 2.0
 
     return np.float32([[x - w, y - h, z], [x - w, y + h, z], [x + w, y + h, z], [x + w, y - h, z]])
 
@@ -93,14 +101,58 @@ def create_roi_rect(roi):
 #                      TagCornerToObjectPoint(-3_in, +3_in, *tagPose)}
 
 
-def create_tag_cornerlocs(pose):
+def create_tag_cornerlocs(pose: Pose3d):
     """takes a roi row (X,Y,Z,W,H), and creates a rectangle
-    centered at X,Y,Z, having width -W and height -H
+    centered at X,Y,Z, having width W and height H
+    According to robotpy_apriltag, corners are defined in this order:(-1,1), (1,1), (1,-1), and (-1,-1)
     """
     x, y, z = np.array(pose.translation())
-    w = h = 3
+    w = 3 / 39.37
+    h = 3 / 39.37
 
+    # return np.float32([[x - w, y + h, z], [x + w, y + h, z], [x + w, y - h, z], [x - w, y - h, z]])
     return np.float32([[x - w, y - h, z], [x + w, y - h, z], [x + w, y + h, z], [x - w, y + h, z]])
+
+
+# std::optional<std::array<cv::Point3d, 4>> detail::CalcTagCorners(
+#     int tagID, const frc::AprilTagFieldLayout& aprilTags) {
+#   if (auto tagPose = aprilTags.GetTagPose(tagID); tagPose.has_value()) {
+#     return std::array{TagCornerToObjectPoint(-3_in, -3_in, *tagPose),
+#                       TagCornerToObjectPoint(+3_in, -3_in, *tagPose),
+#                       TagCornerToObjectPoint(+3_in, +3_in, *tagPose),
+#                       TagCornerToObjectPoint(-3_in, +3_in, *tagPose)};
+#   } else {
+#     return std::nullopt;
+#   }
+# }
+
+# cv::Point3d detail::ToPoint3d(const frc::Translation3d& translation) {
+#   return cv::Point3d(-translation.Y().value(), -translation.Z().value(),
+#                      +translation.X().value());
+# }
+
+# cv::Point3d detail::TagCornerToObjectPoint(units::meter_t cornerX,
+#                                            units::meter_t cornerY,
+#                                            frc::Pose3d tagPose) {
+#   frc::Translation3d cornerTrans =
+#       tagPose.Translation() +
+#       frc::Translation3d(0.0_m, cornerX, cornerY).RotateBy(tagPose.Rotation());
+#   return ToPoint3d(cornerTrans);
+# }
+def tag_corner_to_objectPoint(x, y, pose: Pose3d):
+    cornerTrans = pose.translation() + Translation3d(0, x / 39.37, y / 39.37).rotateBy(pose.rotation())
+    return [-cornerTrans.y, -cornerTrans.z, cornerTrans.x]
+
+
+def create_field_cornerlocs(tag_id, pose: Pose3d):
+    fieldpose = field.getTagPose(tag_id)
+    ret = [
+        tag_corner_to_objectPoint(-3, -3, fieldpose),
+        tag_corner_to_objectPoint(+3, -3, fieldpose),
+        tag_corner_to_objectPoint(+3, +3, fieldpose),
+        tag_corner_to_objectPoint(-3, +3, fieldpose),
+    ]
+    return ret
 
 
 class AprilTagPipeline:
@@ -119,9 +171,9 @@ class AprilTagPipeline:
         self.detector = robotpy_apriltag.AprilTagDetector()
         self.detector.addFamily("tag16h5")
         # TODO: do these config values need to be exposed to NetworkTables?
-        self.detector.Config.numThreads = 1  # default value
-        self.detector.Config.decodeSharpening = 0.25  # default value
-        self.detector.Config.quadDecimate = 2.0  # default value
+        self.detector.Config.numThreads = 1  # default value = 1
+        self.detector.Config.decodeSharpening = 0.25  # default value = 0.25
+        self.detector.Config.quadDecimate = 1.0  # default value = 2
         # Notes for AprilTagPoseEstimator.Config
         # From https://github.com/AprilRobotics/apriltag/wiki/AprilTag-User-Guide#python
         # fx, fy: The camera's focal length (in pixels).
@@ -197,25 +249,28 @@ class AprilTagPipeline:
         # see https://github.com/PhotonVision/photonvision/blob/dcd917870cece9e34eb32bf7ddc068d52dc5aefa/photon-lib/src/main/native/cpp/photonlib/PhotonPoseEstimator.cpp#L373
         objpts = []
         imgpts = []
-        if len(self.results) > 3:  # if reading documentation right, SOLVEPNP_SQPNP requires 3 tags
+        if len(self.results) > 2:  # if reading documentation right, SOLVEPNP_SQPNP requires 3 tags
             for idx, result in enumerate(self.results):
                 pose, tag, est = result
                 # objpts.append(np.array(pose.translation()))
-                objpts.append(create_tag_cornerlocs(pose))
+                # objpts.append(create_tag_cornerlocs(pose))
+                objpts.append(create_field_cornerlocs(tag.getId(), pose))
                 tmp = np.zeros(8, dtype="float")
                 tmp = tag.getCorners(tmp)
                 tmp = np.array(tmp)
                 tmp = tmp.reshape(-1, 2)
                 imgpts.append(tmp)
-                log.info(f"{idx:03d}:Rotation[{pose.rotation().getQuaternion().toRotationVector()}]")
+                print(f"\t{idx:03d}:[{pose.translation()}]\t[{pose.rotation()}]")
                 # pts = [(pose,tag.getCorners()) for pose,tag,_ in self.results]
-            # print(np.concatenate(objpts), np.concatenate(imgpts))
-            _, rvec_multi, rvec_multi = cv2.solvePnP(
+            # log.info(f"{np.concatenate(objpts)},{np.concatenate(imgpts)}")
+            _, rvec_multi, tvec_multi = cv2.solvePnP(
                 np.concatenate(objpts), np.concatenate(imgpts), cal.mtx, cal.dst, flags=cv2.SOLVEPNP_SQPNP
             )
-            log.info(f"ALL:Rotation[{rvec_multi}]")
+            p = Pose3d(*tvec_multi.ravel(), Rotation3d(*rvec_multi.ravel()))
+            print(f"\tALL:[{p.translation()}*39.37]\t[{p.rotation()}]")
+            # log.info(f"\tALL::Translation[{tvec_multi.ravel()*39.37}]\tRotation[{rvec_multi.ravel()}]")
             return rvec_multi
-        return None, None
+        return None
 
     def runPipeline(self, frame: ndarray, cal: CameraCalibration):
         """
@@ -243,7 +298,7 @@ class AprilTagPipeline:
             filter_tags = [tag for tag in tags if tag.getDecisionMargin() > self.DETECTION_MARGIN_THRESHOLD]
             log.debug(f"Num Filtered Tags={len(filter_tags)}")
             self.results = [self.process_apriltag(tag) for tag in filter_tags]
-            # rvec_multi, tvec_multi = self.adjust_PoseEstimate(cal)
+            _ = self.adjust_PoseEstimate(cal)
             # NOT WORKING YET self.adjust_PoseEstimate(cal)
 
             for idx, result in enumerate(self.results):
@@ -255,7 +310,7 @@ class AprilTagPipeline:
                 frame = draw_tagframe(frame, tag)
                 frame = draw_tagid(frame, tag)
                 frame = draw_cube(frame, result, cal)
-                # frame = draw_tagpose(frame, pose, tag)
+                frame = draw_tagpose(frame, pose, tag)
 
                 # we only care about these tags for gamepiece detection.
                 if tag_id in self.match_tags:
@@ -272,7 +327,7 @@ class AprilTagPipeline:
 
 # Draw the TagID and Pose of the Tag
 def draw_tagid(frame: ndarray, tag: AprilTagDetection):
-    """draw the tagId and pose of the tag on the image"""
+    """draw the tagId on the image"""
     tagId = tag.getId()
     ptA = tag.getCorner(0)
     ptA = (int(ptA.x), int(ptA.y))
@@ -282,7 +337,7 @@ def draw_tagid(frame: ndarray, tag: AprilTagDetection):
     return frame
 
 
-def draw_tagpose(frame: ndarray, pose: Transform3d, tag: AprilTagDetection):
+def draw_tagpose(frame: ndarray, pose: Pose3d, tag: AprilTagDetection):
     """draw XYZ, Roll,Pitch,Yaw on the image
 
     Args:
@@ -353,9 +408,9 @@ def project_gamepiece_locations(
     for roi in roi_map:  # iterate over each row in the array
         rect = create_roi_rect(roi)
         rect /= 39.37
-        # using the imag_cal class to automatically pull in the calibration values needed for cv2.projectPoints
-        # imgpts,jac = cv2.projectPoints(rect, rvec, tvec,cal_factors.mtx, cal_factors.dst)
-        imgpts, jac = cal.projectPoints(rect, rvec, tvec)
+        # using the CameraCalibration class to automatically pull in the calibration values needed for cv2.projectPoints
+        # otherwise, the direct call to opencv is: imgpts,jac = cv2.projectPoints(rect, rvec, tvec,cal_factors.mtx, cal_factors.dst)
+        imgpts, _ = cal.projectPoints(rect, rvec, tvec)
         imgpts = np.int32(imgpts).reshape(-1, 2)
         ret.append([*imgpts[0], *imgpts[2]])
         for i in range(4):

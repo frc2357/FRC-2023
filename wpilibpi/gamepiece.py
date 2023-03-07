@@ -1,22 +1,36 @@
-import json
 import numpy as np
 import logging
+from ntcore import NetworkTableInstance, NetworkTable, EventFlags
 
 log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
 
+# this should be used as a singleton.  Notice it is initiazlied at the bottom of this file
+# to use, just import like normal, the instance is the same name as the class
+global gamepiecetracker  # this is defined below after the class as the singleton class instance
+
 
 class GamePieceTracker:
+    """
+    This class tracks manages data tracking gamepieces on the field
+    It is meant to be a singleton.
+    Like the following variable declarations below, in python when variables are defined outside of __init__,
+    they are not unique to a class instance
+    """
+
     # the following are singletons
     gamepiece_results = np.zeros((3, 9, 2), dtype=float)
     gamepiece_chars = np.chararray((3, 9), unicode=True)
     gamepiece_chars[:] = "-"  # set default value to dash
+    NTvar = NetworkTableInstance.getDefault().getTable("gridcam").getStringArrayTopic("grid").publish()
+    NTreset = NetworkTableInstance.getDefault().getTable("gridcam").getBooleanTopic("grid_reset").getEntry(False)
+    gamepiece_func = max
 
-    def register_NT_vars(self, ntable):
-        self.reset_results()
-        # TODO: add NETWORK TABLES SUPPORT HERE
-        self.NTvar = ntable.getStringArrayTopic("grid").publish()
-        self.NTreset = ntable.getBooleanTopic("grid_reset").getEntry()
+    # def register_NT_vars(self, ntable: NetworkTable):
+    #     # self.reset_results()
+    #     # TODO: add NETWORK TABLES SUPPORT HERE
+    #     # self.NTvar = NetworkTableInstance.getDefault().getTable("gridcam").getStringArrayTopic("grid").publish()
+    #     # self.NTreset = NetworkTableInstance.getDefault().getTable("gridcam").getBooleanTopic("grid_reset").getEntry(False)
 
     def reset_results(self):
         self.gamepiece_results[:] = 0
@@ -41,11 +55,15 @@ class GamePieceTracker:
         # write new values to gamepiece_results
         # TODO: make these values sticky
         prev_yel, prev_vio = self.gamepiece_results[row, col, :]
-        self.gamepiece_results[row, col, :] = [max(prev_yel, yel_pct), max(prev_vio, vio_pct)]
+        self.gamepiece_results[row, col, :] = [
+            self.gamepiece_func(prev_yel, yel_pct),
+            self.gamepiece_func(prev_vio, vio_pct),
+        ]
 
         self.NTvar.set(self.to_str())
 
-        if self.NTreset.getTopic():
+        if self.NTreset.get():
+            log.debug("GOT RESET FROM NETWORK TABLES")
             self.NTreset.set(False)
             self.reset_results()
 
@@ -63,4 +81,4 @@ class GamePieceTracker:
         #                   separators=(',',':'))
 
 
-# gamepieces = GamePieceTracker()
+gamepiecetracker = GamePieceTracker()
