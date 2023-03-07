@@ -12,24 +12,24 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
+import com.team2357.frc2023.networktables.Buttonboard;
 import com.team2357.frc2023.subsystems.SubsystemFactory;
-import com.team2357.frc2023.util.DriverStationAllianceGetter;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 @TestInstance(Lifecycle.PER_CLASS)
 public class AvailableTeleopTrajectoriesTest {
+    private Buttonboard buttonboard;
 
     @BeforeAll
     public void setup() {
         SubsystemFactory factory = new SubsystemFactory();
         factory.CreateSwerveDriveSubsystem();
-        try (MockedStatic<DriverStationAllianceGetter> allianceGetter = Mockito.mockStatic(DriverStationAllianceGetter.class)) {
-            allianceGetter.when(DriverStationAllianceGetter::getAlliance).thenReturn(Alliance.Blue);
-            AvailableTeleopTrajectories.generateTrajectories();
-        }
+        buttonboard = mock(Buttonboard.class);
+        when(buttonboard.getAlliance()).thenReturn(DriverStation.Alliance.Blue);
     }
 
     @Test
