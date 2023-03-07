@@ -12,6 +12,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import com.team2357.frc2023.commands.drive.SyncDriveEncodersCommand;
 import com.team2357.frc2023.commands.drive.ZeroDriveCommand;
+import com.team2357.frc2023.commands.intake.IntakeSolenoidExtendCommand;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -108,6 +109,7 @@ public class Robot extends LoggedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    new IntakeSolenoidExtendCommand().schedule();
   }
 
   /** This function is called periodically during operator control. */

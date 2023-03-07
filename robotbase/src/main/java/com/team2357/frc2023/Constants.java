@@ -279,8 +279,8 @@ public final class Constants {
         public static WristSubsystem.Configuration GET_WRIST_CONFIG() {
             WristSubsystem.Configuration config = new WristSubsystem.Configuration();
 
-            config.m_extendMilliseconds = 1000;
-            config.m_retractMilliseconds = 1000;
+            config.m_extendMilliseconds = 500;
+            config.m_retractMilliseconds = 2000;
 
             return config;
         }
@@ -365,10 +365,11 @@ public final class Constants {
         public static final double RETRACTED_ROTATIONS = 0;
         public static final double INTAKE_HANDOFF_ROTATIONS = 0;
 
-        public static final double AUTO_SCORE_MID_ROTATIONS = 0;
+        public static final double AUTO_SCORE_MID_ROTATIONS = 45;
         public static final double AUTO_SCORE_HIGH_ROTATIONS = 51;
 
         public static final double ARM_ROTATION_GEAR_RATIO  = 190.91;
+        public static final double ARM_HANDOFF_ROTATIONS = ARM_ROTATION_GEAR_RATIO / 8;
 
         public static ArmRotationSubsystem.Configuration GET_ROTATION_CONFIG() {
             ArmRotationSubsystem.Configuration config = new ArmRotationSubsystem.Configuration();
@@ -422,7 +423,7 @@ public final class Constants {
     }
 
     public static final class AUTO_SCORE_TIMINGS {
-        public static final int SECONDS_BEFORE_RETURNING_TO_STARTING_POSITION = 0;
+        public static final double SECONDS_BEFORE_RETURNING_TO_STARTING_POSITION = 0.5;
     }
 
     public static final class LIMELIGHT {
