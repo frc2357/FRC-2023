@@ -43,14 +43,13 @@ public class ButtonboardConnect {
     }
 
     private static void testNetworkTablesClient() {
-        NetworkTablesClient nt = new NetworkTablesClient();
+        NetworkTablesClient nt = new NetworkTablesClient("localhost");
         nt.open();
         try {
             System.out.println("Client ready");
             while (true) {
-                long x = (long)(Math.random() * 9);
-                long y = (long)(Math.random() * 3);
-                System.out.println("Grid target x=" + x + ", y=" + y);
+                int x = (int)(Math.random() * 9);
+                int y = (int)(Math.random() * 3);
                 nt.setGridTarget(x, y);
                 Thread.sleep(1000);
             }
@@ -66,7 +65,6 @@ public class ButtonboardConnect {
         nt.open();
         try {
             while (true) {
-                System.out.println("Grid target x=" + nt.getGridX() + ", y=" + nt.getGridY());
                 Thread.sleep(1000);
             }
         } catch (InterruptedException ie) {

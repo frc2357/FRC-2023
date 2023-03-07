@@ -5,7 +5,8 @@ import java.util.EnumSet;
 
 import edu.wpi.first.cscore.CameraServerJNI;
 import edu.wpi.first.math.WPIMathJNI;
-import edu.wpi.first.networktables.IntegerArraySubscriber;
+import edu.wpi.first.networktables.IntegerSubscriber;
+import edu.wpi.first.networktables.StringArraySubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -18,9 +19,15 @@ import buttonboard.Constants;
 public class NetworkTablesServer {
     private int m_connListenerHandle;
     private int m_topicListenerHandle;
-    private int m_valueListenerHandle;
+    private int m_gridListenerHandle;
+    private int m_targetRowListenerHandle;
+    private int m_targetColListenerHandle;
 
-    private IntegerArraySubscriber m_gridTargetSub;
+    private NetworkTable m_buttonboardTable;
+    private NetworkTable m_gridCamTable;
+    private StringArraySubscriber m_gridSub;
+    private IntegerSubscriber m_targetRowSub;
+    private IntegerSubscriber m_targetColSub;
 
     public NetworkTablesServer() {
         NetworkTablesJNI.Helper.setExtractOnStaticLoad(false);
@@ -43,8 +50,12 @@ public class NetworkTablesServer {
         inst.setServer("localhost");
         inst.startServer();
 
-        NetworkTable datatable = inst.getTable(Constants.NT_TABLE_NAME);
-        m_gridTargetSub = datatable.getIntegerArrayTopic(Constants.NT_GRID_TARGET).subscribe(new long[] {-1, -1});
+        m_gridCamTable = inst.getTable(Constants.NT_GRIDCAM_TABLE);
+        m_gridSub = m_gridCamTable.getStringArrayTopic(Constants.NT_GRID_TOPIC).subscribe(new String[] {"", "", ""});
+
+        m_buttonboardTable = inst.getTable(Constants.NT_BUTTONBOARD_TABLE);
+        m_targetRowSub = m_buttonboardTable.getIntegerTopic(Constants.NT_TARGET_ROW_TOPIC).subscribe(-1);
+        m_targetColSub = m_buttonboardTable.getIntegerTopic(Constants.NT_TARGET_COL_TOPIC).subscribe(-1);
 
         m_connListenerHandle = inst.addConnectionListener(true, event -> {
             if (event.is(NetworkTableEvent.Kind.kConnected)) {
@@ -54,24 +65,33 @@ public class NetworkTablesServer {
             }
         });
 
-        m_topicListenerHandle = inst.addListener(
-            new String[] { datatable.getPath() + "/" },
-            EnumSet.of(NetworkTableEvent.Kind.kTopic),
-            event -> {
-                if (event.is(NetworkTableEvent.Kind.kPublish)) {
-                // topicInfo.name is the full topic name, e.g. "/datatable/X"
-                System.out.println("newly published " + event.topicInfo.name);
-                }
-        });
-
-        m_valueListenerHandle = inst.addListener(
-            m_gridTargetSub,
+        m_gridListenerHandle = inst.addListener(
+            m_gridSub,
             EnumSet.of(NetworkTableEvent.Kind.kValueAll),
             event -> {
-                long gridArray[] = event.valueData.value.getIntegerArray();
-                long gridX = gridArray[0];
-                long gridY = gridArray[1];
-                System.out.println("gridTarget set to (" + gridX + ", " + gridY + ")");
+                String grid[] = event.valueData.value.getStringArray();
+                System.out.println("grid set to:");
+                System.out.println(grid[0]);
+                System.out.println(grid[1]);
+                System.out.println(grid[2]);
+            }
+        );
+
+        m_targetRowListenerHandle = inst.addListener(
+            m_targetRowSub,
+            EnumSet.of(NetworkTableEvent.Kind.kValueAll),
+            event -> {
+                long row = event.valueData.value.getInteger();
+                System.out.println("target row set to: " + row);
+            }
+        );
+
+        m_targetColListenerHandle = inst.addListener(
+            m_targetColSub,
+            EnumSet.of(NetworkTableEvent.Kind.kValueAll),
+            event -> {
+                long col = event.valueData.value.getInteger();
+                System.out.println("target col set to: " + col);
             }
         );
     }
@@ -79,18 +99,12 @@ public class NetworkTablesServer {
     public void close() {
         NetworkTableInstance inst = NetworkTableInstance.getDefault();
         inst.removeListener(m_topicListenerHandle);
-        inst.removeListener(m_valueListenerHandle);
+        inst.removeListener(m_gridListenerHandle);
+        inst.removeListener(m_targetRowListenerHandle);
+        inst.removeListener(m_targetColListenerHandle);
         inst.removeListener(m_connListenerHandle);
-        m_gridTargetSub.close();
-    }
-
-    public long getGridX() {
-        long[] gridTarget = m_gridTargetSub.get();
-        return gridTarget[0];
-    }
-
-    public long getGridY() {
-        long[] gridTarget = m_gridTargetSub.get();
-        return gridTarget[1];
+        m_gridSub.close();
+        m_targetColSub.close();
+        m_targetRowSub.close();
     }
 }
