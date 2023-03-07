@@ -5,17 +5,23 @@ import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class TranslateToTargetCommand extends CommandBase {
-    private double m_xSetpoint;
+    private SwerveDriveSubsystem.COLUMN_TARGET m_targetColumn;
 
-    public TranslateToTargetCommand(double xSetpoint) {
-        m_xSetpoint = xSetpoint;
+    private int m_aprilTagId;
+
+    public TranslateToTargetCommand(SwerveDriveSubsystem.COLUMN_TARGET targetColumn) {
+        this(targetColumn, -1);
+    }
+
+    public TranslateToTargetCommand(SwerveDriveSubsystem.COLUMN_TARGET targetColumn, int aprilTagId) {
+        m_targetColumn = targetColumn;
+        m_aprilTagId = aprilTagId;
         addRequirements(SwerveDriveSubsystem.getInstance());
     }
 
     @Override
     public void initialize() {
-        SwerveDriveSubsystem.getInstance().setClosedLoopEnabled(true);
-        SwerveDriveSubsystem.getInstance().trackTarget(m_xSetpoint);
+        SwerveDriveSubsystem.getInstance().trackTarget(m_targetColumn, m_aprilTagId);
     }
 
     @Override
@@ -25,7 +31,6 @@ public class TranslateToTargetCommand extends CommandBase {
 
     @Override
     public void end(boolean isInterrupted) {
-        SwerveDriveSubsystem.getInstance().setClosedLoopEnabled(false);
         SwerveDriveSubsystem.getInstance().stopTracking();
     }
 }

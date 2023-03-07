@@ -78,21 +78,21 @@ public class ShuffleboardPIDTuner {
      * @return The P value of the PID this instance controls.
      */
     public double getPValue() {
-        return m_table.getEntry(m_subsystemName + " P").getDouble(0);
+        return m_table.getEntry(m_subsystemName + " P").getDouble(m_pDefault);
     }
 
     /**
      * @return The I value of the PID this instance controls.
      */
     public double getIValue() {
-        return m_table.getEntry(m_subsystemName + " I").getDouble(0);
+        return m_table.getEntry(m_subsystemName + " I").getDouble(m_iDefault);
     }
 
     /**
      * @return The D value of the PID this instance controls.
      */
     public double getDValue() {
-        return m_table.getEntry(m_subsystemName + " D").getDouble(0);
+        return m_table.getEntry(m_subsystemName + " D").getDouble(m_dDefault);
     }
 
     public void makePIDWidgets() {
