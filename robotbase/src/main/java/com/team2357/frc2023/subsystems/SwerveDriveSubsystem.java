@@ -6,29 +6,38 @@ package com.team2357.frc2023.subsystems;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.ErrorCode;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.pathplanner.lib.PathConstraints;
 import com.swervedrivespecialties.swervelib.AbsoluteEncoder;
+import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
-import com.team2357.frc2023.commands.scoring.AutoScoreHighCommand;
-import com.team2357.frc2023.commands.scoring.AutoScoreLowCommand;
-import com.team2357.frc2023.commands.scoring.AutoScoreMidCommand;
+import com.team2357.frc2023.commands.scoring.AutoScoreLowCommandGroup;
+import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
+import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreMidCommandGroup;
+import com.team2357.frc2023.commands.scoring.cube.CubeAutoScoreHighCommandGroup;
+import com.team2357.frc2023.commands.scoring.cube.CubeAutoScoreMidCommandGroup;
+import com.team2357.frc2023.util.Utility;
+import com.team2357.frc2023.networktables.AprilTagPose;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
-import com.team2357.lib.subsystems.LimelightSubsystem;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -41,46 +50,60 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		return instance;
 	}
 
-	public static enum ColumnSetpoints {
-		LEFT(Constants.DRIVE.LEFT_COL_X_ANGLE_SETPOINT, 0),
-		MIDDLE(Constants.DRIVE.MID_COL_X_ANGLE_SETPOINT, 1),
-		RIGHT(Constants.DRIVE.RIGHT_COL_X_ANGLE_SETPOINT, 2),
-		DEFAULT(Constants.DRIVE.DEFAULT_X_ANGLE_SETPOINT, -1);
+	public static enum COLUMN_TARGET {
+		LEFT(Constants.DRIVE.LEFT_COL_X_ANGLE_SETPOINT, DualLimelightManagerSubsystem.LIMELIGHT.RIGHT, 0),
+		MIDDLE(Constants.DRIVE.MID_COL_X_ANGLE_SETPOINT, DualLimelightManagerSubsystem.LIMELIGHT.LEFT, 1),
+		RIGHT(Constants.DRIVE.RIGHT_COL_X_ANGLE_SETPOINT, DualLimelightManagerSubsystem.LIMELIGHT.LEFT, 2),
+		NONE(Double.NaN, DualLimelightManagerSubsystem.LIMELIGHT.LEFT, -1);
 
 		public final double setpoint;
 		public final int index;
+		public final DualLimelightManagerSubsystem.LIMELIGHT primaryLimelight;
 
-		private ColumnSetpoints(double setpoint, int index) {
+		private COLUMN_TARGET(double setpoint, DualLimelightManagerSubsystem.LIMELIGHT primaryLimelight, int index) {
 			this.setpoint = setpoint;
+			this.primaryLimelight = primaryLimelight;
 			this.index = index;
 		}
 	}
 
-	public static ColumnSetpoints getSetpoint(int val) {
-		for (ColumnSetpoints setpoint : ColumnSetpoints.values()) {
+	public static COLUMN_TARGET getSetpoint(int val) {
+		for (COLUMN_TARGET setpoint : COLUMN_TARGET.values()) {
 			if (val == setpoint.index) {
 				return setpoint;
 			}
 		}
-		return ColumnSetpoints.DEFAULT;
+		return COLUMN_TARGET.NONE;
 	}
 
 	/**
-     * @param row row to score on (low: 0, mid: 1, high: 2)
-     * @return Auto score command to run
-     */
-    public static Command getAutoScoreCommands(int row) {
-        switch (row) {
-            case 0:
-                return new AutoScoreLowCommand();
-            case 1:
-                return new AutoScoreMidCommand();
-            case 2:
-                return new AutoScoreHighCommand();
-            default:
-                return new AutoScoreLowCommand();
-        }
-    }
+	 * @param row row to score on (low: 0, mid: 1, high: 2)
+	 * @return Auto score command to run
+	 */
+	public static Command getAutoScoreCommands(int row, int col) {
+		switch (row) {
+			case 1:
+				switch(col % 3) {
+					case 0: case 2:
+						return new ConeAutoScoreMidCommandGroup();
+					case 1:
+						return new CubeAutoScoreMidCommandGroup();
+					default:
+						return new AutoScoreLowCommandGroup(); // Potentially default to ConeAutoScoreMidCommandGroup
+				}
+			case 2:
+				switch(col % 3) {
+					case 0: case 2:
+						return new ConeAutoScoreHighCommandGroup();
+					case 1:
+						return new CubeAutoScoreHighCommandGroup();
+					default:
+						return new AutoScoreLowCommandGroup(); // Potentially default to ConeAutoScoreHighCommandGroup
+				}
+			default:
+				return new AutoScoreLowCommandGroup();
+		}
+	}
 
 	private SwerveDriveKinematics m_kinematics;
 
@@ -95,14 +118,21 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	private Configuration m_config;
 
-	private SwerveDriveOdometry m_odometry;
+	private SwerveDrivePoseEstimator m_poseEstimator;
 
 	private PathConstraints m_pathConstraints;
 
+	// Controller for robot movement along the y-axis
 	private PIDController m_translateXController;
+
+	// Controller for robot movement along the x-axis
 	private PIDController m_translateYController;
 
-	private boolean m_isTracking;
+	private COLUMN_TARGET m_targetColumn;
+	// Whether or not the robot is seeking to get the primary limelight camera in
+	// view
+	private boolean m_isSeeking;
+
 	public static class Configuration {
 		/**
 		 * The left-to-right distance between the drivetrain wheels (measured from
@@ -194,15 +224,59 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	}
 
-	public SwerveDriveSubsystem(WPI_Pigeon2 pigeon, SwerveModule frontLeft, SwerveModule frontRight,
-			SwerveModule backLeft, SwerveModule backRight) {
-		m_pigeon = pigeon;
-		
-		m_frontLeftModule = frontLeft;
-		m_frontRightModule = frontRight;
-		m_backLeftModule = backLeft;
-		m_backRightModule = backRight;
+	public SwerveDriveSubsystem(int pigeonId, int[] frontLeftIds, int[] frontRightIds,
+			int[] backLeftIds, int[] backRightIds, String canbus, String shuffleboardTab) {
+		ShuffleboardTab tab = Shuffleboard.getTab(shuffleboardTab);
 
+		m_pigeon = new WPI_Pigeon2(pigeonId, canbus);
+
+		m_frontLeftModule = Mk4iSwerveModuleHelper.createFalcon500(
+				tab.getLayout("Front Left Module", BuiltInLayouts.kList)
+						.withSize(2, 4)
+						.withPosition(0, 0),
+				Mk4iSwerveModuleHelper.GearRatio.L2,
+				frontLeftIds[0],
+				frontLeftIds[1],
+				frontLeftIds[2],
+				canbus,
+				0 // Offsets are set manually so this parameter is unnecessary
+		);
+
+		m_frontRightModule = Mk4iSwerveModuleHelper.createFalcon500(
+				tab.getLayout("Front Right Module", BuiltInLayouts.kList)
+						.withSize(2, 4)
+						.withPosition(2, 0),
+				Mk4iSwerveModuleHelper.GearRatio.L2,
+				frontRightIds[0],
+				frontRightIds[1],
+				frontRightIds[2],
+				canbus,
+				0 // Offsets are set manually so this parameter is unnecessary
+		);
+
+		m_backLeftModule = Mk4iSwerveModuleHelper.createFalcon500(
+				tab.getLayout("Back Left Module", BuiltInLayouts.kList)
+						.withSize(2, 4)
+						.withPosition(4, 0),
+				Mk4iSwerveModuleHelper.GearRatio.L2,
+				backLeftIds[0],
+				backLeftIds[1],
+				backLeftIds[2],
+				canbus,
+				0 // Offsets are set manually so this parameter is unnecessary
+		);
+
+		m_backRightModule = Mk4iSwerveModuleHelper.createFalcon500(
+				tab.getLayout("Back Right Module", BuiltInLayouts.kList)
+						.withSize(2, 4)
+						.withPosition(6, 0),
+				Mk4iSwerveModuleHelper.GearRatio.L2,
+				backRightIds[0],
+				backRightIds[1],
+				backRightIds[2],
+				canbus,
+				0 // Offsets are set manually so this parameter is unnecessary
+		);
 
 		instance = this;
 	}
@@ -222,10 +296,11 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 				new Translation2d(-m_config.m_trackwidthMeters / 2.0,
 						-m_config.m_wheelbaseMeters / 2.0));
 
-		m_odometry = new SwerveDriveOdometry(m_kinematics, getGyroscopeRotation(),
+		m_poseEstimator = new SwerveDrivePoseEstimator(m_kinematics, getGyroscopeRotation(),
 				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
 						m_frontRightModule.getPosition(),
-						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
+						m_backLeftModule.getPosition(), m_backRightModule.getPosition() },
+				new Pose2d(0.0, 0.0, getGyroscopeRotation()));
 
 		m_pathConstraints = new PathConstraints(m_config.m_trajectoryMaxVelocityMetersPerSecond,
 				m_config.m_trajectoryMaxAccelerationMetersPerSecond);
@@ -252,7 +327,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	public PathConstraints getPathConstraints() {
 		return m_pathConstraints;
 	}
-	
+
 	public void syncEncoders() {
 		syncEncoder(m_frontLeftModule);
 		syncEncoder(m_frontRightModule);
@@ -261,14 +336,17 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	private void syncEncoder(SwerveModule module) {
-		WPI_TalonFX steerMotor = (WPI_TalonFX) (module.getSteerMotor());
+		TalonFX steerMotor = (TalonFX) (module.getSteerMotor());
 
 		double absoluteAngle = module.getSteerEncoder().getAbsoluteAngle();
-		steerMotor.setSelectedSensorPosition(absoluteAngle / m_config.m_sensorPositionCoefficient);
+		ErrorCode error = steerMotor.setSelectedSensorPosition(absoluteAngle / m_config.m_sensorPositionCoefficient);
+		if (error != ErrorCode.OK)
+			System.out
+					.println("Sensor position unsuccessfully set on motor " + steerMotor.getDeviceID() + ": " + error);
 	}
 
 	private boolean isEncoderSynced(SwerveModule module) {
-		WPI_TalonFX steerMotor = (WPI_TalonFX) (module.getSteerMotor());
+		TalonFX steerMotor = (TalonFX) (module.getSteerMotor());
 		AbsoluteEncoder steerEncoder = module.getSteerEncoder();
 
 		double difference = Math.abs(steerMotor.getSelectedSensorPosition() * m_config.m_sensorPositionCoefficient
@@ -334,12 +412,12 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	public Pose2d getPose() {
-		return m_odometry.getPoseMeters();
+		return m_poseEstimator.getEstimatedPosition();
 	}
 
-	public void resetOdometry(Pose2d pose) {
+	public void resetPoseEstimator(Pose2d pose) {
 		setGyroScope(pose.getRotation().getDegrees());
-		m_odometry.resetPosition(
+		m_poseEstimator.resetPosition(
 				pose.getRotation(),
 				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
 						m_frontRightModule.getPosition(),
@@ -364,10 +442,10 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 			checkEncodersSynced();
 			return;
 		}
+
 		m_chassisSpeeds = chassisSpeeds;
 		SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
 		SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxVelocityMetersPerSecond);
-
 
 		m_frontLeftModule.set(
 				states[0].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
@@ -385,12 +463,15 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		Logger.getInstance().recordOutput("Swerve States", states);
 	}
 
-	public void setOdemetryFromApriltag() {
-		if (LimelightSubsystem.getInstance().validTargetExists()) {
-			Pose2d p2d = LimelightSubsystem.getInstance().getLimelightPose2d();
-			resetOdometry(p2d);
-		} else {
-			DriverStation.reportError("No AprilTag target", false);
+	public void updatePoseEstimator() {
+		m_poseEstimator.update(getGyroscopeRotation(),
+				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
+						m_frontRightModule.getPosition(),
+						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
+
+		Pose2d visionPose = AprilTagPose.getInstance().getPose();
+		if (visionPose != null) {
+			m_poseEstimator.addVisionMeasurement(visionPose, Timer.getFPGATimestamp());
 		}
 	}
 
@@ -428,30 +509,30 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		drive(power, 0, 0);
 	}
 
-	public void enableOpenLoopRamp(){
-		WPI_TalonFX motor = (WPI_TalonFX) m_backRightModule.getDriveMotor();
+	public void enableOpenLoopRamp() {
+		TalonFX motor = (TalonFX) m_backRightModule.getDriveMotor();
 		motor.configOpenloopRamp(m_config.m_openLoopRampRateSeconds);
-		motor = (WPI_TalonFX) m_backLeftModule.getDriveMotor();
+		motor = (TalonFX) m_backLeftModule.getDriveMotor();
 		motor.configOpenloopRamp(m_config.m_openLoopRampRateSeconds);
-		motor = (WPI_TalonFX) m_frontLeftModule.getDriveMotor();
+		motor = (TalonFX) m_frontLeftModule.getDriveMotor();
 		motor.configOpenloopRamp(m_config.m_openLoopRampRateSeconds);
-		motor = (WPI_TalonFX) m_frontRightModule.getDriveMotor();
+		motor = (TalonFX) m_frontRightModule.getDriveMotor();
 		motor.configOpenloopRamp(m_config.m_openLoopRampRateSeconds);
 	}
 
 	public void disableOpenLoopRamp() {
-		WPI_TalonFX motor = (WPI_TalonFX) m_backRightModule.getDriveMotor();
+		TalonFX motor = (TalonFX) m_backRightModule.getDriveMotor();
 		motor.configOpenloopRamp(0);
-		motor = (WPI_TalonFX) m_backLeftModule.getDriveMotor();
+		motor = (TalonFX) m_backLeftModule.getDriveMotor();
 		motor.configOpenloopRamp(0);
-		motor = (WPI_TalonFX) m_frontLeftModule.getDriveMotor();
+		motor = (TalonFX) m_frontLeftModule.getDriveMotor();
 		motor.configOpenloopRamp(0);
-		motor = (WPI_TalonFX) m_frontRightModule.getDriveMotor();
+		motor = (TalonFX) m_frontRightModule.getDriveMotor();
 		motor.configOpenloopRamp(0);
 	}
 
 	public boolean isTracking() {
-		return m_isTracking;
+		return m_targetColumn != COLUMN_TARGET.NONE;
 	}
 
 	public boolean isAtXTarget() {
@@ -470,62 +551,104 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	public boolean isAtTarget() {
 		// System.out.println(isAtXTarget() && isAtYTarget());
-		//return isAtXTarget();
+		// return isAtXTarget();
 		// return isAtYTarget();
-		return isAtXTarget() && isAtYTarget();
+		return isAtXTarget() && isAtYTarget() && !m_isSeeking;
 	}
 
-	public void trackTarget(double setpoint) {
+	/**
+	 * 
+	 * @param column         The target column relative to the selected april tag
+	 *                       (RIGHT, MIDDLE, LEFT)
+	 * @param targetAprilTag The target AprilTag for the limelight to track,
+	 *                       -1 will cause the limelight to track the primary in
+	 *                       view AprilTag
+	 */
+	public void trackTarget(SwerveDriveSubsystem.COLUMN_TARGET column, int targetAprilTag) {
 		System.out.println("track target");
-		m_isTracking = true;
-		trackXTarget(setpoint);
-		trackYTarget();
+		setClosedLoopEnabled(true);
+
+		DualLimelightManagerSubsystem limelightManager = DualLimelightManagerSubsystem.getInstance();
+		m_targetColumn = column;
+
+		limelightManager.setPrimary(m_targetColumn.primaryLimelight);
+		limelightManager.setTargetAprilTag(targetAprilTag);
+		limelightManager.setAprilTagPipelineActive();
+
+		trackXTarget();
+		trackYTarget(column.setpoint);
 		enableOpenLoopRamp();
 	}
 
-	public void trackXTarget(double setpoint) {
+	public void trackXTarget() {
 		m_translateXController.reset();
-		m_translateXController.setSetpoint(setpoint);
+		m_translateXController.setSetpoint(m_config.m_defaultYAngleSetpoint);
 		m_translateXController.setTolerance(m_config.m_translateXToleranceMeters);
 	}
 
-	public void trackYTarget() {
+	public void trackYTarget(double setpoint) {
 		m_translateYController.reset();
-		m_translateYController.setSetpoint(m_config.m_defaultYAngleSetpoint);
+		m_translateYController.setSetpoint(setpoint);
 		m_translateYController.setTolerance(m_config.m_translateYToleranceMeters);
 	}
 
+	private void configureSeeking() {
+		m_isSeeking = true;
+		DualLimelightManagerSubsystem limelightManager = DualLimelightManagerSubsystem.getInstance();
+		trackYTarget(limelightManager.getPrimaryTXSetpoint());
+	}
+
+	private void stopSeeking() {
+		m_isSeeking = false;
+		trackYTarget(m_targetColumn.setpoint);
+	}
+
 	public double calculateXMetersPerSecond() {
-		double outputMetersPerSecond = m_translateXController.calculate(LimelightSubsystem.getInstance().getTY());
+		double outputMetersPerSecond = m_translateXController
+				.calculate(DualLimelightManagerSubsystem.getInstance().getTY());
 		outputMetersPerSecond = outputMetersPerSecond * -1; // Invert output
-		outputMetersPerSecond = MathUtil.clamp(outputMetersPerSecond, m_config.m_translateXMaxSpeedMeters*-1, m_config.m_translateXMaxSpeedMeters);
+		outputMetersPerSecond = MathUtil.clamp(outputMetersPerSecond, m_config.m_translateXMaxSpeedMeters * -1,
+				m_config.m_translateXMaxSpeedMeters);
 		return outputMetersPerSecond;
 	}
 
 	public double calculateYMetersPerSecond() {
-		double outputMetersPerSecond = m_translateYController.calculate(LimelightSubsystem.getInstance().getTX());
-		outputMetersPerSecond = MathUtil.clamp(outputMetersPerSecond, m_config.m_translateYMaxSpeedMeters*-1, m_config.m_translateYMaxSpeedMeters);
+		DualLimelightManagerSubsystem limelightManager = DualLimelightManagerSubsystem.getInstance();
+		double errorAngle = m_isSeeking ? limelightManager.getPrimaryTX() : limelightManager.getSecondaryTX();
+		double outputMetersPerSecond = m_translateYController.calculate(errorAngle);
+		outputMetersPerSecond = MathUtil.clamp(outputMetersPerSecond, m_config.m_translateYMaxSpeedMeters * -1,
+				m_config.m_translateYMaxSpeedMeters);
 		return outputMetersPerSecond;
 	}
 
 	public void trackingPeriodic() {
-		LimelightSubsystem limelight = LimelightSubsystem.getInstance();
+		DualLimelightManagerSubsystem limelightManager = DualLimelightManagerSubsystem.getInstance();
 		// System.out.println(m_translateXController.getSetpoint());
 		// System.out.println("TY "+limelight.getTY());
-		if (!limelight.validTargetExists()) {
+		if (!limelightManager.validTargetExists()) {
 			setClosedLoopEnabled(false);
 			return;
 		}
+
 		System.out.println(isTracking());
 
+		if (!limelightManager.validTargetExistsOnPrimary() && !m_isSeeking) { // If the primary limelight has no target,
+																				// and has not been set to seek
+			configureSeeking();
+		} else if (limelightManager.validTargetExistsOnPrimary() && m_isSeeking) {
+			stopSeeking();
+		}
+
 		// drive(new ChassisSpeeds(0, calculateYMetersPerSecond(), 0));
-		//drive(new ChassisSpeeds(calculateX(), 0, 0));
+		// drive(new ChassisSpeeds(calculateX(), 0, 0));
 		drive(new ChassisSpeeds(calculateXMetersPerSecond(), calculateYMetersPerSecond(), 0));
 	}
 
 	public void stopTracking() {
 		setClosedLoopEnabled(false);
-		m_isTracking = false;
+		DualLimelightManagerSubsystem.getInstance().setTargetAprilTag(-1);
+		m_targetColumn = COLUMN_TARGET.NONE;
+		m_isSeeking = false;
 
 		System.out.println("Ending Tracking -----------------");
 		disableOpenLoopRamp();
@@ -534,11 +657,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	@Override
 	public void periodic() {
-	    m_odometry.update(getGyroscopeRotation(),
-		 new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
-		 m_frontRightModule.getPosition(),
-		 m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
-		//setOdemetryFromApriltag();
+		// setOdemetryFromApriltag();
+		updatePoseEstimator();
 
 		SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
 
@@ -547,9 +667,10 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		// SmartDashboard.putNumber("Yaw", m_pigeon.getYaw());
 		// SmartDashboard.putNumber("Pose X", m_odometry.getPoseMeters().getX());
 		// SmartDashboard.putNumber("Pose Y", m_odometry.getPoseMeters().getY());
-		// SmartDashboard.putNumber("Pose Angle", m_odometry.getPoseMeters().getRotation().getDegrees());
+		// SmartDashboard.putNumber("Pose Angle",
+		// m_odometry.getPoseMeters().getRotation().getDegrees());
 
-		Logger.getInstance().recordOutput("Robot Pose", m_odometry.getPoseMeters());
+		Logger.getInstance().recordOutput("Robot Pose", getPose());
 
 		if (isClosedLoopEnabled() && isTracking()) {
 			trackingPeriodic();
@@ -557,11 +678,15 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	public void printEncoderVals() {
-		SmartDashboard.putNumber("front left encoder count", ((WPI_TalonFX) (m_frontLeftModule.getDriveMotor())).getSelectedSensorPosition(0));
-	
-		SmartDashboard.putNumber("front right encoder count", ((WPI_TalonFX) (m_frontRightModule.getDriveMotor())).getSelectedSensorPosition(0));
-		SmartDashboard.putNumber("back left module encoder count", ((WPI_TalonFX) (m_backLeftModule.getDriveMotor())).getSelectedSensorPosition(0));
-		SmartDashboard.putNumber("back right module encoder count", ((WPI_TalonFX) (m_backRightModule.getDriveMotor())).getSelectedSensorPosition(0));
+		SmartDashboard.putNumber("front left encoder count",
+				((TalonFX) (m_frontLeftModule.getDriveMotor())).getSelectedSensorPosition(0));
+
+		SmartDashboard.putNumber("front right encoder count",
+				((TalonFX) (m_frontRightModule.getDriveMotor())).getSelectedSensorPosition(0));
+		SmartDashboard.putNumber("back left module encoder count",
+				((TalonFX) (m_backLeftModule.getDriveMotor())).getSelectedSensorPosition(0));
+		SmartDashboard.putNumber("back right module encoder count",
+				((TalonFX) (m_backRightModule.getDriveMotor())).getSelectedSensorPosition(0));
 
 	}
 }
