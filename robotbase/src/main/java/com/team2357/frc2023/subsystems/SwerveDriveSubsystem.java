@@ -21,7 +21,7 @@ import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreMidCommandGroup;
 import com.team2357.frc2023.commands.scoring.cube.CubeAutoScoreHighCommandGroup;
 import com.team2357.frc2023.commands.scoring.cube.CubeAutoScoreMidCommandGroup;
 import com.team2357.frc2023.util.Utility;
-import com.team2357.frc2023.networktables.AprilTagPose;
+import com.team2357.frc2023.networktables.GridCam;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 
 import edu.wpi.first.math.MathUtil;
@@ -468,7 +468,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 						m_frontRightModule.getPosition(),
 						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
 
-		Pose2d visionPose = AprilTagPose.getInstance().getPose();
+		Pose2d visionPose = GridCam.getInstance().getPose();
 		if (visionPose != null) {
 			m_poseEstimator.addVisionMeasurement(visionPose, Timer.getFPGATimestamp());
 		}
