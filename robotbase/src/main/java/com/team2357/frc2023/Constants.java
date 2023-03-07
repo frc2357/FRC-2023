@@ -16,6 +16,8 @@ import com.team2357.frc2023.subsystems.WristSubsystem;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -77,7 +79,7 @@ public final class Constants {
 
         public static final int WRIST_FORWARD_SOLENOID_CHANNEL = 3; // Red
         public static final int WRIST_REVERSE_SOLENOID_CHANNEL = 0;
-        
+
         public static final int CLAW_FORWARD_SOLENOID_CHANNEL = 4;
         public static final int CLAW_REVERSE_SOLENOID_CHANNEL = 1; // Black
 
@@ -140,11 +142,11 @@ public final class Constants {
         // sensorDirection = false;
         // initializationStrategy = bootToAbsValue;
 
-        public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(8.79+180);
-        public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(314.38-180); 
-        public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(306.3-180); 
-        public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(163.04+180);
-        
+        public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(8.79 + 180);
+        public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(314.38 - 180);
+        public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(306.3 - 180);
+        public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(163.04 + 180);
+
         public static final PIDController CHARGE_STATION_BALANCE_ANGLE_CONTROLLER = new PIDController(0.5, 0, 0);
         public static final PIDController CHARGE_STATION_DISTANCE_CONTROLLER = new PIDController(0.5, 0, 0);
 
@@ -176,12 +178,15 @@ public final class Constants {
         public static final double DEAD_RECKONING_TRANSLATION_METERS_PER_SECOND = 1;
         public static final double DEAD_RECKONING_ROTATION_RADIANS_PER_SECOND = 0.1;
 
-        public static final ChassisSpeeds DEAD_RECKONING_X_CHASSIS_SPEEDS = new ChassisSpeeds(DEAD_RECKONING_TRANSLATION_METERS_PER_SECOND, 0, 0);
-        public static final ChassisSpeeds DEAD_RECKONING_Y_CHASSIS_SPEEDS = new ChassisSpeeds(0, DEAD_RECKONING_TRANSLATION_METERS_PER_SECOND, 0);
-        public static final ChassisSpeeds DEAD_RECKONING_ROTATION_CHASSIS_SPEEDS = new ChassisSpeeds(0, 0, DEAD_RECKONING_ROTATION_RADIANS_PER_SECOND);
+        public static final ChassisSpeeds DEAD_RECKONING_X_CHASSIS_SPEEDS = new ChassisSpeeds(
+                DEAD_RECKONING_TRANSLATION_METERS_PER_SECOND, 0, 0);
+        public static final ChassisSpeeds DEAD_RECKONING_Y_CHASSIS_SPEEDS = new ChassisSpeeds(0,
+                DEAD_RECKONING_TRANSLATION_METERS_PER_SECOND, 0);
+        public static final ChassisSpeeds DEAD_RECKONING_ROTATION_CHASSIS_SPEEDS = new ChassisSpeeds(0, 0,
+                DEAD_RECKONING_ROTATION_RADIANS_PER_SECOND);
 
         public static final String SWERVE_MODULE_SHUFFLEBOARD_TAB_NAME = "Drivetrain";
-    
+
         // Tolerance for out-of-range poses on auto-mapping
         public static final double TRAJECTORY_MAP_TOLERANCE_METERS = 0.1;
     }
@@ -414,7 +419,8 @@ public final class Constants {
             // Static gain, will likely be zero
             config.m_feedforwardKs = 0;
 
-            // Gravity gain, should be the gain required to keep the arm parallel with the floor
+            // Gravity gain, should be the gain required to keep the arm parallel with the
+            // floor
             config.m_feedforwardKg = 0.64;
 
             // Velocity gain, will be zero
@@ -484,4 +490,20 @@ public final class Constants {
         public static final int AMP_ZERO_DEADLINE_SECONDS = 1;
     }
 
+    public static final class GRIDCAM {
+        public static final double FRONT_CAM_HEIGHT_METERS = 1.183482768666;
+        public static final double REAR_CAM_HIEGHT_METERS = 1.183482768666;
+
+        public static final double FRONT_CAM_X_METERS = -0.10795;
+        public static final double REAR_CAM_X_METERS = -0.10795;
+
+        public static final double FRONT_CAM_Y_METERS = 0.078725095534;
+        public static final double REAR_CAM_Y_METERS = 0.226074904466;
+
+        public static final double FRONT_CAM_YAW_DEGREES = 0.0;
+        public static final double REAR_CAM_YAW_DEGREES = 180;
+
+        public static final Pose2d FRONT_CAM_POSE = new Pose2d(FRONT_CAM_X_METERS, FRONT_CAM_Y_METERS, Rotation2d.fromDegrees(FRONT_CAM_YAW_DEGREES));
+        public static final Pose2d REAR_CAM_POSE = new Pose2d(REAR_CAM_X_METERS, REAR_CAM_Y_METERS, Rotation2d.fromDegrees(REAR_CAM_YAW_DEGREES));
+    }
 }

@@ -37,8 +37,24 @@ public class GridCam {
         m_instance = this;
     }
 
-    public Pose2d getPose() {
+    /**
+     * 
+     * @return List of poses at a given time relative to the camera
+     */
+    public Pose2d getCamRelativePose() {
         return toPose2d(m_poseSub.get());
+    }
+
+    /**
+     * 
+     * @return List of poses at a given time relative to the robot
+     */
+    public Pose2d getRobotRelativePose() {
+        return getCamRelativePose();
+    }
+
+    public Pose2d getFieldRelativePoses() {
+        return getRobotRelativePose();
     }
 
     public Pose2d toPose2d(String jsonString) {
