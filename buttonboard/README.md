@@ -130,8 +130,6 @@ How to run in dev environment
 ## TODO
 This is a list of things still to be done:
 
-- Rename "app" to something more useful
-- Consider renaming base `buttonboard` name to something more DS-centric
 - Enumerate serial devices
   - Connect to each one to get device name
   - Create mapping of device name to port
