@@ -74,11 +74,11 @@ public final class Constants {
 
     public static final class PH_ID {
 
-        public static final int WRIST_FORWARD_SOLENOID_CHANNEL = 3;
+        public static final int WRIST_FORWARD_SOLENOID_CHANNEL = 3; // Red
         public static final int WRIST_REVERSE_SOLENOID_CHANNEL = 0;
         
         public static final int CLAW_FORWARD_SOLENOID_CHANNEL = 4;
-        public static final int CLAW_REVERSE_SOLENOID_CHANNEL = 1;
+        public static final int CLAW_REVERSE_SOLENOID_CHANNEL = 1; // Black
 
         public static final int INTAKE_SOLENOID_FORWARD_CHANNEL = 5;
         public static final int INTAKE_SOLENOID_REVERSE_CHANNEL = 2;
@@ -266,7 +266,7 @@ public final class Constants {
             config.m_smartMotionRotationAllowedError = 2;
 
             config.m_winchMotorAllowedError = 2;
-            config.m_winchDeployRotations = 130;
+            config.m_winchDeployRotations = 140;
             config.m_winchStowRotations = 0.0;
 
             return config;

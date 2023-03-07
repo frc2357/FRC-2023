@@ -113,6 +113,7 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
     private void configureWinchMotor(CANSparkMax motor) {
         motor.setIdleMode(m_config.m_winchMotorIdleMode);
         motor.setSmartCurrentLimit(m_config.m_winchMotorStallLimitAmps, m_config.m_winchMotorFreeLimitAmps);
+        motor.enableVoltageCompensation(12);
     }
 
     private void configureWinchPID(SparkMaxPIDController pidController) {
