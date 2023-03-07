@@ -2,6 +2,7 @@ package com.team2357.frc2023.shuffleboard;
 
 import com.team2357.frc2023.commands.auto.blue.grid3.BlueGridThreeTwoConeAutoCommand;
 import com.team2357.frc2023.commands.drive.ZeroDriveCommand;
+import com.team2357.frc2023.commands.intake.IntakeSolenoidExtendCommand;
 import com.team2357.frc2023.trajectoryutil.AvailableTrajectoryCommands;
 import com.team2357.frc2023.trajectoryutil.TrajectoryUtil;
 
@@ -63,8 +64,10 @@ public class AutoCommandChooser {
 
     public Command generateCommand() {
         CommandScheduler.getInstance().removeComposedCommand(choosers[0].getActionCommand());
-        return new SequentialCommandGroup(
-                new ParallelCommandGroup(choosers[0].getWaitCommand(), new ZeroDriveCommand()),
-                choosers[0].getActionCommand());
+        return new ParallelCommandGroup(
+            new SequentialCommandGroup(
+                choosers[0].getWaitCommand(),
+                choosers[0].getActionCommand()),
+            new IntakeSolenoidExtendCommand());
     }
 }

@@ -63,7 +63,7 @@ public class SubsystemFactory {
         }
 
         public ArmRotationSubsystem CreateArmRotationSubsystem() {
-                ArmRotationSubsystem subsystem = new ArmRotationSubsystem(Constants.CAN_ID.ROTATION_MOTOR_ID);
+                ArmRotationSubsystem subsystem = new ArmRotationSubsystem(Constants.CAN_ID.ARM_ROTATION_MOTOR_ID);
                 subsystem.configure(Constants.ARM_ROTATION.GET_ROTATION_CONFIG());
                 return subsystem;
         }

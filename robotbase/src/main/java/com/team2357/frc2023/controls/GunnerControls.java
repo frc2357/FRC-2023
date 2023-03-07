@@ -3,10 +3,12 @@ package com.team2357.frc2023.controls;
 import com.team2357.lib.triggers.AxisThresholdTrigger;
 import com.team2357.lib.util.Utility;
 import com.team2357.lib.util.XboxRaw;
+import com.team2357.frc2023.subsystems.IntakeArmSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -22,9 +24,9 @@ import com.team2357.frc2023.commands.human.panic.IntakeWinchCommand;
 import com.team2357.frc2023.commands.human.panic.WristToggleCommand;
 import com.team2357.frc2023.commands.intake.IntakeArmDeployCommand;
 import com.team2357.frc2023.commands.intake.IntakeArmStowCommand;
-import com.team2357.frc2023.commands.scoring.AutoScoreHighCommandGroup;
 import com.team2357.frc2023.commands.scoring.AutoScoreLowCommandGroup;
-import com.team2357.frc2023.commands.scoring.AutoScoreMidCommandGroup;
+import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
+import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreMidCommandGroup;
 
 /**
  * These are the controls for the gunner.
@@ -157,8 +159,11 @@ public class GunnerControls {
         downDPadAndA.onTrue(new TranslateToTargetCommandGroup(SwerveDriveSubsystem.COLUMN_TARGET.MIDDLE));
         downDPadAndB.onTrue(new TranslateToTargetCommandGroup(SwerveDriveSubsystem.COLUMN_TARGET.RIGHT));
 
-        yButton.onTrue(new AutoScoreHighCommandGroup());
-        xButton.onTrue(new AutoScoreMidCommandGroup());
+        yButton.onTrue(new ConeAutoScoreHighCommandGroup());
+        xButton.onTrue(new ConeAutoScoreMidCommandGroup());
         aButton.onTrue(new AutoScoreLowCommandGroup());
+        rightDPadAndY.onTrue(new InstantCommand(() -> {
+            IntakeArmSubsystem.getInstance().resetEncoders();
+        }));
     }
 }

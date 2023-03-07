@@ -10,6 +10,8 @@ import com.team2357.lib.util.Utility;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class IntakeArmSubsystem extends ClosedLoopSubsystem {
     private static IntakeArmSubsystem instance = null;
@@ -105,6 +107,7 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
         configureWinchPID(m_winchPIDController);
 
         m_winchMotor.setInverted(m_config.m_isInverted);
+        resetEncoders();
     }
 
     private void configureWinchMotor(CANSparkMax motor) {
@@ -141,7 +144,12 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
                 pidSlot);
     }
 
-    public void setWinchRotation(double rotations, int pidSlot) {
+    public void setWinchRotations(double rotations) {
+        int pidSlot = getWinchRotations() > rotations ? m_config.m_winchStowPidSlot : m_config.m_deployMilliseconds;
+        setWinchRotations(rotations, pidSlot);
+    }
+
+    public void setWinchRotations(double rotations, int pidSlot) {
         setClosedLoopEnabled(true);
         m_targetRotations = rotations;
         m_winchPIDController.setReference(m_targetRotations, CANSparkMax.ControlType.kSmartMotion, pidSlot);
@@ -196,13 +204,21 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
     public void deploy() {
         m_currentState = ArmState.Unknown;
         m_desiredState = ArmState.Deployed;
-        setWinchRotation(m_config.m_winchDeployRotations, m_config.m_winchDeployPidSlot);
+        setWinchRotations(m_config.m_winchDeployRotations, m_config.m_winchDeployPidSlot);
     }
 
     public void stow() {
         m_currentState = ArmState.Unknown;
         m_desiredState = ArmState.Stowed;
-        setWinchRotation(m_config.m_winchStowRotations, m_config.m_winchStowPidSlot);
+        setWinchRotations(m_config.m_winchStowRotations, m_config.m_winchStowPidSlot);
+    }
+
+    public void extendSolenoid() {
+        m_intakeSolenoid.set(Value.kForward);
+    }
+
+    public void stopSolenoid() {
+        m_intakeSolenoid.set(Value.kOff);
     }
 
     @Override
@@ -221,22 +237,20 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
         if (m_shuffleboardPIDTuner.arePIDsUpdated()) {
             updatePID();
         }
+
+        SmartDashboard.putNumber("Arm rotations", m_winchMotor.getEncoder().getPosition());
     }
 
     private void deployPeriodic() {
         if (!isWinchAtRotations()) {
-            m_intakeSolenoid.set(DoubleSolenoid.Value.kForward);
         } else if (isWinchAtRotations()) {
-            m_intakeSolenoid.set(DoubleSolenoid.Value.kOff);
             m_currentState = ArmState.Deployed;
         }
     }
 
     private void stowPeriodic() {
         if (!isWinchAtRotations()) {
-            m_intakeSolenoid.set(DoubleSolenoid.Value.kReverse);
         } else if (isWinchAtRotations()) {
-            m_intakeSolenoid.set(DoubleSolenoid.Value.kOff);
             m_currentState = ArmState.Stowed;
         }
     }

@@ -1,10 +1,11 @@
-package com.team2357.frc2023.commands.scoring;
+package com.team2357.frc2023.commands.scoring.cone;
 
 import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.commands.armextension.ArmExtendToPositionCommand;
 import com.team2357.frc2023.commands.armrotation.ArmRotateToPositionCommand;
 import com.team2357.frc2023.commands.claw.ClawOpenCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerReverseCommand;
+import com.team2357.frc2023.commands.scoring.ArmReturnToStartCommandGroup;
 import com.team2357.frc2023.commands.wrist.WristExtendCommand;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -12,8 +13,8 @@ import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
-public class AutoScoreHighCommandGroup extends ParallelCommandGroup {
-    public AutoScoreHighCommandGroup() {
+public class ConeAutoScoreHighCommandGroup extends ParallelCommandGroup {
+    public ConeAutoScoreHighCommandGroup() {
         // Pull game piece away from intake
 
         addCommands(new ParallelRaceGroup(

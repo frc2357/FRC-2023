@@ -6,16 +6,19 @@ package com.team2357.frc2023.subsystems;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.ErrorCode;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.pathplanner.lib.PathConstraints;
 import com.swervedrivespecialties.swervelib.AbsoluteEncoder;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
-import com.team2357.frc2023.commands.scoring.AutoScoreHighCommandGroup;
 import com.team2357.frc2023.commands.scoring.AutoScoreLowCommandGroup;
-import com.team2357.frc2023.commands.scoring.AutoScoreMidCommandGroup;
+import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
+import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreMidCommandGroup;
+import com.team2357.frc2023.commands.scoring.cube.CubeAutoScoreHighCommandGroup;
+import com.team2357.frc2023.commands.scoring.cube.CubeAutoScoreMidCommandGroup;
 import com.team2357.frc2023.util.Utility;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 
@@ -75,14 +78,26 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	 * @param row row to score on (low: 0, mid: 1, high: 2)
 	 * @return Auto score command to run
 	 */
-	public static Command getAutoScoreCommands(int row) {
+	public static Command getAutoScoreCommands(int row, int col) {
 		switch (row) {
-			case 0:
-				return new AutoScoreLowCommandGroup();
 			case 1:
-				return new AutoScoreMidCommandGroup();
+				switch(col % 3) {
+					case 0: case 2:
+						return new ConeAutoScoreMidCommandGroup();
+					case 1:
+						return new CubeAutoScoreMidCommandGroup();
+					default:
+						return new AutoScoreLowCommandGroup(); // Potentially default to ConeAutoScoreMidCommandGroup
+				}
 			case 2:
-				return new AutoScoreHighCommandGroup();
+				switch(col % 3) {
+					case 0: case 2:
+						return new ConeAutoScoreHighCommandGroup();
+					case 1:
+						return new CubeAutoScoreHighCommandGroup();
+					default:
+						return new AutoScoreLowCommandGroup(); // Potentially default to ConeAutoScoreHighCommandGroup
+				}
 			default:
 				return new AutoScoreLowCommandGroup();
 		}
@@ -317,14 +332,16 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	private void syncEncoder(SwerveModule module) {
-		WPI_TalonFX steerMotor = (WPI_TalonFX) (module.getSteerMotor());
+		TalonFX steerMotor = (TalonFX) (module.getSteerMotor());
 
 		double absoluteAngle = module.getSteerEncoder().getAbsoluteAngle();
-		steerMotor.setSelectedSensorPosition(absoluteAngle / m_config.m_sensorPositionCoefficient);
+		ErrorCode error = steerMotor.setSelectedSensorPosition(absoluteAngle / m_config.m_sensorPositionCoefficient);
+		if(error != ErrorCode.OK)
+			System.out.println("Sensor position unsuccessfully set on motor "+steerMotor.getDeviceID() + ": " + error);
 	}
 
 	private boolean isEncoderSynced(SwerveModule module) {
-		WPI_TalonFX steerMotor = (WPI_TalonFX) (module.getSteerMotor());
+		TalonFX steerMotor = (TalonFX) (module.getSteerMotor());
 		AbsoluteEncoder steerEncoder = module.getSteerEncoder();
 
 		double difference = Math.abs(steerMotor.getSelectedSensorPosition() * m_config.m_sensorPositionCoefficient
@@ -420,6 +437,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 			checkEncodersSynced();
 			return;
 		}
+
 		m_chassisSpeeds = chassisSpeeds;
 		SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
 		SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxVelocityMetersPerSecond);
@@ -484,24 +502,24 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	public void enableOpenLoopRamp() {
-		WPI_TalonFX motor = (WPI_TalonFX) m_backRightModule.getDriveMotor();
+		TalonFX motor = (TalonFX) m_backRightModule.getDriveMotor();
 		motor.configOpenloopRamp(m_config.m_openLoopRampRateSeconds);
-		motor = (WPI_TalonFX) m_backLeftModule.getDriveMotor();
+		motor = (TalonFX) m_backLeftModule.getDriveMotor();
 		motor.configOpenloopRamp(m_config.m_openLoopRampRateSeconds);
-		motor = (WPI_TalonFX) m_frontLeftModule.getDriveMotor();
+		motor = (TalonFX) m_frontLeftModule.getDriveMotor();
 		motor.configOpenloopRamp(m_config.m_openLoopRampRateSeconds);
-		motor = (WPI_TalonFX) m_frontRightModule.getDriveMotor();
+		motor = (TalonFX) m_frontRightModule.getDriveMotor();
 		motor.configOpenloopRamp(m_config.m_openLoopRampRateSeconds);
 	}
 
 	public void disableOpenLoopRamp() {
-		WPI_TalonFX motor = (WPI_TalonFX) m_backRightModule.getDriveMotor();
+		TalonFX motor = (TalonFX) m_backRightModule.getDriveMotor();
 		motor.configOpenloopRamp(0);
-		motor = (WPI_TalonFX) m_backLeftModule.getDriveMotor();
+		motor = (TalonFX) m_backLeftModule.getDriveMotor();
 		motor.configOpenloopRamp(0);
-		motor = (WPI_TalonFX) m_frontLeftModule.getDriveMotor();
+		motor = (TalonFX) m_frontLeftModule.getDriveMotor();
 		motor.configOpenloopRamp(0);
-		motor = (WPI_TalonFX) m_frontRightModule.getDriveMotor();
+		motor = (TalonFX) m_frontRightModule.getDriveMotor();
 		motor.configOpenloopRamp(0);
 	}
 
@@ -651,14 +669,14 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	public void printEncoderVals() {
 		SmartDashboard.putNumber("front left encoder count",
-				((WPI_TalonFX) (m_frontLeftModule.getDriveMotor())).getSelectedSensorPosition(0));
+				((TalonFX) (m_frontLeftModule.getDriveMotor())).getSelectedSensorPosition(0));
 
 		SmartDashboard.putNumber("front right encoder count",
-				((WPI_TalonFX) (m_frontRightModule.getDriveMotor())).getSelectedSensorPosition(0));
+				((TalonFX) (m_frontRightModule.getDriveMotor())).getSelectedSensorPosition(0));
 		SmartDashboard.putNumber("back left module encoder count",
-				((WPI_TalonFX) (m_backLeftModule.getDriveMotor())).getSelectedSensorPosition(0));
+				((TalonFX) (m_backLeftModule.getDriveMotor())).getSelectedSensorPosition(0));
 		SmartDashboard.putNumber("back right module encoder count",
-				((WPI_TalonFX) (m_backRightModule.getDriveMotor())).getSelectedSensorPosition(0));
+				((TalonFX) (m_backRightModule.getDriveMotor())).getSelectedSensorPosition(0));
 
 	}
 }
