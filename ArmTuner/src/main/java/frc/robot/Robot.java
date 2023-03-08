@@ -368,6 +368,8 @@ public class Robot extends TimedRobot {
       m_extensionEncoder.setPosition(0);
     }
 
+    System.out.println("Output current: " + m_extensionMotor.getOutputCurrent());
+    
     SmartDashboard.putNumber("Velocity", m_extensionEncoder.getVelocity());
     SmartDashboard.putNumber("Current rotations", m_extensionEncoder.getPosition());
     SmartDashboard.putNumber("Output", m_extensionMotor.getAppliedOutput());
