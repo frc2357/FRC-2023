@@ -125,7 +125,6 @@ public class Robot extends TimedRobot {
     m_extensionMotor.setIdleMode(IdleMode.kBrake);
     m_extensionMotor.enableVoltageCompensation(12);
 
-
     // initialze PID controller and encoder objects
 
     // Rotation motor
@@ -171,10 +170,10 @@ public class Robot extends TimedRobot {
     extensionKI = 0;
     extensionKD = 0;
     extensionKIz = 0;
-    extensionKFF = 0.0001; // 0.00007
+    extensionKFF = 0.000001; // 0.00007
     extensionKMaxOutput = 1;
     extensionKMinOutput = -1;
-    extensionMaxRPM = 11000; // 5676 for ne0, 11000 for neo 550
+    extensionMaxRPM = 5676; // 5676 for ne0, 11000 for neo 550
 
     // Smart Motion Coefficients
 
@@ -183,8 +182,8 @@ public class Robot extends TimedRobot {
     rotationMaxAcc = 4600;
 
     // arm extension
-    extensionMaxVel = 8700; // rpm
-    extensionMaxAcc = 8700;
+    extensionMaxVel = 4600; // rpm
+    extensionMaxAcc = 4600;
 
     // set PID coefficients
 
@@ -358,8 +357,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testPeriodic() {
-    m_rotationMotor.set(deadband(controller.getRightY(), 0.1) * -0.4);
-    m_extensionMotor.set(deadband(controller.getLeftY(), 0.1) * -0.4);
+    m_rotationMotor.set(deadband(controller.getRightY(), 0.1) * -0.7);
+    m_extensionMotor.set(deadband(controller.getLeftY(), 0.1) * -1);
 
     if (controller.getAButtonPressed()) {
       m_rotationEncoder.setPosition(0);
