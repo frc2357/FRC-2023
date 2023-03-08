@@ -14,7 +14,7 @@ public class ArmReturnToStartCommandGroup extends SequentialCommandGroup {
         addCommands(new WristRetractCommand());
         addCommands(new CloseClawCommand());
         //addCommands(new ArmRetractToPositionCommand(Constants.ARM_EXTENSION.RETRACTED_ROTATIONS));
-        addCommands(new WaitCommand(5));
+        addCommands(new WaitCommand(2));
         addCommands(new ArmRotateToPositionCommand(Constants.ARM_ROTATION.RETRACTED_ROTATIONS));
     }
 }
