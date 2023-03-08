@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-// Full extension rotations = 271.65
+// Full extension rotations = 253
 
 package frc.robot;
 
@@ -154,11 +154,11 @@ public class Robot extends TimedRobot {
     // rotationDefaultKG = 0.64;
     // rotationExtendedKG = 0.64;
 
-    rotationKP = 0;
+    rotationKP = 0.00075;
     rotationKI = 0;
     rotationKD = 0;
     rotationKIz = 0;
-    rotationKFF = 0; // 0.00007
+    rotationKFF = 0.001; // 0.00007
     rotationKMaxOutput = 1;
     rotationKMinOutput = -1;
     rotationMaxRPM = 5676; // 5676 for ne0, 11000 for neo 550
@@ -167,16 +167,14 @@ public class Robot extends TimedRobot {
 
 
     // arm extension
-    extensionKP = 0.00025;
+    extensionKP = 0.0000;
     extensionKI = 0;
     extensionKD = 0;
     extensionKIz = 0;
-    extensionKFF = 0.00001; // 0.00007
+    extensionKFF = 0.0001; // 0.00007
     extensionKMaxOutput = 1;
     extensionKMinOutput = -1;
-    extensionMaxRPM = 5676; // 5676 for ne0, 11000 for neo 550
-    extensionKG = 0.64;
-
+    extensionMaxRPM = 11000; // 5676 for ne0, 11000 for neo 550
 
     // Smart Motion Coefficients
 
@@ -185,8 +183,8 @@ public class Robot extends TimedRobot {
     rotationMaxAcc = 4600;
 
     // arm extension
-    extensionMaxVel = 4600; // rpm
-    extensionMaxAcc = 4600;
+    extensionMaxVel = 8700; // rpm
+    extensionMaxAcc = 8700;
 
     // set PID coefficients
 
@@ -237,17 +235,17 @@ public class Robot extends TimedRobot {
     m_extensionPidController.setSmartMotionMaxVelocity(extensionMaxVel, smartMotionSlot);
     m_extensionPidController.setSmartMotionMinOutputVelocity(extensionMinVel, smartMotionSlot);
     m_extensionPidController.setSmartMotionMaxAccel(extensionMaxAcc, smartMotionSlot);
-    extensionAllowedErr = 0.5;
+    extensionAllowedErr = 1;
     m_extensionPidController.setSmartMotionAllowedClosedLoopError(extensionAllowedErr, smartMotionSlot);
 
 
     // display PID coefficients on SmartDashboard
-    SmartDashboard.putNumber("P Gain", rotationKP);
-    SmartDashboard.putNumber("I Gain", rotationKI);
-    SmartDashboard.putNumber("D Gain", rotationKD);
-    SmartDashboard.putNumber("I Zone", rotationKIz);
-    SmartDashboard.putNumber("Feed Forward", rotationKFF);
-    SmartDashboard.putNumber("G Gain", rotationExtendedKG);
+    SmartDashboard.putNumber("P Gain", extensionKP);
+    SmartDashboard.putNumber("I Gain", extensionKI);
+    SmartDashboard.putNumber("D Gain", extensionKD);
+    SmartDashboard.putNumber("I Zone", extensionKIz);
+    SmartDashboard.putNumber("Feed Forward", extensionKFF);
+    //SmartDashboard.putNumber("G Gain", rotationExtendedKG);
     // SmartDashboard.putNumber("Max Output", kMaxOutput);
     // SmartDashboard.putNumber("Min Output", kMinOutput);
 
@@ -260,9 +258,9 @@ public class Robot extends TimedRobot {
     // SmartDashboard.putNumber("Set Velocity", 0);
     SmartDashboard.putNumber("Set Position", 0);
 
-    // SmartDashboard.putNumber("Velocity", m_rotationEncoder.getVelocity());
-    // SmartDashboard.putNumber("Current rotations", m_rotationEncoder.getPosition());
-    // SmartDashboard.putNumber("Output", m_rotationMotor.getAppliedOutput());
+    SmartDashboard.putNumber("Velocity", m_extensionEncoder.getVelocity());
+    SmartDashboard.putNumber("Current rotations", m_extensionEncoder.getPosition());
+    SmartDashboard.putNumber("Output", m_extensionMotor.getAppliedOutput());
     // m_extensionTab.addDouble("P Gain", () -> {return extensionKP;});
     // m_extensionTab.addDouble("I Gain", () -> {return extensionKI;});
     // m_extensionTab.addDouble("D Gain", () -> {return extensionKD;});
@@ -332,21 +330,30 @@ public class Robot extends TimedRobot {
 
     double extensionSetPoint, rotationSetPoint, rotationDefaultFeedForward, rotationExtendedFeedForward;
     // extensionSetPoint = m_extensionTable.getEntry("Set Position").getDouble(0);
-    rotationSetPoint = SmartDashboard.getNumber("Set Position", 0);
+    //rotationSetPoint = SmartDashboard.getNumber("Set Position", 0);
 
-    double ffDefaultCalc = (rotationSetPoint - m_horizontalRotations) / m_rotationsPerRadian;
-    rotationDefaultFeedForward = m_rotationDefaultFeedforward.calculate(0, 0);
+    //double ffDefaultCalc = (rotationSetPoint - m_horizontalRotations) / m_rotationsPerRadian;
+    //rotationDefaultFeedForward = m_rotationDefaultFeedforward.calculate(0, 0);
 
     // double ffExtendedCalc = (extensionSetPoint);
 
     // m_rotationPidController.setReference(0, CANSparkMax.ControlType.kSmartMotion, 0, rotationDefaultKG + rotationExtendedKG, ArbFFUnits.kVoltage);
-    m_rotationMotor.setVoltage(rotationDefaultKG);
-    System.out.println(m_rotationMotor.get());
-    System.out.println(rotationDefaultKG + rotationExtendedKG);
+    //System.out.println(m_rotationMotor.get());
+    //System.out.println(rotationDefaultKG + rotationExtendedKG);
     // System.out.println(m_rotationMotor.get);
 
-    SmartDashboard.putNumber("Current rotations", m_extensionEncoder.getPosition());
+    extensionSetPoint = SmartDashboard.getNumber("Set Position", 0);
+    
+    m_extensionPidController.setReference(extensionSetPoint, CANSparkMax.ControlType.kSmartMotion, 0);
 
+    m_rotationPidController.setReference(0, CANSparkMax.ControlType.kSmartMotion, 0, rotationDefaultKG, ArbFFUnits.kVoltage);
+
+    System.out.println("Vel: " + m_extensionEncoder.getVelocity());
+
+    SmartDashboard.putNumber("Velocity", m_extensionEncoder.getVelocity());
+    SmartDashboard.putNumber("Current rotations", m_extensionEncoder.getPosition());
+    SmartDashboard.putNumber("Output", m_extensionMotor.getAppliedOutput());
+  
   }
 
   @Override
