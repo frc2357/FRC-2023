@@ -615,7 +615,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 			return;
 		}
 
-		System.out.println(isTracking());
+		// System.out.println(isTracking());
 
 		if (!limelightManager.validTargetExistsOnPrimary() && !m_isSeeking) { // If the primary limelight has no target,
 																				// and has not been set to seek
@@ -624,9 +624,14 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 			stopSeeking();
 		}
 
+		double speed = calculateXMetersPerSecond();
+		System.out.println("speed: " + speed);
+		System.out.println("ty: " + DualLimelightManagerSubsystem.getInstance().getTY());
+		System.out.println("error: " + (DualLimelightManagerSubsystem.getInstance().getTY() - m_translateXController.getSetpoint()));
+		System.out.println("Limelight: " + DualLimelightManagerSubsystem.getInstance().getPrimaryLimelight());
 		// drive(new ChassisSpeeds(0, calculateYMetersPerSecond(), 0));
-		// drive(new ChassisSpeeds(calculateX(), 0, 0));
-		drive(new ChassisSpeeds(calculateXMetersPerSecond(), calculateYMetersPerSecond(), 0));
+		drive(new ChassisSpeeds(speed, 0, 0));
+		// drive(new ChassisSpeeds(calculateXMetersPerSecond(), calculateYMetersPerSecond(), 0));
 	}
 
 	public void stopTracking() {

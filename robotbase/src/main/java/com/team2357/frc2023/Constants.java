@@ -162,7 +162,7 @@ public final class Constants {
         public static final double SYNC_ENCODER_LIMIT_MS = 10000;
 
 
-        public static final double DEFAULT_Y_ANGLE_SETPOINT = 0;
+        public static final double DEFAULT_Y_ANGLE_SETPOINT = 1.8;
         public static final double DEFAULT_X_ANGLE_SETPOINT = -9;
 
         public static final double LEFT_COL_X_ANGLE_SETPOINT = -10;
@@ -408,8 +408,8 @@ public final class Constants {
     }
 
     public static final class LIMELIGHT {
-        public static final String LEFT_LIMELIGHT_NAME = "leftLimelight";
-        public static final String RIGHT_LIMELIGHT_NAME = "rightLimelight";
+        public static final String LEFT_LIMELIGHT_NAME = "limelight-left";
+        public static final String RIGHT_LIMELIGHT_NAME = "limelight-right";
         
         public static final double LEFT_LIMELIGHT_TX_SETPOINT = Double.NaN;
         public static final double RIGHT_LIMELIGHT_TX_SETPOINT = Double.NaN;

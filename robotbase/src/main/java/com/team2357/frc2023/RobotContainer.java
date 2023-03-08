@@ -8,6 +8,7 @@ import com.team2357.frc2023.commands.drive.DefaultDriveCommand;
 import com.team2357.frc2023.controls.GunnerControls;
 import com.team2357.frc2023.controls.SwerveDriveControls;
 import com.team2357.frc2023.shuffleboard.AutoCommandChooser;
+import com.team2357.frc2023.subsystems.DualLimelightManagerSubsystem;
 import com.team2357.frc2023.subsystems.SubsystemFactory;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.frc2023.trajectoryutil.AvailableTeleopTrajectories;
@@ -72,6 +73,8 @@ public class RobotContainer {
     AvailableTrajectories.generateTrajectories();
     AvailableTrajectoryCommands.generateTrajectories();
     AvailableTeleopTrajectories.generateTrajectories();
+
+    DualLimelightManagerSubsystem.getInstance().setAprilTagPipelineActive();
 
     // Configure Shuffleboard
     configureShuffleboard();
