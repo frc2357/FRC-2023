@@ -1,37 +1,55 @@
 package com.team2357.frc2023.commands.scoring.cone;
 
 import com.team2357.frc2023.Constants;
-import com.team2357.frc2023.commands.armextension.ArmExtendToPositionCommand;
 import com.team2357.frc2023.commands.armrotation.ArmRotateToPositionCommand;
-import com.team2357.frc2023.commands.claw.ClawOpenCommand;
+import com.team2357.frc2023.commands.claw.ClawInstantCloseCommand;
+import com.team2357.frc2023.commands.claw.ClawInstantOpenCommand;
+import com.team2357.frc2023.commands.intake.IntakeArmStowCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerReverseCommand;
-import com.team2357.frc2023.commands.scoring.ArmReturnToStartCommandGroup;
-import com.team2357.frc2023.commands.scoring.IntakeHandoffCommandGroup;
-import com.team2357.frc2023.commands.wrist.WristExtendCommand;
+import com.team2357.frc2023.commands.intake.IntakeRollerStopCommand;
+import com.team2357.frc2023.commands.intake.WinchRotateToPositionCommand;
+import com.team2357.frc2023.commands.wrist.WristInstantExtendCommand;
+import com.team2357.frc2023.commands.wrist.WristInstantRetractCommand;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 public class ConeAutoScoreHighCommandGroup extends ParallelCommandGroup {
     public ConeAutoScoreHighCommandGroup() {
-        // Pull game piece away from intake
-        addCommands(new IntakeHandoffCommandGroup());
         
-        System.out.println("AutoScoreHighCommandGroup");
-        addCommands(new SequentialCommandGroup(
-            // Extend to node 
-            //new ArmRotateToPositionCommand(Constants.ARM_ROTATION.AUTO_SCORE_HIGH_ROTATIONS)
-            // new ArmExtendToPositionCommand(Constants.ARM_EXTENSION.AUTO_SCORE_HIGH_ROTATIONS),
+        addCommands(
+                // Move mechanisms to score
+                new WaitCommand(0.25)
+                        .andThen(new ArmRotateToPositionCommand(Constants.ARM_ROTATION.AUTO_SCORE_MID_ROTATIONS))
+                        .andThen(new WaitCommand(3))
+                        .andThen(new ArmRotateToPositionCommand(Constants.ARM_ROTATION.RETRACTED_ROTATIONS)),
 
-            // // Release the game piece
-            // new WristExtendCommand(),
-            // new ClawOpenCommand(),
+                new WaitCommand(2)
+                        .andThen(new WristInstantExtendCommand())
+                        .andThen(new WaitCommand(1))
+                        .andThen(new WristInstantRetractCommand()),
 
-            // // Return to starting position
-            // new WaitCommand(Constants.AUTO_SCORE_TIMINGS.SECONDS_BEFORE_RETURNING_TO_STARTING_POSITION),
-            // new ArmReturnToStartCommandGroup()
-        ));
+                // new WaitCommand(5)
+                // .andThen(new
+                // ArmExtendToPositionCommand(Constants.ARM_EXTENSION.AUTO_SCORE_MID_ROTATIONS))
+
+                new WaitCommand(2.5)
+                        .andThen(new ClawInstantOpenCommand())
+                        .andThen(new WaitCommand(1))
+                        .andThen(new ClawInstantCloseCommand()));
+
+                
+        // Intake movement
+        addCommands(
+                new WaitCommand(0)
+                        .andThen(new WinchRotateToPositionCommand(Constants.INTAKE_ARM.INTAKE_HANDOFF_WINCH_ROTATIONS))
+                        .andThen(new WaitCommand(0.75))
+                        .andThen(new IntakeArmStowCommand()),
+
+                new WaitCommand(0)
+                        .andThen(new IntakeRollerReverseCommand()
+                                .withTimeout(1))
+                        .andThen(new IntakeRollerStopCommand()));
+
     }
 }

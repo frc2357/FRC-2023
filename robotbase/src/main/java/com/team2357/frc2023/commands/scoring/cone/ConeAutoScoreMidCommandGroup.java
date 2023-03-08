@@ -38,7 +38,6 @@ public class ConeAutoScoreMidCommandGroup extends ParallelCommandGroup {
                         .andThen(new WaitCommand(0.5))
                         .andThen(new ClawInstantCloseCommand()));
 
-                
         // Intake movement
         addCommands(
                 new WaitCommand(0)
