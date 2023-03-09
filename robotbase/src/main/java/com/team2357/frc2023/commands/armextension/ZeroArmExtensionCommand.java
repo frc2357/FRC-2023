@@ -19,4 +19,10 @@ public class ZeroArmExtensionCommand extends CommandBase {
     public boolean isFinished() {
         return ArmExtensionSubsystem.getInstance().getAmps() >= Constants.ARM_EXTENSION.AMPERAGE_ZERO_MAX_AMPS;
     }
+
+    @Override
+    public void end(boolean interrupted) {
+        ArmExtensionSubsystem.getInstance().stopMotor();
+        ArmExtensionSubsystem.getInstance().resetEncoder();
+    }
 }
