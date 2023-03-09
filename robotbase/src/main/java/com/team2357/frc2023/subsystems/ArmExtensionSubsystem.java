@@ -159,7 +159,7 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
     }
 
     public double getAmps() {
-        // return m_extendMotor.
+        return m_extendMotor.getOutputCurrent();
     }
 
     public void updatePID() {
