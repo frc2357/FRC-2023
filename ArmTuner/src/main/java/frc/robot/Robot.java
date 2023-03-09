@@ -78,7 +78,7 @@ public class Robot extends TimedRobot {
   private ArmFeedforward m_extensionFeedforward;
   private RelativeEncoder m_extensionEncoder;
   public double extensionKP, extensionKI, extensionKD, extensionKIz, extensionKFF, extensionKMaxOutput, extensionKMinOutput, extensionMaxRPM, extensionMaxVel, extensionMinVel, extensionMaxAcc, extensionAllowedErr, extensionKG, extensionSetPoint;
-  public double m_fullExtensionRotations = 271.65;
+  public double m_fullExtensionRotations = 263;
 
   public double m_rotationsPerRadian = 190.91 / (2 * Math.PI);
   public double m_horizontalRotations = 47.7275; // Position when arm is parallel with floor
@@ -157,7 +157,7 @@ public class Robot extends TimedRobot {
     rotationKI = 0;
     rotationKD = 0;
     rotationKIz = 0;
-    rotationKFF = 0.001; // 0.00007
+    rotationKFF = 0.0001; // 0.00007
     rotationKMaxOutput = 1;
     rotationKMinOutput = -1;
     rotationMaxRPM = 5676; // 5676 for ne0, 11000 for neo 550
@@ -166,14 +166,14 @@ public class Robot extends TimedRobot {
 
 
     // arm extension
-    extensionKP = 0.0000;
+    extensionKP = 0.00001;
     extensionKI = 0;
     extensionKD = 0;
     extensionKIz = 0;
-    extensionKFF = 0.000001; // 0.00007
+    extensionKFF = 0.00011; // 0.00007
     extensionKMaxOutput = 1;
     extensionKMinOutput = -1;
-    extensionMaxRPM = 5676; // 5676 for ne0, 11000 for neo 550
+    extensionMaxRPM = 11000; // 5676 for ne0, 11000 for neo 550
 
     // Smart Motion Coefficients
 
@@ -182,8 +182,8 @@ public class Robot extends TimedRobot {
     rotationMaxAcc = 4600;
 
     // arm extension
-    extensionMaxVel = 4600; // rpm
-    extensionMaxAcc = 4600;
+    extensionMaxVel = 8700; // rpm
+    extensionMaxAcc = 8700*2;
 
     // set PID coefficients
 
@@ -234,7 +234,7 @@ public class Robot extends TimedRobot {
     m_extensionPidController.setSmartMotionMaxVelocity(extensionMaxVel, smartMotionSlot);
     m_extensionPidController.setSmartMotionMinOutputVelocity(extensionMinVel, smartMotionSlot);
     m_extensionPidController.setSmartMotionMaxAccel(extensionMaxAcc, smartMotionSlot);
-    extensionAllowedErr = 1;
+    extensionAllowedErr = 0.5;
     m_extensionPidController.setSmartMotionAllowedClosedLoopError(extensionAllowedErr, smartMotionSlot);
 
 
@@ -347,12 +347,11 @@ public class Robot extends TimedRobot {
 
     m_rotationPidController.setReference(0, CANSparkMax.ControlType.kSmartMotion, 0, rotationDefaultKG, ArbFFUnits.kVoltage);
 
-    System.out.println("Vel: " + m_extensionEncoder.getVelocity());
+    System.out.println("Vel: " + m_extensionEncoder.getVelocity() + " curr: " + m_extensionMotor.getOutputCurrent());
 
     SmartDashboard.putNumber("Velocity", m_extensionEncoder.getVelocity());
     SmartDashboard.putNumber("Current rotations", m_extensionEncoder.getPosition());
     SmartDashboard.putNumber("Output", m_extensionMotor.getAppliedOutput());
-  
   }
 
   @Override

@@ -35,8 +35,8 @@ public class SwerveDriveControls {
         m_rightBumper = new JoystickButton(m_controller, XboxRaw.BumperRight.value);
         m_leftBumper = new JoystickButton(m_controller, XboxRaw.BumperLeft.value);
 
-        m_rightTrigger = new AxisThresholdTrigger(m_controller, Axis.kRightTrigger, 0.1);
-        m_leftTrigger = new AxisThresholdTrigger(m_controller, Axis.kLeftTrigger, 0.1);
+        m_rightTrigger = new AxisThresholdTrigger(m_controller, Axis.kRightTrigger, 0.05);
+        m_leftTrigger = new AxisThresholdTrigger(m_controller, Axis.kLeftTrigger, 0.05);
 
         mapControls();
     }

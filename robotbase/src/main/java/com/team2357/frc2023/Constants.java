@@ -302,9 +302,7 @@ public final class Constants {
         public static final double INTAKE_HANDOFF_ROTATIONS = 0;
 
         public static final double AUTO_SCORE_MID_ROTATIONS = 0;
-        public static final double AUTO_SCORE_HIGH_ROTATIONS = 271;
-
-        public static final double AUTO_SCORE_LOW_RETRACT_WAIT_TIME = 1;
+        public static final double AUTO_SCORE_HIGH_ROTATIONS = 263;
 
         public static ArmExtensionSubsystem.Configuration GET_EXTENSION_CONFIG() {
             ArmExtensionSubsystem.Configuration config = new ArmExtensionSubsystem.Configuration();
@@ -312,12 +310,10 @@ public final class Constants {
 
             config.m_extendMotorIdleMode = IdleMode.kBrake;
 
-            config.m_extendMotorStallLimitAmps = 0;
-            config.m_extendMotorFreeLimitAmps = 0;
+            config.m_extendMotorStallLimitAmps = 30;
+            config.m_extendMotorFreeLimitAmps = 30;
 
-            config.m_isInverted = false;
-
-            config.m_extendGrippedAmps = 0;
+            config.m_isInverted = true;
 
             config.m_extendMotorRampRate = 0;
 
@@ -328,29 +324,21 @@ public final class Constants {
             // smart motion config
 
             // extend PID
-            config.m_extendP = 0.00025;
+            config.m_extendP = 0.00001;
             config.m_extendI = 0;
             config.m_extendD = 0;
             config.m_extendIZone = 0;
-            config.m_extendFF = 0.00001;
+            config.m_extendFF = 0.00011;
             config.m_extendPidSlot = 0;
-
-            // retract PID
-            config.m_retractP = 0;
-            config.m_retractI = 0;
-            config.m_retractD = 0;
-            config.m_retractIZone = 0;
-            config.m_retractFF = 0;
-            config.m_retractPidSlot = 1;
 
             // Smart motion
             config.m_pidMaxOutput = 1;
             config.m_pidMinOutput = -1;
-            config.m_smartMotionMaxVelRPM = 8000;
+            config.m_smartMotionMaxVelRPM = 8700;
             config.m_smartMotionMinVelRPM = 0;
-            config.m_smartMotionMaxAccRPM = 8000;
+            config.m_smartMotionMaxAccRPM = 8700*2;
             config.m_smartMotionRotationAllowedError = 0.5;
-            config.m_rotationAllowedError = 0;
+            config.m_rotationAllowedError = 2;
 
             config.m_maxSpeedPercent = 0.7;
             return config;
