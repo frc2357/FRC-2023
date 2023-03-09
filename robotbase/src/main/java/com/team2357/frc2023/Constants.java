@@ -427,6 +427,7 @@ public final class Constants {
         public static final String BUTTONBOARD_TABLE_NAME = "buttonboard";
         public static final String ROW_TOPIC_NAME = "row";
         public static final String COLUMN_TOPIC_NAME = "col";
+        public static final String ALLIANCE_TOPIC_NAME = "alliance";
     
     }
 
