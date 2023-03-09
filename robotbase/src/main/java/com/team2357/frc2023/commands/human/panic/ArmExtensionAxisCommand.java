@@ -4,10 +4,10 @@ import com.team2357.frc2023.controls.AxisInterface;
 import com.team2357.frc2023.subsystems.ArmExtensionSubsystem;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class ArmExtenderCommand extends CommandBase {
+public class ArmExtensionAxisCommand extends CommandBase {
     AxisInterface m_axis;
 
-    public ArmExtenderCommand(AxisInterface axis) {
+    public ArmExtensionAxisCommand(AxisInterface axis) {
         addRequirements(ArmExtensionSubsystem.getInstance());
         m_axis = axis;
     }

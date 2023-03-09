@@ -5,10 +5,10 @@ import com.team2357.frc2023.subsystems.ArmRotationSubsystem;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class ArmRotationCommand extends CommandBase {
+public class ArmRotationAxisCommand extends CommandBase {
     AxisInterface m_axis;
 
-    public ArmRotationCommand(AxisInterface axis) {
+    public ArmRotationAxisCommand(AxisInterface axis) {
         addRequirements(ArmRotationSubsystem.getInstance());
         m_axis = axis;
     }

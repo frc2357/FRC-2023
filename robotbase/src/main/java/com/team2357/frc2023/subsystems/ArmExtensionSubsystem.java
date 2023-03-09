@@ -127,7 +127,7 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
         m_extendMotor.set(0);
     }
 
-    public void resetEncoder() {
+    public void resetEncoders() {
         m_extendMotor.getEncoder().setPosition(0);
     }
 
