@@ -10,6 +10,7 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import com.team2357.frc2023.commands.armextension.ZeroArmExtensionCommand;
 import com.team2357.frc2023.commands.drive.SyncDriveEncodersCommand;
 import com.team2357.frc2023.commands.drive.ZeroDriveCommand;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
@@ -84,6 +85,8 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    new ZeroArmExtensionCommand().schedule();
+
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -98,6 +101,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopInit() {
+    new ZeroArmExtensionCommand().schedule();
 
     // CommandScheduler.getInstance().schedule(new ZeroDriveCommand());
     // This makes sure that the autonomous stops running when
