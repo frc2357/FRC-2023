@@ -293,6 +293,9 @@ public final class Constants {
     }
 
     public static final class ARM_EXTENSION {
+        public static final double AMPERAGE_ZERO_PERCENT_OUTPUT = 0;
+        public static final double AMPERAGE_ZERO_MAX_AMPS = 0;
+
         public static ArmExtensionSubsystem.Configuration GET_EXTENSION_CONFIG() {
             ArmExtensionSubsystem.Configuration config = new ArmExtensionSubsystem.Configuration();
             config.m_extendAxisMaxSpeed = 0;

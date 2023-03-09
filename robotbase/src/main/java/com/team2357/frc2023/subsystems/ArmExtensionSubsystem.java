@@ -158,6 +158,10 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
         return m_extendMotor.getEncoder().getPosition();
     }
 
+    public double getAmps() {
+        // return m_extendMotor.
+    }
+
     public void updatePID() {
         m_pidcontroller.setP(m_shuffleboardPIDTuner.getPValue());
         m_pidcontroller.setI(m_shuffleboardPIDTuner.getIValue());
