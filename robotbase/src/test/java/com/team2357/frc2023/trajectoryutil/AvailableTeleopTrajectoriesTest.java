@@ -5,12 +5,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 
 import com.team2357.frc2023.networktables.Buttonboard;
 import com.team2357.frc2023.subsystems.SubsystemFactory;
@@ -18,7 +15,6 @@ import com.team2357.frc2023.subsystems.SubsystemFactory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 @TestInstance(Lifecycle.PER_CLASS)
 public class AvailableTeleopTrajectoriesTest {
@@ -29,12 +25,12 @@ public class AvailableTeleopTrajectoriesTest {
         SubsystemFactory factory = new SubsystemFactory();
         factory.CreateSwerveDriveSubsystem();
         buttonboard = mock(Buttonboard.class);
-        when(buttonboard.getAlliance()).thenReturn(DriverStation.Alliance.Blue);
+        AvailableTeleopTrajectories.generateTrajectories();
     }
 
     @Test
     public void testAutoMapping() {
-
+        when(buttonboard.getAlliance()).thenReturn(DriverStation.Alliance.Blue);
 
         // exact values
         Pose2d testPose = new Pose2d(3.5, 4.5, Rotation2d.fromDegrees(0));
