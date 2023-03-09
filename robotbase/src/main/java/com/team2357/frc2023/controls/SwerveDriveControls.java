@@ -1,6 +1,8 @@
 package com.team2357.frc2023.controls;
 
+import com.team2357.frc2023.commands.drive.AutoBalanceCommand;
 import com.team2357.frc2023.commands.intake.IntakeDeployCommandGroup;
+import com.team2357.frc2023.commands.intake.IntakeDumpCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakeRollerReverseCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
 import com.team2357.frc2023.commands.intake.IntakeStowCommandGroup;
@@ -13,13 +15,17 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class SwerveDriveControls {
     private XboxController m_controller;
     private double m_deadband;
+
     private JoystickButton m_backButton;
     private JoystickButton m_rightBumper;
     private JoystickButton m_leftBumper;
+    private JoystickButton m_aButton;
+    private JoystickButton m_xButton;
 
     private AxisThresholdTrigger m_leftTrigger;
     private AxisThresholdTrigger m_rightTrigger;
@@ -30,6 +36,9 @@ public class SwerveDriveControls {
         m_controller = controller;
         m_deadband = deadband;
 
+        m_aButton = new JoystickButton(m_controller, XboxRaw.A.value);
+        m_xButton = new JoystickButton(m_controller, XboxRaw.X.value);
+        
         m_backButton = new JoystickButton(m_controller, XboxRaw.Back.value);
         
         m_rightBumper = new JoystickButton(m_controller, XboxRaw.BumperRight.value);
@@ -42,6 +51,8 @@ public class SwerveDriveControls {
     }
 
     public void mapControls() {
+        Trigger leftTriggerAndRightTrigger = m_leftTrigger.and(m_rightTrigger);
+
         // Zero swerve drive
         m_backButton.whileTrue(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().zeroGyroscope()));
         
@@ -51,11 +62,23 @@ public class SwerveDriveControls {
         m_leftBumper.whileTrue(new IntakeRollerReverseCommand());
 
         // Intake deploy/stow
+        // TODO: Create command for intaking cube
         m_leftTrigger.whileTrue(new IntakeDeployCommandGroup());
         m_leftTrigger.onFalse(new IntakeStowCommandGroup());
 
+        // TODO: Create command for intaking cone
+        m_rightTrigger.whileTrue(new IntakeDeployCommandGroup());
+        m_rightTrigger.onFalse(new IntakeStowCommandGroup());
+
+        leftTriggerAndRightTrigger.whileTrue(new IntakeDumpCommandGroup());
+        leftTriggerAndRightTrigger.onFalse(new IntakeStowCommandGroup());
+
         // Teleop auto
-        m_rightTrigger.whileTrue(new TeleopAutoScoreCommandGroup(m_controller));
+        // m_rightTrigger.whileTrue(new TeleopAutoScoreCommandGroup(m_controller));
+        m_xButton.whileTrue(new TeleopAutoScoreCommandGroup(m_controller));
+
+        // Auto balance
+        m_aButton.whileTrue(new AutoBalanceCommand());
     }
 
     public double getX() {
