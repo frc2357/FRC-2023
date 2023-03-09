@@ -1,6 +1,7 @@
 package com.team2357.frc2023.commands.scoring.cone;
 
 import com.team2357.frc2023.Constants;
+import com.team2357.frc2023.commands.armextension.ArmExtendToPositionCommand;
 import com.team2357.frc2023.commands.armrotation.ArmRotateToPositionCommand;
 import com.team2357.frc2023.commands.claw.ClawInstantCloseCommand;
 import com.team2357.frc2023.commands.claw.ClawInstantOpenCommand;
@@ -20,22 +21,23 @@ public class ConeAutoScoreHighCommandGroup extends ParallelCommandGroup {
         addCommands(
                 // Move mechanisms to score
                 new WaitCommand(0.25)
-                        .andThen(new ArmRotateToPositionCommand(Constants.ARM_ROTATION.AUTO_SCORE_MID_ROTATIONS))
-                        .andThen(new WaitCommand(3))
+                        .andThen(new ArmRotateToPositionCommand(Constants.ARM_ROTATION.AUTO_SCORE_HIGH_ROTATIONS))
+                        .andThen(new WaitCommand(4.5))
                         .andThen(new ArmRotateToPositionCommand(Constants.ARM_ROTATION.RETRACTED_ROTATIONS)),
 
-                new WaitCommand(2)
+                new WaitCommand(1)
                         .andThen(new WristInstantExtendCommand())
-                        .andThen(new WaitCommand(1))
+                        .andThen(new WaitCommand(2.5))
                         .andThen(new WristInstantRetractCommand()),
 
-                // new WaitCommand(5)
-                // .andThen(new
-                // ArmExtendToPositionCommand(Constants.ARM_EXTENSION.AUTO_SCORE_MID_ROTATIONS))
+                 new WaitCommand(1)
+                 .andThen(new ArmExtendToPositionCommand(Constants.ARM_EXTENSION.AUTO_SCORE_HIGH_ROTATIONS).withTimeout(2))
+                 .andThen(new WaitCommand(1.5))
+                 .andThen(new ArmExtendToPositionCommand(Constants.ARM_EXTENSION.RETRACTED_ROTATIONS)),
 
-                new WaitCommand(2.5)
+                new WaitCommand(3)
                         .andThen(new ClawInstantOpenCommand())
-                        .andThen(new WaitCommand(1))
+                        .andThen(new WaitCommand(0.5))
                         .andThen(new ClawInstantCloseCommand()));
 
                 

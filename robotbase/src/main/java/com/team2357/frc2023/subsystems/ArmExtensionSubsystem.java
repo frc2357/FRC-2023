@@ -8,6 +8,8 @@ import com.team2357.frc2023.shuffleboard.ShuffleboardPIDTuner;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 import com.team2357.lib.util.Utility;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
     private static ArmExtensionSubsystem instance = null;
 
@@ -77,6 +79,7 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
 
         m_extendMotor.setInverted(m_config.m_isInverted);
         m_extendMotor.setOpenLoopRampRate(m_config.m_extendMotorRampRate);
+        m_extendMotor.enableVoltageCompensation(12);
 
     }
 
@@ -150,5 +153,7 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
         if (isClosedLoopEnabled() && isMotorAtRotations()) {
             setClosedLoopEnabled(false);
         }
+
+        SmartDashboard.putNumber("arm extension rot", getMotorRotations());
     }
 }

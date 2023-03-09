@@ -2,6 +2,7 @@ package com.team2357.frc2023.controls;
 
 import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.Constants.CONTROLLER;
+import com.team2357.frc2023.commands.armextension.ArmExtendToPositionCommand;
 import com.team2357.frc2023.commands.armrotation.ArmRotateToPositionCommand;
 import com.team2357.frc2023.commands.auto.TranslateToTargetCommandGroup;
 import com.team2357.frc2023.commands.human.panic.ArmExtensionAxisCommand;
@@ -16,6 +17,7 @@ import com.team2357.frc2023.commands.scoring.AutoScoreLowCommandGroup;
 import com.team2357.frc2023.commands.scoring.IntakeHandoffCommandGroup;
 import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
 import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreMidCommandGroup;
+import com.team2357.frc2023.subsystems.ArmExtensionSubsystem;
 import com.team2357.frc2023.subsystems.ArmRotationSubsystem;
 import com.team2357.frc2023.subsystems.IntakeArmSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
@@ -182,6 +184,7 @@ public class GunnerControls {
         rightDPadAndY.onTrue(new InstantCommand(() -> {
             IntakeArmSubsystem.getInstance().resetEncoders();
             ArmRotationSubsystem.getInstance().resetEncoders();
+            ArmExtensionSubsystem.getInstance().resetEncoder();
         }));
 
         rightDPadAndB.whileTrue(new IntakeRollerReverseCommand());

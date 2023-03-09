@@ -20,7 +20,6 @@ public class ArmRotateToPositionCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        ArmRotationSubsystem.getInstance().stopRotationMotors();
         System.out.println("end");
     }
 
