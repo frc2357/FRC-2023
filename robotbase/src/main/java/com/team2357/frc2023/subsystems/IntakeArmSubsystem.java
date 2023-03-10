@@ -113,6 +113,7 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
     private void configureWinchMotor(CANSparkMax motor) {
         motor.setIdleMode(m_config.m_winchMotorIdleMode);
         motor.setSmartCurrentLimit(m_config.m_winchMotorStallLimitAmps, m_config.m_winchMotorFreeLimitAmps);
+        motor.enableVoltageCompensation(12);
     }
 
     private void configureWinchPID(SparkMaxPIDController pidController) {
@@ -168,6 +169,7 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
 
     public void resetEncoders() {
         m_winchMotor.getEncoder().setPosition(0);
+        m_targetRotations = 0;
     }
 
     public double getWinchRotations() {
@@ -238,7 +240,7 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
             updatePID();
         }
 
-        SmartDashboard.putNumber("Arm rotations", m_winchMotor.getEncoder().getPosition());
+       // SmartDashboard.putNumber("Winch rotations", m_winchMotor.getEncoder().getPosition());
     }
 
     private void deployPeriodic() {

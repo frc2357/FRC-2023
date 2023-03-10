@@ -5,6 +5,7 @@ import com.team2357.frc2023.commands.claw.ClawOpenCommand;
 import com.team2357.frc2023.commands.claw.CloseClawCommand;
 import com.team2357.frc2023.commands.intake.IntakeArmDeployCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerReverseCommand;
+import com.team2357.frc2023.commands.intake.IntakeStowCommandGroup;
 
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -21,6 +22,6 @@ public class AutoScoreLowCommandGroup extends SequentialCommandGroup {
             new WaitCommand(Constants.INTAKE_ROLLER.AUTO_SCORE_LOW_REVERSE_TIME)
         ));
 
-        addCommands(new CloseClawCommand());
+        addCommands(new IntakeStowCommandGroup());
     }
 }
