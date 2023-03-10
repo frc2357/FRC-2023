@@ -97,6 +97,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
+    CTREConfigs.createConfigs();
+
     // initialize motor
     m_rotationMotor = new CANSparkMax(armRotationID, MotorType.kBrushless);
     m_extensionMotor = new CANSparkMax(extensionID, MotorType.kBrushless);

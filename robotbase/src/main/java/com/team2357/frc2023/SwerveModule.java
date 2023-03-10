@@ -31,19 +31,20 @@ public class SwerveModule {
         m_angleOffset = moduleConstants.angleOffset;
 
         m_canCoder = new CANCoder(moduleConstants.cancoderID);
-        configCANCoder();
 
         m_steerMotor = new TalonFX(moduleConstants.steerMotorID);
-        configSteerMotor();
 
         m_driveMotor = new TalonFX(moduleConstants.driveMotorID);
-        configDriveMotor();
 
         m_lastAngle = getState().angle;
     }
 
     public void configure(Team364SwerveDriveSubsystem.Configuration config) {
         m_config = config;
+        
+        configCANCoder();
+        configSteerMotor();
+        configDriveMotor();
     }
 
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
@@ -79,14 +80,23 @@ public class SwerveModule {
 
     private void configCANCoder() {
         m_canCoder.configFactoryDefault();
+        m_canCoder.configAllSettings(CTREConfigs.swerveCANCoderConfig);
     }
 
     private void configSteerMotor() {
         m_steerMotor.configFactoryDefault();
+        m_steerMotor.configAllSettings(CTREConfigs.swerveSteerFXConfig);
+        m_steerMotor.setInverted(m_config.m_steerMotorInverted);
+        m_steerMotor.setNeutralMode(m_config.m_steerMotorNeutralMode);
+        resetToAbsolute();
     }
 
     private void configDriveMotor() {
         m_driveMotor.configFactoryDefault();
+        m_driveMotor.configAllSettings(CTREConfigs.swerveDriveFXConfig);
+        m_driveMotor.setInverted(m_config.m_driveMotorInverted);
+        m_driveMotor.setNeutralMode(m_config.m_driveMotorNeutralMode);
+        m_driveMotor.setSelectedSensorPosition(0);
     }
 
     public SwerveModuleState getState() {

@@ -3,7 +3,7 @@ package com.team2357.frc2023.subsystems;
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.SwerveModule;
-
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -32,6 +32,12 @@ public class Team364SwerveDriveSubsystem extends SubsystemBase {
         public double m_angleGearRatio;
         public double m_driveGearRatio;
         public double m_wheelCircumference;
+
+        public boolean m_steerMotorInverted;
+        public boolean m_driveMotorInverted;
+
+        public NeutralMode m_driveMotorNeutralMode;
+        public NeutralMode m_steerMotorNeutralMode;
     }
 
     private Configuration m_config;
@@ -44,11 +50,11 @@ public class Team364SwerveDriveSubsystem extends SubsystemBase {
     private SwerveModule m_backRightModule;
     private SwerveModule[] m_swerveModules;
 
-    private Pigeon2 m_gyro;
+    private Pigeon2 m_pigeon;
 
     public Team364SwerveDriveSubsystem(int pigeonId, SwerveModuleConstants frontLeftConstants, SwerveModuleConstants frontRightConstants, SwerveModuleConstants backLeftConstants, SwerveModuleConstants backRightConstants) {
-        m_gyro = new Pigeon2(pigeonId);
-        m_gyro.configFactoryDefault();
+        m_pigeon = new Pigeon2(pigeonId);
+        m_pigeon.configFactoryDefault();
         zeroGyro();
 
         m_frontLeftModule = new SwerveModule(frontLeftConstants);
@@ -130,11 +136,11 @@ public class Team364SwerveDriveSubsystem extends SubsystemBase {
     }
 
     public void zeroGyro() {
-        m_gyro.setYaw(0);
+        m_pigeon.setYaw(0);
     }
 
     public Rotation2d getYaw() {
-        return Rotation2d.fromDegrees(m_gyro.getYaw());
+        return Rotation2d.fromDegrees(m_pigeon.getYaw());
     }
 
     public void resetModulesToAbsolute() {
