@@ -437,7 +437,14 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 				states[3].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
 				states[3].angle.getRadians());
 
-		Logger.getInstance().recordOutput("Swerve States", states);
+		Logger.getInstance().recordOutput("Swerve Setpoints", states);
+		// this is only so it doesnt complain about it not being initialized
+		SwerveModuleState[] loggingSwerveStates = states;
+		loggingSwerveStates[0] = m_frontLeftModule.getState();
+		loggingSwerveStates[1] = m_frontRightModule.getState();
+		loggingSwerveStates[2] = m_backLeftModule.getState();
+		loggingSwerveStates[3] = m_backRightModule.getState();
+		Logger.getInstance().recordOutput("Swerve Speeds", loggingSwerveStates);
 	}
 
 	public void setOdemetryFromApriltag() {
