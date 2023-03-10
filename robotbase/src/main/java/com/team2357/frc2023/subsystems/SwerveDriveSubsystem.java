@@ -47,7 +47,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	public static enum COLUMN_TARGET {
 		LEFT(Constants.DRIVE.LEFT_COL_X_ANGLE_SETPOINT, DualLimelightManagerSubsystem.LIMELIGHT.RIGHT, 0),
-		MIDDLE(Constants.DRIVE.MID_COL_X_ANGLE_SETPOINT,  DualLimelightManagerSubsystem.LIMELIGHT.LEFT, 1),
+		MIDDLE(Constants.DRIVE.MID_COL_X_ANGLE_SETPOINT, DualLimelightManagerSubsystem.LIMELIGHT.LEFT, 1),
 		RIGHT(Constants.DRIVE.RIGHT_COL_X_ANGLE_SETPOINT, DualLimelightManagerSubsystem.LIMELIGHT.LEFT, 2),
 		NONE(Double.NaN, DualLimelightManagerSubsystem.LIMELIGHT.LEFT, -1);
 
@@ -112,7 +112,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	private PIDController m_translateYController;
 
 	private COLUMN_TARGET m_targetColumn;
-	// Whether or not the robot is seeking to get the primary limelight camera in view
+	// Whether or not the robot is seeking to get the primary limelight camera in
+	// view
 	private boolean m_isSeeking;
 
 	public static class Configuration {
@@ -213,51 +214,51 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		m_pigeon = new WPI_Pigeon2(pigeonId, canbus);
 
 		m_frontLeftModule = Mk4iSwerveModuleHelper.createFalcon500(
-			tab.getLayout("Front Left Module", BuiltInLayouts.kList)
-							.withSize(2, 4)
-							.withPosition(0, 0),
-			Mk4iSwerveModuleHelper.GearRatio.L2,
-			frontLeftIds[0],
-			frontLeftIds[1],
-			frontLeftIds[2],
-			canbus,
-			0 // Offsets are set manually so this parameter is unnecessary
+				tab.getLayout("Front Left Module", BuiltInLayouts.kList)
+						.withSize(2, 4)
+						.withPosition(0, 0),
+				Mk4iSwerveModuleHelper.GearRatio.L2,
+				frontLeftIds[0],
+				frontLeftIds[1],
+				frontLeftIds[2],
+				canbus,
+				0 // Offsets are set manually so this parameter is unnecessary
 		);
 
 		m_frontRightModule = Mk4iSwerveModuleHelper.createFalcon500(
-			tab.getLayout("Front Right Module", BuiltInLayouts.kList)
-							.withSize(2, 4)
-							.withPosition(2, 0),
-			Mk4iSwerveModuleHelper.GearRatio.L2,
-			frontRightIds[0],
-			frontRightIds[1],
-			frontRightIds[2],
-			canbus,
-			0 // Offsets are set manually so this parameter is unnecessary
+				tab.getLayout("Front Right Module", BuiltInLayouts.kList)
+						.withSize(2, 4)
+						.withPosition(2, 0),
+				Mk4iSwerveModuleHelper.GearRatio.L2,
+				frontRightIds[0],
+				frontRightIds[1],
+				frontRightIds[2],
+				canbus,
+				0 // Offsets are set manually so this parameter is unnecessary
 		);
 
 		m_backLeftModule = Mk4iSwerveModuleHelper.createFalcon500(
-			tab.getLayout("Back Left Module", BuiltInLayouts.kList)
-							.withSize(2, 4)
-							.withPosition(4, 0),
-			Mk4iSwerveModuleHelper.GearRatio.L2,
-			backLeftIds[0],
-			backLeftIds[1],
-			backLeftIds[2],
-			canbus,
-			0 // Offsets are set manually so this parameter is unnecessary
+				tab.getLayout("Back Left Module", BuiltInLayouts.kList)
+						.withSize(2, 4)
+						.withPosition(4, 0),
+				Mk4iSwerveModuleHelper.GearRatio.L2,
+				backLeftIds[0],
+				backLeftIds[1],
+				backLeftIds[2],
+				canbus,
+				0 // Offsets are set manually so this parameter is unnecessary
 		);
 
 		m_backRightModule = Mk4iSwerveModuleHelper.createFalcon500(
-			tab.getLayout("Back Right Module", BuiltInLayouts.kList)
-							.withSize(2, 4)
-							.withPosition(6, 0),
-			Mk4iSwerveModuleHelper.GearRatio.L2,
-			backRightIds[0],
-			backRightIds[1],
-			backRightIds[2],
-			canbus,
-			0 // Offsets are set manually so this parameter is unnecessary
+				tab.getLayout("Back Right Module", BuiltInLayouts.kList)
+						.withSize(2, 4)
+						.withPosition(6, 0),
+				Mk4iSwerveModuleHelper.GearRatio.L2,
+				backRightIds[0],
+				backRightIds[1],
+				backRightIds[2],
+				canbus,
+				0 // Offsets are set manually so this parameter is unnecessary
 		);
 
 		instance = this;
@@ -436,15 +437,13 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		m_backRightModule.set(
 				states[3].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
 				states[3].angle.getRadians());
-
 		Logger.getInstance().recordOutput("Swerve Setpoints", states);
-		// this is only so it doesnt complain about it not being initialized
 		SwerveModuleState[] loggingSwerveStates = states;
 		loggingSwerveStates[0] = m_frontLeftModule.getState();
 		loggingSwerveStates[1] = m_frontRightModule.getState();
 		loggingSwerveStates[2] = m_backLeftModule.getState();
 		loggingSwerveStates[3] = m_backRightModule.getState();
-		Logger.getInstance().recordOutput("Swerve Speeds", loggingSwerveStates);
+		Logger.getInstance().recordOutput("Swerve Speed", loggingSwerveStates);
 	}
 
 	public void setOdemetryFromApriltag() {
@@ -577,7 +576,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	public double calculateXMetersPerSecond() {
-		double outputMetersPerSecond = m_translateXController.calculate(DualLimelightManagerSubsystem.getInstance().getTY());
+		double outputMetersPerSecond = m_translateXController
+				.calculate(DualLimelightManagerSubsystem.getInstance().getTY());
 		outputMetersPerSecond = outputMetersPerSecond * -1; // Invert output
 		outputMetersPerSecond = MathUtil.clamp(outputMetersPerSecond, m_config.m_translateXMaxSpeedMeters * -1,
 				m_config.m_translateXMaxSpeedMeters);
@@ -588,7 +588,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		DualLimelightManagerSubsystem limelightManager = DualLimelightManagerSubsystem.getInstance();
 		double errorAngle = m_isSeeking ? limelightManager.getPrimaryTX() : limelightManager.getSecondaryTX();
 		double outputMetersPerSecond = m_translateYController.calculate(errorAngle);
-		outputMetersPerSecond = MathUtil.clamp(outputMetersPerSecond, m_config.m_translateYMaxSpeedMeters*-1, m_config.m_translateYMaxSpeedMeters);
+		outputMetersPerSecond = MathUtil.clamp(outputMetersPerSecond, m_config.m_translateYMaxSpeedMeters * -1,
+				m_config.m_translateYMaxSpeedMeters);
 		return outputMetersPerSecond;
 	}
 
@@ -603,7 +604,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 		System.out.println(isTracking());
 
-		if(!limelightManager.validTargetExistsOnPrimary() && !m_isSeeking) { // If the primary limelight has no target, and has not been set to seek
+		if (!limelightManager.validTargetExistsOnPrimary() && !m_isSeeking) { // If the primary limelight has no target,
+																				// and has not been set to seek
 			configureSeeking();
 		} else if (limelightManager.validTargetExistsOnPrimary() && m_isSeeking) {
 			stopSeeking();
