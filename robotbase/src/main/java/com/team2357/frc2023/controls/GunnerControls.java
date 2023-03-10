@@ -1,9 +1,6 @@
 package com.team2357.frc2023.controls;
 
-import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.Constants.CONTROLLER;
-import com.team2357.frc2023.commands.armextension.ArmExtendToPositionCommand;
-import com.team2357.frc2023.commands.armrotation.ArmRotateToPositionCommand;
 import com.team2357.frc2023.commands.auto.TranslateToTargetCommandGroup;
 import com.team2357.frc2023.commands.human.panic.ArmExtensionAxisCommand;
 import com.team2357.frc2023.commands.human.panic.ArmRotationAxisCommand;
@@ -30,21 +27,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import com.team2357.frc2023.Constants.CONTROLLER;
-import com.team2357.frc2023.commands.auto.TranslateToTargetCommand;
-import com.team2357.frc2023.commands.auto.TranslateToTargetCommandGroup;
-import com.team2357.frc2023.commands.human.panic.ArmExtenderCommand;
-import com.team2357.frc2023.commands.human.panic.ArmRotationCommand;
-import com.team2357.frc2023.commands.human.panic.ClawToggleCommand;
-import com.team2357.frc2023.commands.human.panic.IntakeArmToggleCommand;
-import com.team2357.frc2023.commands.human.panic.IntakeAxisRollerCommand;
-import com.team2357.frc2023.commands.human.panic.IntakeWinchCommand;
-import com.team2357.frc2023.commands.human.panic.WristToggleCommand;
-import com.team2357.frc2023.commands.intake.IntakeArmDeployCommand;
-import com.team2357.frc2023.commands.intake.IntakeArmStowCommand;
-import com.team2357.frc2023.commands.scoring.AutoScoreLowCommandGroup;
-import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
-import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreMidCommandGroup;
 
 /**
  * These are the controls for the gunner.
