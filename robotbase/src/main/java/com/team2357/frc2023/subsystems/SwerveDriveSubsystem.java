@@ -373,18 +373,18 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	public void zero() {
 		SwerveModuleState state = new SwerveModuleState(0.0, Rotation2d.fromDegrees(0.0));
 
-		m_frontLeftModule.set(
-				state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
-				state.angle.getRadians());
-		m_frontRightModule.set(
-				state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
-				state.angle.getRadians());
-		m_backLeftModule.set(
-				state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
-				state.angle.getRadians());
-		m_backRightModule.set(
-				state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
-				state.angle.getRadians());
+		// m_frontLeftModule.set(
+		// 		state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
+		// 		state.angle.getRadians());
+		// m_frontRightModule.set(
+		// 		state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
+		// 		state.angle.getRadians());
+		// m_backLeftModule.set(
+		// 		state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
+		// 		state.angle.getRadians());
+		// m_backRightModule.set(
+		// 		state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
+		// 		state.angle.getRadians());
 	}
 
 	public void zeroGyroscope() {
@@ -444,23 +444,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		}
 
 		m_chassisSpeeds = chassisSpeeds;
-		SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
-		SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxVelocityMetersPerSecond);
-
-		m_frontLeftModule.set(
-				states[0].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
-				states[0].angle.getRadians());
-		m_frontRightModule.set(
-				states[1].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
-				states[1].angle.getRadians());
-		m_backLeftModule.set(
-				states[2].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
-				states[2].angle.getRadians());
-		m_backRightModule.set(
-				states[3].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
-				states[3].angle.getRadians());
-
-		Logger.getInstance().recordOutput("Swerve States", states);
+		
 	}
 
 	public void updatePoseEstimator() {
@@ -669,6 +653,24 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		// SmartDashboard.putNumber("Pose Y", m_odometry.getPoseMeters().getY());
 		// SmartDashboard.putNumber("Pose Angle",
 		// m_odometry.getPoseMeters().getRotation().getDegrees());
+
+		SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
+		SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxVelocityMetersPerSecond);
+
+		m_frontLeftModule.set(
+				states[0].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
+				states[0].angle.getRadians());
+		m_frontRightModule.set(
+				states[1].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
+				states[1].angle.getRadians());
+		m_backLeftModule.set(
+				states[2].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
+				states[2].angle.getRadians());
+		m_backRightModule.set(
+				states[3].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
+				states[3].angle.getRadians());
+
+		Logger.getInstance().recordOutput("Swerve States", states);
 
 		Logger.getInstance().recordOutput("Robot Pose", getPose());
 
