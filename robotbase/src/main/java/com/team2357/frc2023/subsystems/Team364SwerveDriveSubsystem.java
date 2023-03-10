@@ -24,7 +24,11 @@ public class Team364SwerveDriveSubsystem extends SubsystemBase {
 
     public class Configuration {
         public SwerveDriveKinematics m_kinematics;
-        public double m_maxSpeed;
+
+        public double m_maxVelocityMetersPerSecond;
+        public double m_maxAngularVelocityRadiansPerSecond;
+        public double m_maxAngularAccelerationRadiansPerSecondSquared;
+
         public double m_angleGearRatio;
         public double m_driveGearRatio;
         public double m_wheelCircumference;
@@ -75,33 +79,29 @@ public class Team364SwerveDriveSubsystem extends SubsystemBase {
         m_odometry = new SwerveDriveOdometry(m_config.m_kinematics, getYaw(), getModulePositions());
     }
 
-    public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
-        SwerveModuleState[] swerveModuleStates =
-            m_config.m_kinematics.toSwerveModuleStates(
-                fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
-                                    translation.getX(), 
-                                    translation.getY(), 
-                                    rotation, 
-                                    getYaw()
-                                )
-                                : new ChassisSpeeds(
-                                    translation.getX(), 
-                                    translation.getY(), 
-                                    rotation)
-                                );
+    public void drive(double x, double y, double rotation) {
+        ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+            x * m_config.m_maxVelocityMetersPerSecond,
+            y * m_config.m_maxVelocityMetersPerSecond,
+            rotation m_config.m_maxAngularVelocityRadiansPerSecond,
+            getYaw()
+        )
+        drive(chassisSpeeds);
+    }
 
-        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, m_config.m_maxSpeed);
+    public void drive(chassisSpeeds) {
+        SwerveModuleState[] states = m_config.m_kinematics.toSwerveModuleStates(chassisSpeeds);
 
-        for (SwerveModule module : m_swerveModules) {
-            module.setDesiredState(swerveModuleStates[module.m_modNumber], isOpenLoop);
-        }
+        SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxVelocityMetersPerSecond);
+
+        setModuleStates(states);
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
-        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, m_config.m_maxSpeed);
+        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, m_config.m_maxVelocityMetersPerSecond);
 
         for (SwerveModule module : m_swerveModules) {
-            module.setDesiredState(desiredStates[module.m_modNumber], false);
+            module.setDesiredState(desiredStates[module.m_modNumber]);
         }
     }
 

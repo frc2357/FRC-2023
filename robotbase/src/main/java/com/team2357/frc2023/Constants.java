@@ -189,11 +189,11 @@ public final class Constants {
     }
 
     public static final class TEAM_364_SWERVE {
-{     
         public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(8.79+180);
         public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(314.38-180); 
         public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(306.3-180); 
         public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(163.04+180);
+        
         public static final SwerveModuleConstants FRONT_LEFT_MODULE_CONSTANTS = new SwerveModuleConstants(
             CAN_ID.FRONT_LEFT_MODULE_DRIVE_MOTOR_ID,
             CAN_ID.FRONT_LEFT_MODULE_STEER_MOTOR_ID,
@@ -225,7 +225,6 @@ public final class Constants {
             BACK_RIGHT_MODULE_STEER_OFFSET,
             3
         );
-}
 
         public Team364SwerveDriveSubsystem.Configuration GET_SWERVE_DRIVE_CONFIG() {
             Team364SwerveDriveSubsystem.Configuration config = new Team364SwerveDriveSubsystem.Configuration();
@@ -239,10 +238,14 @@ public final class Constants {
             config.m_wheelCircumference = SdsModuleConfigurations.MK4I_L2.getWheelDiameter() * Math.PI;
             config.m_angleGearRatio = SdsModuleConfigurations.MK4I_L2.getSteerReduction() * Math.PI;
             config.m_driveGearRatio = SdsModuleConfigurations.MK4I_L2.getDriveReduction() * Math.PI;
-            config.m_maxSpeed = 6380.0 / 60.0 *
+
+            
+            config.m_maxVelocityMetersPerSecond = 6380.0 / 60.0 *
                     SdsModuleConfigurations.MK4I_L2.getDriveReduction() *
                     SdsModuleConfigurations.MK4I_L2.getWheelDiameter() * Math.PI;
-
+            config.m_maxAngularVelocityRadiansPerSecond = config.m_maxVelocityMetersPerSecond /
+                    Math.hypot(config.m_trackwidthMeters / 2.0, config.m_wheelbaseMeters / 2.0);
+            config.m_maxAngularAccelerationRadiansPerSecondSquared = config.m_maxAngularVelocityRadiansPerSecond / 3.0;
 
             return config;
         }

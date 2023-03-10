@@ -52,14 +52,9 @@ public class SwerveModule {
         setSpeed(desiredState, isOpenLoop);
     }
 
-    private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
-        if (isOpenLoop) {
-            double percentOutput = desiredState.speedMetersPerSecond / m_config.m_maxSpeed;
-            m_driveMotor.set(ControlMode.PercentOutput, percentOutput);
-        } else {
-            double velocity = Conversions.MPSToFalcon(desiredState.speedMetersPerSecond, m_config.m_wheelCircumference, m_config.m_driveGearRatio);
-            m_driveMotor.set(ControlMode.Velocity, velocity, DemandType.ArbitraryFeedForward, m_feedforward.calculate(desiredState.speedMetersPerSecond));
-        }
+    private void setSpeed(SwerveModuleState desiredState) {
+        double velocity = Conversions.MPSToFalcon(desiredState.speedMetersPerSecond, m_config.m_wheelCircumference, m_config.m_driveGearRatio);
+        m_driveMotor.set(ControlMode.Velocity, velocity, DemandType.ArbitraryFeedForward, m_feedforward.calculate(desiredState.speedMetersPerSecond));
     }
 
     private void setAngle(SwerveModuleState desiredState) {

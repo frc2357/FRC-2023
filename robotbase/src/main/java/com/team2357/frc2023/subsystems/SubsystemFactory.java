@@ -34,6 +34,20 @@ public class SubsystemFactory {
                 return subsystem;
         }
 
+        public Team364SwerveDriveSubsystem CreateTeam364SwerveDriveSubsystem() {
+                Team364SwerveDriveSubsystem subsystem = new Team364SwerveDriveSubsystem(
+                        Constants.CAN_ID.PIGEON_ID,
+                        Constants.TEAM_364_SWERVE.FRONT_LEFT_MODULE_CONSTANTS,
+                        Constants.TEAM_364_SWERVE.FRONT_RIGHT_MODULE_CONSTANTS,
+                        Constants.TEAM_364_SWERVE.BACK_LEFT_MODULE_CONSTANTS,
+                        Constants.TEAM_364_SWERVE.BACK_RIGHT_MODULE_CONSTANTS,
+                )
+
+                subsystem.configure(Constants.TEAM_364_SWERVE.GET_SWERVE_DRIVE_CONFIG());
+
+                return subsystem;
+        }
+
         public IntakeRollerSubsystem CreateIntakeRollerSubsystem() {
                 IntakeRollerSubsystem subsystem = new IntakeRollerSubsystem(Constants.CAN_ID.MASTER_INTAKE_MOTOR_ID,
                                 Constants.CAN_ID.FOLLOWER_INTAKE_MOTOR_ID);
