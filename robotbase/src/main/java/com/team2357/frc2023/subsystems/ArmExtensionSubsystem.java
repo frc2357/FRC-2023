@@ -115,6 +115,7 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
 
     public void resetEncoder() {
         m_extendMotor.getEncoder().setPosition(0);
+        m_targetRotations = 0;
     }
 
     private void setMotorRotations(double rotations, int pidSlot) {
