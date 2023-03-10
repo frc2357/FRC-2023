@@ -186,58 +186,66 @@ public final class Constants {
     
         // Tolerance for out-of-range poses on auto-mapping
         public static final double TRAJECTORY_MAP_TOLERANCE_METERS = 0.1;
+    }
+
+    public static final class TEAM_364_SWERVE {
+{     
+        public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(8.79+180);
+        public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(314.38-180); 
+        public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(306.3-180); 
+        public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(163.04+180);
+        public static final SwerveModuleConstants FRONT_LEFT_MODULE_CONSTANTS = new SwerveModuleConstants(
+            CAN_ID.FRONT_LEFT_MODULE_DRIVE_MOTOR_ID,
+            CAN_ID.FRONT_LEFT_MODULE_STEER_MOTOR_ID,
+            CAN_ID.FRONT_LEFT_MODULE_STEER_ENCODER_ID,
+            FRONT_LEFT_MODULE_STEER_OFFSET,
+            0
+        );
+
+        public static final SwerveModuleConstants FRONT_RIGHT_MODULE_CONSTANTS = new SwerveModuleConstants(
+            CAN_ID.FRONT_RIGHT_MODULE_DRIVE_MOTOR_ID,
+            CAN_ID.FRONT_RIGHT_MODULE_STEER_MOTOR_ID,
+            CAN_ID.FRONT_RIGHT_MODULE_STEER_ENCODER_ID,
+            FRONT_RIGHT_MODULE_STEER_OFFSET,
+            1
+        );
+
+        public static final SwerveModuleConstants BACK_LEFT_MODULE_CONSTANTS = new SwerveModuleConstants(
+            CAN_ID.BACK_LEFT_MODULE_DRIVE_MOTOR_ID,
+            CAN_ID.BACK_LEFT_MODULE_STEER_MOTOR_ID,
+            CAN_ID.BACK_LEFT_MODULE_STEER_ENCODER_ID,
+            BACK_LEFT_MODULE_STEER_OFFSET,
+            2
+        );
+
+        public static final SwerveModuleConstants BACK_RIGHT_MODULE_CONSTANTS = new SwerveModuleConstants(
+            CAN_ID.BACK_RIGHT_MODULE_DRIVE_MOTOR_ID,
+            CAN_ID.BACK_RIGHT_MODULE_STEER_MOTOR_ID,
+            CAN_ID.BACK_RIGHT_MODULE_STEER_ENCODER_ID,
+            BACK_RIGHT_MODULE_STEER_OFFSET,
+            3
+        );
+}
+
+        public Team364SwerveDriveSubsystem.Configuration GET_SWERVE_DRIVE_CONFIG() {
+            Team364SwerveDriveSubsystem.Configuration config = new Team364SwerveDriveSubsystem.Configuration();
+
+            config.m_kinematics = new SwerveDriveKinematics(
+                new Translation2d(DRIVE.WHEEL_BASE / 2.0, DRIVE.TRACK_WIDTH / 2.0),
+                new Translation2d(DRIVE.WHEEL_BASE / 2.0, -DRIVE.TRACK_WIDTH / 2.0),
+                new Translation2d(-DRIVE.WHEEL_BASE / 2.0, DRIVE.TRACK_WIDTH / 2.0),
+                new Translation2d(-DRIVE.WHEEL_BASE / 2.0, -DRIVE.TRACK_WIDTH / 2.0)
+            );
+            config.m_wheelCircumference = SdsModuleConfigurations.MK4I_L2.getWheelDiameter() * Math.PI;
+            config.m_angleGearRatio = SdsModuleConfigurations.MK4I_L2.getSteerReduction() * Math.PI;
+            config.m_driveGearRatio = SdsModuleConfigurations.MK4I_L2.getDriveReduction() * Math.PI;
+            config.m_maxSpeed = 6380.0 / 60.0 *
+                    SdsModuleConfigurations.MK4I_L2.getDriveReduction() *
+                    SdsModuleConfigurations.MK4I_L2.getWheelDiameter() * Math.PI;
 
 
-        // Team 364 swerve constants
-        public static final double MAX_SPEED = 0;
-        public static final double WHEEL_CIRCUMFERENCE = SdsModuleConfigurations.MK4I_L2.getWheelDiameter() * Math.PI;
-        public static final double GEAR_RATIO = SdsModuleConfigurations.MK4I_L2.getDriveReduction();
-        public static final double ANGLE_GEAR_RATIO = SdsModuleConfigurations.MK4I_L2.getSteerReduction();
-
-        public static final class Mod0 { //TODO: This must be tuned to specific robot
-            public static final int driveMotorID = CAN_ID.FRONT_LEFT_MODULE_DRIVE_MOTOR_ID;
-            public static final int angleMotorID = CAN_ID.FRONT_LEFT_MODULE_STEER_MOTOR_ID;
-            public static final int canCoderID = CAN_ID.FRONT_LEFT_MODULE_STEER_ENCODER_ID;
-            public static final Rotation2d angleOffset = Rotation2d.fromRadians(FRONT_LEFT_MODULE_STEER_OFFSET);
-            public static final SwerveModuleConstants constants = 
-                new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
+            return config;
         }
-
-        /* Front Right Module - Module 1 */
-        public static final class Mod1 { //TODO: This must be tuned to specific robot
-            public static final int driveMotorID = CAN_ID.FRONT_RIGHT_MODULE_DRIVE_MOTOR_ID;
-            public static final int angleMotorID = CAN_ID.FRONT_RIGHT_MODULE_STEER_MOTOR_ID;
-            public static final int canCoderID = CAN_ID.FRONT_RIGHT_MODULE_STEER_ENCODER_ID;
-            public static final Rotation2d angleOffset = Rotation2d.fromRadians(FRONT_RIGHT_MODULE_STEER_OFFSET);
-            public static final SwerveModuleConstants constants = 
-                new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
-        }
-        
-        /* Back Left Module - Module 2 */
-        public static final class Mod2 { //TODO: This must be tuned to specific robot
-            public static final int driveMotorID = CAN_ID.BACK_LEFT_MODULE_DRIVE_MOTOR_ID;
-            public static final int angleMotorID = CAN_ID.BACK_LEFT_MODULE_STEER_MOTOR_ID;
-            public static final int canCoderID = CAN_ID.BACK_LEFT_MODULE_STEER_ENCODER_ID;
-            public static final Rotation2d angleOffset = Rotation2d.fromRadians(BACK_LEFT_MODULE_STEER_OFFSET);
-            public static final SwerveModuleConstants constants = 
-                new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
-        }
-
-        /* Back Right Module - Module 3 */
-        public static final class Mod3 { //TODO: This must be tuned to specific robot
-            public static final int driveMotorID = CAN_ID.BACK_RIGHT_MODULE_DRIVE_MOTOR_ID;
-            public static final int angleMotorID = CAN_ID.BACK_RIGHT_MODULE_STEER_MOTOR_ID;
-            public static final int canCoderID = CAN_ID.BACK_RIGHT_MODULE_STEER_ENCODER_ID;
-            public static final Rotation2d angleOffset = Rotation2d.fromRadians(BACK_RIGHT_MODULE_STEER_OFFSET);
-            public static final SwerveModuleConstants constants = 
-                new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
-        }
-
-        public static final SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(
-            new Translation2d(WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0),
-            new Translation2d(WHEEL_BASE / 2.0, -TRACK_WIDTH / 2.0),
-            new Translation2d(-WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0),
-            new Translation2d(-WHEEL_BASE / 2.0, -TRACK_WIDTH / 2.0));
     }
 
     public static final class INTAKE_ROLLER {
