@@ -299,7 +299,6 @@ public final class Constants {
 
     public static final class ARM_EXTENSION {
         public static final double RETRACTED_ROTATIONS = 0;
-        public static final double INTAKE_HANDOFF_ROTATIONS = 0;
 
         public static final double AUTO_SCORE_MID_ROTATIONS = 0;
         public static final double AUTO_SCORE_HIGH_ROTATIONS = 260;
@@ -348,10 +347,8 @@ public final class Constants {
     }
 
     public static final class ARM_ROTATION {
-
         
         public static final double RETRACTED_ROTATIONS = 0;
-        public static final double INTAKE_HANDOFF_ROTATIONS = 0;
 
         public static final double AUTO_SCORE_MID_ROTATIONS = 45;
         public static final double AUTO_SCORE_HIGH_ROTATIONS = 58;
@@ -408,10 +405,6 @@ public final class Constants {
             return config;
         }
 
-    }
-
-    public static final class AUTO_SCORE_TIMINGS {
-        public static final double SECONDS_BEFORE_RETURNING_TO_STARTING_POSITION = 0.5;
     }
 
     public static final class LIMELIGHT {

@@ -208,7 +208,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
             updatePID();
         }
 
-        System.out.println("Current rot: " + getMotorRotations());
-        SmartDashboard.putNumber("Rotations", getMotorRotations());
+        // System.out.println("Current rot: " + getMotorRotations());
+        // SmartDashboard.putNumber("Rotations", getMotorRotations());
     }
 }
