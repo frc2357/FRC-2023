@@ -5,10 +5,7 @@
 #
 import numpy as np
 import cv2
-import glob
 import json
-import numpy as np
-from functools import partial
 
 cam0_json = """{
     "camera": "SPCA2688 AV Camera (1bcf:0b15)",
@@ -89,7 +86,6 @@ class CameraCalibration:
         return ret[y : y + h, x : x + w]
 
     def projectPoints(self, pts, rvec=[0, 0, 0], tvec=[0, 0, 0]):
-        # cv.projectPoints(	objectPoints, rvec, tvec, cameraMatrix, distCoeffs[, imagePoints[, jacobian[, aspectRatio]]]	) ->	imagePoints, jacobian
         return cv2.projectPoints(pts, rvec, tvec, self.mtx, self.dst)
 
     def to_json(self):
@@ -138,4 +134,4 @@ class CameraCalibration:
 image_cal = CameraCalibration(
     mtx=np.array([1000, 0, 1280 / 2, 0, 1000, 720 / 2, 0, 0, 1]).reshape(3, 3), dst=np.float32([0, 0, 0, 0])
 )
-cam0 = CameraCalibration.load_cal_json("left_camera_cal.json")  # load calibration data in CameraCalibration class
+# cam0 = CameraCalibration.load_cal_json("left_camera_cal.json")  # load calibration data in CameraCalibration class

@@ -1,9 +1,5 @@
-#!/usr/bin/env python3
-from dataclasses import dataclass
-
 import glob
 import json
-import time
 import sys
 import cv2
 import numpy as np
@@ -11,9 +7,9 @@ import numpy as np
 # to use on your PC vs Raspberry PI, need numpy, robotpy, opencv installed to run
 # See https://robotpy.readthedocs.io/en/stable/getting_started.html
 
-from cscore import CameraServer, VideoSource, UsbCamera, MjpegServer
-from ntcore import NetworkTableInstance, EventFlags
-from calibration import cam0, image_cal
+from cscore import CameraServer, VideoSource, UsbCamera
+from ntcore import NetworkTableInstance
+from calibration import image_cal
 
 
 class CameraConfig:
@@ -41,10 +37,10 @@ def list_cameras():
     """
     cams = []
     for c in UsbCamera.enumerateUsbCameras():
-        cams.append(UsbCamera(c.name, c.path))
-        cam = cams[-1]
-        print(c.name, f"{c.path}")
-        print(cam.getConfigJsonObject())
+        cam = UsbCamera(c.name, c.path)
+        ret = (c.name, c.path, cam.getConfigJsonObject())
+        cams.append(ret)
+        print(ret)
     return cams
 
 
@@ -65,13 +61,15 @@ class CameraVision:
     server = False
     cameraConfigs = []
     cameras = []
+    outputstream = None
 
     def __init__(self, configFile=".\\pc.json", simulate=False):
         self.configFile = configFile
         self.readConfig(configFile)  # sets team, server, cameraConfigs[]
         self.ntinst = ntinst = NetworkTableInstance.getDefault()
+        CameraServer.enableLogging()
         # TODO: define networks table variable for passing json
-        # this might be a good start: https://docs.wpilib.org/en/stable/docs/software/networktables/client-side-program.html
+        # good start: https://docs.wpilib.org/en/stable/docs/software/networktables/client-side-program.html
         if self.server:
             print("Setting up NetworkTables server")
             ntinst.startServer()
@@ -104,7 +102,7 @@ class CameraVision:
             c.images = imgs
             c.cal = image_cal  # bandaid for now
             self.cameras.append(c)
-        else:
+        else:  # real cameras
             for config in self.cameraConfigs:
                 self.cameras.append(self.startCamera(config))
 
@@ -130,11 +128,15 @@ class CameraVision:
         try:
             cam.width = config["width"]
             cam.height = config["height"]
-        except:
+        except Exception:
             pass
         # stream properties
         cam.streamConfig = config.get("stream")
         cam.config = config
+        try:
+            cam.calibration = config["calibration"]
+        except KeyError:
+            cam.calibration = image_cal  # use default calibration
         self.cameraConfigs.append(cam)
         return True
 
@@ -199,23 +201,29 @@ class CameraVision:
 
         print("Starting camera '{}' on {}".format(config.name, config.path))
         camera = UsbCamera(config.name, config.path)
-        server = CameraServer.startAutomaticCapture(camera=camera)
+        server = CameraServer.addCamera(camera)
 
-        camera.setConfigJson(json.dumps(config.config))
+        # camera.setConfigJson(json.dumps(config.config))
         camera.setConnectionStrategy(VideoSource.ConnectionStrategy.kConnectionKeepOpen)
 
         if config.streamConfig is not None:
             server.setConfigJson(json.dumps(config.streamConfig))
 
-        CameraServer.enableLogging()
-        # frame = np.zeros(shape=(camConfig["height"], camConfig["width"], 3), dtype=np.uint8)
-        # blackFrame = np.zeros(shape=(camConfig["height"], camConfig["width"], 3), dtype=np.uint8)
         camConfig = camera.getConfigJsonObject()
-        outputStream = CameraServer.putVideo("VideoStream", camConfig["width"], camConfig["height"])
+        # create object to hold camera state
         c = CameraObject()
         c.camera = camera
         c.config = camConfig
-        c.outstream = outputStream
+        c.outstream = CameraServer.putVideo(config.name, camConfig["width"], camConfig["height"])
         c.sink = CameraServer.getVideo(camera)
-        c.cal = image_cal
+        c.cal = config.calibration
         return c
+
+
+if __name__ == "__main__":
+    c = CameraVision("/boot/frc.json")
+    frame = np.zeros(shape=(720, 1280, 3), dtype="uint8")
+    while True:
+        for cam in c.cameras:
+            c.sink.grabFrame(frame)
+            c.outstream.putFrame(frame)

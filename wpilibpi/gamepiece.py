@@ -1,13 +1,12 @@
 import numpy as np
 import logging
-from ntcore import NetworkTableInstance, NetworkTable, EventFlags
+from ntcore import NetworkTable
 
 log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
 
 # this should be used as a singleton.  Notice it is initiazlied at the bottom of this file
-# to use, just import like normal, the instance is the same name as the class
-global gamepiecetracker  # this is defined below after the class as the singleton class instance
+# to use, just import like normal
 
 
 class GamePieceTracker:
@@ -22,15 +21,17 @@ class GamePieceTracker:
     gamepiece_results = np.zeros((3, 9, 2), dtype=float)
     gamepiece_chars = np.chararray((3, 9), unicode=True)
     gamepiece_chars[:] = "-"  # set default value to dash
-    NTvar = NetworkTableInstance.getDefault().getTable("gridcam").getStringArrayTopic("grid").publish()
-    NTreset = NetworkTableInstance.getDefault().getTable("gridcam").getBooleanTopic("grid_reset").getEntry(False)
-    gamepiece_func = max
+    gamepiece_func = max  # set a function to control stickiness of gamepieces
 
     # def register_NT_vars(self, ntable: NetworkTable):
     #     # self.reset_results()
     #     # TODO: add NETWORK TABLES SUPPORT HERE
-    #     # self.NTvar = NetworkTableInstance.getDefault().getTable("gridcam").getStringArrayTopic("grid").publish()
-    #     # self.NTreset = NetworkTableInstance.getDefault().getTable("gridcam").getBooleanTopic("grid_reset").getEntry(False)
+
+    def register_NT_vars(self, table: NetworkTable):
+        self.gridNT = table.getStringArrayTopic("grid").publish()
+        self.resetgridNT = table.getBooleanTopic("grid_reset").getEntry(False)
+        self.resetgridNT.set(False)  # so it displays in glass
+        self.update_NT_vars()
 
     def reset_results(self):
         self.gamepiece_results[:] = 0
@@ -59,12 +60,13 @@ class GamePieceTracker:
             self.gamepiece_func(prev_yel, yel_pct),
             self.gamepiece_func(prev_vio, vio_pct),
         ]
-
-        self.NTvar.set(self.to_str())
-
-        if self.NTreset.get():
-            log.debug("GOT RESET FROM NETWORK TABLES")
-            self.NTreset.set(False)
+        
+    def update_NT_vars(self):
+        # update NetworkTable variables
+        self.gridNT.set(self.to_str())
+        if self.resetgridNT.get() is True:
+            log.info("GOT RESET FROM NETWORK TABLES")
+            self.resetgridNT.set(False)
             self.reset_results()
 
     def to_str(self):
@@ -73,7 +75,7 @@ class GamePieceTracker:
         self.gamepiece_chars[self.gamepiece_results[:, :, 1] == 1] = "O"
         ret = ["".join(x) for x in self.gamepiece_chars]
         ret.reverse()  # so that when printing, bottom row is the bottom!
-        log.info("\n%s", "\n".join(ret))
+        log.debug("\n%s", "\n".join(ret))
         return ret
         # return json.dumps({"gamepieces":["".join(x) for x in self.gamepiece_chars]})
         # return json.dumps({'cone':",".join([f"{x:0.2f}" for x in self.gamepiece_results[:,:,0].ravel()]),

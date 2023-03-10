@@ -6,20 +6,15 @@
 #
 # Python code for Multiple Color Detection
 
-from dataclasses import dataclass
-import json
 import logging
 import numpy as np
 from numpy import ndarray
 from gamepiece import gamepiecetracker
-from ntcore import NetworkTableInstance, NetworkTable, EventFlags
+from ntcore import NetworkTable 
 import cv2
 
 log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
-# YELLOW CONE
-# Lower HSV (15, 90,100) -- (15,136,255)
-# Upper HSV (60,255,255) -- (31,255,255)
 
 
 class GamePieceDetector:
@@ -33,6 +28,11 @@ class GamePieceDetector:
     _yel_upper = np.array((100, 255, 237), "uint8")  # HSV
     _vio_lower = np.array((118, 55, 55), "uint8")  # HSV
     _vio_upper = np.array((153, 255, 255), "uint8")  # HSV
+    last_NT_update = 0
+
+    def __init__(self):
+        """ """
+        pass
 
     def register_NT_vars(self, ntable: NetworkTable):
         # first index is row ( 0 = low, 1 = mid, 2 = high )
@@ -41,23 +41,17 @@ class GamePieceDetector:
         # gamepieces = GamePieceTracker()
         self.NT_yel_lower = ntable.getIntegerArrayTopic("yellow_lower_HSV").getEntry([5, 100, 140])
         self.NT_yel_upper = ntable.getIntegerArrayTopic("yellow_upper_HSV").getEntry([100, 255, 237])
-        # NT_vio_lower = (
-        #     NetworkTableInstance.getDefault()
-        #     .getTable("gridcam")
-        #     .getIntegerArrayTopic("violet_lower_HSV")
-        #     .getEntry([118, 55, 55])
-        # )
-        # NT_vio_upper = (
-        #     NetworkTableInstance.getDefault()
-        #     .getTable("gridcam")
-        #     .getIntegerArrayTopic("violet_upper_HSV")
-        #     .getEntry([153, 255, 255])
-        # )
+        self.NT_vio_lower = ntable.getIntegerArrayTopic("violet_lower_HSV").getEntry([118, 55, 55])
+        self.NT_vio_upper = ntable.getIntegerArrayTopic("violet_upper_HSV").getEntry([153, 255, 255])
+        self.NT_yel_lower.set([5, 100, 140])
+        self.NT_yel_upper.set([100, 255, 237])
+        self.NT_vio_lower.set([118, 55, 55])
+        self.NT_vio_upper.set([153, 255, 255])
 
-    def __init__(self):
-        """ """
-        # TODO: Add NETWORK TABLES support here
-        pass
+    def update_NT_vars(self):
+        return
+        self.set_yellow_range(self.NT_yel_lower.get(), self.NT_yel_upper.get())
+        self.set_violet_range(self.NT_vio_lower.get(), self.NT_vio_upper.get())
 
     def set_yellow_range(self, low=None, upp=None):
         """update the lower / upper ranges (HSV)! for yellow color determination
