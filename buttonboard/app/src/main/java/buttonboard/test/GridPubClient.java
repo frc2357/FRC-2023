@@ -1,33 +1,26 @@
-package buttonboard;
+package buttonboard.test;
 
 import java.io.IOException;
-import java.lang.Math;
-import java.util.EnumSet;
-
-import com.google.common.graph.Network;
 
 import edu.wpi.first.cscore.CameraServerJNI;
 import edu.wpi.first.math.WPIMathJNI;
-import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTablesJNI;
-import edu.wpi.first.networktables.StringArraySubscriber;
+import edu.wpi.first.networktables.StringArrayPublisher;
 import edu.wpi.first.util.CombinedRuntimeLoader;
 import edu.wpi.first.util.WPIUtilJNI;
 
-public class NetworkTablesClient {
-    private String[] m_grid = {"", "", ""};
+import buttonboard.Constants;
+
+public class GridPubClient {
     private String m_serverName;
     private int m_connListenerHandle;
-    private NetworkTable m_buttonboardTable;
     private NetworkTable m_gridCamTable;
-    private StringArraySubscriber m_gridSub;
-    private IntegerPublisher m_targetRowPub;
-    private IntegerPublisher m_targetColPub;
+    private StringArrayPublisher m_gridPub;
 
-    public NetworkTablesClient(String serverName) {
+    public GridPubClient(String serverName) {
         m_serverName = serverName;
 
         NetworkTablesJNI.Helper.setExtractOnStaticLoad(false);
@@ -37,7 +30,7 @@ public class NetworkTablesClient {
 
         try {
             CombinedRuntimeLoader.loadLibraries(
-                NetworkTablesClient.class,
+                GridPubClient.class,
                 "wpiutiljni",
                 "wpimathjni",
                 "ntcorejni",
@@ -64,46 +57,27 @@ public class NetworkTablesClient {
             }
         );
 
-        inst.startClient4(Constants.NT4_CLIENT_IDENTITY);
+        inst.startClient4("gridpub");
         inst.setServer(m_serverName);
         inst.startDSClient(); 
 
         m_gridCamTable = inst.getTable(Constants.NT_GRIDCAM_TABLE);
-        m_buttonboardTable = inst.getTable(Constants.NT_BUTTONBOARD_TABLE);
 
-        m_gridSub = m_gridCamTable.getStringArrayTopic(Constants.NT_GRID_TOPIC).subscribe(new String[] {"", "", ""});
-
-        inst.addListener(
-            m_gridSub,
-            EnumSet.of(NetworkTableEvent.Kind.kValueAll),
-            event -> {
-                m_grid = event.valueData.value.getStringArray();
-                System.out.println("grid set to:");
-                System.out.println(m_grid[0]);
-                System.out.println(m_grid[1]);
-                System.out.println(m_grid[2]);
-            }
-        );
-
-        m_targetRowPub = m_buttonboardTable.getIntegerTopic(Constants.NT_TARGET_ROW_TOPIC).publish();
-        m_targetRowPub.setDefault(-1);
-
-        m_targetColPub = m_buttonboardTable.getIntegerTopic(Constants.NT_TARGET_COL_TOPIC).publish();
-        m_targetColPub.setDefault(-1);
+        m_gridPub = m_gridCamTable.getStringArrayTopic(Constants.NT_GRID_TOPIC).publish();
     }
 
     public void close() {
         System.out.println("NetworkTablesClient.close");
         NetworkTableInstance inst = NetworkTableInstance.getDefault();
-        m_gridSub.close();
-        m_targetRowPub.close();
-        m_targetColPub.close();
+        m_gridPub.close();
         inst.removeListener(m_connListenerHandle);
     }
 
-    public void setGridTarget(int row, int col) {
-        System.out.println("Set grid target to (row=" + row + ", col=" + col + ")");
-        m_targetRowPub.set(row);
-        m_targetColPub.set(col);
+    public void setGrid(String[] rows) {
+        System.out.println("setting grid to:");
+        System.out.println(rows[0]);
+        System.out.println(rows[1]);
+        System.out.println(rows[2]);
+        m_gridPub.set(rows);
     }
 }
