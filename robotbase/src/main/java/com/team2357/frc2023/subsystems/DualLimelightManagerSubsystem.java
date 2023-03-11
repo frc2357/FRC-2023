@@ -69,11 +69,22 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
                 m_primaryLimelight = m_leftLimelight;
                 m_secondaryLimelight = m_rightLimelight;
                 m_primaryLimelightTXSetpoint = m_leftLimelightTXSetpoint;
+                break;
             case RIGHT:
                 m_primaryLimelight = m_rightLimelight;
                 m_secondaryLimelight = m_leftLimelight;
                 m_primaryLimelightTXSetpoint = m_rightLimelightTXSetpoint;
+                break;
         }
+    }
+
+    public LIMELIGHT getPrimaryLimelight() {
+        if (m_primaryLimelight == m_rightLimelight) {
+            return LIMELIGHT.RIGHT;
+        } else if (m_primaryLimelight == m_leftLimelight) {
+            return LIMELIGHT.LEFT;
+        }
+        return null;
     }
 
     public void setTargetAprilTag(int id) {

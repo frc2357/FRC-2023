@@ -6,7 +6,7 @@ import java.util.HashMap;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 import com.team2357.frc2023.Constants;
-import com.team2357.frc2023.util.DriverStationAllianceGetter;
+import com.team2357.frc2023.networktables.Buttonboard;
 import com.team2357.lib.util.Utility;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -61,19 +61,20 @@ public class AvailableTeleopTrajectories {
          * To add another start to convergence trajectory simply do
          * addStartTrajectory(fileName, CONVERGENCE_POINT)
         */ 
-        addStartTrajectory("4.5Y to NEAR", CONVERGENCE_POINT.NEAR);
-        addStartTrajectory("4.65Y to NEAR", CONVERGENCE_POINT.NEAR);
-        addStartTrajectory("4.85Y to NEAR", CONVERGENCE_POINT.NEAR);
-
+        addStartTrajectory("1.00Y to NEAR", CONVERGENCE_POINT.NEAR);
+        addStartTrajectory("0.75Y to NEAR", CONVERGENCE_POINT.NEAR);
+        addStartTrajectory("0.50Y to NEAR", CONVERGENCE_POINT.NEAR);
+       
         addStartTrajectory("1.99Y to MIDDLE", CONVERGENCE_POINT.MIDDLE);
         addStartTrajectory("2.8Y to MIDDLE", CONVERGENCE_POINT.MIDDLE);
         addStartTrajectory("2.24Y to MIDDLE", CONVERGENCE_POINT.MIDDLE);
         addStartTrajectory("3.23Y to MIDDLE", CONVERGENCE_POINT.MIDDLE);
         addStartTrajectory("3.44Y to MIDDLE", CONVERGENCE_POINT.MIDDLE);
 
-        addStartTrajectory("1.00Y to FAR", CONVERGENCE_POINT.FAR);
-        addStartTrajectory("0.75Y to FAR", CONVERGENCE_POINT.FAR);
-        addStartTrajectory("0.50Y to FAR", CONVERGENCE_POINT.FAR);
+        addStartTrajectory("4.5Y to FAR", CONVERGENCE_POINT.FAR);
+        addStartTrajectory("4.65Y to FAR", CONVERGENCE_POINT.FAR);
+        addStartTrajectory("4.85Y to FAR", CONVERGENCE_POINT.FAR);
+
 
         // Add all convergence to column trajectories
         convergenceToColumnTraj = new Command[CONVERGENCE_POINT.values().length][numberColumns];
@@ -98,15 +99,15 @@ public class AvailableTeleopTrajectories {
         addConvergenceToColumnTrajectory("MIDDLE to node 7", CONVERGENCE_POINT.MIDDLE, 7);
         addConvergenceToColumnTrajectory("MIDDLE to node 8", CONVERGENCE_POINT.MIDDLE, 8);
 
-        addConvergenceToColumnTrajectory("FAR to node 0", CONVERGENCE_POINT.MIDDLE, 0);
-        addConvergenceToColumnTrajectory("FAR to node 1", CONVERGENCE_POINT.MIDDLE, 1);
-        addConvergenceToColumnTrajectory("FAR to node 2", CONVERGENCE_POINT.MIDDLE, 2);
-        addConvergenceToColumnTrajectory("FAR to node 3", CONVERGENCE_POINT.MIDDLE, 3);
-        addConvergenceToColumnTrajectory("FAR to node 4", CONVERGENCE_POINT.MIDDLE, 4);
-        addConvergenceToColumnTrajectory("FAR to node 5", CONVERGENCE_POINT.MIDDLE, 5);
-        addConvergenceToColumnTrajectory("FAR to node 6", CONVERGENCE_POINT.MIDDLE, 6);
-        addConvergenceToColumnTrajectory("FAR to node 7", CONVERGENCE_POINT.MIDDLE, 7);
-        addConvergenceToColumnTrajectory("FAR to node 8", CONVERGENCE_POINT.MIDDLE, 8);
+        addConvergenceToColumnTrajectory("FAR to node 0", CONVERGENCE_POINT.FAR, 0);
+        addConvergenceToColumnTrajectory("FAR to node 1", CONVERGENCE_POINT.FAR, 1);
+        addConvergenceToColumnTrajectory("FAR to node 2", CONVERGENCE_POINT.FAR, 2);
+        addConvergenceToColumnTrajectory("FAR to node 3", CONVERGENCE_POINT.FAR, 3);
+        addConvergenceToColumnTrajectory("FAR to node 4", CONVERGENCE_POINT.FAR, 4);
+        addConvergenceToColumnTrajectory("FAR to node 5", CONVERGENCE_POINT.FAR, 5);
+        addConvergenceToColumnTrajectory("FAR to node 6", CONVERGENCE_POINT.FAR, 6);
+        addConvergenceToColumnTrajectory("FAR to node 7", CONVERGENCE_POINT.FAR, 7);
+        addConvergenceToColumnTrajectory("FAR to node 8", CONVERGENCE_POINT.FAR, 8);
 
         // Load hashmap keys into sorted array for efficient searching
         yVals = new Double[startToConvergenceTrajMap.keySet().size()];
@@ -118,7 +119,7 @@ public class AvailableTeleopTrajectories {
         PathPlannerTrajectory trajectory = TrajectoryUtil.createPathPlannerTrajectory(fileName);
         Command TrajCmd = TrajectoryUtil.createDrivePathCommand(trajectory, false);
         PathPlannerState initialState = PathPlannerTrajectory.transformStateForAlliance(trajectory.getInitialState(),
-                DriverStationAllianceGetter.getAlliance());
+                Buttonboard.getInstance().getAlliance());
         double yVal = initialState.poseMeters.getY();
 
         startToConvergenceTrajMap.put(yVal, TrajCmd);

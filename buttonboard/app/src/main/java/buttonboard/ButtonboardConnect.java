@@ -4,14 +4,16 @@
 package buttonboard;
 
 import java.lang.Math;
-import buttonboard.ArduinoUSB;
-import buttonboard.NetworkTablesClient;
-import buttonboard.NetworkTablesServer;
+import java.util.Arrays;
+import java.util.List;
+
+import buttonboard.test.GridPubClient;
 
 public class ButtonboardConnect {
     private static final String ARG_TEST_ARDUINO = "test:arduino";
     private static final String ARG_TEST_NTCLIENT = "test:ntclient";
     private static final String ARG_TEST_NTSERVER = "test:ntserver";
+    private static final String ARG_TEST_GRIDPUB = "test:gridpub";
 
     public static void main(String[] args) {
         try {
@@ -25,6 +27,9 @@ public class ButtonboardConnect {
                         System.exit(0);
                     case ARG_TEST_NTSERVER:
                         testNetworkTablesServer();
+                        System.exit(0);
+                    case ARG_TEST_GRIDPUB:
+                        testGridPubClient();
                         System.exit(0);
                     default:
                         System.err.println("Unrecognized command: '" + args[0] + "'");
@@ -43,15 +48,48 @@ public class ButtonboardConnect {
     }
 
     private static void testNetworkTablesClient() {
-        NetworkTablesClient nt = new NetworkTablesClient();
+        NetworkTablesClient nt = new NetworkTablesClient("localhost");
         nt.open();
         try {
             System.out.println("Client ready");
             while (true) {
-                long x = (long)(Math.random() * 9);
-                long y = (long)(Math.random() * 3);
-                System.out.println("Grid target x=" + x + ", y=" + y);
+                int x = (int)(Math.random() * 9);
+                int y = (int)(Math.random() * 3);
                 nt.setGridTarget(x, y);
+                Thread.sleep(1000);
+            }
+        } catch (InterruptedException ie) {
+            System.out.println("Client exiting");
+            nt.close();
+            return;
+        }
+    }
+
+    private static void testGridPubClient() {
+        GridPubClient nt = new GridPubClient("localhost");
+        nt.open();
+        try {
+            System.out.println("Grid Pub Client ready");
+            List<Integer> coneColumns = Arrays.asList(0, 2, 3, 5, 6, 8);
+            List<Integer> cubeColumns = Arrays.asList(1, 4, 7);
+            String[] rows = {"---------", "---------", "---------"};
+            while (true) {
+                // Each second, change one node on the grid randomly
+                int row = (int)(Math.random() * 3);
+                int col = (int)(Math.random() * 9);
+                int nodeInt = (int)(Math.random() * 3);
+                char nodeChar = nodeInt == 1 ? 'A' : nodeInt == 2 ? 'O' : '-';
+                if (nodeChar == 'O' && row < 2 && coneColumns.contains(col)) {
+                    // Has to be a cone
+                    nodeChar = 'A';
+                } else if (nodeChar == 'A' && row < 2 && cubeColumns.contains(col)) {
+                    // Has to be a cube
+                    nodeChar = 'O';
+                }
+                char[] nodeChars = rows[row].toCharArray();
+                nodeChars[col] = nodeChar;
+                rows[row] = new String(nodeChars);
+                nt.setGrid(rows);
                 Thread.sleep(1000);
             }
         } catch (InterruptedException ie) {
@@ -66,7 +104,6 @@ public class ButtonboardConnect {
         nt.open();
         try {
             while (true) {
-                System.out.println("Grid target x=" + nt.getGridX() + ", y=" + nt.getGridY());
                 Thread.sleep(1000);
             }
         } catch (InterruptedException ie) {

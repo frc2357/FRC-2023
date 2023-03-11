@@ -111,6 +111,8 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
 
         m_feedforward = new ArmFeedforward(m_config.m_feedforwardKs, m_config.m_feedforwardKg, m_config.m_feedforwardKv,
                 m_config.m_feedforwardKa);
+        
+        resetEncoders();
     }
 
     private void configureRotationMotor(CANSparkMax motor) {
@@ -139,10 +141,6 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
     public void setRotations(double rotations) {
         setClosedLoopEnabled(true);
         m_targetRotations = rotations;
-
-        double feedforwardVolts = m_feedforward.calculate(calculateFeedforwardRadians(rotations), 0);
-        m_pidController.setReference(m_targetRotations, CANSparkMax.ControlType.kSmartMotion, 0,
-                feedforwardVolts, ArbFFUnits.kVoltage);
     }
 
     /**
@@ -156,16 +154,21 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
     }
 
     public boolean isAtRotations() {
-        return Utility.isWithinTolerance(m_rotationMotor.getEncoder().getPosition(), m_targetRotations,
+        System.out.println(getMotorRotations());
+        return Utility.isWithinTolerance(getMotorRotations(), m_targetRotations,
                 m_config.m_rotationMotorAllowedError);
     }
 
     public void setRotationAxisSpeed(double axisSpeed) {
-        setClosedLoopEnabled(false);
-
         double motorSpeed = (-axisSpeed) * m_config.m_rotationAxisMaxSpeed;
 
         m_rotationMotor.set(motorSpeed);
+    }
+
+    public void endAxisCommand() {
+        stopRotationMotors();
+        m_targetRotations = getMotorRotations();
+        setClosedLoopEnabled(true);
     }
 
     // Method for the panic mode to rotate the arms
@@ -181,10 +184,15 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
 
     public void resetEncoders() {
         m_rotationMotor.getEncoder().setPosition(0);
+        m_targetRotations = 0;
     }
 
     public double getMotorRotations() {
         return m_rotationMotor.getEncoder().getPosition();
+    }
+
+    public void setTargetRotationsToCurrentRotations(){
+        m_targetRotations = m_rotationMotor.getEncoder().getPosition();
     }
 
     public void updatePID() {
@@ -195,13 +203,16 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
 
     @Override
     public void periodic() {
-        if (isClosedLoopEnabled() && isAtRotations()) {
-            setClosedLoopEnabled(false);
+        if (isClosedLoopEnabled()) {
+            double feedforwardVolts = m_feedforward.calculate(calculateFeedforwardRadians(m_targetRotations), 0);
+            m_pidController.setReference(m_targetRotations, CANSparkMax.ControlType.kSmartMotion,
+                    m_config.m_smartMotionSlot, feedforwardVolts, ArbFFUnits.kVoltage);
         }
         if (m_shuffleboardPIDTuner.arePIDsUpdated()) {
             updatePID();
         }
 
-        SmartDashboard.putNumber("Rotations", getMotorRotations());
+        // System.out.println("Current rot: " + getMotorRotations());
+        // SmartDashboard.putNumber("Rotations", getMotorRotations());
     }
 }
