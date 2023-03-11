@@ -73,6 +73,7 @@ public class IntakeRollerSubsystem extends SubsystemBase {
 
     public void setAxisRollerSpeed(double axisSpeed) {
         double motorSpeed = (-axisSpeed) * m_config.m_rollerAxisMaxSpeed;
+
         m_masterIntakeMotor.set(ControlMode.PercentOutput, motorSpeed);
         manualRunIntake(axisSpeed);
     }

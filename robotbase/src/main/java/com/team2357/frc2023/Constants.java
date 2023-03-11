@@ -15,6 +15,7 @@ import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.frc2023.subsystems.WristSubsystem;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -109,11 +110,11 @@ public final class Constants {
             config.m_sensorPositionCoefficient = 2.0 * Math.PI / Constants.DRIVE.TICKS_PER_ROTATION
                     * SdsModuleConfigurations.MK4I_L2.getSteerReduction();
 
-            config.m_translateXMaxSpeedMeters = 0.25;
-            config.m_translateYMaxSpeedMeters = 0.25;
+            config.m_translateXMaxSpeedMeters = 3;
+            config.m_translateYMaxSpeedMeters = 3;
 
-            config.m_translateXToleranceMeters = 0.05;
-            config.m_translateYToleranceMeters = 0.05;
+            config.m_translateYAngleTolerance = 1;
+            config.m_translateXAngleTolerance = 1;
 
             config.m_defaultXAngleSetpoint = DRIVE.DEFAULT_X_ANGLE_SETPOINT;
             config.m_defaultYAngleSetpoint = DRIVE.DEFAULT_Y_ANGLE_SETPOINT;
@@ -122,8 +123,11 @@ public final class Constants {
             config.m_midColXAngleSetpoint = DRIVE.MID_COL_X_ANGLE_SETPOINT;
             config.m_rightColXAngleSetpoint = DRIVE.RIGHT_COL_X_ANGLE_SETPOINT;
 
-            config.m_translateXController = new PIDController(0.5, 0, 0);
-            config.m_translateYController = new PIDController(0.05, 0, 0);
+            config.m_translateXController = new PIDController(0.3, 0, 0.015);
+            config.m_translateYController = new PIDController(0.1, 0, 0.025);
+
+            config.m_translationXFeedForward = new SimpleMotorFeedforward(0.244, 0);
+            config.m_translationYFeedForward = new SimpleMotorFeedforward(0.244, 0.00);
 
             config.m_openLoopRampRateSeconds = 1;
 
@@ -162,7 +166,7 @@ public final class Constants {
         public static final double SYNC_ENCODER_LIMIT_MS = 10000;
 
 
-        public static final double DEFAULT_Y_ANGLE_SETPOINT = 0;
+        public static final double DEFAULT_Y_ANGLE_SETPOINT = 20;
         public static final double DEFAULT_X_ANGLE_SETPOINT = -9;
 
         public static final double LEFT_COL_X_ANGLE_SETPOINT = -10;
@@ -413,8 +417,8 @@ public final class Constants {
     }
 
     public static final class LIMELIGHT {
-        public static final String LEFT_LIMELIGHT_NAME = "leftLimelight";
-        public static final String RIGHT_LIMELIGHT_NAME = "rightLimelight";
+        public static final String LEFT_LIMELIGHT_NAME = "limelight-left";
+        public static final String RIGHT_LIMELIGHT_NAME = "limelight-right";
         
         public static final double LEFT_LIMELIGHT_TX_SETPOINT = Double.NaN;
         public static final double RIGHT_LIMELIGHT_TX_SETPOINT = Double.NaN;
