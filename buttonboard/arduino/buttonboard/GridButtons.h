@@ -5,6 +5,10 @@
 #include <Adafruit_Keypad.h>
 #include <Adafruit_NeoPXL8.h>
 
+#define ALLIANCE_UNSET           -1
+#define ALLIANCE_RED             0
+#define ALLIANCE_BLUE            1
+
 #define GRID_ROWS                3
 #define GRID_COLS                9
 #define NODE_COUNT               (GRID_ROWS * GRID_COLS)
@@ -31,11 +35,13 @@ public:
     : m_neoPixels(neoPixels),
       m_pixelOffset(pixelOffset),
       m_keypad(keypad),
+      m_alliance(ALLIANCE_UNSET),
       m_ledsChanged(false),
       m_selectedRow(-1),
       m_selectedCol(-1)
   {
     memset(m_nodes, 0, GRID_ROWS * GRID_COLS);
+    memset(m_pixelColors, 0, GRID_ROWS * GRID_COLS);
   }
 
   void begin() {
@@ -93,6 +99,10 @@ public:
     }
   }
 
+  void setAlliance(int8_t alliance) {
+    m_alliance = alliance;
+  }
+
   bool isConnected() {
     return m_nodes[0][0] != NodeDisconnected;
   }
@@ -112,9 +122,11 @@ public:
 
 private:
   NodeState m_nodes[GRID_ROWS][GRID_COLS];
+  uint32_t m_pixelColors[GRID_ROWS * GRID_COLS];
   Adafruit_NeoPXL8 &m_neoPixels;
   size_t m_pixelOffset;
   Adafruit_Keypad &m_keypad;
+  int8_t m_alliance;
   bool m_ledsChanged;
   int8_t m_selectedRow;
   int8_t m_selectedCol;
@@ -164,13 +176,24 @@ private:
   }
 
   void setPixelColor(uint16_t index, uint32_t color) {
-    m_neoPixels.setPixelColor(index, color);
-    m_ledsChanged = true;
+    if (m_pixelColors[index] != color) {
+      m_pixelColors[index] = color;
+      m_neoPixels.setPixelColor(index, color);
+      m_ledsChanged = true;
+    }
   }
 
   void updatePixelColors() {
-    uint32_t colorEmptyAlliance = getColorEmptyBlue();
     uint32_t colorEmptyCoop = getColorEmptyCoop();
+    uint32_t colorEmptyAlliance;
+
+    if (m_alliance == ALLIANCE_RED) {
+      colorEmptyAlliance = getColorEmptyRed();
+    } else if (m_alliance == ALLIANCE_BLUE) {
+      colorEmptyAlliance = getColorEmptyBlue();
+    } else {
+      colorEmptyAlliance = getColorEmptyUnsetAlliance();
+    }
 
     for (uint8_t row = 0; row < GRID_ROWS; row++) {
       for (uint8_t col = 0; col < GRID_COLS; col++) {
@@ -223,6 +246,18 @@ private:
     }
 
     return index;
+  }
+
+  uint32_t getColorEmptyUnsetAlliance() {
+    unsigned long cycleMillis = millis() % 2000;
+
+    if (cycleMillis < 1000) {
+      float factor = ((float)cycleMillis) / 1000.0;
+      return m_neoPixels.Color(255 * factor, 255 * factor, 255 * factor);
+    } else {
+      float factor = ((float)2000 - cycleMillis) / 1000.0;
+      return m_neoPixels.Color(255 * factor, 255 * factor, 255 * factor);
+    }
   }
 
   uint32_t getColorEmptyRed() {
