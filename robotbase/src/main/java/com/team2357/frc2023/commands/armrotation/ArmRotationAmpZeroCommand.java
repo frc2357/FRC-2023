@@ -1,8 +1,11 @@
 package com.team2357.frc2023.commands.armrotation;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.subsystems.ArmRotationSubsystem;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class ArmRotationAmpZeroCommand extends CommandBase{
@@ -23,6 +26,13 @@ public boolean isFinished() {
 @Override
 public void end(boolean interrupted) {
     ArmRotationSubsystem.getInstance().stopRotationMotors();
+    if(interrupted){
+        DriverStation.reportError("Amp Zeroing did not finish in time! Arm Rotation not zeroed.",false);
+        Logger.getInstance().recordOutput("Arm Rotation Amp Zero fail", true);
+    }
+    else{
+        Logger.getInstance().recordOutput("Arm Rotation Amp Zero fail", false);
     ArmRotationSubsystem.getInstance().resetEncoders();
+    }
 }
 }
