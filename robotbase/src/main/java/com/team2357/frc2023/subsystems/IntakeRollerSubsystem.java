@@ -32,8 +32,6 @@ public class IntakeRollerSubsystem extends SubsystemBase {
         public boolean m_masterInverted;
         public boolean m_followerInverted;
 
-        public double m_spikeAmount;
-        public double m_waitTime;
     }
 
     public Configuration m_config;
