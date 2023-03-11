@@ -22,6 +22,7 @@ public class SwerveDriveControls {
     private JoystickButton m_rightBumper;
     private JoystickButton m_leftBumper;
     private JoystickButton m_aButton;
+    private JoystickButton m_startButton;
 
     private AxisThresholdTrigger m_leftTrigger;
     private AxisThresholdTrigger m_rightTrigger;
@@ -33,6 +34,7 @@ public class SwerveDriveControls {
         m_deadband = deadband;
 
         m_backButton = new JoystickButton(m_controller, XboxRaw.Back.value);
+        m_startButton = new JoystickButton(m_controller, XboxRaw.Start.value);
         m_aButton = new JoystickButton(m_controller, XboxRaw.A.value);
         
         m_rightBumper = new JoystickButton(m_controller, XboxRaw.BumperRight.value);
@@ -47,7 +49,7 @@ public class SwerveDriveControls {
     public void mapControls() {
         // Zero swerve drive
         m_backButton.whileTrue(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().zeroGyroscope()));
-        
+        m_startButton.whileTrue(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().setGyroScope(180)));
         // Intake commands
         // TODO: Remove these bindings
         m_rightBumper.whileTrue(new IntakeRollerRunCommand());
@@ -58,6 +60,7 @@ public class SwerveDriveControls {
         m_leftTrigger.onFalse(new IntakeStowCommandGroup());
 
         m_aButton.whileTrue(new TranslateToTargetCommand(SwerveDriveSubsystem.COLUMN_TARGET.MIDDLE));
+        
 
         // Teleop auto
        // m_rightTrigger.whileTrue(new TeleopAutoScoreCommandGroup(m_controller));

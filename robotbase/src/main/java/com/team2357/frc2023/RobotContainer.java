@@ -63,6 +63,9 @@ public class RobotContainer {
         m_drivetrainSubsystem,
         driveControls));
 
+    // Set default pipeline
+    DualLimelightManagerSubsystem.getInstance().setAprilTagPipelineActive();
+    
     // Setup compressor
     m_compressor = new Compressor(Constants.CAN_ID.PNEUMATICS_HUB_ID, PneumaticsModuleType.REVPH);
     m_compressor.enableAnalog(Constants.COMPRESSOR.MIN_PRESSURE_PSI,
@@ -73,8 +76,6 @@ public class RobotContainer {
     AvailableTrajectories.generateTrajectories();
     AvailableTrajectoryCommands.generateTrajectories();
     AvailableTeleopTrajectories.generateTrajectories();
-
-    DualLimelightManagerSubsystem.getInstance().setAprilTagPipelineActive();
 
     // Configure Shuffleboard
     configureShuffleboard();

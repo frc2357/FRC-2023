@@ -1,6 +1,7 @@
 package com.team2357.frc2023.controls;
 
 import com.team2357.frc2023.Constants.CONTROLLER;
+import com.team2357.frc2023.commands.auto.TranslateToTargetCommand;
 import com.team2357.frc2023.commands.auto.TranslateToTargetCommandGroup;
 import com.team2357.frc2023.commands.human.panic.ArmExtensionAxisCommand;
 import com.team2357.frc2023.commands.human.panic.ArmRotationAxisCommand;
@@ -159,9 +160,12 @@ public class GunnerControls {
         downDPadAndA.onTrue(new TranslateToTargetCommandGroup(SwerveDriveSubsystem.COLUMN_TARGET.MIDDLE));
         downDPadAndB.onTrue(new TranslateToTargetCommandGroup(SwerveDriveSubsystem.COLUMN_TARGET.RIGHT));
 
-        yButton.onTrue(new ConeAutoScoreHighCommandGroup());
-        xButton.onTrue(new ConeAutoScoreMidCommandGroup());
-        aButton.onTrue(new AutoScoreLowCommandGroup());
+        // yButton.onTrue(new ConeAutoScoreHighCommandGroup());
+        // xButton.onTrue(new ConeAutoScoreMidCommandGroup());
+        // aButton.onTrue(new AutoScoreLowCommandGroup());
+
+        aButton.whileTrue(new TranslateToTargetCommand(SwerveDriveSubsystem.COLUMN_TARGET.LEFT));
+
         rightDPadAndY.onTrue(new InstantCommand(() -> {
             IntakeArmSubsystem.getInstance().resetEncoders();
             ArmRotationSubsystem.getInstance().resetEncoders();

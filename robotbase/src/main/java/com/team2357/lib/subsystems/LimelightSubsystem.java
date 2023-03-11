@@ -67,7 +67,7 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
 
   protected NetworkTable m_table;
 
-  private IntegerPublisher m_streamPub; 
+  private DoublePublisher m_streamPub; 
   private DoublePublisher m_pipelinePub; 
   private DoubleSubscriber m_pipelineSub;
   private DoubleSubscriber m_TvSub;
@@ -90,7 +90,7 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
         .getDefault()
         .getTable(limelightName);
 
-    m_streamPub = m_table.getIntegerTopic("stream").publish();
+    m_streamPub = m_table.getDoubleTopic("stream").publish();
     m_pipelinePub = m_table.getDoubleTopic("pipeline").publish();
     m_pipelineSub = m_table.getDoubleTopic("pipeline").subscribe(Double.NaN);
     m_TvSub = m_table.getDoubleTopic("tv").subscribe(m_Configuration.m_DefaultReturnValue);
