@@ -1,6 +1,7 @@
 package com.team2357.frc2023.controls;
 
 import com.team2357.frc2023.Constants.CONTROLLER;
+import com.team2357.frc2023.commands.auto.TranslateToTargetCommand;
 import com.team2357.frc2023.commands.auto.TranslateToTargetCommandGroup;
 import com.team2357.frc2023.commands.human.panic.ArmExtensionAxisCommand;
 import com.team2357.frc2023.commands.human.panic.ArmRotationAxisCommand;
@@ -121,6 +122,7 @@ public class GunnerControls {
         Trigger rightDPadOnly = m_rightDPad.and(noLetterButtons);
 
         Trigger upDPadAndA = m_upDPad.and(m_aButton);
+
         Trigger upDPadAndX = m_upDPad.and(m_xButton);
         Trigger upDPadAndY = m_upDPad.and(m_yButton);
         Trigger upDPadAndB = m_upDPad.and(m_bButton);
@@ -150,6 +152,7 @@ public class GunnerControls {
 
         leftDPadAndA.onTrue(new WristToggleCommand());
         leftDPadAndB.onTrue(new ClawToggleCommand());
+
         downDPadOnly.whileTrue(new IntakeWinchCommand(axisRightStickY));
 
         rightDPadAndA.onTrue(new IntakeArmToggleCommand());
@@ -159,9 +162,9 @@ public class GunnerControls {
         downDPadAndA.onTrue(new TranslateToTargetCommandGroup(SwerveDriveSubsystem.COLUMN_TARGET.MIDDLE));
         downDPadAndB.onTrue(new TranslateToTargetCommandGroup(SwerveDriveSubsystem.COLUMN_TARGET.RIGHT));
 
-        yButton.onTrue(new ConeAutoScoreHighCommandGroup());
-        xButton.onTrue(new ConeAutoScoreMidCommandGroup());
-        aButton.onTrue(new AutoScoreLowCommandGroup());
+        yButton.whileTrue(new ConeAutoScoreHighCommandGroup());
+        xButton.whileTrue(new ConeAutoScoreMidCommandGroup());
+        aButton.whileTrue(new AutoScoreLowCommandGroup());
         rightDPadAndY.onTrue(new InstantCommand(() -> {
             IntakeArmSubsystem.getInstance().resetEncoders();
             ArmRotationSubsystem.getInstance().resetEncoders();
