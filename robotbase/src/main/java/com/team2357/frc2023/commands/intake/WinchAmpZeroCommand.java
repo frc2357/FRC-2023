@@ -18,7 +18,7 @@ public class WinchAmpZeroCommand extends CommandBase{
     
     @Override
     public boolean isFinished() {
-        return IntakeArmSubsystem.getInstance().getAmps() >= Constants.INTAKE_ARM.WINCH_AMPERAGE_ZERO_MAX_AMPS;
+        return IntakeArmSubsystem.getInstance().getAmps() >= Constants.INTAKE_ARM.WINCH_AMP_ZERO_MAX_AMPS;
     }
     
     @Override
