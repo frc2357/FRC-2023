@@ -147,6 +147,10 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
         m_pidcontroller.setD(m_shuffleboardPIDTuner.getDValue());
     }
 
+    public double getAmps() {
+        return Math.abs(m_extendMotor.getOutputCurrent());
+    }
+
     @Override
     public void periodic() {
         if (m_shuffleboardPIDTuner.arePIDsUpdated()) {

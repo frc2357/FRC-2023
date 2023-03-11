@@ -315,6 +315,9 @@ public final class Constants {
         public static final double AUTO_SCORE_MID_ROTATIONS = 0;
         public static final double AUTO_SCORE_HIGH_ROTATIONS = 260;
 
+        public static final int ARM_EXTENSION_AMP_ZERO_PERCENT_OUTPUT = 0;
+        public static final int ARM_EXTENSION_AMP_ZERO_MAX_AMPS = 0;
+
         public static ArmExtensionSubsystem.Configuration GET_EXTENSION_CONFIG() {
             ArmExtensionSubsystem.Configuration config = new ArmExtensionSubsystem.Configuration();
             config.m_extendAxisMaxSpeed = 0;
