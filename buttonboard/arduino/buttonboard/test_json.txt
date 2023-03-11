@@ -5,6 +5,14 @@
 ||v1||{"timeoutMs":9999999,"error":""}
 
 
+# Red Alliance
+
+||v1||{"sensors":{"alliance":{"value":0}}}
+
+# Blue Alliance
+
+||v1||{"sensors":{"alliance":{"value":1}}}
+
 # Clear grid
 
 ||v1||{"sensors":{"grid":{"value":"---------------------------"}}}
