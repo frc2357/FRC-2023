@@ -8,6 +8,8 @@ import com.team2357.frc2023.shuffleboard.ShuffleboardPIDTuner;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 import com.team2357.lib.util.Utility;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
     private static ArmExtensionSubsystem instance = null;
 
@@ -26,8 +28,6 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
 
         public boolean m_isInverted = false;
 
-        public int m_extendGrippedAmps;
-
         public double m_shuffleboardTunerPRange;
         public double m_shuffleboardTunerIRange;
         public double m_shuffleboardTunerDRange;
@@ -41,14 +41,6 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
         public double m_extendIZone;
         public double m_extendFF;
         public int m_extendPidSlot;
-
-        // Retract PID
-        public double m_retractP;
-        public double m_retractI;
-        public double m_retractD;
-        public double m_retractIZone;
-        public double m_retractFF;
-        public int m_retractPidSlot;
 
         // Smart motion
         public double m_pidMaxOutput;
@@ -87,7 +79,9 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
 
         m_extendMotor.setInverted(m_config.m_isInverted);
         m_extendMotor.setOpenLoopRampRate(m_config.m_extendMotorRampRate);
+        m_extendMotor.enableVoltageCompensation(12);
 
+        resetEncoder();
     }
 
     public void manualExtend(double proportion) {
@@ -102,15 +96,7 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
         pidController.setIZone(m_config.m_extendIZone, m_config.m_extendPidSlot);
         pidController.setFF(m_config.m_extendFF, m_config.m_extendPidSlot);
 
-        // Set PID coefficeints for retraction
-        pidController.setP(m_config.m_retractP, m_config.m_retractPidSlot);
-        pidController.setI(m_config.m_retractI, m_config.m_retractPidSlot);
-        pidController.setD(m_config.m_retractD, m_config.m_retractPidSlot);
-        pidController.setIZone(m_config.m_retractIZone, m_config.m_retractPidSlot);
-        pidController.setFF(m_config.m_retractFF, m_config.m_retractPidSlot);
-
         configureSmartMotion(pidController, m_config.m_extendPidSlot);
-        configureSmartMotion(pidController, m_config.m_retractPidSlot);
     }
 
     public void configureSmartMotion(SparkMaxPIDController pidController, int pidSlot) {
@@ -129,6 +115,7 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
 
     public void resetEncoder() {
         m_extendMotor.getEncoder().setPosition(0);
+        m_targetRotations = 0;
     }
 
     private void setMotorRotations(double rotations, int pidSlot) {
@@ -139,10 +126,6 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
 
     public void setExtensionRotations(double rotations) {
         setMotorRotations(rotations, m_config.m_extendPidSlot);
-    }
-
-    public void setRetractionRotations(double rotations) {
-        setMotorRotations(rotations, m_config.m_retractPidSlot);
     }
 
     /**
@@ -172,5 +155,7 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
         if (isClosedLoopEnabled() && isMotorAtRotations()) {
             setClosedLoopEnabled(false);
         }
+
+       // SmartDashboard.putNumber("arm extension rot", getMotorRotations());
     }
 }

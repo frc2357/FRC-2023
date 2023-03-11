@@ -10,6 +10,7 @@ import edu.wpi.first.networktables.MultiSubscriber;
 import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.PubSubOption;
+import edu.wpi.first.wpilibj.DriverStation;
 
 public class Buttonboard {
 
@@ -17,6 +18,8 @@ public class Buttonboard {
 
     private final AtomicReference<Integer> m_rowValue = new AtomicReference<Integer>();
     private final AtomicReference<Integer> m_colValue = new AtomicReference<Integer>();
+
+    private final AtomicReference<DriverStation.Alliance> m_allianceValue = new AtomicReference<DriverStation.Alliance>();
 
     private final MultiSubscriber m_buttonboardSub;
     private final int m_buttonboardListenerHandle;
@@ -31,7 +34,20 @@ public class Buttonboard {
             case Constants.BUTTONBOARD.ROW_TOPIC_NAME:
                 m_rowValue.set((int) event.valueData.value.getInteger());
                 break;
-        }
+            case Constants.BUTTONBOARD.ALLIANCE_TOPIC_NAME:
+                switch (event.valueData.value.getString()) {
+                    case "red":
+                        m_allianceValue.set(DriverStation.Alliance.Red);
+                        break;
+                    case "blue":
+                        m_allianceValue.set(DriverStation.Alliance.Blue);
+                        break;
+                    default:
+                        m_allianceValue.set(DriverStation.Alliance.Invalid);
+                        break;
+                }
+                break;
+        };
     };
 
     public static Buttonboard getInstance() {
@@ -65,6 +81,10 @@ public class Buttonboard {
             return -1;
         }
         return m_colValue.get();
+    }
+
+    public DriverStation.Alliance getAlliance() {
+        return m_allianceValue.get();
     }
 
     public void close() {

@@ -5,18 +5,23 @@ import com.team2357.frc2023.subsystems.ArmRotationSubsystem;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class ArmRotationCommand extends CommandBase {
+public class ArmRotationAxisCommand extends CommandBase {
     AxisInterface m_axis;
 
-    public ArmRotationCommand(AxisInterface axis) {
+    public ArmRotationAxisCommand(AxisInterface axis) {
         addRequirements(ArmRotationSubsystem.getInstance());
         m_axis = axis;
     }
 
     @Override
+    public void initialize() {
+        ArmRotationSubsystem.getInstance().setClosedLoopEnabled(false);
+    }
+
+    @Override
     public void execute() {
         double axisValue = m_axis.getValue();
-        ArmRotationSubsystem.getInstance().manualRotate(axisValue);
+        ArmRotationSubsystem.getInstance().setRotationAxisSpeed(axisValue);
     }
 
     @Override
@@ -26,6 +31,6 @@ public class ArmRotationCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        ArmRotationSubsystem.getInstance().stopRotationMotors();
+        ArmRotationSubsystem.getInstance().endAxisCommand();
     }
 }

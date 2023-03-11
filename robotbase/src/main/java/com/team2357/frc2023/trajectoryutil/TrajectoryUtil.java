@@ -60,7 +60,7 @@ public class TrajectoryUtil {
 				initialState = PathPlannerTrajectory.transformStateForAlliance(initialState, DriverStation.getAlliance());
 				Pose2d initialPose = new Pose2d(initialState.poseMeters.getTranslation(),
 				initialState.holonomicRotation);
-				swerveDrive.resetOdometry(initialPose);
+				swerveDrive.resetPoseEstimator(initialPose);
 			}
 			swerveDrive.getXController().reset();
 			swerveDrive.getYController().reset();
