@@ -77,11 +77,11 @@ if __name__ == "__main__":
     # configure networks tables
     nt_table = camvis.ntinst.getTable("gridcam")
     apriltag_NT = nt_table.getStringTopic("tags").publish()
-    frame = np.zeros(shape=(cam0.config["height"], cam0.config["width"], 3), dtype=np.uint8)
+    frame = np.zeros(shape=(cam0.config.height, cam0.config.width, 3), dtype=np.uint8)
     frame1 = np.zeros_like(frame)
     # retrieve the camera calibration information needed by apriltags
 
-    apriltag = detect_apriltags.AprilTagDetector((cam0.config["height"], cam0.config["width"]))
+    apriltag = detect_apriltags.AprilTagDetector((cam0.config.height, cam0.config.width))
     apriltag.register_NT_vars(nt_table)
 
     gpdetector = detect_colors.GamePieceDetector()
@@ -155,7 +155,7 @@ if __name__ == "__main__":
             if count % 10 == 0:
                 g_avg = avg / 10.0
                 log.info(
-                    f"Processing took Avg: {g_avg:.4f} sec Tag:{tag_end-offset_start:.4f}\tGP:{gp_end-tag_end:.4f}\tNT:{nt_end-gp_end:.4f}"
+                    f"Processing took Avg: {g_avg:.4f} sec Grab:{offset_start-capture_start:.4f}\tTag:{tag_end-offset_start:.4f}\tGP:{gp_end-tag_end:.4f}\tNT:{nt_end-gp_end:.4f}"
                 )
                 avg = 0
             # if simulate:  # the following slows down image processing w/out messing up web server function

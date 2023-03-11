@@ -44,6 +44,16 @@ class CameraCalibration:
                 "roi": self.roi,
             }
         )
+    
+    @staticmethod
+    def load_cal_dict(c):
+        #j = json.loads(jstr)
+        mtx = np.array(c["mtx"]).reshape(3, 3)
+        dst = np.array(c["dst"])
+        img_size = c["img_size"]
+        newmtx = np.array(c["newmtx"]).reshape(3, 3)
+        roi = c["roi"]
+        return CameraCalibration(mtx, dst, img_size, newmtx, roi)        
 
     @staticmethod
     def load_cal_json(jfile):

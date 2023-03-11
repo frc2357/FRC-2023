@@ -9,7 +9,7 @@ import numpy as np
 
 from cscore import CameraServer, VideoSource, UsbCamera
 from ntcore import NetworkTableInstance
-from calibration import image_cal
+from calibration import CameraCalibration, image_cal
 
 
 class CameraConfig:
@@ -89,16 +89,16 @@ class CameraVision:
                 cv2.putText(i, f"{fname}", (10, 20), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 0), 5)
                 cv2.putText(i, f"{fname}", (10, 20), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 255), 1)
                 imgs.append(np.ascontiguousarray(i))
-            camConfig = dict()
-            camConfig["width"] = imgs[0].shape[1]  # all images should be same dimensions!!!
-            camConfig["height"] = imgs[0].shape[0]
+            camConfig = CameraConfig()
+            camConfig.width = imgs[0].shape[1]  # all images should be same dimensions!!!
+            camConfig.height = imgs[0].shape[0]
             self.cameraConfigs.append(camConfig)
 
             c = CameraObject()
             c.camera = None
             c.config = camConfig
             c.sink = None
-            c.outstream = CameraServer.putVideo("VideoStream", camConfig["width"], camConfig["height"])
+            c.outstream = CameraServer.putVideo("VideoStream", camConfig.width, camConfig.height)
             c.images = imgs
             c.cal = image_cal  # bandaid for now
             self.cameras.append(c)
@@ -134,7 +134,7 @@ class CameraVision:
         cam.streamConfig = config.get("stream")
         cam.config = config
         try:
-            cam.calibration = config["calibration"]
+            cam.calibration = CameraCalibration.load_cal_dict(config["calibration"])
         except KeyError:
             cam.calibration = image_cal  # use default calibration
         self.cameraConfigs.append(cam)
@@ -206,7 +206,7 @@ class CameraVision:
         camera.setConfigJson(json.dumps(config.config))
         camera.setConnectionStrategy(VideoSource.ConnectionStrategy.kConnectionKeepOpen)
 
-        #if config.streamConfig is not None:
+        # if config.streamConfig is not None:
         #    print(json.dumps(config.streamConfig))
         #    server.setConfigJson(json.dumps(config.streamConfig))
 
