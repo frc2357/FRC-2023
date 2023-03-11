@@ -224,7 +224,7 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
     }
 
     public double getAmps() {
-        return Math.abs(m_winchMotor.getOutputCurrent());
+        return m_winchMotor.getOutputCurrent();
     } 
 
     public void manualStow(Double speed){

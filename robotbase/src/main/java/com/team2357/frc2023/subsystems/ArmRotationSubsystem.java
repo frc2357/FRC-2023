@@ -202,7 +202,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
     }
 
     public double getAmps() {
-        return Math.abs(m_rotationMotor.getOutputCurrent());
+        return m_rotationMotor.getOutputCurrent();
     }
 
     @Override

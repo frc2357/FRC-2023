@@ -20,7 +20,7 @@ public void initialize() {
 
 @Override
 public boolean isFinished() {
-    return ArmRotationSubsystem.getInstance().getAmps() >= Constants.ARM_ROTATION.ARM_ROTATION_AMP_ZERO_MAX_AMPS;
+    return Math.abs(ArmRotationSubsystem.getInstance().getAmps()) >= Constants.ARM_ROTATION.ARM_ROTATION_AMP_ZERO_MAX_AMPS;
 }
 
 @Override

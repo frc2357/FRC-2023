@@ -148,7 +148,7 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
     }
 
     public double getAmps() {
-        return Math.abs(m_extendMotor.getOutputCurrent());
+        return m_extendMotor.getOutputCurrent();
     }
 
     @Override

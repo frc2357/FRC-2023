@@ -20,7 +20,7 @@ public class ArmExtendAmpZeroCommand extends CommandBase{
     
     @Override
     public boolean isFinished() {
-        return ArmExtensionSubsystem.getInstance().getAmps() >= Constants.ARM_EXTENSION.ARM_EXTENSION_AMP_ZERO_MAX_AMPS;
+        return Math.abs(ArmExtensionSubsystem.getInstance().getAmps()) >= Constants.ARM_EXTENSION.ARM_EXTENSION_AMP_ZERO_MAX_AMPS;
     }
     
     @Override
