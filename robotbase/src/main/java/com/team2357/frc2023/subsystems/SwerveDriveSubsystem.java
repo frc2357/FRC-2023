@@ -85,17 +85,19 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	public static Command getAutoScoreCommands(int row, int col) {
 		switch (row) {
 			case 0:
-			switch(col % 3) {
-				case 0: case 2:
-					return new ConeAutoScoreHighCommandGroup();
-				case 1:
-					return new CubeAutoScoreHighCommandGroup();
-				default:
-					return new AutoScoreLowCommandGroup(); // Potentially default to ConeAutoScoreHighCommandGroup
-			}
+				switch (col % 3) {
+					case 0:
+					case 2:
+						return new ConeAutoScoreHighCommandGroup();
+					case 1:
+						return new CubeAutoScoreHighCommandGroup();
+					default:
+						return new AutoScoreLowCommandGroup(); // Potentially default to ConeAutoScoreHighCommandGroup
+				}
 			case 1:
-				switch(col % 3) {
-					case 0: case 2:
+				switch (col % 3) {
+					case 0:
+					case 2:
 						return new ConeAutoScoreMidCommandGroup();
 					case 1:
 						return new CubeAutoScoreMidCommandGroup();
@@ -382,17 +384,21 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		SwerveModuleState state = new SwerveModuleState(0.0, Rotation2d.fromDegrees(0.0));
 
 		// m_frontLeftModule.set(
-		// 		state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
-		// 		state.angle.getRadians());
+		// state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond *
+		// m_config.m_maxVoltage,
+		// state.angle.getRadians());
 		// m_frontRightModule.set(
-		// 		state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
-		// 		state.angle.getRadians());
+		// state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond *
+		// m_config.m_maxVoltage,
+		// state.angle.getRadians());
 		// m_backLeftModule.set(
-		// 		state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
-		// 		state.angle.getRadians());
+		// state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond *
+		// m_config.m_maxVoltage,
+		// state.angle.getRadians());
 		// m_backRightModule.set(
-		// 		state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
-		// 		state.angle.getRadians());
+		// state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond *
+		// m_config.m_maxVoltage,
+		// state.angle.getRadians());
 	}
 
 	public void zeroGyroscope() {
@@ -452,7 +458,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		}
 
 		m_chassisSpeeds = chassisSpeeds;
-		
+
 	}
 
 	public void updatePoseEstimator() {
@@ -543,8 +549,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	public boolean isAtTarget() {
 		// System.out.println(isAtXTarget() && isAtYTarget());
-		 //return isAtXTarget();
-		 //return isAtYTarget();
+		// return isAtXTarget();
+		// return isAtYTarget();
 		return isAtXTarget() && isAtYTarget() && !m_isSeeking;
 	}
 
@@ -568,8 +574,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		limelightManager.setAprilTagPipelineActive();
 
 		trackXTarget();
-		//trackYTarget(column.setpoint);
-		trackYTarget(0);
+		trackYTarget(column.setpoint);
 		enableOpenLoopRamp();
 	}
 
@@ -615,7 +620,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 		double outputMetersPerSecond = m_translateYController.calculate(errorAngle);
 		outputMetersPerSecond += -m_config.m_translationYFeedForward.calculate(errorAngle);
-		outputMetersPerSecond = MathUtil.clamp(outputMetersPerSecond, -m_config.m_translateYMaxSpeedMeters, m_config.m_translateYMaxSpeedMeters);
+		outputMetersPerSecond = MathUtil.clamp(outputMetersPerSecond, -m_config.m_translateYMaxSpeedMeters,
+				m_config.m_translateYMaxSpeedMeters);
 		return outputMetersPerSecond;
 	}
 
@@ -624,7 +630,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		// System.out.println(m_translateXController.getSetpoint());
 		// System.out.println("TY "+limelight.getTY());
 		if (!limelightManager.validTargetExists()) {
-			System.out.println("Catching here");
+			DriverStation.reportWarning("NOT IN RANGE OF APRILTAG", null);
 			return;
 		}
 
@@ -638,10 +644,12 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		}
 
 		double speed = calculateXMetersPerSecond();
-		System.out.println("speed: " + speed);
-		System.out.println("error: " + (DualLimelightManagerSubsystem.getInstance().getTY() - m_translateXController.getSetpoint()));
-		//drive(new ChassisSpeeds(0, speed, 0));
-		//drive(new ChassisSpeeds(speed, 0, 0));
+		// System.out.println("speed: " + speed);
+		// System.out.println("error: " +
+		// (DualLimelightManagerSubsystem.getInstance().getTY() -
+		// m_translateXController.getSetpoint()));
+		// drive(new ChassisSpeeds(0, speed, 0));
+		// drive(new ChassisSpeeds(speed, 0, 0));
 		drive(new ChassisSpeeds(calculateXMetersPerSecond(), calculateYMetersPerSecond(), 0));
 	}
 
@@ -691,7 +699,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 		Logger.getInstance().recordOutput("Robot Pose", getPose());
 
-		//System.out.println("Is closed loop: "+isClosedLoopEnabled() + ", tracking: " + isTracking());
+		// System.out.println("Is closed loop: "+isClosedLoopEnabled() + ", tracking: "
+		// + isTracking());
 		if (isClosedLoopEnabled() && isTracking()) {
 			trackingPeriodic();
 		}

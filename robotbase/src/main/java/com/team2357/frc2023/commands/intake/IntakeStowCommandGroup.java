@@ -9,13 +9,13 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 public class IntakeStowCommandGroup extends ParallelCommandGroup {
     public IntakeStowCommandGroup() {
-        addCommands(new InstantCommand(() -> DualLimelightManagerSubsystem.getInstance().setHumanPipelineActive()));
+        addCommands(new InstantCommand(() -> DualLimelightManagerSubsystem.getInstance().setAprilTagPipelineActive()));
 
-        new SequentialCommandGroup(
+        addCommands(new SequentialCommandGroup(
                 new ParallelCommandGroup(
                         new IntakeRollerStopCommand(),
                         new IntakeArmStowCommand()),
 
-                new CloseClawCommand());
+                new CloseClawCommand()));
     }
 }
