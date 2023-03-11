@@ -9,6 +9,7 @@ public class IntakeRollerStopCommand extends CommandBase{
     @Override
     public void initialize() {
         IntakeRollerSubsystem.getInstance().stopIntake();
+        System.out.println("roller stop");
     }
 
     @Override

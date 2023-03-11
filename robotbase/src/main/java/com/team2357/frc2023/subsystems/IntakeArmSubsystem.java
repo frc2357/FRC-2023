@@ -240,7 +240,7 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
             updatePID();
         }
 
-       // SmartDashboard.putNumber("Winch rotations", m_winchMotor.getEncoder().getPosition());
+       SmartDashboard.putNumber("Winch rotations", m_winchMotor.getEncoder().getPosition());
     }
 
     private void deployPeriodic() {
