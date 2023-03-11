@@ -6,7 +6,7 @@ import java.util.HashMap;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 import com.team2357.frc2023.Constants;
-import com.team2357.frc2023.util.DriverStationAllianceGetter;
+import com.team2357.frc2023.networktables.Buttonboard;
 import com.team2357.lib.util.Utility;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -118,7 +118,7 @@ public class AvailableTeleopTrajectories {
         PathPlannerTrajectory trajectory = TrajectoryUtil.createPathPlannerTrajectory(fileName);
         Command TrajCmd = TrajectoryUtil.createDrivePathCommand(trajectory, false);
         PathPlannerState initialState = PathPlannerTrajectory.transformStateForAlliance(trajectory.getInitialState(),
-                DriverStationAllianceGetter.getAlliance());
+                Buttonboard.getInstance().getAlliance());
         double yVal = initialState.poseMeters.getY();
 
         startToConvergenceTrajMap.put(yVal, TrajCmd);

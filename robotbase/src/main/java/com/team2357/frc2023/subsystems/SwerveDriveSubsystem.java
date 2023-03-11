@@ -20,19 +20,21 @@ import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreMidCommandGroup;
 import com.team2357.frc2023.commands.scoring.cube.CubeAutoScoreHighCommandGroup;
 import com.team2357.frc2023.commands.scoring.cube.CubeAutoScoreMidCommandGroup;
 import com.team2357.frc2023.util.Utility;
+import com.team2357.frc2023.networktables.AprilTagPose;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -50,7 +52,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	public static enum COLUMN_TARGET {
 		LEFT(Constants.DRIVE.LEFT_COL_X_ANGLE_SETPOINT, DualLimelightManagerSubsystem.LIMELIGHT.RIGHT, 0),
-		MIDDLE(Constants.DRIVE.MID_COL_X_ANGLE_SETPOINT,  DualLimelightManagerSubsystem.LIMELIGHT.LEFT, 1),
+		MIDDLE(Constants.DRIVE.MID_COL_X_ANGLE_SETPOINT, DualLimelightManagerSubsystem.LIMELIGHT.LEFT, 1),
 		RIGHT(Constants.DRIVE.RIGHT_COL_X_ANGLE_SETPOINT, DualLimelightManagerSubsystem.LIMELIGHT.LEFT, 2),
 		NONE(Double.NaN, DualLimelightManagerSubsystem.LIMELIGHT.LEFT, -1);
 
@@ -116,7 +118,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	private Configuration m_config;
 
-	private SwerveDriveOdometry m_odometry;
+	private SwerveDrivePoseEstimator m_poseEstimator;
 
 	private PathConstraints m_pathConstraints;
 
@@ -127,7 +129,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	private PIDController m_translateYController;
 
 	private COLUMN_TARGET m_targetColumn;
-	// Whether or not the robot is seeking to get the primary limelight camera in view
+	// Whether or not the robot is seeking to get the primary limelight camera in
+	// view
 	private boolean m_isSeeking;
 
 	public static class Configuration {
@@ -228,51 +231,51 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		m_pigeon = new WPI_Pigeon2(pigeonId, canbus);
 
 		m_frontLeftModule = Mk4iSwerveModuleHelper.createFalcon500(
-			tab.getLayout("Front Left Module", BuiltInLayouts.kList)
-							.withSize(2, 4)
-							.withPosition(0, 0),
-			Mk4iSwerveModuleHelper.GearRatio.L2,
-			frontLeftIds[0],
-			frontLeftIds[1],
-			frontLeftIds[2],
-			canbus,
-			0 // Offsets are set manually so this parameter is unnecessary
+				tab.getLayout("Front Left Module", BuiltInLayouts.kList)
+						.withSize(2, 4)
+						.withPosition(0, 0),
+				Mk4iSwerveModuleHelper.GearRatio.L2,
+				frontLeftIds[0],
+				frontLeftIds[1],
+				frontLeftIds[2],
+				canbus,
+				0 // Offsets are set manually so this parameter is unnecessary
 		);
 
 		m_frontRightModule = Mk4iSwerveModuleHelper.createFalcon500(
-			tab.getLayout("Front Right Module", BuiltInLayouts.kList)
-							.withSize(2, 4)
-							.withPosition(2, 0),
-			Mk4iSwerveModuleHelper.GearRatio.L2,
-			frontRightIds[0],
-			frontRightIds[1],
-			frontRightIds[2],
-			canbus,
-			0 // Offsets are set manually so this parameter is unnecessary
+				tab.getLayout("Front Right Module", BuiltInLayouts.kList)
+						.withSize(2, 4)
+						.withPosition(2, 0),
+				Mk4iSwerveModuleHelper.GearRatio.L2,
+				frontRightIds[0],
+				frontRightIds[1],
+				frontRightIds[2],
+				canbus,
+				0 // Offsets are set manually so this parameter is unnecessary
 		);
 
 		m_backLeftModule = Mk4iSwerveModuleHelper.createFalcon500(
-			tab.getLayout("Back Left Module", BuiltInLayouts.kList)
-							.withSize(2, 4)
-							.withPosition(4, 0),
-			Mk4iSwerveModuleHelper.GearRatio.L2,
-			backLeftIds[0],
-			backLeftIds[1],
-			backLeftIds[2],
-			canbus,
-			0 // Offsets are set manually so this parameter is unnecessary
+				tab.getLayout("Back Left Module", BuiltInLayouts.kList)
+						.withSize(2, 4)
+						.withPosition(4, 0),
+				Mk4iSwerveModuleHelper.GearRatio.L2,
+				backLeftIds[0],
+				backLeftIds[1],
+				backLeftIds[2],
+				canbus,
+				0 // Offsets are set manually so this parameter is unnecessary
 		);
 
 		m_backRightModule = Mk4iSwerveModuleHelper.createFalcon500(
-			tab.getLayout("Back Right Module", BuiltInLayouts.kList)
-							.withSize(2, 4)
-							.withPosition(6, 0),
-			Mk4iSwerveModuleHelper.GearRatio.L2,
-			backRightIds[0],
-			backRightIds[1],
-			backRightIds[2],
-			canbus,
-			0 // Offsets are set manually so this parameter is unnecessary
+				tab.getLayout("Back Right Module", BuiltInLayouts.kList)
+						.withSize(2, 4)
+						.withPosition(6, 0),
+				Mk4iSwerveModuleHelper.GearRatio.L2,
+				backRightIds[0],
+				backRightIds[1],
+				backRightIds[2],
+				canbus,
+				0 // Offsets are set manually so this parameter is unnecessary
 		);
 
 		instance = this;
@@ -293,10 +296,11 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 				new Translation2d(-m_config.m_trackwidthMeters / 2.0,
 						-m_config.m_wheelbaseMeters / 2.0));
 
-		m_odometry = new SwerveDriveOdometry(m_kinematics, getGyroscopeRotation(),
+		m_poseEstimator = new SwerveDrivePoseEstimator(m_kinematics, getGyroscopeRotation(),
 				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
 						m_frontRightModule.getPosition(),
-						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
+						m_backLeftModule.getPosition(), m_backRightModule.getPosition() },
+				new Pose2d(0.0, 0.0, getGyroscopeRotation()));
 
 		m_pathConstraints = new PathConstraints(m_config.m_trajectoryMaxVelocityMetersPerSecond,
 				m_config.m_trajectoryMaxAccelerationMetersPerSecond);
@@ -336,8 +340,9 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 		double absoluteAngle = module.getSteerEncoder().getAbsoluteAngle();
 		ErrorCode error = steerMotor.setSelectedSensorPosition(absoluteAngle / m_config.m_sensorPositionCoefficient);
-		if(error != ErrorCode.OK)
-			System.out.println("Sensor position unsuccessfully set on motor "+steerMotor.getDeviceID() + ": " + error);
+		if (error != ErrorCode.OK)
+			System.out
+					.println("Sensor position unsuccessfully set on motor " + steerMotor.getDeviceID() + ": " + error);
 	}
 
 	private boolean isEncoderSynced(SwerveModule module) {
@@ -368,18 +373,18 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	public void zero() {
 		SwerveModuleState state = new SwerveModuleState(0.0, Rotation2d.fromDegrees(0.0));
 
-		m_frontLeftModule.set(
-				state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
-				state.angle.getRadians());
-		m_frontRightModule.set(
-				state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
-				state.angle.getRadians());
-		m_backLeftModule.set(
-				state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
-				state.angle.getRadians());
-		m_backRightModule.set(
-				state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
-				state.angle.getRadians());
+		// m_frontLeftModule.set(
+		// 		state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
+		// 		state.angle.getRadians());
+		// m_frontRightModule.set(
+		// 		state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
+		// 		state.angle.getRadians());
+		// m_backLeftModule.set(
+		// 		state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
+		// 		state.angle.getRadians());
+		// m_backRightModule.set(
+		// 		state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
+		// 		state.angle.getRadians());
 	}
 
 	public void zeroGyroscope() {
@@ -407,12 +412,12 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	public Pose2d getPose() {
-		return m_odometry.getPoseMeters();
+		return m_poseEstimator.getEstimatedPosition();
 	}
 
-	public void resetOdometry(Pose2d pose) {
+	public void resetPoseEstimator(Pose2d pose) {
 		setGyroScope(pose.getRotation().getDegrees());
-		m_odometry.resetPosition(
+		m_poseEstimator.resetPosition(
 				pose.getRotation(),
 				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
 						m_frontRightModule.getPosition(),
@@ -439,31 +444,18 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		}
 
 		m_chassisSpeeds = chassisSpeeds;
-		SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
-		SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxVelocityMetersPerSecond);
-
-		m_frontLeftModule.set(
-				states[0].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
-				states[0].angle.getRadians());
-		m_frontRightModule.set(
-				states[1].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
-				states[1].angle.getRadians());
-		m_backLeftModule.set(
-				states[2].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
-				states[2].angle.getRadians());
-		m_backRightModule.set(
-				states[3].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
-				states[3].angle.getRadians());
-
-		Logger.getInstance().recordOutput("Swerve States", states);
+		
 	}
 
-	public void setOdemetryFromApriltag() {
-		if (DualLimelightManagerSubsystem.getInstance().validTargetExists()) {
-			Pose2d p2d = DualLimelightManagerSubsystem.getInstance().getLimelightPose2d();
-			resetOdometry(p2d);
-		} else {
-			DriverStation.reportError("No AprilTag target", false);
+	public void updatePoseEstimator() {
+		m_poseEstimator.update(getGyroscopeRotation(),
+				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
+						m_frontRightModule.getPosition(),
+						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
+
+		Pose2d visionPose = AprilTagPose.getInstance().getPose();
+		if (visionPose != null) {
+			m_poseEstimator.addVisionMeasurement(visionPose, Timer.getFPGATimestamp());
 		}
 	}
 
@@ -550,9 +542,11 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	/**
 	 * 
-	 * @param column The target column relative to the selected april tag (RIGHT, MIDDLE, LEFT)
-	 * @param targetAprilTag The target AprilTag for the limelight to track, 
-	 * -1 will cause the limelight to track the primary in view AprilTag
+	 * @param column         The target column relative to the selected april tag
+	 *                       (RIGHT, MIDDLE, LEFT)
+	 * @param targetAprilTag The target AprilTag for the limelight to track,
+	 *                       -1 will cause the limelight to track the primary in
+	 *                       view AprilTag
 	 */
 	public void trackTarget(SwerveDriveSubsystem.COLUMN_TARGET column, int targetAprilTag) {
 		System.out.println("track target");
@@ -594,7 +588,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	public double calculateXMetersPerSecond() {
-		double outputMetersPerSecond = m_translateXController.calculate(DualLimelightManagerSubsystem.getInstance().getTY());
+		double outputMetersPerSecond = m_translateXController
+				.calculate(DualLimelightManagerSubsystem.getInstance().getTY());
 		outputMetersPerSecond = outputMetersPerSecond * -1; // Invert output
 		outputMetersPerSecond = MathUtil.clamp(outputMetersPerSecond, m_config.m_translateXMaxSpeedMeters * -1,
 				m_config.m_translateXMaxSpeedMeters);
@@ -605,7 +600,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		DualLimelightManagerSubsystem limelightManager = DualLimelightManagerSubsystem.getInstance();
 		double errorAngle = m_isSeeking ? limelightManager.getPrimaryTX() : limelightManager.getSecondaryTX();
 		double outputMetersPerSecond = m_translateYController.calculate(errorAngle);
-		outputMetersPerSecond = MathUtil.clamp(outputMetersPerSecond, m_config.m_translateYMaxSpeedMeters*-1, m_config.m_translateYMaxSpeedMeters);
+		outputMetersPerSecond = MathUtil.clamp(outputMetersPerSecond, m_config.m_translateYMaxSpeedMeters * -1,
+				m_config.m_translateYMaxSpeedMeters);
 		return outputMetersPerSecond;
 	}
 
@@ -620,7 +616,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 		System.out.println(isTracking());
 
-		if(!limelightManager.validTargetExistsOnPrimary() && !m_isSeeking) { // If the primary limelight has no target, and has not been set to seek
+		if (!limelightManager.validTargetExistsOnPrimary() && !m_isSeeking) { // If the primary limelight has no target,
+																				// and has not been set to seek
 			configureSeeking();
 		} else if (limelightManager.validTargetExistsOnPrimary() && m_isSeeking) {
 			stopSeeking();
@@ -644,11 +641,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	@Override
 	public void periodic() {
-		m_odometry.update(getGyroscopeRotation(),
-				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
-						m_frontRightModule.getPosition(),
-						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
 		// setOdemetryFromApriltag();
+		updatePoseEstimator();
 
 		SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
 
@@ -660,7 +654,25 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		// SmartDashboard.putNumber("Pose Angle",
 		// m_odometry.getPoseMeters().getRotation().getDegrees());
 
-		Logger.getInstance().recordOutput("Robot Pose", m_odometry.getPoseMeters());
+		SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
+		SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxVelocityMetersPerSecond);
+
+		m_frontLeftModule.set(
+				states[0].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
+				states[0].angle.getRadians());
+		m_frontRightModule.set(
+				states[1].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
+				states[1].angle.getRadians());
+		m_backLeftModule.set(
+				states[2].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
+				states[2].angle.getRadians());
+		m_backRightModule.set(
+				states[3].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
+				states[3].angle.getRadians());
+
+		Logger.getInstance().recordOutput("Swerve States", states);
+
+		Logger.getInstance().recordOutput("Robot Pose", getPose());
 
 		if (isClosedLoopEnabled() && isTracking()) {
 			trackingPeriodic();
