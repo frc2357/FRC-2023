@@ -201,6 +201,10 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
         m_pidController.setD(m_shuffleboardPIDTuner.getDValue());
     }
 
+    public double getAmps() {
+        return m_rotationMotor.getOutputCurrent();
+    }
+
     @Override
     public void periodic() {
         if (isClosedLoopEnabled()) {
