@@ -13,8 +13,8 @@ public class IntakeStowCommandGroup extends SequentialCommandGroup {
         addCommands(new InstantCommand(() -> DualLimelightManagerSubsystem.getInstance().setAprilTagPipelineActive()));
 
         addCommands(new SequentialCommandGroup(
+            new WaitCommand(0.25),
                 new ParallelCommandGroup(
-                        new WaitCommand(0.25),
                         new IntakeRollerStopCommand(),
                         new IntakeArmStowCommand()),
 
