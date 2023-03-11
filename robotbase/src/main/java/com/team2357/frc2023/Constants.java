@@ -129,6 +129,9 @@ public final class Constants {
             config.m_translationXFeedForward = new SimpleMotorFeedforward(0.244, 0);
             config.m_translationYFeedForward = new SimpleMotorFeedforward(0.244, 0.00);
 
+            config.m_rotateTargetController = new PIDController(0.01, 0, 0);
+            config.m_rotateToTargetFeedforward = 0.6;
+
             config.m_openLoopRampRateSeconds = 1;
 
             return config;
@@ -159,9 +162,6 @@ public final class Constants {
         public static final double WAIT_FOR_ZERO_TIME_MILLIS = 250;
 
         public static final double ENCODER_SYNC_ACCURACY_RADIANS = 0.05;
-
-        public static final double ROTATE_TO_TARGET_FEEDFORWARD = 0.6;
-        public static final PIDController ROTATE_TO_TARGET_CONTROLLER = new PIDController(0.01, 0, 0);
 
         public static final double ROTATE_MAXSPEED_RADIANS_PER_SECOND = 0.91;
         public static final double SYNC_ENCODER_LIMIT_MS = 10000;

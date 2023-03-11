@@ -221,6 +221,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		public PIDController m_translateXController;
 		public PIDController m_translateYController;
 
+		public double m_rotateToTargetFeedforward;
+
 		public SimpleMotorFeedforward m_translationXFeedForward;
 		public SimpleMotorFeedforward m_translationYFeedForward;
 
@@ -506,6 +508,48 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		power *= direction;
 
 		drive(power, 0, 0);
+	}
+
+	public void initRotating(double targetDegrees) {
+		m_config.m_rotateTargetController.reset();
+        double currentAngle = getYaw() % 360;
+
+        while (currentAngle < 0) {
+            currentAngle += 360;
+        }
+
+        double distance = targetDegrees - currentAngle;
+        while (distance < -180) {
+            distance += 360;
+        }
+        while (distance > 180) {
+            distance -= 360;
+        }
+
+        m_config.m_rotateTargetController.setSetpoint(getYaw() + distance);
+        m_config.m_rotateTargetController.setTolerance(0.05);
+	}
+
+	public void rotateExecute() {
+		double errorAngle = getYaw();
+        double newSpeed = m_config.m_rotateTargetController.calculate(errorAngle);
+
+        newSpeed += Math.copySign(m_config.m_rotateToTargetFeedforward, newSpeed);
+
+        newSpeed = MathUtil.clamp(newSpeed, -Constants.DRIVE.ROTATE_MAXSPEED_RADIANS_PER_SECOND, Constants.DRIVE.ROTATE_MAXSPEED_RADIANS_PER_SECOND);
+        drive(ChassisSpeeds.fromFieldRelativeSpeeds(0, 0, newSpeed, getGyroscopeRotation()));
+        
+        System.out.print("Speed: " + newSpeed);
+        System.out.println("Setpoint: " + m_config.m_rotateTargetController.getSetpoint());
+        System.out.println("Error: " + m_config.m_rotateTargetController.getPositionError());
+	}
+
+	public void stopRotating() {
+		drive(new ChassisSpeeds());
+	}
+
+	public boolean atRotation() {
+		return m_config.m_rotateTargetController.atSetpoint();
 	}
 
 	public void enableOpenLoopRamp() {
