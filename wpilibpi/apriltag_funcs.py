@@ -172,7 +172,7 @@ class AprilTagDetector:
     DETECTION_MARGIN_THRESHOLD = 100
     POSE_SOLVER_ITERATIONS = 200
     _match_tags = []  # holds the _MATCH_TAGMAP currently in use
-    taglocs = copy(apriltagloc_type2)
+    taglocs = copy(apriltagloc_type)
 
     def __init__(self, frame_size, Fx=1000, Fy=1000, Cx=1280 / 2, Cy=720 / 2, alliance="RED"):
         """AprilTagPipeline class
@@ -279,7 +279,7 @@ class AprilTagDetector:
 
     def reset_taglocs(self):
         """We want tags to be all zero if we didn't see them"""
-        self.taglocs = copy(apriltagloc_type2)
+        self.taglocs = copy(apriltagloc_type)
 
     def runPipeline(self, frame: ndarray, cal: CameraCalibration, cam_idx=0):
         """
@@ -330,22 +330,22 @@ class AprilTagDetector:
                     frame, pts = project_gamepiece_locations(g_roi_map, frame, result, cal)
                     roipts.append((tag_id, pts))
 
-                self.taglocs["tags"][tag_id - 1]["pose"] = [
-                    tvec.x,
-                    tvec.y,
-                    tvec.z,
-                    rqua.W(),
-                    rqua.X(),
-                    rqua.Y(),
-                    rqua.Z(),
-                ]
-                # self.taglocs["tags"]["pose"]["translation"] = {"x": tvec.x, "y": tvec.y, "z": tvec.z}
-                # self.taglocs["tags"]["pose"]["rotation"]["quaternion"] = {
-                #    "W": rqua.W(),
-                #    "X": rqua.X(),
-                #    "Y": rqua.Y(),
-                #    "Z": rqua.Z(),
-                # }
+                # self.taglocs["tags"][tag_id - 1]["pose"] = [
+                #    tvec.x,
+                #    tvec.y,
+                #    tvec.z,
+                #    rqua.W(),
+                #    rqua.X(),
+                #    rqua.Y(),
+                #    rqua.Z(),
+                # ]
+                self.taglocs["tags"][tag_id-1]["pose"]["translation"] = {"x": tvec.x, "y": tvec.y, "z": tvec.z}
+                self.taglocs["tags"][tag_id-1]["pose"]["rotation"]["quaternion"] = {
+                   "W": rqua.W(),
+                   "X": rqua.X(),
+                   "Y": rqua.Y(),
+                   "Z": rqua.Z(),
+                }
                 self.taglocs["tags"][tag_id - 1]["ambiguity"] = amb
                 self.taglocs["tags"][tag_id - 1]["camera"] = cam_idx
             dt = time.perf_counter() - start

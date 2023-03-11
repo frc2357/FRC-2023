@@ -17,18 +17,22 @@ import glob
 def nothing(x):
     pass
 
-# Initializing the webcam feed.
-#cap = cv2.VideoCapture(0)
-#cap.set(3,1280)
-#cap.set(4,720)
+simulate = False
 
 
-# Use pre-captured images
-imgs = []
-fimages = glob.glob(".\\images\\*.png")
-print(fimages)
-for fname in fimages:
-    imgs.append(np.ascontiguousarray(cv2.imread(fname)))
+if simulate:
+    # Use pre-captured images
+    imgs = []
+    fimages = glob.glob(".\\images\\*.png")
+    print(fimages)
+    for fname in fimages:
+        imgs.append(np.ascontiguousarray(cv2.imread(fname)))
+else:
+    # Initializing the webcam feed.
+    cap = cv2.VideoCapture(1)
+    cap.set(3,1280)
+    cap.set(4,720)    
+
 # Create a window named trackbars.
 cv2.namedWindow("Trackbars")
 
@@ -47,10 +51,13 @@ count = 0
 while True:
     
     # Start reading the webcam feed frame by frame.
-    frame = imgs[count % len(imgs)]    
-    #ret, frame = cap.read()
-    #if not ret:
-    #    break
+    if simulate:
+        frame = imgs[count % len(imgs)]    
+        ret = True
+    else:
+        ret, frame = cap.read()
+    if not ret:
+        break
 
     # Convert the BGR image to HSV image.
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)

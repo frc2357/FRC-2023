@@ -203,27 +203,32 @@ class CameraVision:
         camera = UsbCamera(config.name, config.path)
         server = CameraServer.addCamera(camera)
 
-        # camera.setConfigJson(json.dumps(config.config))
+        #camera.setConfigJson(json.dumps(config.config))
         camera.setConnectionStrategy(VideoSource.ConnectionStrategy.kConnectionKeepOpen)
 
         if config.streamConfig is not None:
             server.setConfigJson(json.dumps(config.streamConfig))
 
         camConfig = camera.getConfigJsonObject()
+        #camera.setConfigJson(camConfig)
+        #print(dir(camera))
+        #print(camConfig)
         # create object to hold camera state
         c = CameraObject()
         c.camera = camera
         c.config = camConfig
-        c.outstream = CameraServer.putVideo(config.name, camConfig["width"], camConfig["height"])
+        c.outstream = CameraServer.putVideo(config.name, config.width, config.height)
         c.sink = CameraServer.getVideo(camera)
         c.cal = config.calibration
         return c
 
 
 if __name__ == "__main__":
-    c = CameraVision("/boot/frc.json")
+    import sys
+    cfgfile = sys.argv[1]
+    c = CameraVision(cfgfile)
     frame = np.zeros(shape=(720, 1280, 3), dtype="uint8")
     while True:
         for cam in c.cameras:
-            c.sink.grabFrame(frame)
-            c.outstream.putFrame(frame)
+            cam.sink.grabFrame(frame)
+            cam.outstream.putFrame(frame)
