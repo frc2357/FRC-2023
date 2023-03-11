@@ -53,7 +53,6 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	public static enum COLUMN_TARGET {
 		LEFT(Constants.DRIVE.LEFT_COL_X_ANGLE_SETPOINT, DualLimelightManagerSubsystem.LIMELIGHT.RIGHT, 0),
 		MIDDLE(Constants.DRIVE.MID_COL_X_ANGLE_SETPOINT, DualLimelightManagerSubsystem.LIMELIGHT.LEFT, 1),
-		MIDDLE(Constants.DRIVE.MID_COL_X_ANGLE_SETPOINT, DualLimelightManagerSubsystem.LIMELIGHT.LEFT, 1),
 		RIGHT(Constants.DRIVE.RIGHT_COL_X_ANGLE_SETPOINT, DualLimelightManagerSubsystem.LIMELIGHT.LEFT, 2),
 		NONE(Double.NaN, DualLimelightManagerSubsystem.LIMELIGHT.LEFT, -1);
 
@@ -241,27 +240,9 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 				frontLeftIds[2],
 				canbus,
 				0 // Offsets are set manually so this parameter is unnecessary
-				tab.getLayout("Front Left Module", BuiltInLayouts.kList)
-						.withSize(2, 4)
-						.withPosition(0, 0),
-				Mk4iSwerveModuleHelper.GearRatio.L2,
-				frontLeftIds[0],
-				frontLeftIds[1],
-				frontLeftIds[2],
-				canbus,
-				0 // Offsets are set manually so this parameter is unnecessary
 		);
 
 		m_frontRightModule = Mk4iSwerveModuleHelper.createFalcon500(
-				tab.getLayout("Front Right Module", BuiltInLayouts.kList)
-						.withSize(2, 4)
-						.withPosition(2, 0),
-				Mk4iSwerveModuleHelper.GearRatio.L2,
-				frontRightIds[0],
-				frontRightIds[1],
-				frontRightIds[2],
-				canbus,
-				0 // Offsets are set manually so this parameter is unnecessary
 				tab.getLayout("Front Right Module", BuiltInLayouts.kList)
 						.withSize(2, 4)
 						.withPosition(2, 0),
@@ -283,27 +264,9 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 				backLeftIds[2],
 				canbus,
 				0 // Offsets are set manually so this parameter is unnecessary
-				tab.getLayout("Back Left Module", BuiltInLayouts.kList)
-						.withSize(2, 4)
-						.withPosition(4, 0),
-				Mk4iSwerveModuleHelper.GearRatio.L2,
-				backLeftIds[0],
-				backLeftIds[1],
-				backLeftIds[2],
-				canbus,
-				0 // Offsets are set manually so this parameter is unnecessary
 		);
 
 		m_backRightModule = Mk4iSwerveModuleHelper.createFalcon500(
-				tab.getLayout("Back Right Module", BuiltInLayouts.kList)
-						.withSize(2, 4)
-						.withPosition(6, 0),
-				Mk4iSwerveModuleHelper.GearRatio.L2,
-				backRightIds[0],
-				backRightIds[1],
-				backRightIds[2],
-				canbus,
-				0 // Offsets are set manually so this parameter is unnecessary
 				tab.getLayout("Back Right Module", BuiltInLayouts.kList)
 						.withSize(2, 4)
 						.withPosition(6, 0),
