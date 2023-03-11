@@ -14,6 +14,7 @@ import com.swervedrivespecialties.swervelib.AbsoluteEncoder;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
+import com.team2357.frc2023.commands.controller.RumbleCommand;
 import com.team2357.frc2023.commands.scoring.AutoScoreLowCommandGroup;
 import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
 import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreMidCommandGroup;
@@ -545,6 +546,10 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 			return m_translateYController.atSetpoint();
 		}
 		return true;
+	}
+
+	public boolean hasTarget() {
+		return DualLimelightManagerSubsystem.getInstance().validTargetExists();
 	}
 
 	public boolean isAtTarget() {
