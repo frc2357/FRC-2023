@@ -6,38 +6,109 @@ package com.team2357.frc2023.subsystems;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.ErrorCode;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.pathplanner.lib.PathConstraints;
 import com.swervedrivespecialties.swervelib.AbsoluteEncoder;
+import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
+import com.team2357.frc2023.commands.controller.RumbleCommand;
+import com.team2357.frc2023.commands.scoring.AutoScoreLowCommandGroup;
+import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
+import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreMidCommandGroup;
+import com.team2357.frc2023.commands.scoring.cube.CubeAutoScoreHighCommandGroup;
+import com.team2357.frc2023.commands.scoring.cube.CubeAutoScoreMidCommandGroup;
+import com.team2357.frc2023.util.Utility;
+import com.team2357.frc2023.networktables.AprilTagPose;
+import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.networktables.DoubleArraySubscriber;
-import edu.wpi.first.networktables.DoubleArrayTopic;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.PubSubOption;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.Command;
 
-public class SwerveDriveSubsystem extends SubsystemBase {
+public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	private static SwerveDriveSubsystem instance = null;
 
-	private boolean m_isZeroed;
+	private boolean m_areEncodersSynced;
 
 	public static SwerveDriveSubsystem getInstance() {
 		return instance;
+	}
+
+	// View of 3x3 section of the grid from robot POV
+	public static enum COLUMN_TARGET {
+		LEFT(Constants.DRIVE.LEFT_COL_X_ANGLE_SETPOINT, DualLimelightManagerSubsystem.LIMELIGHT.RIGHT, 0),
+		MIDDLE(Constants.DRIVE.MID_COL_X_ANGLE_SETPOINT, DualLimelightManagerSubsystem.LIMELIGHT.LEFT, 1),
+		RIGHT(Constants.DRIVE.RIGHT_COL_X_ANGLE_SETPOINT, DualLimelightManagerSubsystem.LIMELIGHT.LEFT, 2),
+		NONE(Double.NaN, DualLimelightManagerSubsystem.LIMELIGHT.LEFT, -1);
+
+		public final double setpoint;
+		public final int index;
+		public final DualLimelightManagerSubsystem.LIMELIGHT primaryLimelight;
+
+		private COLUMN_TARGET(double setpoint, DualLimelightManagerSubsystem.LIMELIGHT primaryLimelight, int index) {
+			this.setpoint = setpoint;
+			this.primaryLimelight = primaryLimelight;
+			this.index = index;
+		}
+	}
+
+	public static COLUMN_TARGET getSetpoint(int val) {
+		for (COLUMN_TARGET setpoint : COLUMN_TARGET.values()) {
+			if (val == setpoint.index) {
+				return setpoint;
+			}
+		}
+		return COLUMN_TARGET.NONE;
+	}
+
+	/**
+	 * @param row row to score on (low: 2, mid: 1, high: 0)
+	 * @return Auto score command to run
+	 */
+	public static Command getAutoScoreCommands(int row, int col) {
+		switch (row) {
+			case 0:
+				switch (col % 3) {
+					case 0:
+					case 2:
+						return new ConeAutoScoreHighCommandGroup();
+					case 1:
+						return new CubeAutoScoreHighCommandGroup();
+					default:
+						return new AutoScoreLowCommandGroup(); // Potentially default to ConeAutoScoreHighCommandGroup
+				}
+			case 1:
+				switch (col % 3) {
+					case 0:
+					case 2:
+						return new ConeAutoScoreMidCommandGroup();
+					case 1:
+						return new CubeAutoScoreMidCommandGroup();
+					default:
+						return new AutoScoreLowCommandGroup(); // Potentially default to ConeAutoScoreHighCommandGroup
+				}
+			default:
+				return new AutoScoreLowCommandGroup();
+		}
+
 	}
 
 	private SwerveDriveKinematics m_kinematics;
@@ -53,13 +124,20 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
 	private Configuration m_config;
 
-	private SwerveDriveOdometry m_odometry;
+	private SwerveDrivePoseEstimator m_poseEstimator;
 
 	private PathConstraints m_pathConstraints;
 
-	public NetworkTable m_limelightTable;
-	public DoubleArrayTopic m_limelightInfo;
-	private DoubleArraySubscriber m_limelightSubscriber;
+	// Controller for robot movement along the y-axis
+	private PIDController m_translateXController;
+
+	// Controller for robot movement along the x-axis
+	private PIDController m_translateYController;
+
+	private COLUMN_TARGET m_targetColumn;
+	// Whether or not the robot is seeking to get the primary limelight camera in
+	// view
+	private boolean m_isSeeking;
 
 	public static class Configuration {
 		/**
@@ -102,9 +180,49 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
 		public double m_trajectoryMaxAccelerationMetersPerSecond;
 
+		/**
+		 * These are the maximum speeds that the targeting methods should achieve in
+		 * meters per second
+		 */
+		public double m_translateXMaxSpeedMeters;
+
+		public double m_translateYMaxSpeedMeters;
+
+		/**
+		 * These are the tolerances for the targeting methods in angle on the limelight
+		 */
+		public double m_translateYAngleTolerance;
+
+		public double m_translateXAngleTolerance;
+
+		/**
+		 * These are the setpoints for the PID's that the translate commands use
+		 */
+		public double m_defaultXAngleSetpoint;
+		public double m_defaultYAngleSetpoint;
+
+		public double m_leftColXAngleSetpoint;
+		public double m_midColXAngleSetpoint;
+		public double m_rightColXAngleSetpoint;
+
+		/*
+		 * Open loop ramp rate for auto targeting
+		 * In seconds from neutral to full throttle
+		 */
+		public double m_openLoopRampRateSeconds;
+
+		// Trajectory PID controllers
 		public PIDController m_xController;
 		public PIDController m_yController;
 		public PIDController m_thetaController;
+
+		// Auto targeting PID controllers
+		public PIDController m_rotateTargetController;
+		public PIDController m_translateXController;
+		public PIDController m_translateYController;
+
+		public SimpleMotorFeedforward m_translationXFeedForward;
+		public SimpleMotorFeedforward m_translationYFeedForward;
 
 		/**
 		 * Conversion coefficient to go from degrees to Falcon500 sensor units
@@ -113,26 +231,71 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		 * moduleConfiguration.getSteerReduction()
 		 */
 		public double m_sensorPositionCoefficient;
+
 	}
 
-	public SwerveDriveSubsystem(WPI_Pigeon2 pigeon, SwerveModule frontLeft, SwerveModule frontRight,
-			SwerveModule backLeft, SwerveModule backRight) {
-		m_pigeon = pigeon;
+	public SwerveDriveSubsystem(int pigeonId, int[] frontLeftIds, int[] frontRightIds,
+			int[] backLeftIds, int[] backRightIds, String canbus, String shuffleboardTab) {
+		ShuffleboardTab tab = Shuffleboard.getTab(shuffleboardTab);
 
-		m_frontLeftModule = frontLeft;
-		m_frontRightModule = frontRight;
-		m_backLeftModule = backLeft;
-		m_backRightModule = backRight;
+		m_pigeon = new WPI_Pigeon2(pigeonId, canbus);
 
-		m_limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
-		m_limelightInfo = m_limelightTable.getDoubleArrayTopic("botpose");
-		m_limelightSubscriber = m_limelightInfo.subscribe(null, PubSubOption.keepDuplicates(true));
+		m_frontLeftModule = Mk4iSwerveModuleHelper.createFalcon500(
+				tab.getLayout("Front Left Module", BuiltInLayouts.kList)
+						.withSize(2, 4)
+						.withPosition(0, 0),
+				Mk4iSwerveModuleHelper.GearRatio.L2,
+				frontLeftIds[0],
+				frontLeftIds[1],
+				frontLeftIds[2],
+				canbus,
+				0 // Offsets are set manually so this parameter is unnecessary
+		);
 
+		m_frontRightModule = Mk4iSwerveModuleHelper.createFalcon500(
+				tab.getLayout("Front Right Module", BuiltInLayouts.kList)
+						.withSize(2, 4)
+						.withPosition(2, 0),
+				Mk4iSwerveModuleHelper.GearRatio.L2,
+				frontRightIds[0],
+				frontRightIds[1],
+				frontRightIds[2],
+				canbus,
+				0 // Offsets are set manually so this parameter is unnecessary
+		);
+
+		m_backLeftModule = Mk4iSwerveModuleHelper.createFalcon500(
+				tab.getLayout("Back Left Module", BuiltInLayouts.kList)
+						.withSize(2, 4)
+						.withPosition(4, 0),
+				Mk4iSwerveModuleHelper.GearRatio.L2,
+				backLeftIds[0],
+				backLeftIds[1],
+				backLeftIds[2],
+				canbus,
+				0 // Offsets are set manually so this parameter is unnecessary
+		);
+
+		m_backRightModule = Mk4iSwerveModuleHelper.createFalcon500(
+				tab.getLayout("Back Right Module", BuiltInLayouts.kList)
+						.withSize(2, 4)
+						.withPosition(6, 0),
+				Mk4iSwerveModuleHelper.GearRatio.L2,
+				backRightIds[0],
+				backRightIds[1],
+				backRightIds[2],
+				canbus,
+				0 // Offsets are set manually so this parameter is unnecessary
+		);
+
+		m_targetColumn = COLUMN_TARGET.NONE;
 		instance = this;
 	}
 
 	public void configure(Configuration config) {
 		m_config = config;
+
+		m_pigeon.configFactoryDefault();
 
 		m_kinematics = new SwerveDriveKinematics(
 				new Translation2d(m_config.m_trackwidthMeters / 2.0,
@@ -144,13 +307,16 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 				new Translation2d(-m_config.m_trackwidthMeters / 2.0,
 						-m_config.m_wheelbaseMeters / 2.0));
 
-		m_odometry = new SwerveDriveOdometry(m_kinematics, getGyroscopeRotation(),
+		m_poseEstimator = new SwerveDrivePoseEstimator(m_kinematics, getGyroscopeRotation(),
 				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
 						m_frontRightModule.getPosition(),
-						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
+						m_backLeftModule.getPosition(), m_backRightModule.getPosition() },
+				new Pose2d(0.0, 0.0, getGyroscopeRotation()));
 
 		m_pathConstraints = new PathConstraints(m_config.m_trajectoryMaxVelocityMetersPerSecond,
 				m_config.m_trajectoryMaxAccelerationMetersPerSecond);
+		m_translateXController = m_config.m_translateXController;
+		m_translateYController = m_config.m_translateYController;
 	}
 
 	public PIDController getXController() {
@@ -173,26 +339,27 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		return m_pathConstraints;
 	}
 
-	public boolean isReadyToZero() {
-		if (isReadyToZero(m_frontLeftModule) && isReadyToZero(m_frontRightModule) && isReadyToZero(m_backLeftModule)
-				&& isReadyToZero(m_backRightModule)) {
-			return true;
-		}
-		return false;
+	public void syncEncoders() {
+		syncEncoder(m_frontLeftModule);
+		syncEncoder(m_frontRightModule);
+		syncEncoder(m_backLeftModule);
+		syncEncoder(m_backRightModule);
 	}
 
-	private boolean isReadyToZero(SwerveModule module) {
-		WPI_TalonFX steerMotor;
-		steerMotor = (WPI_TalonFX) (module.getSteerMotor());
+	private void syncEncoder(SwerveModule module) {
+		TalonFX steerMotor = (TalonFX) (module.getSteerMotor());
 
 		double absoluteAngle = module.getSteerEncoder().getAbsoluteAngle();
-		((WPI_TalonFX) (module.getSteerMotor()))
-				.setSelectedSensorPosition(absoluteAngle / m_config.m_sensorPositionCoefficient);
-
-		return isEncoderSynced(steerMotor, module.getSteerEncoder());
+		ErrorCode error = steerMotor.setSelectedSensorPosition(absoluteAngle / m_config.m_sensorPositionCoefficient);
+		if (error != ErrorCode.OK)
+			System.out
+					.println("Sensor position unsuccessfully set on motor " + steerMotor.getDeviceID() + ": " + error);
 	}
 
-	private boolean isEncoderSynced(WPI_TalonFX steerMotor, AbsoluteEncoder steerEncoder) {
+	private boolean isEncoderSynced(SwerveModule module) {
+		TalonFX steerMotor = (TalonFX) (module.getSteerMotor());
+		AbsoluteEncoder steerEncoder = module.getSteerEncoder();
+
 		double difference = Math.abs(steerMotor.getSelectedSensorPosition() * m_config.m_sensorPositionCoefficient
 				- steerEncoder.getAbsoluteAngle());
 		difference %= Math.PI;
@@ -201,36 +368,46 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 				|| Math.abs(difference - Math.PI) < Constants.DRIVE.ENCODER_SYNC_ACCURACY_RADIANS;
 	}
 
+	public boolean checkEncodersSynced() {
+		m_areEncodersSynced = ((isEncoderSynced(m_frontLeftModule)) &&
+				(isEncoderSynced(m_frontRightModule)) &&
+				(isEncoderSynced(m_backLeftModule)) &&
+				(isEncoderSynced(m_backRightModule)));
+
+		return m_areEncodersSynced;
+	}
+
+	public boolean getIsEncodersSynced() {
+		return m_areEncodersSynced;
+	}
+
 	public void zero() {
 		SwerveModuleState state = new SwerveModuleState(0.0, Rotation2d.fromDegrees(0.0));
 
-		m_frontLeftModule.set(
-				state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
-				state.angle.getRadians());
-		m_frontRightModule.set(
-				state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
-				state.angle.getRadians());
-		m_backLeftModule.set(
-				state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
-				state.angle.getRadians());
-		m_backRightModule.set(
-				state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
-				state.angle.getRadians());
-	}
-
-	public void checkEncodersSynced() {
-		m_isZeroed = ((isEncoderSynced((WPI_TalonFX) m_frontLeftModule.getSteerMotor(),
-				m_frontLeftModule.getSteerEncoder())) &&
-				(isEncoderSynced((WPI_TalonFX) m_frontRightModule.getSteerMotor(),
-						m_frontRightModule.getSteerEncoder()))
-				&&
-				(isEncoderSynced((WPI_TalonFX) m_backLeftModule.getSteerMotor(), m_backLeftModule.getSteerEncoder())) &&
-				(isEncoderSynced((WPI_TalonFX) m_backRightModule.getSteerMotor(),
-						m_backRightModule.getSteerEncoder())));
+		// m_frontLeftModule.set(
+		// state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond *
+		// m_config.m_maxVoltage,
+		// state.angle.getRadians());
+		// m_frontRightModule.set(
+		// state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond *
+		// m_config.m_maxVoltage,
+		// state.angle.getRadians());
+		// m_backLeftModule.set(
+		// state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond *
+		// m_config.m_maxVoltage,
+		// state.angle.getRadians());
+		// m_backRightModule.set(
+		// state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond *
+		// m_config.m_maxVoltage,
+		// state.angle.getRadians());
 	}
 
 	public void zeroGyroscope() {
 		m_pigeon.reset();
+	}
+
+	public void setGyroScope(double degrees) {
+		m_pigeon.setYaw(degrees);
 	}
 
 	public double getYaw() {
@@ -246,16 +423,17 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	}
 
 	public Rotation2d getGyroscopeRotation() {
-		return Rotation2d.fromDegrees(m_pigeon.getYaw());
+		return Rotation2d.fromDegrees(getYaw());
 	}
 
 	public Pose2d getPose() {
-		return m_odometry.getPoseMeters();
+		return m_poseEstimator.getEstimatedPosition();
 	}
 
-	public void resetOdometry(Pose2d pose) {
-		m_odometry.resetPosition(
-				getGyroscopeRotation(),
+	public void resetPoseEstimator(Pose2d pose) {
+		setGyroScope(pose.getRotation().getDegrees());
+		m_poseEstimator.resetPosition(
+				pose.getRotation(),
 				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
 						m_frontRightModule.getPosition(),
 						m_backLeftModule.getPosition(), m_backRightModule.getPosition() },
@@ -273,39 +451,26 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	}
 
 	public void drive(ChassisSpeeds chassisSpeeds) {
-		if (!m_isZeroed) {
-			DriverStation.reportError("Swerve is not zeroed", false);
+		if (!m_areEncodersSynced) {
+			DriverStation.reportError("Swerve is not synced", false);
+			syncEncoders();
+			checkEncodersSynced();
 			return;
 		}
+
 		m_chassisSpeeds = chassisSpeeds;
-		SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
-		SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxVelocityMetersPerSecond);
 
-		m_frontLeftModule.set(
-				states[0].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
-				states[0].angle.getRadians());
-		m_frontRightModule.set(
-				states[1].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
-				states[1].angle.getRadians());
-		m_backLeftModule.set(
-				states[2].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
-				states[2].angle.getRadians());
-		m_backRightModule.set(
-				states[3].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
-				states[3].angle.getRadians());
-
-		Logger.getInstance().recordOutput("Swerve States", states);
 	}
 
-	public void setOdemetryFromApriltag() {
-		double[] vals = m_limelightSubscriber.get();
-		if (vals.length >= 2) {
-			Translation2d t2d = new Translation2d(vals[0], vals[1]);
-			Rotation2d r2d = new Rotation2d(getYaw());
-			Pose2d p2d = new Pose2d(t2d, r2d);
-			resetOdometry(p2d);
-		} else {
-			DriverStation.reportError("No AprilTag target", false);
+	public void updatePoseEstimator() {
+		m_poseEstimator.update(getGyroscopeRotation(),
+				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
+						m_frontRightModule.getPosition(),
+						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
+
+		Pose2d visionPose = AprilTagPose.getInstance().getPose();
+		if (visionPose != null) {
+			m_poseEstimator.addVisionMeasurement(visionPose, Timer.getFPGATimestamp());
 		}
 	}
 
@@ -343,21 +508,219 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		drive(power, 0, 0);
 	}
 
+	public void enableOpenLoopRamp() {
+		TalonFX motor = (TalonFX) m_backRightModule.getDriveMotor();
+		motor.configOpenloopRamp(m_config.m_openLoopRampRateSeconds);
+		motor = (TalonFX) m_backLeftModule.getDriveMotor();
+		motor.configOpenloopRamp(m_config.m_openLoopRampRateSeconds);
+		motor = (TalonFX) m_frontLeftModule.getDriveMotor();
+		motor.configOpenloopRamp(m_config.m_openLoopRampRateSeconds);
+		motor = (TalonFX) m_frontRightModule.getDriveMotor();
+		motor.configOpenloopRamp(m_config.m_openLoopRampRateSeconds);
+	}
+
+	public void disableOpenLoopRamp() {
+		TalonFX motor = (TalonFX) m_backRightModule.getDriveMotor();
+		motor.configOpenloopRamp(0);
+		motor = (TalonFX) m_backLeftModule.getDriveMotor();
+		motor.configOpenloopRamp(0);
+		motor = (TalonFX) m_frontLeftModule.getDriveMotor();
+		motor.configOpenloopRamp(0);
+		motor = (TalonFX) m_frontRightModule.getDriveMotor();
+		motor.configOpenloopRamp(0);
+	}
+
+	public boolean isTracking() {
+		return m_targetColumn != COLUMN_TARGET.NONE;
+	}
+
+	public boolean isAtXTarget() {
+		if (isTracking()) {
+			return m_translateXController.atSetpoint();
+		}
+		return true;
+	}
+
+	public boolean isAtYTarget() {
+		if (isTracking()) {
+			return m_translateYController.atSetpoint();
+		}
+		return true;
+	}
+
+	public boolean hasTarget() {
+		return DualLimelightManagerSubsystem.getInstance().validTargetExists();
+	}
+
+	public boolean isAtTarget() {
+		// System.out.println(isAtXTarget() && isAtYTarget());
+		// return isAtXTarget();
+		// return isAtYTarget();
+		return isAtXTarget() && isAtYTarget() && !m_isSeeking;
+	}
+
+	/**
+	 * 
+	 * @param column         The target column relative to the selected april tag
+	 *                       (RIGHT, MIDDLE, LEFT)
+	 * @param targetAprilTag The target AprilTag for the limelight to track,
+	 *                       -1 will cause the limelight to track the primary in
+	 *                       view AprilTag
+	 */
+	public void trackTarget(SwerveDriveSubsystem.COLUMN_TARGET column, int targetAprilTag) {
+		System.out.println("track target");
+		setClosedLoopEnabled(true);
+
+		DualLimelightManagerSubsystem limelightManager = DualLimelightManagerSubsystem.getInstance();
+		m_targetColumn = column;
+
+		limelightManager.setPrimary(m_targetColumn.primaryLimelight);
+		limelightManager.setTargetAprilTag(targetAprilTag);
+		limelightManager.setAprilTagPipelineActive();
+
+		trackXTarget();
+		trackYTarget(column.setpoint);
+		enableOpenLoopRamp();
+	}
+
+	public void trackXTarget() {
+		m_translateXController.reset();
+		m_translateXController.setSetpoint(m_config.m_defaultYAngleSetpoint);
+		m_translateXController.setTolerance(m_config.m_translateYAngleTolerance);
+	}
+
+	public void trackYTarget(double setpoint) {
+		m_translateYController.reset();
+		m_translateYController.setSetpoint(setpoint);
+		m_translateYController.setTolerance(m_config.m_translateXAngleTolerance);
+	}
+
+	private void configureSeeking() {
+		m_isSeeking = true;
+		DualLimelightManagerSubsystem limelightManager = DualLimelightManagerSubsystem.getInstance();
+		trackYTarget(limelightManager.getPrimaryTXSetpoint());
+	}
+
+	private void stopSeeking() {
+		m_isSeeking = false;
+		trackYTarget(m_targetColumn.setpoint);
+	}
+
+	public double calculateXMetersPerSecond() {
+		double tY = DualLimelightManagerSubsystem.getInstance().getTY();
+
+		double outputMetersPerSecond = m_translateXController
+				.calculate(tY);
+		outputMetersPerSecond *= -1; // Invert output
+		outputMetersPerSecond += m_config.m_translationYFeedForward.calculate(tY);
+
+		outputMetersPerSecond = MathUtil.clamp(outputMetersPerSecond, -m_config.m_translateXMaxSpeedMeters,
+				m_config.m_translateXMaxSpeedMeters);
+		return outputMetersPerSecond;
+	}
+
+	public double calculateYMetersPerSecond() {
+		DualLimelightManagerSubsystem limelightManager = DualLimelightManagerSubsystem.getInstance();
+		double errorAngle = m_isSeeking ? limelightManager.getSecondaryTX() : limelightManager.getPrimaryTX();
+
+		double outputMetersPerSecond = m_translateYController.calculate(errorAngle);
+		outputMetersPerSecond += -m_config.m_translationYFeedForward.calculate(errorAngle);
+		outputMetersPerSecond = MathUtil.clamp(outputMetersPerSecond, -m_config.m_translateYMaxSpeedMeters,
+				m_config.m_translateYMaxSpeedMeters);
+		return outputMetersPerSecond;
+	}
+
+	public void trackingPeriodic() {
+		DualLimelightManagerSubsystem limelightManager = DualLimelightManagerSubsystem.getInstance();
+		// System.out.println(m_translateXController.getSetpoint());
+		// System.out.println("TY "+limelight.getTY());
+		if (!limelightManager.validTargetExists()) {
+			DriverStation.reportWarning("NOT IN RANGE OF APRILTAG", null);
+			return;
+		}
+
+		// System.out.println(isTracking());
+
+		if (!limelightManager.validTargetExistsOnPrimary() && !m_isSeeking) { // If the primary limelight has no target,
+																				// and has not been set to seek
+			configureSeeking();
+		} else if (limelightManager.validTargetExistsOnPrimary() && m_isSeeking) {
+			stopSeeking();
+		}
+
+		double speed = calculateXMetersPerSecond();
+		// System.out.println("speed: " + speed);
+		// System.out.println("error: " +
+		// (DualLimelightManagerSubsystem.getInstance().getTY() -
+		// m_translateXController.getSetpoint()));
+		// drive(new ChassisSpeeds(0, speed, 0));
+		// drive(new ChassisSpeeds(speed, 0, 0));
+		drive(new ChassisSpeeds(calculateXMetersPerSecond(), calculateYMetersPerSecond(), 0));
+	}
+
+	public void stopTracking() {
+		setClosedLoopEnabled(false);
+		DualLimelightManagerSubsystem.getInstance().setTargetAprilTag(-1);
+		m_targetColumn = COLUMN_TARGET.NONE;
+		m_isSeeking = false;
+
+		System.out.println("Ending Tracking -----------------");
+		disableOpenLoopRamp();
+		drive(0, 0, 0);
+	}
+
 	@Override
 	public void periodic() {
-	    m_odometry.update(getGyroscopeRotation(),
-		 new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
-		 m_frontRightModule.getPosition(),
-		 m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
-		//setOdemetryFromApriltag();
+		// setOdemetryFromApriltag();
+		updatePoseEstimator();
 
 		SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
 
-		SmartDashboard.putNumber("Yaw", m_pigeon.getYaw());
-		SmartDashboard.putNumber("Pose X", m_odometry.getPoseMeters().getX());
-		SmartDashboard.putNumber("Pose Y", m_odometry.getPoseMeters().getY());
-		SmartDashboard.putNumber("Pose Angle", m_odometry.getPoseMeters().getRotation().getDegrees());
+		// SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
 
-		Logger.getInstance().recordOutput("Robot Pose", m_odometry.getPoseMeters());
+		// SmartDashboard.putNumber("Yaw", m_pigeon.getYaw());
+		// SmartDashboard.putNumber("Pose X", m_odometry.getPoseMeters().getX());
+		// SmartDashboard.putNumber("Pose Y", m_odometry.getPoseMeters().getY());
+		// SmartDashboard.putNumber("Pose Angle",
+		// m_odometry.getPoseMeters().getRotation().getDegrees());
+
+		SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
+		SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxVelocityMetersPerSecond);
+
+		m_frontLeftModule.set(
+				states[0].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
+				states[0].angle.getRadians());
+		m_frontRightModule.set(
+				states[1].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
+				states[1].angle.getRadians());
+		m_backLeftModule.set(
+				states[2].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
+				states[2].angle.getRadians());
+		m_backRightModule.set(
+				states[3].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
+				states[3].angle.getRadians());
+
+		Logger.getInstance().recordOutput("Swerve States", states);
+
+		Logger.getInstance().recordOutput("Robot Pose", getPose());
+
+		// System.out.println("Is closed loop: "+isClosedLoopEnabled() + ", tracking: "
+		// + isTracking());
+		if (isClosedLoopEnabled() && isTracking()) {
+			trackingPeriodic();
+		}
+	}
+
+	public void printEncoderVals() {
+		SmartDashboard.putNumber("front left encoder count",
+				((TalonFX) (m_frontLeftModule.getDriveMotor())).getSelectedSensorPosition(0));
+
+		SmartDashboard.putNumber("front right encoder count",
+				((TalonFX) (m_frontRightModule.getDriveMotor())).getSelectedSensorPosition(0));
+		SmartDashboard.putNumber("back left module encoder count",
+				((TalonFX) (m_backLeftModule.getDriveMotor())).getSelectedSensorPosition(0));
+		SmartDashboard.putNumber("back right module encoder count",
+				((TalonFX) (m_backRightModule.getDriveMotor())).getSelectedSensorPosition(0));
+
 	}
 }

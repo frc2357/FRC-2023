@@ -1,6 +1,8 @@
 package com.team2357.frc2023.subsystems;
 
-import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ClawSubsystem extends SubsystemBase {
@@ -19,14 +21,13 @@ public class ClawSubsystem extends SubsystemBase {
 
     private enum ClawState { Unknown, Open, Closed };
 
-    private Solenoid m_clawSolenoid;
+    private DoubleSolenoid m_clawSolenoid;
     private ClawState m_currentState;
     private ClawState m_desiredState;
     private long m_lastActionMillis;
     
-    public ClawSubsystem(Solenoid clawSolenoid) {
-        m_clawSolenoid = clawSolenoid;
-
+    public ClawSubsystem(int forwardChannel, int reverseChannel) {
+        m_clawSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, forwardChannel, reverseChannel);
         instance = this;
     }
 
@@ -75,11 +76,11 @@ public class ClawSubsystem extends SubsystemBase {
 
     private void openPeriodic() {
         long now = System.currentTimeMillis();
-
         if (m_lastActionMillis == 0) {
-            m_clawSolenoid.set(true);
+            m_clawSolenoid.set(Value.kForward);
             m_lastActionMillis = now;
         } else if (now > m_lastActionMillis + m_config.m_openMilliseconds) {
+            m_clawSolenoid.set(Value.kOff);
             m_currentState = ClawState.Open;
             m_lastActionMillis = 0;
         }
@@ -89,9 +90,10 @@ public class ClawSubsystem extends SubsystemBase {
         long now = System.currentTimeMillis();
 
         if (m_lastActionMillis == 0) {
-            m_clawSolenoid.set(false);
+            m_clawSolenoid.set(Value.kReverse);
             m_lastActionMillis = now;
         } else if (now > m_lastActionMillis + m_config.m_openMilliseconds) {
+            m_clawSolenoid.set(Value.kOff);
             m_currentState = ClawState.Closed;
             m_lastActionMillis = 0;
         }

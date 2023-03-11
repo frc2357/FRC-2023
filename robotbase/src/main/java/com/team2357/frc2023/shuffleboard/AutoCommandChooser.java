@@ -1,11 +1,16 @@
 package com.team2357.frc2023.shuffleboard;
 
 import com.team2357.frc2023.commands.auto.blue.grid3.BlueGridThreeTwoConeAutoCommand;
-import com.team2357.frc2023.util.TrajectoryUtil;
+import com.team2357.frc2023.commands.drive.ZeroDriveCommand;
+import com.team2357.frc2023.commands.intake.IntakeSolenoidExtendCommand;
+import com.team2357.frc2023.trajectoryutil.AvailableTrajectoryCommands;
+import com.team2357.frc2023.trajectoryutil.TrajectoryUtil;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
@@ -13,7 +18,7 @@ public class AutoCommandChooser {
 
     private AutoActionChooser[] choosers;
 
-    private enum automodes{
+    private enum automodes {
         NONE,
         BLUE_GRID_THREE_TWO_CONE_AUTO;
     }
@@ -27,9 +32,9 @@ public class AutoCommandChooser {
             m_chooser = new SendableChooser<>();
 
             m_chooser.setDefaultOption("None", automodes.NONE);
-            for (automodes s:automodes.values()){
-                if(s!=automodes.NONE)
-                m_chooser.addOption(s.toString().toLowerCase(), s);
+            for (automodes s : automodes.values()) {
+                if (s != automodes.NONE)
+                    m_chooser.addOption(s.toString().toLowerCase(), s);
             }
 
             SmartDashboard.putNumber((m_waitCommandKey), 0.0);
@@ -44,7 +49,7 @@ public class AutoCommandChooser {
         public Command getActionCommand() {
             switch (m_chooser.getSelected()) {
                 case BLUE_GRID_THREE_TWO_CONE_AUTO:
-                    return new BlueGridThreeTwoConeAutoCommand();
+                    return AvailableTrajectoryCommands.blueGridThreeTwoConeAuto;
                 default:
                     System.out.println("ACTION: NONE");
                     return new WaitCommand(0);
@@ -58,8 +63,11 @@ public class AutoCommandChooser {
     }
 
     public Command generateCommand() {
-        return new SequentialCommandGroup(
+        CommandScheduler.getInstance().removeComposedCommand(choosers[0].getActionCommand());
+        return new ParallelCommandGroup(
+            new SequentialCommandGroup(
                 choosers[0].getWaitCommand(),
-                choosers[0].getActionCommand());
+                choosers[0].getActionCommand()),
+            new IntakeSolenoidExtendCommand());
     }
 }
