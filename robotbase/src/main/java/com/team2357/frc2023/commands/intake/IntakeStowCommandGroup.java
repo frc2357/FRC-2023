@@ -8,12 +8,11 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
-public class IntakeStowCommandGroup extends SequentialCommandGroup {
+public class IntakeStowCommandGroup extends ParallelCommandGroup {
     public IntakeStowCommandGroup() {
         addCommands(new InstantCommand(() -> DualLimelightManagerSubsystem.getInstance().setAprilTagPipelineActive()));
 
         addCommands(new SequentialCommandGroup(
-            new WaitCommand(0.25),
                 new ParallelCommandGroup(
                         new IntakeRollerStopCommand(),
                         new IntakeArmStowCommand()),
