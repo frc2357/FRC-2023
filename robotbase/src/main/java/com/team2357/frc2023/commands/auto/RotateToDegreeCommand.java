@@ -5,6 +5,7 @@ import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
@@ -39,15 +40,22 @@ public class RotateToDegreeCommand extends CommandBase {
         }
 
         m_pidController.setSetpoint(m_swerve.getGyroscopeRotation().getDegrees() + distance);
-        m_pidController.setTolerance(0.045);
+        m_pidController.setTolerance(0.05);
     }
 
     @Override
     public void execute() {
-        double newSpeed = m_pidController.calculate(m_swerve.getGyroscopeRotation().getDegrees());
+        double errorAngle = m_swerve.getGyroscopeRotation().getDegrees();
+        double newSpeed = m_pidController.calculate(errorAngle);
 
-        newSpeed = MathUtil.clamp(newSpeed, Constants.DRIVE.ROTATE_MAXSPEED_RADIANS_PER_SECOND*-1, Constants.DRIVE.ROTATE_MAXSPEED_RADIANS_PER_SECOND*-1);
-        m_swerve.drive(new ChassisSpeeds(0, 0, newSpeed));
+        newSpeed += Math.copySign(Constants.DRIVE.ROTATE_TO_TARGET_FEEDFORWARD, newSpeed);
+
+        newSpeed = MathUtil.clamp(newSpeed, -Constants.DRIVE.ROTATE_MAXSPEED_RADIANS_PER_SECOND, Constants.DRIVE.ROTATE_MAXSPEED_RADIANS_PER_SECOND);
+        m_swerve.drive(ChassisSpeeds.fromFieldRelativeSpeeds(0, 0, newSpeed, m_swerve.getGyroscopeRotation()));
+        
+        System.out.print("Speed: " + newSpeed);
+        System.out.println("Setpoint: " + m_pidController.getSetpoint());
+        System.out.println("Error: " + m_pidController.getPositionError());
     }
 
     @Override
@@ -57,6 +65,6 @@ public class RotateToDegreeCommand extends CommandBase {
 
     @Override
     public void end(boolean isInterrupted) {
-        m_swerve.drive(0, 0, 0);
+        m_swerve.drive(new ChassisSpeeds());
     }
 }
