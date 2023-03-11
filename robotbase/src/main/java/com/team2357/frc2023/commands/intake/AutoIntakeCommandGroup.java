@@ -6,10 +6,9 @@ import com.team2357.frc2023.subsystems.DualLimelightManagerSubsystem;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 
-public class IntakeStowCommandGroup extends ParallelCommandGroup {
-    public IntakeStowCommandGroup() {
+public class AutoIntakeCommandGroup extends ParallelCommandGroup {
+    public AutoIntakeCommandGroup() {
         addCommands(new InstantCommand(() -> DualLimelightManagerSubsystem.getInstance().setAprilTagPipelineActive()));
 
         addCommands(new SequentialCommandGroup(

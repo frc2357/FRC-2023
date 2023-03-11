@@ -1,20 +1,20 @@
 package com.team2357.frc2023.commands.intake;
 
 import com.team2357.frc2023.subsystems.IntakeRollerSubsystem;
-import com.team2357.lib.commands.CommandLoggerBase;
 
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
-public class IntakeAutoStowCommand extends CommandLoggerBase{
+public class AutoIntakeCommand extends CommandBase{
 
     public IntakeDeployCommandGroup m_deployGroup;
-    public IntakeStowCommandGroup m_stowGroup;
+    public AutoIntakeCommandGroup m_stowGroup;
     public boolean m_spiked = false;
     public long m_initializedAt;
 
-    public IntakeAutoStowCommand(){
+    public AutoIntakeCommand(){
         m_deployGroup = new IntakeDeployCommandGroup();
-        m_stowGroup = new IntakeStowCommandGroup();
+        m_stowGroup = new AutoIntakeCommandGroup();
         m_initializedAt = System.currentTimeMillis();
     }
 

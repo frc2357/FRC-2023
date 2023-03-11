@@ -5,7 +5,7 @@ import com.team2357.frc2023.arduino.GamepieceLED.SIGNAL_COLOR;
 import com.team2357.frc2023.commands.intake.IntakeDeployCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakeRollerReverseCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
-import com.team2357.frc2023.commands.intake.IntakeStowCommandGroup;
+import com.team2357.frc2023.commands.intake.AutoIntakeCommandGroup;
 import com.team2357.frc2023.commands.scoring.HeartlandAutoScoreCommand;
 import com.team2357.frc2023.commands.scoring.HeartlandAutoTranslateCommand;
 import com.team2357.frc2023.commands.scoring.TeleopAutoScoreCommandGroup;
@@ -60,10 +60,10 @@ public class SwerveDriveControls {
 
         // Intake deploy/stow
         m_leftTrigger.whileTrue(new IntakeDeployCommandGroup().alongWith(new InstantCommand(() -> GamepieceLED.getInstance().setSignalColor(SIGNAL_COLOR.PURPLE))));
-        m_leftTrigger.onFalse(new IntakeStowCommandGroup());
+        m_leftTrigger.onFalse(new AutoIntakeCommandGroup());
 
         m_rightTrigger.whileTrue(new IntakeDeployCommandGroup().alongWith(new InstantCommand(() -> GamepieceLED.getInstance().setSignalColor(SIGNAL_COLOR.YELLOW))));
-        m_rightTrigger.onFalse(new IntakeStowCommandGroup());
+        m_rightTrigger.onFalse(new AutoIntakeCommandGroup());
 
         //Teleop auto
         m_rightBumper.whileTrue(new HeartlandAutoTranslateCommand(m_controller));
