@@ -122,6 +122,7 @@ public class GunnerControls {
         Trigger rightDPadOnly = m_rightDPad.and(noLetterButtons);
 
         Trigger upDPadAndA = m_upDPad.and(m_aButton);
+
         Trigger upDPadAndX = m_upDPad.and(m_xButton);
         Trigger upDPadAndY = m_upDPad.and(m_yButton);
         Trigger upDPadAndB = m_upDPad.and(m_bButton);
@@ -151,6 +152,7 @@ public class GunnerControls {
 
         leftDPadAndA.onTrue(new WristToggleCommand());
         leftDPadAndB.onTrue(new ClawToggleCommand());
+
         downDPadOnly.whileTrue(new IntakeWinchCommand(axisRightStickY));
 
         rightDPadAndA.onTrue(new IntakeArmToggleCommand());
