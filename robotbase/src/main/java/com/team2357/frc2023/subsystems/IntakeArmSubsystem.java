@@ -223,6 +223,14 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
         m_intakeSolenoid.set(Value.kOff);
     }
 
+    public double getAmps() {
+        return m_winchMotor.getOutputCurrent();
+    } 
+
+    public void manualStow(Double speed){
+        m_winchMotor.set(speed);
+    }
+
     @Override
     public void periodic() {
         if (m_currentState != m_desiredState) {
