@@ -77,11 +77,20 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	/**
-	 * @param row row to score on (low: 0, mid: 1, high: 2)
+	 * @param row row to score on (low: 2, mid: 1, high: 0)
 	 * @return Auto score command to run
 	 */
 	public static Command getAutoScoreCommands(int row, int col) {
 		switch (row) {
+			case 0:
+			switch(col % 3) {
+				case 0: case 2:
+					return new ConeAutoScoreHighCommandGroup();
+				case 1:
+					return new CubeAutoScoreHighCommandGroup();
+				default:
+					return new AutoScoreLowCommandGroup(); // Potentially default to ConeAutoScoreHighCommandGroup
+			}
 			case 1:
 				switch(col % 3) {
 					case 0: case 2:
@@ -89,20 +98,12 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 					case 1:
 						return new CubeAutoScoreMidCommandGroup();
 					default:
-						return new AutoScoreLowCommandGroup(); // Potentially default to ConeAutoScoreMidCommandGroup
-				}
-			case 2:
-				switch(col % 3) {
-					case 0: case 2:
-						return new ConeAutoScoreHighCommandGroup();
-					case 1:
-						return new CubeAutoScoreHighCommandGroup();
-					default:
 						return new AutoScoreLowCommandGroup(); // Potentially default to ConeAutoScoreHighCommandGroup
 				}
 			default:
 				return new AutoScoreLowCommandGroup();
 		}
+
 	}
 
 	private SwerveDriveKinematics m_kinematics;
