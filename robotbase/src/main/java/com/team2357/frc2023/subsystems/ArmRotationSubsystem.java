@@ -191,10 +191,18 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
         return m_rotationMotor.getEncoder().getPosition();
     }
 
+    public void setTargetRotationsToCurrentRotations(){
+        m_targetRotations = m_rotationMotor.getEncoder().getPosition();
+    }
+
     public void updatePID() {
         m_pidController.setP(m_shuffleboardPIDTuner.getPValue());
         m_pidController.setI(m_shuffleboardPIDTuner.getIValue());
         m_pidController.setD(m_shuffleboardPIDTuner.getDValue());
+    }
+
+    public double getAmps() {
+        return m_rotationMotor.getOutputCurrent();
     }
 
     @Override

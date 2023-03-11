@@ -15,6 +15,7 @@ import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.frc2023.subsystems.WristSubsystem;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -109,11 +110,11 @@ public final class Constants {
             config.m_sensorPositionCoefficient = 2.0 * Math.PI / Constants.DRIVE.TICKS_PER_ROTATION
                     * SdsModuleConfigurations.MK4I_L2.getSteerReduction();
 
-            config.m_translateXMaxSpeedMeters = 0.25;
-            config.m_translateYMaxSpeedMeters = 0.25;
+            config.m_translateXMaxSpeedMeters = 3;
+            config.m_translateYMaxSpeedMeters = 3;
 
-            config.m_translateXToleranceMeters = 0.05;
-            config.m_translateYToleranceMeters = 0.05;
+            config.m_translateYAngleTolerance = 1;
+            config.m_translateXAngleTolerance = 1;
 
             config.m_defaultXAngleSetpoint = DRIVE.DEFAULT_X_ANGLE_SETPOINT;
             config.m_defaultYAngleSetpoint = DRIVE.DEFAULT_Y_ANGLE_SETPOINT;
@@ -122,8 +123,11 @@ public final class Constants {
             config.m_midColXAngleSetpoint = DRIVE.MID_COL_X_ANGLE_SETPOINT;
             config.m_rightColXAngleSetpoint = DRIVE.RIGHT_COL_X_ANGLE_SETPOINT;
 
-            config.m_translateXController = new PIDController(0.5, 0, 0);
-            config.m_translateYController = new PIDController(0.05, 0, 0);
+            config.m_translateXController = new PIDController(0.3, 0, 0.015);
+            config.m_translateYController = new PIDController(0.1, 0, 0.025);
+
+            config.m_translationXFeedForward = new SimpleMotorFeedforward(0.244, 0);
+            config.m_translationYFeedForward = new SimpleMotorFeedforward(0.244, 0.00);
 
             config.m_openLoopRampRateSeconds = 1;
 
@@ -162,7 +166,7 @@ public final class Constants {
         public static final double SYNC_ENCODER_LIMIT_MS = 10000;
 
 
-        public static final double DEFAULT_Y_ANGLE_SETPOINT = 0;
+        public static final double DEFAULT_Y_ANGLE_SETPOINT = 20;
         public static final double DEFAULT_X_ANGLE_SETPOINT = -9;
 
         public static final double LEFT_COL_X_ANGLE_SETPOINT = -10;
@@ -217,13 +221,21 @@ public final class Constants {
     public static final class INTAKE_ARM {
         public static final double SOLENOID_EXTEND_WAIT_MILLIS = 250;
 
+        // Auto score low
+        public static final double AUTO_SCORE_LOW_ROTATIONS = 70;
+
+        // Cube shooting
         //TODO: Tune these
         public static final double MID_SHOT_SETPOINT_ROTATIONS = 0;
         public static final double HIGH_SHOT_SETPOINT_ROTATIONS = 0;
+
         public static final double INTAKE_HANDOFF_WINCH_ROTATIONS = 60;
 
         public static final int WINCH_DEPLOY_PID_SLOT = 0;
         public static final int WINCH_STOW_PID_SLOT = 1;
+
+        public static final double WINCH_AMP_ZERO_PERCENT_OUTPUT = 0;
+        public static final int WINCH_AMP_ZERO_MAX_AMPS = 0;
 
         public static IntakeArmSubsystem.Configuration GET_INTAKE_ARM_CONFIG() {
             IntakeArmSubsystem.Configuration config = new IntakeArmSubsystem.Configuration();
@@ -303,6 +315,9 @@ public final class Constants {
         public static final double AUTO_SCORE_MID_ROTATIONS = 0;
         public static final double AUTO_SCORE_HIGH_ROTATIONS = 260;
 
+        public static final int ARM_EXTENSION_AMP_ZERO_PERCENT_OUTPUT = 0;
+        public static final int ARM_EXTENSION_AMP_ZERO_MAX_AMPS = 0;
+
         public static ArmExtensionSubsystem.Configuration GET_EXTENSION_CONFIG() {
             ArmExtensionSubsystem.Configuration config = new ArmExtensionSubsystem.Configuration();
             config.m_extendAxisMaxSpeed = 0;
@@ -356,6 +371,9 @@ public final class Constants {
         public static final double ARM_ROTATION_GEAR_RATIO  = 190.91;
         public static final double ARM_HANDOFF_ROTATIONS = ARM_ROTATION_GEAR_RATIO / 8;
 
+        public static final int ARM_ROTATION_AMP_ZERO_PERCENT_OUTPUT = 0;
+        public static final int ARM_ROTATION_AMP_ZERO_MAX_AMPS = 0;
+
         public static ArmRotationSubsystem.Configuration GET_ROTATION_CONFIG() {
             ArmRotationSubsystem.Configuration config = new ArmRotationSubsystem.Configuration();
 
@@ -408,8 +426,8 @@ public final class Constants {
     }
 
     public static final class LIMELIGHT {
-        public static final String LEFT_LIMELIGHT_NAME = "leftLimelight";
-        public static final String RIGHT_LIMELIGHT_NAME = "rightLimelight";
+        public static final String LEFT_LIMELIGHT_NAME = "limelight-left";
+        public static final String RIGHT_LIMELIGHT_NAME = "limelight-right";
         
         public static final double LEFT_LIMELIGHT_TX_SETPOINT = Double.NaN;
         public static final double RIGHT_LIMELIGHT_TX_SETPOINT = Double.NaN;
@@ -446,6 +464,9 @@ public final class Constants {
     public static final class COMPRESSOR {
         public static final int MIN_PRESSURE_PSI = 90;
         public static final int MAX_PRESSURE_PSI = 100;
+    }
+    public static final class AMP_ZERO{
+        public static final int AMP_ZERO_DEADLINE_SECONDS = 1;
     }
 
 }
