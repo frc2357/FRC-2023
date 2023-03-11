@@ -234,6 +234,9 @@ public final class Constants {
         public static final int WINCH_DEPLOY_PID_SLOT = 0;
         public static final int WINCH_STOW_PID_SLOT = 1;
 
+        public static final double WINCH_AMP_ZERO_PERCENT_OUTPUT = 0;
+        public static final int WINCH_AMPERAGE_ZERO_MAX_AMPS = 0;
+
         public static IntakeArmSubsystem.Configuration GET_INTAKE_ARM_CONFIG() {
             IntakeArmSubsystem.Configuration config = new IntakeArmSubsystem.Configuration();
 
@@ -365,6 +368,9 @@ public final class Constants {
         public static final double ARM_ROTATION_GEAR_RATIO  = 190.91;
         public static final double ARM_HANDOFF_ROTATIONS = ARM_ROTATION_GEAR_RATIO / 8;
 
+        public static final int ARM_ROTATION_AMP_ZERO_PERCENT_OUTPUT = 0;
+        public static final int ARM_ROTATION_AMP_ZERO_MAX_AMPS = 0;
+
         public static ArmRotationSubsystem.Configuration GET_ROTATION_CONFIG() {
             ArmRotationSubsystem.Configuration config = new ArmRotationSubsystem.Configuration();
 
@@ -455,6 +461,9 @@ public final class Constants {
     public static final class COMPRESSOR {
         public static final int MIN_PRESSURE_PSI = 90;
         public static final int MAX_PRESSURE_PSI = 100;
+    }
+    public static final class AMP_ZERO{
+        public static final int AMP_ZERO_DEADLINE_SECONDS = 1;
     }
 
 }
