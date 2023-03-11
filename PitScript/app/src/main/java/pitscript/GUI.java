@@ -25,11 +25,12 @@ public class GUI extends JButton {
     }
 
     public static void buttonPressed() {
-        button.setBackground(Color.GREEN);
         if (App.TransferFiles()) {
             button.setBackground(Color.RED);
         }
-        button.updateUI();
+        else{
+            button.setBackground(Color.GREEN);
+        }
     }
     public static void killProgram(){
         System.exit(0);

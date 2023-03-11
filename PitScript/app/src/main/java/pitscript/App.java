@@ -17,7 +17,7 @@ public class App {
     // IP of the roborio
     public static final String ROBOT_IP = "10.23.57.2";
     // Username you use to connect to it
-    public static final String USERNAME = "lvuser";
+    public static final String USERNAME = "admin";
     // Should always be empty
     public static final String PASSWORD = "";
     // Where the files will go when downloaded
