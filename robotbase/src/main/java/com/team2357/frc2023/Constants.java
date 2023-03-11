@@ -221,9 +221,14 @@ public final class Constants {
     public static final class INTAKE_ARM {
         public static final double SOLENOID_EXTEND_WAIT_MILLIS = 250;
 
+        // Auto score low
+        public static final double AUTO_SCORE_LOW_ROTATIONS = 70;
+
+        // Cube shooting
         //TODO: Tune these
         public static final double MID_SHOT_SETPOINT_ROTATIONS = 0;
         public static final double HIGH_SHOT_SETPOINT_ROTATIONS = 0;
+
         public static final double INTAKE_HANDOFF_WINCH_ROTATIONS = 60;
 
         public static final int WINCH_DEPLOY_PID_SLOT = 0;
