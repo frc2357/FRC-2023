@@ -1,30 +1,33 @@
 package com.team2357.frc2023.controls;
 
-import com.team2357.lib.triggers.AxisThresholdTrigger;
-import com.team2357.lib.util.Utility;
-import com.team2357.lib.util.XboxRaw;
-import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
-
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.XboxController.Axis;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import com.team2357.frc2023.Constants.CONTROLLER;
 import com.team2357.frc2023.commands.auto.TranslateToTargetCommand;
 import com.team2357.frc2023.commands.auto.TranslateToTargetCommandGroup;
-import com.team2357.frc2023.commands.human.panic.ArmExtenderCommand;
-import com.team2357.frc2023.commands.human.panic.ArmRotationCommand;
+import com.team2357.frc2023.commands.human.panic.ArmExtensionAxisCommand;
+import com.team2357.frc2023.commands.human.panic.ArmRotationAxisCommand;
 import com.team2357.frc2023.commands.human.panic.ClawToggleCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeArmToggleCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeAxisRollerCommand;
+import com.team2357.frc2023.commands.human.panic.IntakeWinchCommand;
 import com.team2357.frc2023.commands.human.panic.WristToggleCommand;
-import com.team2357.frc2023.commands.intake.IntakeArmDeployCommand;
-import com.team2357.frc2023.commands.intake.IntakeArmStowCommand;
-import com.team2357.frc2023.commands.scoring.AutoScoreHighCommand;
-import com.team2357.frc2023.commands.scoring.AutoScoreLowCommand;
-import com.team2357.frc2023.commands.scoring.AutoScoreMidCommand;
-import com.team2357.frc2023.commands.scoring.TranslateToColumnCommand;
+import com.team2357.frc2023.commands.intake.IntakeRollerReverseCommand;
+import com.team2357.frc2023.commands.scoring.AutoScoreLowCommandGroup;
+import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
+import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreMidCommandGroup;
+import com.team2357.frc2023.subsystems.ArmExtensionSubsystem;
+import com.team2357.frc2023.subsystems.ArmRotationSubsystem;
+import com.team2357.frc2023.subsystems.IntakeArmSubsystem;
+import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
+import com.team2357.lib.triggers.AxisThresholdTrigger;
+import com.team2357.lib.util.Utility;
+import com.team2357.lib.util.XboxRaw;
+
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.XboxController.Axis;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
  * These are the controls for the gunner.
@@ -119,6 +122,7 @@ public class GunnerControls {
         Trigger rightDPadOnly = m_rightDPad.and(noLetterButtons);
 
         Trigger upDPadAndA = m_upDPad.and(m_aButton);
+
         Trigger upDPadAndX = m_upDPad.and(m_xButton);
         Trigger upDPadAndY = m_upDPad.and(m_yButton);
         Trigger upDPadAndB = m_upDPad.and(m_bButton);
@@ -143,24 +147,30 @@ public class GunnerControls {
         Trigger yButton = m_yButton.and(noDPad);
         Trigger xButton = m_xButton.and(noDPad);
 
-        upDPadOnly.whileTrue(new ArmRotationCommand(axisRightStickY));
-        leftDPadOnly.whileTrue(new ArmExtenderCommand(axisRightStickY));
+        upDPadOnly.whileTrue(new ArmRotationAxisCommand(axisRightStickY));
+        leftDPadOnly.whileTrue(new ArmExtensionAxisCommand(axisRightStickY));
 
         leftDPadAndA.onTrue(new WristToggleCommand());
         leftDPadAndB.onTrue(new ClawToggleCommand());
 
-        m_rightTrigger.whileTrue(new TranslateToTargetCommand(-1));
-        m_rightBumper.whileTrue(new TranslateToTargetCommandGroup(-1));
+        downDPadOnly.whileTrue(new IntakeWinchCommand(axisRightStickY));
 
         rightDPadAndA.onTrue(new IntakeArmToggleCommand());
         rightDPadOnly.whileTrue(new IntakeAxisRollerCommand(axisRightStickY));
 
-        downDPadAndX.onTrue(new TranslateToColumnCommand(SwerveDriveSubsystem.ColumnSetpoints.LEFT));
-        downDPadAndA.onTrue(new TranslateToColumnCommand(SwerveDriveSubsystem.ColumnSetpoints.MIDDLE));
-        downDPadAndB.onTrue(new TranslateToColumnCommand(SwerveDriveSubsystem.ColumnSetpoints.RIGHT));
+        downDPadAndX.onTrue(new TranslateToTargetCommandGroup(SwerveDriveSubsystem.COLUMN_TARGET.LEFT));
+        downDPadAndA.onTrue(new TranslateToTargetCommandGroup(SwerveDriveSubsystem.COLUMN_TARGET.MIDDLE));
+        downDPadAndB.onTrue(new TranslateToTargetCommandGroup(SwerveDriveSubsystem.COLUMN_TARGET.RIGHT));
 
-        yButton.onTrue(new AutoScoreHighCommand());
-        xButton.onTrue(new AutoScoreMidCommand());
-        aButton.onTrue(new AutoScoreLowCommand());
+        yButton.whileTrue(new ConeAutoScoreHighCommandGroup());
+        xButton.whileTrue(new ConeAutoScoreMidCommandGroup());
+        aButton.whileTrue(new AutoScoreLowCommandGroup());
+        rightDPadAndY.onTrue(new InstantCommand(() -> {
+            IntakeArmSubsystem.getInstance().resetEncoders();
+            ArmRotationSubsystem.getInstance().resetEncoders();
+            ArmExtensionSubsystem.getInstance().resetEncoder();
+        }));
+
+        rightDPadAndB.whileTrue(new IntakeRollerReverseCommand());
     }
 }

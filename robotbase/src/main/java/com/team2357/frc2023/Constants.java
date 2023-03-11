@@ -15,6 +15,7 @@ import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.frc2023.subsystems.WristSubsystem;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -43,7 +44,7 @@ public final class Constants {
          */
         public static final String DRIVE_CANBUS = "CANivore";
 
-        public static final int PNEUMATICS_HUB_ID = 2;
+        public static final int PNEUMATICS_HUB_ID = 1;
 
         public static final int PIGEON_ID = 5;
 
@@ -63,24 +64,25 @@ public final class Constants {
         public static final int BACK_RIGHT_MODULE_STEER_MOTOR_ID = 18;
         public static final int BACK_RIGHT_MODULE_STEER_ENCODER_ID = 22;
 
-        public static final int MASTER_INTAKE_MOTOR = 23;
-        public static final int FOLLOWER_INTAKE_MOTOR = 24;
+        public static final int MASTER_INTAKE_MOTOR_ID = 23;
+        public static final int FOLLOWER_INTAKE_MOTOR_ID = 24;
+        public static final int INTAKE_WINCH_MOTOR_ID = 25;
 
-        public static final int ROTATION_MOTOR = 25;
+        public static final int ARM_ROTATION_MOTOR_ID = 26;
 
-        public static final int ARM_EXTENSION_MOTOR = 27;
+        public static final int ARM_EXTENSION_MOTOR_ID = 27;
     }
 
     public static final class PH_ID {
 
-        public static final int WRIST_FORWARD_SOLENOID_CHANNEL = 0;
-        public static final int WRIST_REVERSE_SOLENOID_CHANNEL = 1;
+        public static final int WRIST_FORWARD_SOLENOID_CHANNEL = 3; // Red
+        public static final int WRIST_REVERSE_SOLENOID_CHANNEL = 0;
         
-        public static final int CLAW_FORWARD_SOLENOID_CHANNEL = 3;
-        public static final int CLAW_REVERSE_SOLENOID_CHANNEL = 4;
+        public static final int CLAW_FORWARD_SOLENOID_CHANNEL = 4;
+        public static final int CLAW_REVERSE_SOLENOID_CHANNEL = 1; // Black
 
-        public static final int INTAKE_SOLENOID_FORWARD_CHANNEL = 2;
-        public static final int INTAKE_SOLENOID_REVERSE_CHANNEL = 5;
+        public static final int INTAKE_SOLENOID_FORWARD_CHANNEL = 5;
+        public static final int INTAKE_SOLENOID_REVERSE_CHANNEL = 2;
     }
 
     public static final class DRIVE {
@@ -108,11 +110,11 @@ public final class Constants {
             config.m_sensorPositionCoefficient = 2.0 * Math.PI / Constants.DRIVE.TICKS_PER_ROTATION
                     * SdsModuleConfigurations.MK4I_L2.getSteerReduction();
 
-            config.m_translateXMaxSpeedMeters = 0.25;
-            config.m_translateYMaxSpeedMeters = 0.25;
+            config.m_translateXMaxSpeedMeters = 3;
+            config.m_translateYMaxSpeedMeters = 3;
 
-            config.m_translateXToleranceMeters = 0.05;
-            config.m_translateYToleranceMeters = 0.05;
+            config.m_translateYAngleTolerance = 1;
+            config.m_translateXAngleTolerance = 1;
 
             config.m_defaultXAngleSetpoint = DRIVE.DEFAULT_X_ANGLE_SETPOINT;
             config.m_defaultYAngleSetpoint = DRIVE.DEFAULT_Y_ANGLE_SETPOINT;
@@ -121,8 +123,11 @@ public final class Constants {
             config.m_midColXAngleSetpoint = DRIVE.MID_COL_X_ANGLE_SETPOINT;
             config.m_rightColXAngleSetpoint = DRIVE.RIGHT_COL_X_ANGLE_SETPOINT;
 
-            config.m_translateXController = new PIDController(0.5, 0, 0);
-            config.m_translateYController = new PIDController(0.05, 0, 0);
+            config.m_translateXController = new PIDController(0.3, 0, 0.015);
+            config.m_translateYController = new PIDController(0.1, 0, 0.025);
+
+            config.m_translationXFeedForward = new SimpleMotorFeedforward(0.244, 0);
+            config.m_translationYFeedForward = new SimpleMotorFeedforward(0.244, 0.00);
 
             config.m_openLoopRampRateSeconds = 1;
 
@@ -161,7 +166,7 @@ public final class Constants {
         public static final double SYNC_ENCODER_LIMIT_MS = 10000;
 
 
-        public static final double DEFAULT_Y_ANGLE_SETPOINT = 0;
+        public static final double DEFAULT_Y_ANGLE_SETPOINT = 20;
         public static final double DEFAULT_X_ANGLE_SETPOINT = -9;
 
         public static final double LEFT_COL_X_ANGLE_SETPOINT = -10;
@@ -174,12 +179,22 @@ public final class Constants {
         public static final ChassisSpeeds DEAD_RECKONING_X_CHASSIS_SPEEDS = new ChassisSpeeds(DEAD_RECKONING_TRANSLATION_METERS_PER_SECOND, 0, 0);
         public static final ChassisSpeeds DEAD_RECKONING_Y_CHASSIS_SPEEDS = new ChassisSpeeds(0, DEAD_RECKONING_TRANSLATION_METERS_PER_SECOND, 0);
         public static final ChassisSpeeds DEAD_RECKONING_ROTATION_CHASSIS_SPEEDS = new ChassisSpeeds(0, 0, DEAD_RECKONING_ROTATION_RADIANS_PER_SECOND);
+
+        public static final String SWERVE_MODULE_SHUFFLEBOARD_TAB_NAME = "Drivetrain";
     
         // Tolerance for out-of-range poses on auto-mapping
         public static final double TRAJECTORY_MAP_TOLERANCE_METERS = 0.1;
     }
 
     public static final class INTAKE_ROLLER {
+        public static final double AUTO_SCORE_LOW_REVERSE_TIME = 1;
+
+        //TODO: Tune these
+        public static final double MID_SHOT_PERCENT_OUTPUT = 0;
+        public static final double MID_SHOT_DELAY_SECONDS = .25;
+        public static final double HIGH_SHOT_PERCENT_OUTPUT = 0;
+        public static final double HIGH_SHOT_DELAY_SECONDS = .25;
+
         public static IntakeRollerSubsystem.Configuration GET_INTAKE_CONFIG() {
             IntakeRollerSubsystem.Configuration config = new IntakeRollerSubsystem.Configuration();
 
@@ -202,26 +217,81 @@ public final class Constants {
             return config;
         }
 
-        public static final double AUTO_SCORE_LOW_REVERSE_TIME = 1;
+        
     }
 
     public static final class INTAKE_ARM {
+        public static final double SOLENOID_EXTEND_WAIT_MILLIS = 250;
+
+        // Auto score low
+        public static final double AUTO_SCORE_LOW_ROTATIONS = 70;
+
+        // Cube shooting
+        //TODO: Tune these
+        public static final double MID_SHOT_SETPOINT_ROTATIONS = 0;
+        public static final double HIGH_SHOT_SETPOINT_ROTATIONS = 0;
+
+        public static final double INTAKE_HANDOFF_WINCH_ROTATIONS = 60;
+
+        public static final int WINCH_DEPLOY_PID_SLOT = 0;
+        public static final int WINCH_STOW_PID_SLOT = 1;
+
         public static IntakeArmSubsystem.Configuration GET_INTAKE_ARM_CONFIG() {
             IntakeArmSubsystem.Configuration config = new IntakeArmSubsystem.Configuration();
 
             config.m_deployMilliseconds = 1000;
             config.m_stowMilliseconds = 1000;
 
+            config.m_isInverted = true;
+
+            config.m_winchAxisMaxSpeed = 0.4;
+
+            config.m_winchMotorIdleMode = IdleMode.kBrake;
+
+            config.m_winchMotorStallLimitAmps = 15;
+            config.m_winchMotorFreeLimitAmps = 30;
+
+            // smart motion config
+            // extend PID
+            config.m_winchDeployP = 0;
+            config.m_winchDeployI = 0;
+            config.m_winchDeployD = 0;
+            config.m_winchDeployIZone = 0;
+            config.m_winchDeployFF = 0.0001;
+            config.m_winchDeployPidSlot = WINCH_DEPLOY_PID_SLOT;
+
+            // retract PID
+            config.m_winchStowP = 0;
+            config.m_winchStowI = 0;
+            config.m_winchStowD = 0;
+            config.m_winchStowIZone = 0;
+            config.m_winchStowFF = 0.0005;
+            config.m_winchStowPidSlot = WINCH_STOW_PID_SLOT;
+
+            // Smart motion
+            config.m_pidMaxOutput = 1;
+            config.m_pidMinOutput = -1;
+            config.m_smartMotionMaxVelRPM = 10000;
+            config.m_smartMotionMinVelRPM = 0;
+            config.m_smartMotionMaxAccRPM = 10000;
+            config.m_smartMotionRotationAllowedError = 2;
+
+            config.m_winchMotorAllowedError = 2;
+            config.m_winchDeployRotations = 140;
+            config.m_winchStowRotations = 0.0;
+
             return config;
         }
+
+       
     }
 
     public static final class WRIST {
         public static WristSubsystem.Configuration GET_WRIST_CONFIG() {
             WristSubsystem.Configuration config = new WristSubsystem.Configuration();
 
-            config.m_extendMilliseconds = 1000;
-            config.m_retractMilliseconds = 1000;
+            config.m_extendMilliseconds = 500;
+            config.m_retractMilliseconds = 2000;
 
             return config;
         }
@@ -239,18 +309,21 @@ public final class Constants {
     }
 
     public static final class ARM_EXTENSION {
+        public static final double RETRACTED_ROTATIONS = 0;
+
+        public static final double AUTO_SCORE_MID_ROTATIONS = 0;
+        public static final double AUTO_SCORE_HIGH_ROTATIONS = 260;
+
         public static ArmExtensionSubsystem.Configuration GET_EXTENSION_CONFIG() {
             ArmExtensionSubsystem.Configuration config = new ArmExtensionSubsystem.Configuration();
             config.m_extendAxisMaxSpeed = 0;
 
             config.m_extendMotorIdleMode = IdleMode.kBrake;
 
-            config.m_extendMotorStallLimitAmps = 0;
-            config.m_extendMotorFreeLimitAmps = 0;
+            config.m_extendMotorStallLimitAmps = 30;
+            config.m_extendMotorFreeLimitAmps = 30;
 
-            config.m_isInverted = false;
-
-            config.m_extendGrippedAmps = 0;
+            config.m_isInverted = true;
 
             config.m_extendMotorRampRate = 0;
 
@@ -259,100 +332,105 @@ public final class Constants {
             config.m_shuffleboardTunerDRange = 0.2;
 
             // smart motion config
-            config.m_extendMotorP = 0;
-            config.m_extendMotorI = 0;
-            config.m_extendMotorD = 0;
-            config.m_extendMotorIZone = 0;
-            config.m_extendMotorFF = 0;
-            config.m_extendMotorMaxOutput = 0;
-            config.m_extendMotorMinOutput = 0;
-            config.m_extendMotorMaxRPM = 0;
-            config.m_extendMotorMaxVel = 0;
-            config.m_extendMotorMinVel = 0;
-            config.m_extendMotorMaxAcc = 0;
-            config.m_extendMotorAllowedError = 0;
-            config.m_rotationMotorAllowedError = 0;
-            config.m_maxSpeedPercent = 0.4;
-            config.m_smartMotionSlot = 0;
+
+            // extend PID
+            config.m_extendP = 0.00001;
+            config.m_extendI = 0;
+            config.m_extendD = 0;
+            config.m_extendIZone = 0;
+            config.m_extendFF = 0.00011;
+            config.m_extendPidSlot = 0;
+
+            // Smart motion
+            config.m_pidMaxOutput = 1;
+            config.m_pidMinOutput = -1;
+            config.m_smartMotionMaxVelRPM = 8700;
+            config.m_smartMotionMinVelRPM = 0;
+            config.m_smartMotionMaxAccRPM = 8700*2;
+            config.m_smartMotionRotationAllowedError = 0.5;
+            config.m_rotationAllowedError = 0.5;
+
+            config.m_maxSpeedPercent = 0.7;
             return config;
         }
 
-        public static final double RETRACTED_ROTATIONS = 0;
-        public static final double INTAKE_HANDOFF_ROTATIONS = 0;
-
-        public static final double AUTO_SCORE_MID_ROTATIONS = 0;
-        public static final double AUTO_SCORE_HIGH_ROTATIONS = 0;
-
-        public static final double AUTO_SCORE_LOW_RETRACT_WAIT_TIME = 1;
+        
     }
 
     public static final class ARM_ROTATION {
+        
+        public static final double RETRACTED_ROTATIONS = 0;
+
+        public static final double AUTO_SCORE_MID_ROTATIONS = 45;
+        public static final double AUTO_SCORE_HIGH_ROTATIONS = 58;
+
+        public static final double ARM_ROTATION_GEAR_RATIO  = 190.91;
+        public static final double ARM_HANDOFF_ROTATIONS = ARM_ROTATION_GEAR_RATIO / 8;
+
         public static ArmRotationSubsystem.Configuration GET_ROTATION_CONFIG() {
             ArmRotationSubsystem.Configuration config = new ArmRotationSubsystem.Configuration();
-            config.m_rotationAxisMaxSpeed = 0;
+
+            config.m_rotationAxisMaxSpeed = 0.4;
+            config.m_maxSpeedPercent = 0.4;
 
             config.m_rotationMotorIdleMode = IdleMode.kBrake;
 
-            config.m_rotationMotorStallLimitAmps = 0;
-            config.m_rotationMotorFreeLimitAmps = 0;
+            config.m_rotationMotorStallLimitAmps = 30;
+            config.m_rotationMotorFreeLimitAmps = 30;
 
-            config.m_isInverted = false;
-
-            config.m_shuffleboardTunerPRange = 0.2;
-            config.m_shuffleboardTunerIRange = 0.2;
-            config.m_shuffleboardTunerDRange = 0.2;
+            config.m_isInverted = true;
 
             // smart motion config
-            config.m_rotationMotorP = 0;
+            config.m_rotationMotorP = 0.00075;
             config.m_rotationMotorI = 0;
             config.m_rotationMotorD = 0;
             config.m_rotationMotorIZone = 0;
-            config.m_rotationMotorFF = 0;
-            config.m_rotationMotorMaxOutput = 0;
-            config.m_rotationMotorMinOutput = 0;
-            config.m_rotationMotorMaxRPM = 0;
-            config.m_rotationMotorMaxVel = 0;
+            config.m_rotationMotorFF = 0.001;
+
+            config.m_rotationMotorMaxOutput = 1;
+            config.m_rotationMotorMinOutput = -1;
+            config.m_rotationMotorMaxRPM = 5676;
+            config.m_rotationMotorMaxVel = 4600;
             config.m_rotationMotorMinVel = 0;
-            config.m_rotationMotorMaxAcc = 0;
-            config.m_rotationMotorAllowedError = 0;
-            config.m_maxSpeedPercent = 0.4;
-            config.m_rotationAxisMaxSpeed = 0;
+            config.m_rotationMotorMaxAcc = 4600;
+            config.m_rotationMotorAllowedError = 0.5;
 
-            config.m_rotationMotorIdleMode = IdleMode.kBrake;
-
-            config.m_rotationMotorStallLimitAmps = 0;
-            config.m_rotationMotorFreeLimitAmps = 0;
-
-            // smart motion config
-            config.m_rotationMotorP = 0;
-            config.m_rotationMotorI = 0;
-            config.m_rotationMotorD = 0;
-            config.m_rotationMotorIZone = 0;
-            config.m_rotationMotorFF = 0;
-            config.m_rotationMotorMaxOutput = 0;
-            config.m_rotationMotorMinOutput = 0;
-            config.m_rotationMotorMaxRPM = 0;
-            config.m_rotationMotorMaxVel = 0;
-            config.m_rotationMotorMinVel = 0;
-            config.m_rotationMotorMaxAcc = 0;
-            config.m_rotationMotorAllowedError = 0;
-            config.m_maxSpeedPercent = 0.4;
             config.m_smartMotionSlot = 0;
+
+            // Static gain, will likely be zero
+            config.m_feedforwardKs = 0;
+
+            // Gravity gain, should be the gain required to keep the arm parallel with the floor
+            config.m_feedforwardKg = 0.64;
+
+            // Velocity gain, will be zero
+            config.m_feedforwardKv = 0;
+
+            // Acceleration gain, will be zero
+            config.m_feedforwardKa = 0;
+
+            // TODO: Calculate
+            config.m_armHorizontalRotations = ARM_ROTATION_GEAR_RATIO / 4; // 90 degrees
+            config.m_rotationsPerRadian = ARM_ROTATION_GEAR_RATIO / (2 * Math.PI);
 
             return config;
         }
 
-        public static final double RETRACTED_ROTATIONS = 0;
-        public static final double INTAKE_HANDOFF_ROTATIONS = 0;
+    }
 
-        public static final double AUTO_SCORE_MID_ROTATIONS = 0;
-        public static final double AUTO_SCORE_HIGH_ROTATIONS = 0;
+    public static final class LIMELIGHT {
+        public static final String LEFT_LIMELIGHT_NAME = "limelight-left";
+        public static final String RIGHT_LIMELIGHT_NAME = "limelight-right";
+        
+        public static final double LEFT_LIMELIGHT_TX_SETPOINT = Double.NaN;
+        public static final double RIGHT_LIMELIGHT_TX_SETPOINT = Double.NaN;
     }
 
     public static final class BUTTONBOARD {
         public static final String BUTTONBOARD_TABLE_NAME = "buttonboard";
         public static final String ROW_TOPIC_NAME = "row";
         public static final String COLUMN_TOPIC_NAME = "col";
+        public static final String ALLIANCE_TOPIC_NAME = "alliance";
     
     }
 
@@ -367,6 +445,9 @@ public final class Constants {
 
         public static final double DRIVE_CONTROLLER_DEADBAND = 0.1;
         public static final double GUNNER_CONTROLLER_DEADBAND = 0.1;
+
+        public static final double RUMBLE_INTENSITY = 0.5;
+        public static final double RUMBLE_TIMEOUT_SECONDS_ON_TELEOP_AUTO = 0.5;
 
         public static final int BUTTON_BOARD_NUM_ROWS = 3;
         public static final int BUTTON_BOARD_NUM_COLS = 9;
