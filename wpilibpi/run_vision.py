@@ -77,12 +77,13 @@ if __name__ == "__main__":
     # configure networks tables
     nt_table = camvis.ntinst.getTable("gridcam")
     apriltag_NT = nt_table.getStringTopic("tags").publish()
+    nt_btnboard = camvis.ntinst.getTable("buttonboard")
     frame = np.zeros(shape=(cam0.config.height, cam0.config.width, 3), dtype=np.uint8)
     frame1 = np.zeros_like(frame)
     # retrieve the camera calibration information needed by apriltags
 
     apriltag = detect_apriltags.AprilTagDetector((cam0.config.height, cam0.config.width))
-    apriltag.register_NT_vars(nt_table)
+    apriltag.register_NT_vars(nt_btnboard)
 
     gpdetector = detect_colors.GamePieceDetector()
     gpdetector.register_NT_vars(nt_table)

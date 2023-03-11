@@ -168,7 +168,7 @@ def create_field_cornerlocs(tag_id, pose: Pose3d):
 
 
 class AprilTagDetector:
-    _MATCH_TAGMAP = {"RED": [1, 2, 3], "BLUE": [6, 7, 8], "ALL": [1, 2, 3, 6, 7, 8]}
+    _MATCH_TAGMAP = {"red": [1, 2, 3], "blue": [6, 7, 8], "": [1, 2, 3, 6, 7, 8]}
     DETECTION_MARGIN_THRESHOLD = 100
     POSE_SOLVER_ITERATIONS = 200
     _match_tags = []  # holds the _MATCH_TAGMAP currently in use
@@ -221,7 +221,7 @@ class AprilTagDetector:
         self.match_tags = alliance  # defined as a property vs. method
 
     def register_NT_vars(self, table: NetworkTable):
-        table.getStringTopic("alliance").getEntry("ALL")
+        self.NT_alliance = table.getStringTopic("alliance").getEntry("")
 
     @property
     def match_tags(self):
@@ -309,6 +309,8 @@ class AprilTagDetector:
             log.error("runPipeline called with no frame")
             return self.black_frame, []
         try:
+            # get alliance update if there is one
+            self.match_tags = self.NT_alliance.get()
             # Convert the frame to grayscale
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             tags = self.detector.detect(gray)
