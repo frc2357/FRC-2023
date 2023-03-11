@@ -25,7 +25,7 @@ import time
 
 import cv2
 import numpy as np
-import apriltag_funcs
+import detect_apriltags
 import detect_colors
 
 # class used to encapsulate Camera + Calibration information
@@ -69,7 +69,10 @@ if __name__ == "__main__":
     # this class automatically creates all camera + calibration objects
     camvis = CameraVision(cfgfile, simulate=simulate)
     cam0 = camvis.cameras[0]
-    cam1 = camvis.cameras[1]
+    if simulate:
+        cam1 = camvis.cameras[0]
+    else:
+        cam1 = camvis.cameras[1]
 
     # configure networks tables
     nt_table = camvis.ntinst.getTable("gridcam")
@@ -78,7 +81,7 @@ if __name__ == "__main__":
     frame1 = np.zeros_like(frame)
     # retrieve the camera calibration information needed by apriltags
 
-    apriltag = apriltag_funcs.AprilTagDetector((1280, 720))
+    apriltag = detect_apriltags.AprilTagDetector((cam0.config["height"], cam0.config["width"]))
     apriltag.register_NT_vars(nt_table)
 
     gpdetector = detect_colors.GamePieceDetector()
@@ -103,14 +106,14 @@ if __name__ == "__main__":
             # get server time for which last frame was captured
             timeoffset = camvis.ntinst.getServerTimeOffset()
             offset_start = time.perf_counter()
-        
+
             # reset tag locations on every loop
             apriltag.reset_taglocs()
 
             # TODO: do we care if image is undistorted?
             # asked another way --> is AprilTags using the camera matrix values
-            # to  undistort?  Seemed to cause lockup issues early in testing      
-            # ALSO -- VERY EXPENSIVE TO DO ON RASPBERRY PI (3.5/sec vs 7/sec)     
+            # to  undistort?  Seemed to cause lockup issues early in testing
+            # ALSO -- VERY EXPENSIVE TO DO ON RASPBERRY PI (3.5/sec vs 7/sec)
             # frame = cam0.cal.undistort(frame)
             # frame1 = cam1.cal.undistort(frame1)
             orig = copy.copy(frame)  # create a copy for color detection
@@ -136,7 +139,7 @@ if __name__ == "__main__":
             gpdetector.update_NT_vars()
             gptracker.update_NT_vars()
             nt_end = time.perf_counter()
-                
+
             if simulate:
                 frame = cv2.addWeighted(frame, 0.5, orig, 0.5, 0)
                 frame1 = cv2.addWeighted(frame1, 0.5, orig1, 0.5, 0)
@@ -151,7 +154,9 @@ if __name__ == "__main__":
             count += 1
             if count % 10 == 0:
                 g_avg = avg / 10.0
-                log.info(f"Processing took Avg: {g_avg:.4f} sec Tag:{tag_end-offset_start:.4f}\tGP:{gp_end-tag_end:.4f}\tNT:{nt_end-gp_end:.4f}")
+                log.info(
+                    f"Processing took Avg: {g_avg:.4f} sec Tag:{tag_end-offset_start:.4f}\tGP:{gp_end-tag_end:.4f}\tNT:{nt_end-gp_end:.4f}"
+                )
                 avg = 0
             # if simulate:  # the following slows down image processing w/out messing up web server function
             #    for i in range(0, 30):

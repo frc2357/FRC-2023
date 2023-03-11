@@ -174,7 +174,15 @@ class AprilTagDetector:
     _match_tags = []  # holds the _MATCH_TAGMAP currently in use
     taglocs = copy(apriltagloc_type)
 
-    def __init__(self, frame_size, Fx=1000, Fy=1000, Cx=1280 / 2, Cy=720 / 2, alliance="RED"):
+    def __init__(
+        self,
+        frame_size: tuple = (720, 1280),
+        Fx: int = 1000,
+        Fy: int = 1000,
+        Cx: int = 1280 / 2,
+        Cy: int = 720 / 2,
+        alliance: str = "ALL",
+    ):
         """AprilTagPipeline class
         NETWORK TABLES PARAMETERS ( will effect all instances of AprilTagPipeline)
             DETECTION_MARGIN_THRESHOLD
@@ -205,10 +213,11 @@ class AprilTagDetector:
         # Also see cameravisionclass
 
         # estimator config should be updated with actual camera config values (probably in main loop)
+        # these are just used to get us going
         self.estimator_config = robotpy_apriltag.AprilTagPoseEstimator.Config(6.0 / 39.37, Fx, Fy, Cx, Cy)
         self.estimator = robotpy_apriltag.AprilTagPoseEstimator(self.estimator_config)
         self.results = []
-        self.black_frame = np.zeros(shape=(720, 1280, 3), dtype="uint8")
+        self.black_frame = np.zeros(shape=(*frame_size, 3), dtype="uint8")
         self.match_tags = alliance  # defined as a property vs. method
 
     def register_NT_vars(self, table: NetworkTable):
@@ -339,12 +348,12 @@ class AprilTagDetector:
                 #    rqua.Y(),
                 #    rqua.Z(),
                 # ]
-                self.taglocs["tags"][tag_id-1]["pose"]["translation"] = {"x": tvec.x, "y": tvec.y, "z": tvec.z}
-                self.taglocs["tags"][tag_id-1]["pose"]["rotation"]["quaternion"] = {
-                   "W": rqua.W(),
-                   "X": rqua.X(),
-                   "Y": rqua.Y(),
-                   "Z": rqua.Z(),
+                self.taglocs["tags"][tag_id - 1]["pose"]["translation"] = {"x": tvec.x, "y": tvec.y, "z": tvec.z}
+                self.taglocs["tags"][tag_id - 1]["pose"]["rotation"]["quaternion"] = {
+                    "W": rqua.W(),
+                    "X": rqua.X(),
+                    "Y": rqua.Y(),
+                    "Z": rqua.Z(),
                 }
                 self.taglocs["tags"][tag_id - 1]["ambiguity"] = amb
                 self.taglocs["tags"][tag_id - 1]["camera"] = cam_idx

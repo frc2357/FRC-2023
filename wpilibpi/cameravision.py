@@ -203,16 +203,16 @@ class CameraVision:
         camera = UsbCamera(config.name, config.path)
         server = CameraServer.addCamera(camera)
 
-        #camera.setConfigJson(json.dumps(config.config))
+        # camera.setConfigJson(json.dumps(config.config))
         camera.setConnectionStrategy(VideoSource.ConnectionStrategy.kConnectionKeepOpen)
 
         if config.streamConfig is not None:
             server.setConfigJson(json.dumps(config.streamConfig))
 
         camConfig = camera.getConfigJsonObject()
-        #camera.setConfigJson(camConfig)
-        #print(dir(camera))
-        #print(camConfig)
+        # camera.setConfigJson(camConfig)
+        # print(dir(camera))
+        # print(camConfig)
         # create object to hold camera state
         c = CameraObject()
         c.camera = camera
@@ -225,6 +225,7 @@ class CameraVision:
 
 if __name__ == "__main__":
     import sys
+
     cfgfile = sys.argv[1]
     c = CameraVision(cfgfile)
     frame = np.zeros(shape=(720, 1280, 3), dtype="uint8")

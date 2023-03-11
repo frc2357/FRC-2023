@@ -10,7 +10,7 @@ import logging
 import numpy as np
 from numpy import ndarray
 from gamepiece import gamepiecetracker
-from ntcore import NetworkTable 
+from ntcore import NetworkTable
 import cv2
 
 log = logging.getLogger(__name__)
@@ -53,7 +53,7 @@ class GamePieceDetector:
         self.set_yellow_range(self.NT_yel_lower.get(), self.NT_yel_upper.get())
         self.set_violet_range(self.NT_vio_lower.get(), self.NT_vio_upper.get())
 
-    def set_yellow_range(self, low=None, upp=None):
+    def set_yellow_range(self, low: tuple = None, upp: tuple = None):
         """update the lower / upper ranges (HSV)! for yellow color determination
         Args:
             low: tuple like (H,S,V) value.  If none, no update is performed
@@ -64,7 +64,7 @@ class GamePieceDetector:
         if upp is not None:
             self._yel_upper = np.array(upp, "uint8")
 
-    def set_violet_range(self, low=None, upp=None):
+    def set_violet_range(self, low: tuple = None, upp: tuple = None):
         """update the lower / upper ranges (HSV)! for yellow color determination
         Args:
             low: tuple like (H,S,V) values.  If none, no update is performed
