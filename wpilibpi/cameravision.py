@@ -201,22 +201,20 @@ class CameraVision:
 
         print("Starting camera '{}' on {}".format(config.name, config.path))
         camera = UsbCamera(config.name, config.path)
-        server = CameraServer.addCamera(camera)
+        CameraServer.addCamera(camera)
 
-        # camera.setConfigJson(json.dumps(config.config))
+        camera.setConfigJson(json.dumps(config.config))
         camera.setConnectionStrategy(VideoSource.ConnectionStrategy.kConnectionKeepOpen)
 
-        if config.streamConfig is not None:
-            server.setConfigJson(json.dumps(config.streamConfig))
+        #if config.streamConfig is not None:
+        #    print(json.dumps(config.streamConfig))
+        #    server.setConfigJson(json.dumps(config.streamConfig))
 
-        camConfig = camera.getConfigJsonObject()
-        # camera.setConfigJson(camConfig)
-        # print(dir(camera))
-        # print(camConfig)
+        camera.setConfigJson(config.config)
         # create object to hold camera state
         c = CameraObject()
         c.camera = camera
-        c.config = camConfig
+        c.config = config
         c.outstream = CameraServer.putVideo(config.name, config.width, config.height)
         c.sink = CameraServer.getVideo(camera)
         c.cal = config.calibration
