@@ -24,9 +24,9 @@ class GamePieceDetector:
     # gamepiece_chars[:] = '-' #set default value
     color_violet = (255, 0, 217)  # BGR for 'COLORIZING' game pieces
     color_yellow = (28, 215, 215)  # BGR for 'COLORIZING' game pieces
-    _yel_lower = np.array((5, 100, 140), "uint8")  # HSV
+    _yel_lower = np.array((8, 100, 140), "uint8")  # HSV
     _yel_upper = np.array((100, 255, 237), "uint8")  # HSV
-    _vio_lower = np.array((118, 55, 55), "uint8")  # HSV
+    _vio_lower = np.array((100, 55, 55), "uint8")  # HSV
     _vio_upper = np.array((153, 255, 255), "uint8")  # HSV
     last_NT_update = 0
 
@@ -39,13 +39,13 @@ class GamePieceDetector:
         # second index is column (left most  =0 to right most = 8)
         # third index is color (yellow = 0, violet = 1)
         # gamepieces = GamePieceTracker()
-        self.NT_yel_lower = ntable.getIntegerArrayTopic("yellow_lower_HSV").getEntry([5, 100, 140])
+        self.NT_yel_lower = ntable.getIntegerArrayTopic("yellow_lower_HSV").getEntry([8, 100, 140])
         self.NT_yel_upper = ntable.getIntegerArrayTopic("yellow_upper_HSV").getEntry([100, 255, 237])
-        self.NT_vio_lower = ntable.getIntegerArrayTopic("violet_lower_HSV").getEntry([118, 55, 55])
+        self.NT_vio_lower = ntable.getIntegerArrayTopic("violet_lower_HSV").getEntry([100, 55, 55])
         self.NT_vio_upper = ntable.getIntegerArrayTopic("violet_upper_HSV").getEntry([153, 255, 255])
-        self.NT_yel_lower.set([5, 100, 140])
+        self.NT_yel_lower.set([8, 100, 140])
         self.NT_yel_upper.set([100, 255, 237])
-        self.NT_vio_lower.set([118, 55, 55])
+        self.NT_vio_lower.set([100, 55, 55])
         self.NT_vio_upper.set([153, 255, 255])
 
     def update_NT_vars(self):
