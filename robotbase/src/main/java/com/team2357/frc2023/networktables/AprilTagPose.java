@@ -46,7 +46,7 @@ public class AprilTagPose {
         try {
             obj = (JSONObject) m_parser.parse(jsonString);
         } catch (ParseException e) {
-            return new Pose2d(Double.NaN, Double.NaN, Rotation2d.fromRadians(Double.NaN));
+            return null;
         }
 
         System.out.println(obj);
