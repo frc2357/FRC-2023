@@ -81,7 +81,7 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
         m_extendMotor.setOpenLoopRampRate(m_config.m_extendMotorRampRate);
         m_extendMotor.enableVoltageCompensation(12);
 
-        resetEncoders();
+        resetEncoder();
     }
 
     public void manualExtend(double proportion) {
@@ -113,7 +113,7 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
         m_extendMotor.set(0);
     }
 
-    public void resetEncoders() {
+    public void resetEncoder() {
         m_extendMotor.getEncoder().setPosition(0);
         m_targetRotations = 0;
     }

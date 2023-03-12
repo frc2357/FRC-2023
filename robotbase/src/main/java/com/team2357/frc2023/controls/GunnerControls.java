@@ -172,7 +172,7 @@ public class GunnerControls {
         leftDPadAndB.onTrue(new ClawToggleCommand());
 
         leftDPadAndY.onTrue(new InstantCommand(() -> {
-            ArmExtensionSubsystem.getInstance().resetEncoders();
+            ArmExtensionSubsystem.getInstance().resetEncoder();
         }));
 
         // Intake
@@ -197,7 +197,7 @@ public class GunnerControls {
         m_backButton.onTrue(new InstantCommand(() -> {
             IntakeArmSubsystem.getInstance().resetEncoders();
             ArmRotationSubsystem.getInstance().resetEncoders();
-            ArmExtensionSubsystem.getInstance().resetEncoders();
+            ArmExtensionSubsystem.getInstance().resetEncoder();
         }));
     }
 }

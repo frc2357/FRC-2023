@@ -32,7 +32,7 @@ public class ArmExtendAmpZeroCommand extends CommandBase{
         }
         else{
             Logger.getInstance().recordOutput("Amp Zero fail", false);
-        ArmExtensionSubsystem.getInstance().resetEncoders();
+        ArmExtensionSubsystem.getInstance().resetEncoder();
         }
     }
 }
