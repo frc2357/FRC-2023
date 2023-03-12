@@ -103,8 +103,8 @@ public final class Constants {
 
             config.m_trajectoryMaxVelocityMetersPerSecond = 2;
             config.m_trajectoryMaxAccelerationMetersPerSecond = 3;
-            config.m_xController = new PIDController(.56122, 0, 0);
-            config.m_yController = new PIDController(.56122, 0, 0);
+            config.m_xController = new PIDController(2.2, 0, 0); //.56122   1.7
+            config.m_yController = new PIDController(2.2, 0, 0); //.56122
             config.m_thetaController = new PIDController(2.15, 0, 0);
 
             config.m_sensorPositionCoefficient = 2.0 * Math.PI / Constants.DRIVE.TICKS_PER_ROTATION

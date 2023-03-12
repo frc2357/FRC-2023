@@ -458,7 +458,6 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		}
 
 		m_chassisSpeeds = chassisSpeeds;
-
 	}
 
 	public void updatePoseEstimator() {
@@ -467,10 +466,10 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 						m_frontRightModule.getPosition(),
 						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
 
-		Pose2d visionPose = AprilTagPose.getInstance().getPose();
-		if (visionPose != null) {
-			m_poseEstimator.addVisionMeasurement(visionPose, Timer.getFPGATimestamp());
-		}
+		// Pose2d visionPose = AprilTagPose.getInstance().getPose();
+		// if (visionPose != null) {
+		// 	m_poseEstimator.addVisionMeasurement(visionPose, Timer.getFPGATimestamp());
+		// }
 	}
 
 	public void balance() {
@@ -674,10 +673,17 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		// SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
 
 		// SmartDashboard.putNumber("Yaw", m_pigeon.getYaw());
-		// SmartDashboard.putNumber("Pose X", m_odometry.getPoseMeters().getX());
-		// SmartDashboard.putNumber("Pose Y", m_odometry.getPoseMeters().getY());
-		// SmartDashboard.putNumber("Pose Angle",
-		// m_odometry.getPoseMeters().getRotation().getDegrees());
+		Pose2d pose = getPose();
+		double x = pose.getX();
+		double y = pose.getY();
+		double angle = pose.getRotation().getDegrees();
+
+		SmartDashboard.putNumber("Pose X", x);
+		SmartDashboard.putNumber("Pose Y", y);
+		SmartDashboard.putNumber("Pose Angle",
+		angle);
+
+		//System.out.println("X: " + x + ",  Y: " + y + ",  R: " + angle);
 
 		SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
 		SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxVelocityMetersPerSecond);
