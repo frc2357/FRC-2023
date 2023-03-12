@@ -14,6 +14,7 @@ import com.swervedrivespecialties.swervelib.AbsoluteEncoder;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
+import com.team2357.frc2023.commands.controller.RumbleCommand;
 import com.team2357.frc2023.commands.scoring.AutoScoreLowCommandGroup;
 import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
 import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreMidCommandGroup;
@@ -546,6 +547,10 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		return true;
 	}
 
+	public boolean hasTarget() {
+		return DualLimelightManagerSubsystem.getInstance().validTargetExists();
+	}
+
 	public boolean isAtTarget() {
 		// System.out.println(isAtXTarget() && isAtYTarget());
 		// return isAtXTarget();
@@ -701,8 +706,13 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 				states[3].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
 				states[3].angle.getRadians());
 
-		Logger.getInstance().recordOutput("Swerve States", states);
-
+		Logger.getInstance().recordOutput("Swerve Setpoints", states);
+		SwerveModuleState[] loggingSwerveStates = states;
+		loggingSwerveStates[0] = m_frontLeftModule.getState();
+		loggingSwerveStates[1] = m_frontRightModule.getState();
+		loggingSwerveStates[2] = m_backLeftModule.getState();
+		loggingSwerveStates[3] = m_backRightModule.getState();
+		Logger.getInstance().recordOutput("Swerve Speed", loggingSwerveStates);
 		Logger.getInstance().recordOutput("Robot Pose", getPose());
 
 		// System.out.println("Is closed loop: "+isClosedLoopEnabled() + ", tracking: "

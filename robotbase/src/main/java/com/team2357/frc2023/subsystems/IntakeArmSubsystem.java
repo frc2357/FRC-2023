@@ -223,6 +223,14 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
         m_intakeSolenoid.set(Value.kOff);
     }
 
+    public double getAmps() {
+        return m_winchMotor.getOutputCurrent();
+    } 
+
+    public void manualStow(Double speed){
+        m_winchMotor.set(speed);
+    }
+
     @Override
     public void periodic() {
         if (m_currentState != m_desiredState) {
@@ -240,7 +248,7 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
             updatePID();
         }
 
-       // SmartDashboard.putNumber("Winch rotations", m_winchMotor.getEncoder().getPosition());
+    //    SmartDashboard.putNumber("Winch rotations", m_winchMotor.getEncoder().getPosition());
     }
 
     private void deployPeriodic() {

@@ -194,6 +194,8 @@ public final class Constants {
         public static final double MID_SHOT_DELAY_SECONDS = .25;
         public static final double HIGH_SHOT_PERCENT_OUTPUT = 0;
         public static final double HIGH_SHOT_DELAY_SECONDS = .25;
+        public static final int AUTO_INTAKE_CURRENT_LIMIT = 0;
+        public static final double AUTO_INTAKE_WAIT_TIME = 0;
 
         public static IntakeRollerSubsystem.Configuration GET_INTAKE_CONFIG() {
             IntakeRollerSubsystem.Configuration config = new IntakeRollerSubsystem.Configuration();
@@ -211,7 +213,6 @@ public final class Constants {
 
             config.m_masterInverted = true;
             config.m_followerInverted = false;
-
             return config;
         }
 
@@ -221,13 +222,21 @@ public final class Constants {
     public static final class INTAKE_ARM {
         public static final double SOLENOID_EXTEND_WAIT_MILLIS = 250;
 
+        // Auto score low
+        public static final double AUTO_SCORE_LOW_ROTATIONS = 70;
+
+        // Cube shooting
         //TODO: Tune these
         public static final double MID_SHOT_SETPOINT_ROTATIONS = 0;
         public static final double HIGH_SHOT_SETPOINT_ROTATIONS = 0;
+
         public static final double INTAKE_HANDOFF_WINCH_ROTATIONS = 60;
 
         public static final int WINCH_DEPLOY_PID_SLOT = 0;
         public static final int WINCH_STOW_PID_SLOT = 1;
+
+        public static final double WINCH_AMP_ZERO_PERCENT_OUTPUT = 0;
+        public static final int WINCH_AMP_ZERO_MAX_AMPS = 0;
 
         public static IntakeArmSubsystem.Configuration GET_INTAKE_ARM_CONFIG() {
             IntakeArmSubsystem.Configuration config = new IntakeArmSubsystem.Configuration();
@@ -307,6 +316,9 @@ public final class Constants {
         public static final double AUTO_SCORE_MID_ROTATIONS = 0;
         public static final double AUTO_SCORE_HIGH_ROTATIONS = 260;
 
+        public static final int ARM_EXTENSION_AMP_ZERO_PERCENT_OUTPUT = 0;
+        public static final int ARM_EXTENSION_AMP_ZERO_MAX_AMPS = 0;
+
         public static ArmExtensionSubsystem.Configuration GET_EXTENSION_CONFIG() {
             ArmExtensionSubsystem.Configuration config = new ArmExtensionSubsystem.Configuration();
             config.m_extendAxisMaxSpeed = 0;
@@ -359,6 +371,9 @@ public final class Constants {
 
         public static final double ARM_ROTATION_GEAR_RATIO  = 190.91;
         public static final double ARM_HANDOFF_ROTATIONS = ARM_ROTATION_GEAR_RATIO / 8;
+
+        public static final int ARM_ROTATION_AMP_ZERO_PERCENT_OUTPUT = 0;
+        public static final int ARM_ROTATION_AMP_ZERO_MAX_AMPS = 0;
 
         public static ArmRotationSubsystem.Configuration GET_ROTATION_CONFIG() {
             ArmRotationSubsystem.Configuration config = new ArmRotationSubsystem.Configuration();
@@ -450,6 +465,9 @@ public final class Constants {
     public static final class COMPRESSOR {
         public static final int MIN_PRESSURE_PSI = 90;
         public static final int MAX_PRESSURE_PSI = 100;
+    }
+    public static final class AMP_ZERO{
+        public static final int AMP_ZERO_DEADLINE_SECONDS = 1;
     }
 
 }
