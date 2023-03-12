@@ -36,7 +36,7 @@ public class ArmRotationAmpZeroCommand extends CommandBase {
             DriverStation.reportError("Amp Zeroing did not finish in time! Arm Rotation not zeroed.", false);
             Logger.getInstance().recordOutput("Arm Rotation Amp Zero fail", true);
         } else {
-            ArmRotationSubsystem.getInstance().resetEncoders();
+            ArmRotationSubsystem.getInstance().resetEncoder();
             System.out.println("Correct end");
         }
 

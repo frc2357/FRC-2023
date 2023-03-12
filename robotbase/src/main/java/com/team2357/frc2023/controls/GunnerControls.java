@@ -2,17 +2,14 @@ package com.team2357.frc2023.controls;
 
 import com.team2357.frc2023.Constants.CONTROLLER;
 import com.team2357.frc2023.commands.armextension.ArmExtendAmpZeroCommand;
-import com.team2357.frc2023.commands.armrotation.ArmRotationAmpZeroCommand;
 import com.team2357.frc2023.commands.auto.TranslateToTargetCommand;
-import com.team2357.frc2023.commands.auto.TranslateToTargetCommandGroup;
 import com.team2357.frc2023.commands.human.panic.ArmExtensionAxisCommand;
 import com.team2357.frc2023.commands.human.panic.ArmRotationAxisCommand;
 import com.team2357.frc2023.commands.human.panic.ClawToggleCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeArmToggleCommand;
-import com.team2357.frc2023.commands.human.panic.IntakeAxisRollerCommand;
-import com.team2357.frc2023.commands.human.panic.IntakeWinchCommand;
+import com.team2357.frc2023.commands.human.panic.IntakeRollerAxisCommand;
+import com.team2357.frc2023.commands.human.panic.IntakeWinchAxisCommand;
 import com.team2357.frc2023.commands.human.panic.WristToggleCommand;
-import com.team2357.frc2023.commands.intake.IntakeRollerReverseCommand;
 import com.team2357.frc2023.commands.intake.WinchAmpZeroCommand;
 import com.team2357.frc2023.commands.scoring.AutoScoreLowCommandGroup;
 import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
@@ -28,6 +25,8 @@ import com.team2357.lib.util.XboxRaw;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -60,11 +59,6 @@ public class GunnerControls {
     public POVButton m_rightDPad;
     public POVButton m_downDPad;
     public POVButton m_leftDPad;
-
-    // Chords
-    public Trigger m_upDPadAndXButton;
-    public Trigger m_upDPadAndYButton;
-    public Trigger m_downDPadAndAButton;
 
     /**
      * @param builder The GunnerControlsBuilder object
@@ -106,6 +100,14 @@ public class GunnerControls {
         return Utility.deadband(value, CONTROLLER.GUNNER_CONTROLLER_DEADBAND);
     }
 
+    public double getRightTriggerAxis() {
+        return m_controller.getRightTriggerAxis();
+    }
+
+    public double getLeftTriggerAxis() {
+        return m_controller.getLeftTriggerAxis();
+    }
+
     private void mapControls() {
         AxisInterface axisLeftStickX = () -> {
             return getLeftXAxis();
@@ -113,6 +115,14 @@ public class GunnerControls {
 
         AxisInterface axisRightStickY = () -> {
             return getRightYAxis();
+        };
+
+        AxisInterface intakeRollerForwardAxis = () -> {
+            return getRightTriggerAxis();
+        };
+
+        AxisInterface intakeRollerReverseAxis = () -> {
+            return -getLeftTriggerAxis();
         };
 
         Trigger noDPad = new Trigger(() -> m_upDPad.getAsBoolean() || m_rightDPad.getAsBoolean()
@@ -144,42 +154,56 @@ public class GunnerControls {
         Trigger rightDPadAndX = m_rightDPad.and(m_xButton);
         Trigger rightDPadAndY = m_rightDPad.and(m_yButton);
         Trigger rightDPadAndB = m_rightDPad.and(m_bButton);
+        Trigger rightDPadAndRightTrigger = m_rightDPad.and(m_rightTrigger);
+        Trigger rightDPadAndLeftTrigger = m_rightDPad.and(m_leftTrigger);
 
         Trigger aButton = m_aButton.and(noDPad);
         Trigger bButton = m_bButton.and(noDPad);
         Trigger yButton = m_yButton.and(noDPad);
         Trigger xButton = m_xButton.and(noDPad);
 
+        // Arm rotation
         upDPadOnly.whileTrue(new ArmRotationAxisCommand(axisRightStickY));
 
-        leftDPadOnly.whileTrue(new ArmExtensionAxisCommand(axisRightStickY));
+        upDPadAndY.onTrue(new InstantCommand(() -> {
+            ArmRotationSubsystem.getInstance().resetEncoder();
+        }));
 
+
+        // Arm extension / claw / wrist
+        leftDPadOnly.whileTrue(new ArmExtensionAxisCommand(axisRightStickY));
+        
         leftDPadAndA.onTrue(new WristToggleCommand());
         leftDPadAndB.onTrue(new ClawToggleCommand());
 
-        downDPadOnly.whileTrue(new IntakeWinchCommand(axisRightStickY));
+        leftDPadAndY.onTrue(new ArmExtendAmpZeroCommand());
 
-        downDPadAndX.onTrue(new TranslateToTargetCommandGroup(SwerveDriveSubsystem.COLUMN_TARGET.LEFT));
-        downDPadAndA.onTrue(new TranslateToTargetCommandGroup(SwerveDriveSubsystem.COLUMN_TARGET.MIDDLE));
-        downDPadAndB.onTrue(new TranslateToTargetCommandGroup(SwerveDriveSubsystem.COLUMN_TARGET.RIGHT));
+        // Intake
+        rightDPadOnly.whileTrue(new IntakeWinchAxisCommand(axisRightStickY));
 
-        yButton.whileTrue(new ConeAutoScoreHighCommandGroup());
-        xButton.whileTrue(new ConeAutoScoreMidCommandGroup());
-        aButton.whileTrue(new AutoScoreLowCommandGroup());
+        rightDPadAndRightTrigger.whileTrue(new IntakeRollerAxisCommand(intakeRollerForwardAxis));
+        rightDPadAndLeftTrigger.whileTrue(new IntakeRollerAxisCommand(intakeRollerReverseAxis));
 
         rightDPadAndA.onTrue(new IntakeArmToggleCommand());
-        rightDPadOnly.whileTrue(new IntakeAxisRollerCommand(axisRightStickY));
+        rightDPadAndY.onTrue(new WinchAmpZeroCommand());
 
-        // rightDPadAndY.onTrue(new InstantCommand(() -> {
-        //     IntakeArmSubsystem.getInstance().resetEncoders();
-        //     ArmRotationSubsystem.getInstance().resetEncoders();
-        //     ArmExtensionSubsystem.getInstance().resetEncoder();
-        // }));
+        // Teleop trajectory
+        downDPadAndX.onTrue(new TranslateToTargetCommand(SwerveDriveSubsystem.COLUMN_TARGET.LEFT));
+        downDPadAndA.onTrue(new TranslateToTargetCommand(SwerveDriveSubsystem.COLUMN_TARGET.MIDDLE));
+        downDPadAndB.onTrue(new TranslateToTargetCommand(SwerveDriveSubsystem.COLUMN_TARGET.RIGHT));
 
-        rightDPadAndX.whileTrue(new ArmRotationAmpZeroCommand());
+        // Auto score
+        yButton.onTrue(new ConeAutoScoreHighCommandGroup());
+        xButton.onTrue(new ConeAutoScoreMidCommandGroup());
+        aButton.onTrue(new AutoScoreLowCommandGroup());
 
-        rightDPadAndB.whileTrue(new IntakeRollerReverseCommand());
-
-        leftDPadAndY.whileTrue(new ArmExtendAmpZeroCommand());
+        // Zero all
+        m_backButton.onTrue(new ParallelCommandGroup(
+            new SequentialCommandGroup(
+                new InstantCommand(() -> {ArmRotationSubsystem.getInstance().resetEncoder();}),
+                new ArmExtendAmpZeroCommand()
+            ),
+            new WinchAmpZeroCommand()
+        ));
     }
 }

@@ -114,7 +114,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
         m_feedforward = new ArmFeedforward(m_config.m_feedforwardKs, m_config.m_feedforwardKg, m_config.m_feedforwardKv,
                 m_config.m_feedforwardKa);
         
-        resetEncoders();
+        resetEncoder();
     }
 
     private void configureRotationMotor(CANSparkMax motor) {
@@ -184,7 +184,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
         m_rotationMotor.set(0);
     }
 
-    public void resetEncoders() {
+    public void resetEncoder() {
         m_rotationMotor.getEncoder().setPosition(0);
         m_targetRotations = 0;
     }
