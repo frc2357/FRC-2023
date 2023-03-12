@@ -1,7 +1,7 @@
 package com.team2357.frc2023.trajectoryutil;
 
+import com.team2357.frc2023.commands.auto.gridone.GridOneTwoConeAutoCommand;
 import com.team2357.frc2023.commands.auto.gridone.GridOneTwoConeBalanceAutoCommand;
-import com.team2357.frc2023.commands.auto.gridone.GridOneTwoTwoConeAutoCommand;
 import com.team2357.frc2023.commands.auto.gridtwo.GridTwoTwoConeAutoCommand;
 import com.team2357.frc2023.commands.auto.gridtwo.GridTwoTwoConeBalanceAutoCommand;
 import com.team2357.frc2023.commands.auto.gridzero.GridZeroTwoConeAutoCommand;
@@ -23,7 +23,7 @@ public class AvailableTrajectoryCommands {
         GridZeroTwoConeAuto = new GridZeroTwoConeAutoCommand();
         GridZeroTwoConeBalanceAuto = new GridZeroTwoConeBalanceAutoCommand();
 
-        GridOneTwoConeAuto = new GridOneTwoTwoConeAutoCommand();
+        GridOneTwoConeAuto = new GridOneTwoConeAutoCommand();
         GridOneTwoConeBalanceAuto = new GridOneTwoConeBalanceAutoCommand();
         
         GridTwoTwoConeAuto = new GridTwoTwoConeAutoCommand();
