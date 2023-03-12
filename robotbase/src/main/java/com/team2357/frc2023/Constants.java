@@ -373,11 +373,11 @@ public final class Constants {
         public static final double ARM_ROTATION_GEAR_RATIO  = 190.91;
         public static final double ARM_HANDOFF_ROTATIONS = ARM_ROTATION_GEAR_RATIO / 8 + CHAIN_BACKLASH_ROTATIONS;
 
-        public static final double ARM_ROTATION_AMP_ZERO_PERCENT_OUTPUT = -0.1;
+        public static final double ARM_ROTATION_AMP_ZERO_PERCENT_OUTPUT = -0.25;
         public static final int ARM_ROTATION_AMP_ZERO_MAX_AMPS = 25;
 
 
-        public static final double ARM_ROTATION_AMP_ZERO_TIME_MILLIS = 4000;
+        public static final double ARM_ROTATION_AMP_ZERO_TIME_MILLIS = 1000;
 
         public static ArmRotationSubsystem.Configuration GET_ROTATION_CONFIG() {
             ArmRotationSubsystem.Configuration config = new ArmRotationSubsystem.Configuration();
