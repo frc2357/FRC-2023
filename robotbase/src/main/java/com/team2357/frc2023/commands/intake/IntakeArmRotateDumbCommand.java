@@ -14,7 +14,7 @@ public class IntakeArmRotateDumbCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        IntakeArmSubsystem.getInstance().manualRotate(m_speedPercent);
+        IntakeArmSubsystem.getInstance().manualStow(m_speedPercent);
     }
 
     @Override
@@ -24,6 +24,6 @@ public class IntakeArmRotateDumbCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        IntakeArmSubsystem.getInstance().manualRotate(0.0);
+        IntakeArmSubsystem.getInstance().manualStow(0.0);
     }
 }

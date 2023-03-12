@@ -166,7 +166,11 @@ public class GunnerControls {
         // Arm rotation
         upDPadOnly.whileTrue(new ArmRotationAxisCommand(axisRightStickY));
 
-        upDPadAndY.whileTrue(new ArmRotationAmpZeroCommand());
+        // upDPadAndY.whileTrue(new ArmRotationAmpZeroCommand());
+        upDPadAndY.whileTrue(new InstantCommand(() -> {
+            System.out.println("Zeroing arm rotation");
+            ArmRotationSubsystem.getInstance().resetEncoder();
+        }));
 
         // Arm extension / claw / wrist
         leftDPadOnly.whileTrue(new ArmExtensionAxisCommand(axisRightStickY));
@@ -191,14 +195,14 @@ public class GunnerControls {
         downDPadAndB.onTrue(new TranslateToTargetCommand(SwerveDriveSubsystem.COLUMN_TARGET.RIGHT));
 
         // Auto score
-        yButton.onTrue(new ConeAutoScoreHighCommandGroup());
-        xButton.onTrue(new ConeAutoScoreMidCommandGroup());
-        aButton.onTrue(new AutoScoreLowCommandGroup());
+        yButton.whileTrue(new ConeAutoScoreHighCommandGroup());
+        xButton.whileTrue(new ConeAutoScoreMidCommandGroup());
+        aButton.whileTrue(new AutoScoreLowCommandGroup());
 
         // Zero all
         m_backButton.onTrue(new ParallelCommandGroup(
             new SequentialCommandGroup(
-                new ArmRotationAmpZeroCommand(),
+                new InstantCommand(() -> {ArmRotationSubsystem.getInstance().resetEncoder();}),
                 new ArmExtendAmpZeroCommand()
             ),
             new WinchAmpZeroCommand()

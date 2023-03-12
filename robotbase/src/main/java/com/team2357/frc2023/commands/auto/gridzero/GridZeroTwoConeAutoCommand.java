@@ -1,5 +1,6 @@
 package com.team2357.frc2023.commands.auto.gridzero;
 
+import com.team2357.frc2023.commands.claw.ClawInstantOpenCommand;
 import com.team2357.frc2023.commands.intake.IntakeArmRotateDumbCommand;
 import com.team2357.frc2023.commands.intake.IntakeDeployCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
@@ -36,11 +37,13 @@ public class GridZeroTwoConeAutoCommand extends ParallelCommandGroup {
                                 .deadlineWith(new WaitCommand(7)))
                         .andThen(new WaitCommand(1))
                         .andThen(new ParallelCommandGroup(
-                                new IntakeArmRotateDumbCommand(0.4).withTimeout(0.75),
+                                new ClawInstantOpenCommand(),
+                                new IntakeArmRotateDumbCommand(0.4).withTimeout(1),
 
                                 new WaitCommand(1.5).andThen(
                                         new IntakeRollerRunCommand()
-                                                .withTimeout(2)))),
+                                                .withTimeout(2))))
+                        .andThen(new IntakeStowCommandGroup()),
 
                 new WaitCommand(7).andThen(
                         TrajectoryUtil.createTrajectoryPathCommand("grid0 2 cone", true)));
