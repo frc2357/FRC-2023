@@ -8,6 +8,8 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import com.team2357.frc2023.Constants;
+import com.team2357.frc2023.Constants.GRIDCAM;
+import com.team2357.frc2023.apriltag.AprilTagEstimate;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -26,6 +28,12 @@ public class GridCam {
         return m_instance;
     }
 
+    public enum GRID_CAM {
+        FRONT,
+        REAR,
+        NONE
+    }
+
     private NetworkTable m_table = NetworkTableInstance.getDefault()
             .getTable(Constants.APRILTAG_POSE.APRILTAG_TABLE_NAME);
 
@@ -41,25 +49,13 @@ public class GridCam {
 
     /**
      * 
-     * @return List of poses at a given time relative to the camera
+     * @return List of estimates at a given time relative to the camera
      */
-    public ArrayList<Pose2d> getCamRelativePoses() {
-        return toPose2d(m_poseSub.get());
+    public ArrayList<AprilTagEstimate> getCamRelativePoses() {
+        return toEstimates(m_poseSub.get());
     }
 
-    /**
-     * 
-     * @return List of poses at a given time relative to the robot
-     */
-    public ArrayList<Pose2d> getRobotRelativePoses() {
-        return getCamRelativePoses();
-    }
-
-    public ArrayList<Pose2d> getFieldRelativePoses() {
-        return getRobotRelativePoses();
-    }
-
-    public ArrayList<Pose2d> toPose2d(String jsonString) {
+    public ArrayList<AprilTagEstimate> toEstimates(String jsonString) {
         JSONObject obj;
         try {
             obj = (JSONObject) m_parser.parse(jsonString);
@@ -69,9 +65,10 @@ public class GridCam {
 
         System.out.println(obj);
 
+        Long timestamp = (long) obj.get("timestamp");
         JSONArray jsonTagPoses = (JSONArray) obj.get("tags");
 
-        ArrayList<Pose2d> tagPoses = new ArrayList<Pose2d>();
+        ArrayList<AprilTagEstimate> aprilTagEstimates = new ArrayList<AprilTagEstimate>();
 
         for (int i = 0; i < jsonTagPoses.size(); i++) {
             JSONObject jsonTagInfo = (JSONObject) jsonTagPoses.get(i);
@@ -81,10 +78,31 @@ public class GridCam {
             Translation2d poseTrans = getTranslation(jsonTagPose);
             Rotation2d poseRot = getRotation(jsonTagPose);
 
-            tagPoses.add(new Pose2d(poseTrans, poseRot));
-        }
+            Pose2d poseEstimate = new Pose2d(poseTrans, poseRot);
 
-        return tagPoses;
+            int id = (int) jsonTagInfo.get("ID");
+            double ambiguity = (double) jsonTagInfo.get("ambiguity");
+
+            GRID_CAM gridCam = getGridCam((int) jsonTagInfo.get("camera"));
+
+            if (gridCam != GRID_CAM.NONE) {
+                AprilTagEstimate fullEstimate = new AprilTagEstimate(id, timestamp, poseEstimate, ambiguity, gridCam,
+                        false);
+                aprilTagEstimates.add(fullEstimate);
+            }
+        }
+        return aprilTagEstimates;
+    }
+
+    public GRID_CAM getGridCam(int cam) {
+        switch (cam) {
+            case 0:
+                return GRID_CAM.FRONT;
+            case 1:
+                return GRID_CAM.REAR;
+            default:
+                return GRID_CAM.NONE;
+        }
     }
 
     public Translation2d getTranslation(JSONObject obj) {

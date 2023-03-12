@@ -15,18 +15,14 @@ import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.commands.controller.RumbleCommand;
+import com.team2357.frc2023.apriltag.GridCamEstimator;
 import com.team2357.frc2023.commands.scoring.AutoScoreLowCommandGroup;
 import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
 import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreMidCommandGroup;
 import com.team2357.frc2023.commands.scoring.cube.CubeAutoScoreHighCommandGroup;
 import com.team2357.frc2023.commands.scoring.cube.CubeAutoScoreMidCommandGroup;
-import com.team2357.frc2023.util.Utility;
-import com.team2357.frc2023.networktables.GridCam;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagPoseEstimate;
-import edu.wpi.first.apriltag.AprilTagPoseEstimator;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -471,7 +467,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 						m_frontRightModule.getPosition(),
 						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
 
-		Pose2d visionPose = GridCam.getInstance().getCamRelativePose();
+		Pose2d visionPose = GridCamEstimator.getInstance().estimateRobotPose().getPose();
 		if (visionPose != null) {
 			m_poseEstimator.addVisionMeasurement(visionPose, Timer.getFPGATimestamp());	
 		}
