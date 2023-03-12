@@ -11,12 +11,14 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class ArmRotationAmpZeroCommand extends CommandBase {
 
     long m_startTime;
+
     public ArmRotationAmpZeroCommand() {
         addRequirements(ArmRotationSubsystem.getInstance());
     }
 
     @Override
     public void initialize() {
+        ArmRotationSubsystem.getInstance().setClosedLoopEnabled(false);
         ArmRotationSubsystem.getInstance().manualRotate(Constants.ARM_ROTATION.ARM_ROTATION_AMP_ZERO_PERCENT_OUTPUT);
         m_startTime = System.currentTimeMillis();
     }
@@ -24,7 +26,8 @@ public class ArmRotationAmpZeroCommand extends CommandBase {
     @Override
     public boolean isFinished() {
         return Math.abs(
-                ArmRotationSubsystem.getInstance().getAmps()) >= Constants.ARM_ROTATION.ARM_ROTATION_AMP_ZERO_MAX_AMPS &&
+                ArmRotationSubsystem.getInstance().getAmps()) >= Constants.ARM_ROTATION.ARM_ROTATION_AMP_ZERO_MAX_AMPS
+                &&
                 Constants.ARM_ROTATION.ARM_ROTATION_AMP_ZERO_TIME_MILLIS + m_startTime <= System.currentTimeMillis();
     }
 
@@ -37,5 +40,6 @@ public class ArmRotationAmpZeroCommand extends CommandBase {
         } else {
             ArmRotationSubsystem.getInstance().resetEncoder();
         }
+        ArmRotationSubsystem.getInstance().setClosedLoopEnabled(true);
     }
 }
