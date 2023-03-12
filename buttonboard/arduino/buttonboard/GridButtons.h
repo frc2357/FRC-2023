@@ -102,12 +102,16 @@ public:
     return m_nodes[0][0] != NodeDisconnected;
   }
 
-  uint8_t getSelectedRow() {
+  int8_t getSelectedRow() {
     return m_selectedRow;
   }
 
-  uint8_t getSelectedCol() {
+  int8_t getSelectedCol() {
     return m_selectedCol;
+  }
+
+  bool isSelectedCube() {
+    return m_selectedIsCube;
   }
 
   void clearSelected() {
@@ -149,6 +153,10 @@ private:
   }
 
   void onKeyPress(uint8_t row, uint8_t col) {
+    if (!isConnected()) {
+      return;
+    }
+
     if (m_selectedCol == col && m_selectedRow == row) {
       // We already selected this key.
       if (row == 2 && m_selectedIsCube) {
