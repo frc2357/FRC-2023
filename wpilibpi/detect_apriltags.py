@@ -43,7 +43,7 @@ apriltagloc_type = {
         {
             "ID": idx,
             "ambiguity": 0.0,
-            "camera": 0,
+            "camera": -1,
             "pose": {
                 "translation": {"x": 0, "y": 0, "z": 0},
                 "rotation": {"quaternion": {"W": 0.0, "X": 0.0, "Y": 0.0, "Z": 0.0}},
@@ -170,7 +170,7 @@ def create_field_cornerlocs(tag_id, pose: Pose3d):
 class AprilTagDetector:
     _MATCH_TAGMAP = {"red": [1, 2, 3], "blue": [6, 7, 8], "": [1, 2, 3, 6, 7, 8]}
     DETECTION_MARGIN_THRESHOLD = 100
-    POSE_SOLVER_ITERATIONS = 200
+    POSE_SOLVER_ITERATIONS = 100
     _match_tags = []  # holds the _MATCH_TAGMAP currently in use
     taglocs = copy(apriltagloc_type)
 
@@ -192,7 +192,7 @@ class AprilTagDetector:
         self.detector.addFamily("tag16h5")
         # TODO: do these config values need to be exposed to NetworkTables?
         cfg = self.detector.getConfig()
-        cfg.numThreads = 2
+        cfg.numThreads = 4
         cfg.decodeSharpening = 0.25
         cfg.quadDecimate = 2.0
         self.detector.setConfig(cfg)
@@ -350,15 +350,16 @@ class AprilTagDetector:
                 #    rqua.Y(),
                 #    rqua.Z(),
                 # ]
-                self.taglocs["tags"][tag_id - 1]["pose"]["translation"] = {"x": tvec.x, "y": tvec.y, "z": tvec.z}
-                self.taglocs["tags"][tag_id - 1]["pose"]["rotation"]["quaternion"] = {
-                    "W": rqua.W(),
-                    "X": rqua.X(),
-                    "Y": rqua.Y(),
-                    "Z": rqua.Z(),
-                }
-                self.taglocs["tags"][tag_id - 1]["ambiguity"] = amb
-                self.taglocs["tags"][tag_id - 1]["camera"] = cam_idx
+                if tag_id in range(1,8+1):
+                    self.taglocs["tags"][tag_id - 1]["pose"]["translation"] = {"x": tvec.x, "y": tvec.y, "z": tvec.z}
+                    self.taglocs["tags"][tag_id - 1]["pose"]["rotation"]["quaternion"] = {
+                        "W": rqua.W(),
+                        "X": rqua.X(),
+                        "Y": rqua.Y(),
+                        "Z": rqua.Z(),
+                    }
+                    self.taglocs["tags"][tag_id - 1]["ambiguity"] = amb
+                    self.taglocs["tags"][tag_id - 1]["camera"] = cam_idx
             dt = time.perf_counter() - start
             log.debug(f"runPipeline execution time = {dt:0.4}s")
             return frame, roipts
