@@ -40,5 +40,6 @@ public class ArmRotationAmpZeroCommand extends CommandBase {
         } else {
             ArmRotationSubsystem.getInstance().resetEncoder();
         }
+        ArmRotationSubsystem.getInstance().setClosedLoopEnabled(true);
     }
 }
