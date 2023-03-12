@@ -238,6 +238,9 @@ public final class Constants {
         public static final double WINCH_AMP_ZERO_PERCENT_OUTPUT = 0;
         public static final int WINCH_AMP_ZERO_MAX_AMPS = 0;
 
+        public static final int WINCH_STOW_TIMEOUT_MILLIS = 5000;
+        public static final int WINCH_MAX_BURNUP_AMPS = 40;
+
         public static IntakeArmSubsystem.Configuration GET_INTAKE_ARM_CONFIG() {
             IntakeArmSubsystem.Configuration config = new IntakeArmSubsystem.Configuration();
 
