@@ -1,6 +1,7 @@
 package com.team2357.frc2023.controls;
 
 import com.team2357.frc2023.Constants.CONTROLLER;
+import com.team2357.frc2023.commands.armextension.ArmExtendAmpZeroCommand;
 import com.team2357.frc2023.commands.armrotation.ArmRotationAmpZeroCommand;
 import com.team2357.frc2023.commands.auto.TranslateToTargetCommand;
 import com.team2357.frc2023.commands.auto.TranslateToTargetCommandGroup;
@@ -169,14 +170,16 @@ public class GunnerControls {
         rightDPadAndA.onTrue(new IntakeArmToggleCommand());
         rightDPadOnly.whileTrue(new IntakeAxisRollerCommand(axisRightStickY));
 
-        rightDPadAndY.onTrue(new InstantCommand(() -> {
-            IntakeArmSubsystem.getInstance().resetEncoders();
-            ArmRotationSubsystem.getInstance().resetEncoders();
-            ArmExtensionSubsystem.getInstance().resetEncoder();
-        }));
+        // rightDPadAndY.onTrue(new InstantCommand(() -> {
+        //     IntakeArmSubsystem.getInstance().resetEncoders();
+        //     ArmRotationSubsystem.getInstance().resetEncoders();
+        //     ArmExtensionSubsystem.getInstance().resetEncoder();
+        // }));
 
         rightDPadAndX.whileTrue(new ArmRotationAmpZeroCommand());
 
         rightDPadAndB.whileTrue(new IntakeRollerReverseCommand());
+
+        leftDPadAndY.whileTrue(new ArmExtendAmpZeroCommand());
     }
 }

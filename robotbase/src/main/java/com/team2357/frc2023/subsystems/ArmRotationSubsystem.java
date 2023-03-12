@@ -20,6 +20,8 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
     }
 
     public static class Configuration {
+        public double m_rotationZeroTolerance;
+        
         public double m_rotationAxisMaxSpeed;
 
         public IdleMode m_rotationMotorIdleMode;
@@ -205,6 +207,10 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
         return m_rotationMotor.getOutputCurrent();
     }
 
+    public boolean isZeroed() {
+        return (m_targetRotations >= -m_config.m_rotationZeroTolerance && m_targetRotations <= m_config.m_rotationZeroTolerance) && isAtRotations();
+    }
+
     @Override
     public void periodic() {
         if (isClosedLoopEnabled()) {
@@ -216,9 +222,9 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
             updatePID();
         }
 
-        System.out.println("Speed: " + m_rotationMotor.getAppliedOutput() + "Amp: " + getAmps());
+        // System.out.println("Speed: " + m_rotationMotor.getAppliedOutput() + "Amp: " + getAmps());
 
         // System.out.println("Current rot: " + getMotorRotations());
-        // SmartDashboard.putNumber("Rotations", getMotorRotations());
+        SmartDashboard.putNumber("Rotations", getMotorRotations());
     }
 }

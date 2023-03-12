@@ -316,8 +316,8 @@ public final class Constants {
         public static final double AUTO_SCORE_MID_ROTATIONS = 0;
         public static final double AUTO_SCORE_HIGH_ROTATIONS = 260;
 
-        public static final int ARM_EXTENSION_AMP_ZERO_PERCENT_OUTPUT = 0;
-        public static final int ARM_EXTENSION_AMP_ZERO_MAX_AMPS = 0;
+        public static final double ARM_EXTENSION_AMP_ZERO_PERCENT_OUTPUT = -0.2;
+        public static final int ARM_EXTENSION_AMP_ZERO_MAX_AMPS = 25;
 
         public static ArmExtensionSubsystem.Configuration GET_EXTENSION_CONFIG() {
             ArmExtensionSubsystem.Configuration config = new ArmExtensionSubsystem.Configuration();
@@ -363,7 +363,7 @@ public final class Constants {
     }
 
     public static final class ARM_ROTATION {
-        
+
         public static final double RETRACTED_ROTATIONS = 0;
 
         public static final double AUTO_SCORE_MID_ROTATIONS = 45;
@@ -380,6 +380,8 @@ public final class Constants {
         public static ArmRotationSubsystem.Configuration GET_ROTATION_CONFIG() {
             ArmRotationSubsystem.Configuration config = new ArmRotationSubsystem.Configuration();
 
+            config.m_rotationZeroTolerance = 2.5;
+            
             config.m_rotationAxisMaxSpeed = 0.7;
             config.m_maxSpeedPercent = 0.4;
 
