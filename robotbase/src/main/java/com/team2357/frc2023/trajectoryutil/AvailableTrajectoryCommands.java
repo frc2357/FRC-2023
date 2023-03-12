@@ -1,29 +1,32 @@
 package com.team2357.frc2023.trajectoryutil;
 
-import com.team2357.frc2023.commands.auto.blue.gridone.BlueGridTwoTwoConeAutoCommand;
-import com.team2357.frc2023.commands.auto.blue.gridone.BlueGridTwoTwoConeBalanceAutoCommand;
-import com.team2357.frc2023.commands.auto.blue.gridtwo.BlueGridThreeTwoConeAutoCommand;
-import com.team2357.frc2023.commands.auto.blue.gridtwo.BlueGridThreeTwoConeBalanceAutoCommand;
-import com.team2357.frc2023.commands.auto.blue.gridzero.BlueGridOneTwoConeAutoCommand;
-import com.team2357.frc2023.commands.auto.blue.gridzero.BlueGridOneTwoConeBalanceAutoCommand;
+import com.team2357.frc2023.commands.auto.gridone.GridOneTwoConeBalanceAutoCommand;
+import com.team2357.frc2023.commands.auto.gridone.GridOneTwoTwoConeAutoCommand;
+import com.team2357.frc2023.commands.auto.gridtwo.GridTwoTwoConeAutoCommand;
+import com.team2357.frc2023.commands.auto.gridtwo.GridTwoTwoConeBalanceAutoCommand;
+import com.team2357.frc2023.commands.auto.gridzero.GridZeroTwoConeAutoCommand;
+import com.team2357.frc2023.commands.auto.gridzero.GridZeroTwoConeBalanceAutoCommand;
 
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.Command;
 
 public class AvailableTrajectoryCommands {
-    public static SequentialCommandGroup blueGridOneTwoConeAuto;
-    public static SequentialCommandGroup blueGridOneTwoConeBalanceAuto;
-    public static SequentialCommandGroup blueGridTwoTwoConeAuto;
-    public static SequentialCommandGroup blueGridTwoTwoConeBalanceAuto;
-    public static SequentialCommandGroup blueGridThreeTwoConeAuto;
-    public static SequentialCommandGroup blueGridThreeTwoConeBalanceAuto;
+    public static Command GridZeroTwoConeAuto;
+    public static Command GridZeroTwoConeBalanceAuto;
+
+    public static Command GridOneTwoConeAuto;
+    public static Command GridOneTwoConeBalanceAuto;
+
+    public static Command GridTwoTwoConeAuto;
+    public static Command GridTwoTwoConeBalanceAuto;
 
     public static void generateTrajectories() {
-        blueGridOneTwoConeAuto = new BlueGridOneTwoConeAutoCommand();
-        blueGridOneTwoConeBalanceAuto = new BlueGridOneTwoConeBalanceAutoCommand();
-        blueGridTwoTwoConeAuto = new BlueGridTwoTwoConeAutoCommand();
-        blueGridTwoTwoConeBalanceAuto = new BlueGridTwoTwoConeBalanceAutoCommand();
-        blueGridThreeTwoConeAuto = new BlueGridThreeTwoConeAutoCommand();
-        blueGridThreeTwoConeBalanceAuto = new BlueGridThreeTwoConeBalanceAutoCommand();
+        GridZeroTwoConeAuto = new GridZeroTwoConeAutoCommand();
+        GridZeroTwoConeBalanceAuto = new GridZeroTwoConeBalanceAutoCommand();
 
+        GridOneTwoConeAuto = new GridOneTwoTwoConeAutoCommand();
+        GridOneTwoConeBalanceAuto = new GridOneTwoConeBalanceAutoCommand();
+        
+        GridTwoTwoConeAuto = new GridTwoTwoConeAutoCommand();
+        GridTwoTwoConeBalanceAuto = new GridTwoTwoConeBalanceAutoCommand();
     }
 }

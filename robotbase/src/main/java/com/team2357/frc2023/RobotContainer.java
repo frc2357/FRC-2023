@@ -75,7 +75,6 @@ public class RobotContainer {
     
     // Build trajectory paths
     AvailableTrajectories.generateTrajectories();
-    AvailableTrajectories.createTrajectoryMap();
     AvailableTrajectoryCommands.generateTrajectories();
     AvailableTeleopTrajectories.generateTrajectories();
 

@@ -3,7 +3,7 @@ package com.team2357.frc2023.shuffleboard;
 import java.nio.file.ProviderMismatchException;
 
 import com.fasterxml.jackson.databind.ser.std.StdKeySerializers.Default;
-import com.team2357.frc2023.commands.auto.blue.gridtwo.BlueGridThreeTwoConeAutoCommand;
+import com.team2357.frc2023.commands.auto.gridtwo.GridTwoTwoConeAutoCommand;
 import com.team2357.frc2023.commands.drive.AutoBalanceCommand;
 import com.team2357.frc2023.commands.drive.ZeroDriveCommand;
 import com.team2357.frc2023.commands.intake.IntakeDeployCommandGroup;
@@ -14,8 +14,6 @@ import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreMidCommandGroup;
 import com.team2357.frc2023.trajectoryutil.AvailableTrajectories;
 import com.team2357.frc2023.trajectoryutil.AvailableTrajectoryCommands;
 import com.team2357.frc2023.trajectoryutil.TrajectoryUtil;
-import com.team2357.frc2023.trajectoryutil.AvailableTrajectories.PATH_POINTS;
-
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
