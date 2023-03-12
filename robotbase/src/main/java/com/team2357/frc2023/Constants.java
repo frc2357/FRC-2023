@@ -372,13 +372,15 @@ public final class Constants {
         public static final double ARM_ROTATION_GEAR_RATIO  = 190.91;
         public static final double ARM_HANDOFF_ROTATIONS = ARM_ROTATION_GEAR_RATIO / 8;
 
-        public static final int ARM_ROTATION_AMP_ZERO_PERCENT_OUTPUT = 0;
-        public static final int ARM_ROTATION_AMP_ZERO_MAX_AMPS = 0;
+        public static final double ARM_ROTATION_AMP_ZERO_PERCENT_OUTPUT = -0.3;
+        public static final int ARM_ROTATION_AMP_ZERO_MAX_AMPS = 10;
+
+        public static final double ARM_ROTATION_AMP_ZERO_TIME_MILLIS = 400;
 
         public static ArmRotationSubsystem.Configuration GET_ROTATION_CONFIG() {
             ArmRotationSubsystem.Configuration config = new ArmRotationSubsystem.Configuration();
 
-            config.m_rotationAxisMaxSpeed = 0.4;
+            config.m_rotationAxisMaxSpeed = 0.7;
             config.m_maxSpeedPercent = 0.4;
 
             config.m_rotationMotorIdleMode = IdleMode.kBrake;

@@ -173,7 +173,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
 
     // Method for the panic mode to rotate the arms
     public void manualRotate(double sensorUnits) {
-        m_rotationMotor.set(sensorUnits * m_config.m_maxSpeedPercent);
+        m_rotationMotor.set(sensorUnits);
     }
 
     // Method to stop the motors
@@ -215,6 +215,8 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
         if (m_shuffleboardPIDTuner.arePIDsUpdated()) {
             updatePID();
         }
+
+        System.out.println("Speed: " + m_rotationMotor.getAppliedOutput() + "Amp: " + getAmps());
 
         // System.out.println("Current rot: " + getMotorRotations());
         // SmartDashboard.putNumber("Rotations", getMotorRotations());

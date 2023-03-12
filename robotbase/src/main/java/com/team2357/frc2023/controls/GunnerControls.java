@@ -1,6 +1,7 @@
 package com.team2357.frc2023.controls;
 
 import com.team2357.frc2023.Constants.CONTROLLER;
+import com.team2357.frc2023.commands.armrotation.ArmRotationAmpZeroCommand;
 import com.team2357.frc2023.commands.auto.TranslateToTargetCommand;
 import com.team2357.frc2023.commands.auto.TranslateToTargetCommandGroup;
 import com.team2357.frc2023.commands.human.panic.ArmExtensionAxisCommand;
@@ -157,7 +158,6 @@ public class GunnerControls {
 
         downDPadOnly.whileTrue(new IntakeWinchCommand(axisRightStickY));
 
-       
         downDPadAndX.onTrue(new TranslateToTargetCommandGroup(SwerveDriveSubsystem.COLUMN_TARGET.LEFT));
         downDPadAndA.onTrue(new TranslateToTargetCommandGroup(SwerveDriveSubsystem.COLUMN_TARGET.MIDDLE));
         downDPadAndB.onTrue(new TranslateToTargetCommandGroup(SwerveDriveSubsystem.COLUMN_TARGET.RIGHT));
@@ -175,7 +175,7 @@ public class GunnerControls {
             ArmExtensionSubsystem.getInstance().resetEncoder();
         }));
 
-        rightDPadAndX.whileTrue(new WinchAmpZeroCommand());
+        rightDPadAndX.whileTrue(new ArmRotationAmpZeroCommand());
 
         rightDPadAndB.whileTrue(new IntakeRollerReverseCommand());
     }
