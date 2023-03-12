@@ -20,7 +20,7 @@ public class ArmRotationAmpZeroCommand extends CommandBase {
     public void initialize() {
         ArmRotationSubsystem.getInstance().setClosedLoopEnabled(false);
         ArmRotationSubsystem.getInstance().manualRotate(Constants.ARM_ROTATION.ARM_ROTATION_AMP_ZERO_PERCENT_OUTPUT);
-        // m_startTime = System.currentTimeMillis();
+        m_startTime = System.currentTimeMillis();
     }
 
     @Override
