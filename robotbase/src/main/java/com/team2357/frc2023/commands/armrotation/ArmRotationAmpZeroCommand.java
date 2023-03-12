@@ -19,7 +19,6 @@ public class ArmRotationAmpZeroCommand extends CommandBase {
     public void initialize() {
         ArmRotationSubsystem.getInstance().manualRotate(Constants.ARM_ROTATION.ARM_ROTATION_AMP_ZERO_PERCENT_OUTPUT);
         m_startTime = System.currentTimeMillis();
-        System.out.println("Command start");
     }
 
     @Override
@@ -37,9 +36,6 @@ public class ArmRotationAmpZeroCommand extends CommandBase {
             Logger.getInstance().recordOutput("Arm Rotation Amp Zero fail", true);
         } else {
             ArmRotationSubsystem.getInstance().resetEncoder();
-            System.out.println("Correct end");
         }
-
-        System.out.println("Command end");
     }
 }
