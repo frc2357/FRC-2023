@@ -15,6 +15,7 @@ public class ArmRotationAxisCommand extends CommandBase {
 
     @Override
     public void initialize() {
+        System.out.println("ArmRotationAxisCommand");
         ArmRotationSubsystem.getInstance().setClosedLoopEnabled(false);
     }
 

@@ -2,6 +2,7 @@ package com.team2357.frc2023.controls;
 
 import com.team2357.frc2023.Constants.CONTROLLER;
 import com.team2357.frc2023.commands.armextension.ArmExtendAmpZeroCommand;
+import com.team2357.frc2023.commands.armrotation.ArmRotationAmpZeroCommand;
 import com.team2357.frc2023.commands.auto.TranslateToTargetCommand;
 import com.team2357.frc2023.commands.human.panic.ArmExtensionAxisCommand;
 import com.team2357.frc2023.commands.human.panic.ArmRotationAxisCommand;
@@ -165,10 +166,7 @@ public class GunnerControls {
         // Arm rotation
         upDPadOnly.whileTrue(new ArmRotationAxisCommand(axisRightStickY));
 
-        upDPadAndY.onTrue(new InstantCommand(() -> {
-            ArmRotationSubsystem.getInstance().resetEncoder();
-        }));
-
+        upDPadAndY.whileTrue(new ArmRotationAmpZeroCommand());
 
         // Arm extension / claw / wrist
         leftDPadOnly.whileTrue(new ArmExtensionAxisCommand(axisRightStickY));
@@ -200,7 +198,7 @@ public class GunnerControls {
         // Zero all
         m_backButton.onTrue(new ParallelCommandGroup(
             new SequentialCommandGroup(
-                new InstantCommand(() -> {ArmRotationSubsystem.getInstance().resetEncoder();}),
+                new ArmRotationAmpZeroCommand(),
                 new ArmExtendAmpZeroCommand()
             ),
             new WinchAmpZeroCommand()

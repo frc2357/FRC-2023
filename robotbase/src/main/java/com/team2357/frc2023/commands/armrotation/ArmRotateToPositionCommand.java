@@ -14,6 +14,7 @@ public class ArmRotateToPositionCommand extends CommandBase {
 
     @Override
     public void initialize() {
+        System.out.println("ArmRotateToPositionCommand");
         ArmRotationSubsystem.getInstance().setRotations(m_rotations);
     }
     @Override
