@@ -1,6 +1,7 @@
 package com.team2357.frc2023.commands.scoring;
 
 import com.team2357.frc2023.Constants;
+import com.team2357.frc2023.apriltag.GridCamEstimator;
 import com.team2357.frc2023.commands.auto.TranslateToTargetCommandGroup;
 import com.team2357.frc2023.commands.controller.RumbleCommand;
 import com.team2357.frc2023.networktables.GridCam;
@@ -38,7 +39,7 @@ public class TeleopAutoScoreCommandGroup extends CommandBase {
     @Override
     public void execute() {
         if (m_teleopCommand == null) {
-            Pose2d currentPose = GridCam.getInstance().getCamRelativePose();
+            Pose2d currentPose = GridCamEstimator.getInstance().estimateRobotPose().getPose();
             int col = Buttonboard.getInstance().getColValue();
             Command teleopTrajectory = AvailableTeleopTrajectories.buildTrajectory(col,
                     currentPose);
