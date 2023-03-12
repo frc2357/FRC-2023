@@ -5,9 +5,9 @@
 #include <Adafruit_Keypad.h>
 #include <Adafruit_NeoPXL8.h>
 
-#define ALLIANCE_UNSET           -1
-#define ALLIANCE_RED             0
-#define ALLIANCE_BLUE            1
+#define ALLIANCE_UNSET           ""
+#define ALLIANCE_RED             "red"
+#define ALLIANCE_BLUE            "blue"
 
 #define GRID_ROWS                3
 #define GRID_COLS                9
@@ -99,7 +99,7 @@ public:
     }
   }
 
-  void setAlliance(int8_t alliance) {
+  void setAlliance(const char *alliance) {
     m_alliance = alliance;
   }
 
@@ -126,7 +126,7 @@ private:
   Adafruit_NeoPXL8 &m_neoPixels;
   size_t m_pixelOffset;
   Adafruit_Keypad &m_keypad;
-  int8_t m_alliance;
+  const char *m_alliance;
   bool m_ledsChanged;
   int8_t m_selectedRow;
   int8_t m_selectedCol;
@@ -187,9 +187,9 @@ private:
     uint32_t colorEmptyCoop = getColorEmptyCoop();
     uint32_t colorEmptyAlliance;
 
-    if (m_alliance == ALLIANCE_RED) {
+    if (strcmp(m_alliance, ALLIANCE_RED) == 0) {
       colorEmptyAlliance = getColorEmptyRed();
-    } else if (m_alliance == ALLIANCE_BLUE) {
+    } else if (strcmp(m_alliance, ALLIANCE_BLUE) == 0) {
       colorEmptyAlliance = getColorEmptyBlue();
     } else {
       colorEmptyAlliance = getColorEmptyUnsetAlliance();

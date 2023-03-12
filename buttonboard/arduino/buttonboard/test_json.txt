@@ -7,11 +7,11 @@
 
 # Red Alliance
 
-||v1||{"sensors":{"alliance":{"value":0}}}
+||v1||{"sensors":{"alliance":{"value":"red"}}}
 
 # Blue Alliance
 
-||v1||{"sensors":{"alliance":{"value":1}}}
+||v1||{"sensors":{"alliance":{"value":"blue"}}}
 
 # Clear grid
 
