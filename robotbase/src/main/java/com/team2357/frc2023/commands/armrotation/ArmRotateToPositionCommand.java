@@ -9,12 +9,11 @@ public class ArmRotateToPositionCommand extends CommandBase {
 
     public ArmRotateToPositionCommand(double rotations) {
         m_rotations = rotations;
-        addRequirements(ArmRotationSubsystem.getInstance());
+        addRequirements(ArmRotataionSubsystem.getInstance());
     }
 
     @Override
     public void initialize() {
-        System.out.println("ArmRotateToPositionCommand");
         ArmRotationSubsystem.getInstance().setRotations(m_rotations);
     }
     @Override
