@@ -282,6 +282,8 @@ public final class Constants {
             config.m_winchDeployRotations = 140;
             config.m_winchStowRotations = 0.0;
 
+            config.m_winchPullInRotationTolerance = 10;
+
             return config;
         }
 
