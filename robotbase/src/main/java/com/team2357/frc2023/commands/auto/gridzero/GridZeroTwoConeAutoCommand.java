@@ -43,6 +43,6 @@ public class GridZeroTwoConeAutoCommand extends ParallelCommandGroup {
                                                                                                 .withTimeout(2)))),
 
                                 new WaitCommand(7).andThen(
-                                                TrajectoryUtil.createTrajectoryPathCommand("node0 to stage0", true)));
+                                                TrajectoryUtil.createTrajectoryPathCommand("grid0 2 cone", true)));
         }
 }
