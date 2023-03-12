@@ -4,6 +4,7 @@
 
 package com.team2357.frc2023;
 
+import com.pathplanner.lib.server.PathPlannerServer;
 import com.team2357.frc2023.commands.drive.DefaultDriveCommand;
 import com.team2357.frc2023.controls.GunnerControls;
 import com.team2357.frc2023.controls.SwerveDriveControls;
@@ -14,6 +15,7 @@ import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.frc2023.trajectoryutil.AvailableTeleopTrajectories;
 import com.team2357.frc2023.trajectoryutil.AvailableTrajectories;
 import com.team2357.frc2023.trajectoryutil.AvailableTrajectoryCommands;
+import com.team2357.frc2023.trajectoryutil.TrajectoryUtil;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -80,6 +82,8 @@ public class RobotContainer {
 
     // Configure Shuffleboard
     configureShuffleboard();
+
+    PathPlannerServer.startServer(5811); // 5811 = port number. adjust this according to your needs
   }
 
   /**
@@ -95,14 +99,18 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    int auto = -1;
+    int auto = -3;
 
     switch (auto) {
       case -1:
         return AvailableTrajectories.lineTrajectory;
+      case -2:
+        return AvailableTrajectories.flipTrajectory;
+      case -3:
+        System.out.println("Hit here");
+        return TrajectoryUtil.createTrajectoryPathCommand("node0 to stage0", true);
       default:
         return m_autoCommandChooser.generateCommand();
     }
   }
-
 }
