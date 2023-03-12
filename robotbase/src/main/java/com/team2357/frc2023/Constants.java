@@ -458,7 +458,7 @@ public final class Constants {
         public static final int GUNNER_CONTROLLER_PORT = 1;
 
         public static final double DRIVE_CONTROLLER_DEADBAND = 0.05;
-        public static final double GUNNER_CONTROLLER_DEADBAND = 0.05;
+        public static final double GUNNER_CONTROLLER_DEADBAND = 0.1;
 
         public static final double RUMBLE_INTENSITY = 0.5;
         public static final double RUMBLE_TIMEOUT_SECONDS_ON_TELEOP_AUTO = 0.5;
