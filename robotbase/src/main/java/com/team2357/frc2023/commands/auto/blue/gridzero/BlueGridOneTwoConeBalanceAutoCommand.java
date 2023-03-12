@@ -1,4 +1,4 @@
-package com.team2357.frc2023.commands.auto.blue.grid1;
+package com.team2357.frc2023.commands.auto.blue.gridzero;
 
 import com.team2357.frc2023.commands.drive.AutoBalanceCommand;
 import com.team2357.frc2023.trajectoryutil.TrajectoryUtil;

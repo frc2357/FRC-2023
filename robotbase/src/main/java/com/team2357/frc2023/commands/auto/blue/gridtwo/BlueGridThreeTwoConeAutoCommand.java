@@ -1,4 +1,4 @@
-package com.team2357.frc2023.commands.auto.blue.grid3;
+package com.team2357.frc2023.commands.auto.blue.gridtwo;
 
 import com.team2357.frc2023.trajectoryutil.TrajectoryUtil;
 

@@ -3,7 +3,7 @@ package com.team2357.frc2023.shuffleboard;
 import java.nio.file.ProviderMismatchException;
 
 import com.fasterxml.jackson.databind.ser.std.StdKeySerializers.Default;
-import com.team2357.frc2023.commands.auto.blue.grid3.BlueGridThreeTwoConeAutoCommand;
+import com.team2357.frc2023.commands.auto.blue.gridtwo.BlueGridThreeTwoConeAutoCommand;
 import com.team2357.frc2023.commands.drive.AutoBalanceCommand;
 import com.team2357.frc2023.commands.drive.ZeroDriveCommand;
 import com.team2357.frc2023.commands.intake.IntakeDeployCommandGroup;
@@ -51,37 +51,6 @@ public class AutoCommandChooser {
 
             SmartDashboard.putData("Initial Location", m_chooser);
         }
-
-        public PATH_POINTS getStartPoint() {
-            switch (m_chooser.getSelected()) {
-                case GRID_0:
-                    return PATH_POINTS.NODE_1;
-                case GRID_1:
-                    return PATH_POINTS.NODE_4;
-                case GRID_2:
-                    return PATH_POINTS.NODE_9;
-                default:
-                    return PATH_POINTS.NONE;
-            }
-        }
-
-        public ParallelCommandGroup getCommand() {
-            Command trajectory = AvailableTrajectories.getTrajectory(getStartPoint(), secondaryLocationChooser.getMidPoint());
-            CommandScheduler.getInstance().removeComposedCommand(trajectory);
-
-            return new ParallelCommandGroup(
-                new WaitCommand(6.5)
-                        .andThen(trajectory)
-            );
-
-            // return new SequentialCommandGroup(
-            //     getWaitCommand(),
-            //     trajectory,
-            //     new InstantCommand(() -> {
-            //         System.out.println("InitialLocation command end");
-            //     })
-            // );
-        }
     }
 
     private enum secondaryLocations {
@@ -105,46 +74,6 @@ public class AutoCommandChooser {
 
             SmartDashboard.putData("Secondary Location", m_chooser);
         }
-
-        public PATH_POINTS getMidPoint() {
-            switch (m_chooser.getSelected()) {
-                case CHARGE_STATION:
-                    return PATH_POINTS.CHARGE_STATION;
-                case GAME_PIECE:
-                    switch (initialLocationChooser.getStartPoint()) {
-                        case NODE_1:
-                            return PATH_POINTS.STAGE_1;
-                        case NODE_4:
-                            return PATH_POINTS.STAGE_2;
-                        case NODE_9:
-                            return PATH_POINTS.STAGE_4;
-                        default:
-                            return PATH_POINTS.NONE;
-                    }
-                default:
-                    return PATH_POINTS.NONE;
-            }
-        }
-
-        public PATH_POINTS getEndPoint() {
-            switch (initialLocationChooser.getStartPoint()) {
-                case NODE_1:
-                    return PATH_POINTS.NODE_3;
-                case NODE_4:
-                    return PATH_POINTS.NODE_6;
-                case NODE_9:
-                    return PATH_POINTS.NODE_7;
-                default:
-                    return PATH_POINTS.NONE;
-            }
-        }
-
-        public ParallelCommandGroup getCommand() {
-            Command trajectory = AvailableTrajectories.getTrajectory(getMidPoint(), getEndPoint());
-            return new ParallelCommandGroup(
-                trajectory
-            );
-        }
     }
 
     public AutoCommandChooser() {
@@ -153,9 +82,6 @@ public class AutoCommandChooser {
     }
 
     public Command generateCommand() {
-        CommandScheduler.getInstance().removeComposedCommand(initialLocationChooser.getCommand());
-        CommandScheduler.getInstance().removeComposedCommand(secondaryLocationChooser.getCommand());
-
         initialLocations initialLocation = initialLocationChooser.m_chooser.getSelected();
         secondaryLocations secondaryLocation = secondaryLocationChooser.m_chooser.getSelected();
 
