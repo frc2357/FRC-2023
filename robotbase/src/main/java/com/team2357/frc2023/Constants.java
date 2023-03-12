@@ -235,8 +235,8 @@ public final class Constants {
         public static final int WINCH_DEPLOY_PID_SLOT = 0;
         public static final int WINCH_STOW_PID_SLOT = 1;
 
-        public static final double WINCH_AMP_ZERO_PERCENT_OUTPUT = 0;
-        public static final int WINCH_AMP_ZERO_MAX_AMPS = 0;
+        public static final double WINCH_AMP_ZERO_PERCENT_OUTPUT = -0.4;
+        public static final int WINCH_AMP_ZERO_MAX_AMPS = 15;
 
         public static IntakeArmSubsystem.Configuration GET_INTAKE_ARM_CONFIG() {
             IntakeArmSubsystem.Configuration config = new IntakeArmSubsystem.Configuration();
@@ -246,7 +246,7 @@ public final class Constants {
 
             config.m_isInverted = true;
 
-            config.m_winchAxisMaxSpeed = 0.4;
+            config.m_winchAxisMaxSpeed = 0.7;
 
             config.m_winchMotorIdleMode = IdleMode.kBrake;
 

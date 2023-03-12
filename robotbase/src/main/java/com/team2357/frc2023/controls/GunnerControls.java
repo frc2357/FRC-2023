@@ -11,6 +11,7 @@ import com.team2357.frc2023.commands.human.panic.IntakeAxisRollerCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeWinchCommand;
 import com.team2357.frc2023.commands.human.panic.WristToggleCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerReverseCommand;
+import com.team2357.frc2023.commands.intake.WinchAmpZeroCommand;
 import com.team2357.frc2023.commands.scoring.AutoScoreLowCommandGroup;
 import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
 import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreMidCommandGroup;
@@ -148,6 +149,7 @@ public class GunnerControls {
         Trigger xButton = m_xButton.and(noDPad);
 
         upDPadOnly.whileTrue(new ArmRotationAxisCommand(axisRightStickY));
+
         leftDPadOnly.whileTrue(new ArmExtensionAxisCommand(axisRightStickY));
 
         leftDPadAndA.onTrue(new WristToggleCommand());
@@ -155,9 +157,7 @@ public class GunnerControls {
 
         downDPadOnly.whileTrue(new IntakeWinchCommand(axisRightStickY));
 
-        rightDPadAndA.onTrue(new IntakeArmToggleCommand());
-        rightDPadOnly.whileTrue(new IntakeAxisRollerCommand(axisRightStickY));
-
+       
         downDPadAndX.onTrue(new TranslateToTargetCommandGroup(SwerveDriveSubsystem.COLUMN_TARGET.LEFT));
         downDPadAndA.onTrue(new TranslateToTargetCommandGroup(SwerveDriveSubsystem.COLUMN_TARGET.MIDDLE));
         downDPadAndB.onTrue(new TranslateToTargetCommandGroup(SwerveDriveSubsystem.COLUMN_TARGET.RIGHT));
@@ -165,11 +165,17 @@ public class GunnerControls {
         yButton.whileTrue(new ConeAutoScoreHighCommandGroup());
         xButton.whileTrue(new ConeAutoScoreMidCommandGroup());
         aButton.whileTrue(new AutoScoreLowCommandGroup());
+
+        rightDPadAndA.onTrue(new IntakeArmToggleCommand());
+        rightDPadOnly.whileTrue(new IntakeAxisRollerCommand(axisRightStickY));
+
         rightDPadAndY.onTrue(new InstantCommand(() -> {
             IntakeArmSubsystem.getInstance().resetEncoders();
             ArmRotationSubsystem.getInstance().resetEncoders();
             ArmExtensionSubsystem.getInstance().resetEncoder();
         }));
+
+        rightDPadAndX.whileTrue(new WinchAmpZeroCommand());
 
         rightDPadAndB.whileTrue(new IntakeRollerReverseCommand());
     }
