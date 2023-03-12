@@ -26,7 +26,7 @@ public class TeleopAutoScoreCommandGroup extends CommandBase {
 
     public TeleopAutoScoreCommandGroup(XboxController controller) {
         m_controller = controller;
-    }   
+    }
 
     @Override
     public void initialize() {
@@ -34,17 +34,21 @@ public class TeleopAutoScoreCommandGroup extends CommandBase {
         m_teleopCommand = null;
     }
 
+    // For fancy auto after Heartland
     @Override
     public void execute() {
         if (m_teleopCommand == null) {
             Pose2d currentPose = AprilTagPose.getInstance().getPose();
             int col = Buttonboard.getInstance().getColValue();
-            Command teleopTrajectory = AvailableTeleopTrajectories.buildTrajectory(col, currentPose);
+            Command teleopTrajectory = AvailableTeleopTrajectories.buildTrajectory(col,
+                    currentPose);
 
             if (teleopTrajectory != null) {
-                Command autoScore = SwerveDriveSubsystem.getAutoScoreCommands(Buttonboard.getInstance().getRowValue(), Buttonboard.getInstance().getColValue());
-                Command translate = new TranslateToTargetCommandGroup(SwerveDriveSubsystem.getSetpoint(col % 3), Utility.gridColumnToAprilTagID(col));
-                
+                Command autoScore = SwerveDriveSubsystem.getAutoScoreCommands(Buttonboard.getInstance().getRowValue(),
+                        Buttonboard.getInstance().getColValue());
+                Command translate = new TranslateToTargetCommandGroup(SwerveDriveSubsystem.getSetpoint(col % 3),
+                        Utility.gridColumnToAprilTagID(col));
+
                 m_teleopCommand = new SequentialCommandGroup();
                 m_teleopCommand.addCommands(teleopTrajectory);
                 m_teleopCommand.addCommands(translate);
@@ -53,7 +57,8 @@ public class TeleopAutoScoreCommandGroup extends CommandBase {
                     m_hasScored = true;
                 }));
                 m_teleopCommand.schedule();
-                RumbleCommand.createRumbleCommand(m_controller, Constants.CONTROLLER.RUMBLE_TIMEOUT_SECONDS_ON_TELEOP_AUTO).schedule();;
+                RumbleCommand.createRumbleCommand(m_controller,
+                        Constants.CONTROLLER.RUMBLE_TIMEOUT_SECONDS_ON_TELEOP_AUTO).schedule();
             }
         }
     }

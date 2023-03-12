@@ -1,19 +1,5 @@
 package com.team2357.frc2023.controls;
 
-import com.team2357.lib.triggers.AxisThresholdTrigger;
-import com.team2357.lib.util.Utility;
-import com.team2357.lib.util.XboxRaw;
-import com.team2357.frc2023.subsystems.ArmExtensionSubsystem;
-import com.team2357.frc2023.subsystems.ArmRotationSubsystem;
-import com.team2357.frc2023.subsystems.IntakeArmSubsystem;
-import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
-
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.XboxController.Axis;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import com.team2357.frc2023.Constants.CONTROLLER;
 import com.team2357.frc2023.commands.auto.TranslateToTargetCommand;
 import com.team2357.frc2023.commands.human.panic.ArmExtensionAxisCommand;
@@ -26,6 +12,20 @@ import com.team2357.frc2023.commands.human.panic.WristToggleCommand;
 import com.team2357.frc2023.commands.scoring.AutoScoreLowCommandGroup;
 import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
 import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreMidCommandGroup;
+import com.team2357.frc2023.subsystems.ArmExtensionSubsystem;
+import com.team2357.frc2023.subsystems.ArmRotationSubsystem;
+import com.team2357.frc2023.subsystems.IntakeArmSubsystem;
+import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
+import com.team2357.lib.triggers.AxisThresholdTrigger;
+import com.team2357.lib.util.Utility;
+import com.team2357.lib.util.XboxRaw;
+
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.XboxController.Axis;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
  * These are the controls for the gunner.
@@ -131,6 +131,7 @@ public class GunnerControls {
         Trigger rightDPadOnly = m_rightDPad.and(noLetterButtons);
 
         Trigger upDPadAndA = m_upDPad.and(m_aButton);
+
         Trigger upDPadAndX = m_upDPad.and(m_xButton);
         Trigger upDPadAndY = m_upDPad.and(m_yButton);
         Trigger upDPadAndB = m_upDPad.and(m_bButton);
@@ -159,7 +160,6 @@ public class GunnerControls {
 
         // Arm rotation
         upDPadOnly.whileTrue(new ArmRotationAxisCommand(axisRightStickY));
-
         upDPadAndY.onTrue(new InstantCommand(() -> {
             ArmRotationSubsystem.getInstance().resetEncoders();
         }));
@@ -182,10 +182,6 @@ public class GunnerControls {
         rightDPadAndLeftTrigger.whileTrue(new IntakeRollerAxisCommand(intakeRollerReverseAxis));
 
         rightDPadAndA.onTrue(new IntakeArmToggleCommand());
-
-        rightDPadAndY.onTrue(new InstantCommand(() -> {
-            IntakeArmSubsystem.getInstance().resetEncoders();
-        }));
 
         // Teleop trajectory
         downDPadAndX.onTrue(new TranslateToTargetCommand(SwerveDriveSubsystem.COLUMN_TARGET.LEFT));

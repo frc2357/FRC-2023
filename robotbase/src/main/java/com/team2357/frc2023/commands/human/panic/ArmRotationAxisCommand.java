@@ -14,9 +14,14 @@ public class ArmRotationAxisCommand extends CommandBase {
     }
 
     @Override
+    public void initialize() {
+        ArmRotationSubsystem.getInstance().setClosedLoopEnabled(false);
+    }
+
+    @Override
     public void execute() {
         double axisValue = m_axis.getValue();
-        ArmRotationSubsystem.getInstance().manualRotate(axisValue);
+        ArmRotationSubsystem.getInstance().setRotationAxisSpeed(axisValue);
     }
 
     @Override
@@ -26,6 +31,6 @@ public class ArmRotationAxisCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        ArmRotationSubsystem.getInstance().stopRotationMotors();
+        ArmRotationSubsystem.getInstance().endAxisCommand();
     }
 }

@@ -1,11 +1,15 @@
 package com.team2357.frc2023.controls;
 
 import com.team2357.frc2023.commands.drive.AutoBalanceCommand;
+import com.team2357.frc2023.arduino.GamepieceLED;
+import com.team2357.frc2023.arduino.GamepieceLED.SIGNAL_COLOR;
 import com.team2357.frc2023.commands.intake.IntakeDeployCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakeDumpCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakeRollerReverseCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
 import com.team2357.frc2023.commands.intake.IntakeStowCommandGroup;
+import com.team2357.frc2023.commands.scoring.HeartlandAutoScoreCommand;
+import com.team2357.frc2023.commands.scoring.HeartlandAutoTranslateCommand;
 import com.team2357.frc2023.commands.scoring.TeleopAutoScoreCommandGroup;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.lib.triggers.AxisThresholdTrigger;
@@ -26,6 +30,7 @@ public class SwerveDriveControls {
     private JoystickButton m_leftBumper;
     private JoystickButton m_aButton;
     private JoystickButton m_xButton;
+    private JoystickButton m_startButton;
 
     private AxisThresholdTrigger m_leftTrigger;
     private AxisThresholdTrigger m_rightTrigger;
@@ -40,12 +45,14 @@ public class SwerveDriveControls {
         m_xButton = new JoystickButton(m_controller, XboxRaw.X.value);
         
         m_backButton = new JoystickButton(m_controller, XboxRaw.Back.value);
+        m_startButton = new JoystickButton(m_controller, XboxRaw.Start.value);
+        m_aButton = new JoystickButton(m_controller, XboxRaw.A.value);
         
         m_rightBumper = new JoystickButton(m_controller, XboxRaw.BumperRight.value);
         m_leftBumper = new JoystickButton(m_controller, XboxRaw.BumperLeft.value);
 
-        m_rightTrigger = new AxisThresholdTrigger(m_controller, Axis.kRightTrigger, 0.1);
-        m_leftTrigger = new AxisThresholdTrigger(m_controller, Axis.kLeftTrigger, 0.1);
+        m_rightTrigger = new AxisThresholdTrigger(m_controller, Axis.kRightTrigger, 0.05);
+        m_leftTrigger = new AxisThresholdTrigger(m_controller, Axis.kLeftTrigger, 0.05);
 
         mapControls();
     }
@@ -55,30 +62,23 @@ public class SwerveDriveControls {
 
         // Zero swerve drive
         m_backButton.whileTrue(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().zeroGyroscope()));
-        
+        m_startButton.whileTrue(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().setGyroScope(180)));
         // Intake commands
         // TODO: Remove these bindings
         m_rightBumper.whileTrue(new IntakeRollerRunCommand());
         m_leftBumper.whileTrue(new IntakeRollerReverseCommand());
 
         // Intake deploy/stow
-        // TODO: Create command for intaking cube
-        m_leftTrigger.whileTrue(new IntakeDeployCommandGroup());
+        m_leftTrigger.whileTrue(new IntakeDeployCommandGroup().alongWith(new InstantCommand(() -> GamepieceLED.getInstance().setSignalColor(SIGNAL_COLOR.PURPLE))));
         m_leftTrigger.onFalse(new IntakeStowCommandGroup());
 
-        // TODO: Create command for intaking cone
-        m_rightTrigger.whileTrue(new IntakeDeployCommandGroup());
+        m_rightTrigger.whileTrue(new IntakeDeployCommandGroup().alongWith(new InstantCommand(() -> GamepieceLED.getInstance().setSignalColor(SIGNAL_COLOR.YELLOW))));
         m_rightTrigger.onFalse(new IntakeStowCommandGroup());
 
-        leftTriggerAndRightTrigger.whileTrue(new IntakeDumpCommandGroup());
-        leftTriggerAndRightTrigger.onFalse(new IntakeStowCommandGroup());
+        //Teleop auto
+        m_rightBumper.whileTrue(new HeartlandAutoTranslateCommand(m_controller));
+        m_leftBumper.whileTrue(new HeartlandAutoScoreCommand());
 
-        // Teleop auto
-        // m_rightTrigger.whileTrue(new TeleopAutoScoreCommandGroup(m_controller));
-        m_xButton.whileTrue(new TeleopAutoScoreCommandGroup(m_controller));
-
-        // Auto balance
-        m_aButton.whileTrue(new AutoBalanceCommand());
     }
 
     public double getX() {
