@@ -1,73 +1,252 @@
 package com.team2357.frc2023.shuffleboard;
 
+import java.nio.file.ProviderMismatchException;
+
+import com.fasterxml.jackson.databind.ser.std.StdKeySerializers.Default;
 import com.team2357.frc2023.commands.auto.blue.grid3.BlueGridThreeTwoConeAutoCommand;
+import com.team2357.frc2023.commands.drive.AutoBalanceCommand;
 import com.team2357.frc2023.commands.drive.ZeroDriveCommand;
+import com.team2357.frc2023.commands.intake.IntakeDeployCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakeSolenoidExtendCommand;
+import com.team2357.frc2023.commands.intake.IntakeStowCommandGroup;
+import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
+import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreMidCommandGroup;
+import com.team2357.frc2023.trajectoryutil.AvailableTrajectories;
 import com.team2357.frc2023.trajectoryutil.AvailableTrajectoryCommands;
 import com.team2357.frc2023.trajectoryutil.TrajectoryUtil;
+import com.team2357.frc2023.trajectoryutil.AvailableTrajectories.PATH_POINTS;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 public class AutoCommandChooser {
 
-    private AutoActionChooser[] choosers;
+    private InitialLocationChooser initialLocationChooser;
+    private SecondaryLocationChooser secondaryLocationChooser;
 
-    private enum automodes {
+    private enum initialLocations {
         NONE,
-        BLUE_GRID_THREE_TWO_CONE_AUTO;
+        GRID_0,
+        GRID_1,
+        GRID_2
     }
 
-    private class AutoActionChooser {
-        protected SendableChooser<automodes> m_chooser;
-        protected String m_waitCommandKey;
+    private class InitialLocationChooser {
+        protected SendableChooser<initialLocations> m_chooser;
 
-        protected AutoActionChooser(int index) {
-            m_waitCommandKey = "wait " + index;
+        protected InitialLocationChooser(int index) {
             m_chooser = new SendableChooser<>();
 
-            m_chooser.setDefaultOption("None", automodes.NONE);
-            for (automodes s : automodes.values()) {
-                if (s != automodes.NONE)
+            m_chooser.setDefaultOption("None", initialLocations.NONE);
+            for (initialLocations s : initialLocations.values()) {
+                if (s != initialLocations.NONE)
                     m_chooser.addOption(s.toString().toLowerCase(), s);
             }
 
-            SmartDashboard.putNumber((m_waitCommandKey), 0.0);
-            SmartDashboard.putData("Auto chooser " + index, m_chooser);
+            SmartDashboard.putData("Initial Location", m_chooser);
         }
 
-        public Command getWaitCommand() {
-            double waitTime = SmartDashboard.getNumber(m_waitCommandKey, 0.0);
-            return new WaitCommand(waitTime);
-        }
-
-        public Command getActionCommand() {
+        public PATH_POINTS getStartPoint() {
             switch (m_chooser.getSelected()) {
-                case BLUE_GRID_THREE_TWO_CONE_AUTO:
-                    return AvailableTrajectoryCommands.blueGridThreeTwoConeAuto;
+                case GRID_0:
+                    return PATH_POINTS.NODE_1;
+                case GRID_1:
+                    return PATH_POINTS.NODE_4;
+                case GRID_2:
+                    return PATH_POINTS.NODE_9;
                 default:
-                    System.out.println("ACTION: NONE");
-                    return new WaitCommand(0);
+                    return PATH_POINTS.NONE;
             }
+        }
+
+        public ParallelCommandGroup getCommand() {
+            Command trajectory = AvailableTrajectories.getTrajectory(getStartPoint(), secondaryLocationChooser.getMidPoint());
+            CommandScheduler.getInstance().removeComposedCommand(trajectory);
+
+            return new ParallelCommandGroup(
+                new WaitCommand(6.5)
+                        .andThen(trajectory)
+            );
+
+            // return new SequentialCommandGroup(
+            //     getWaitCommand(),
+            //     trajectory,
+            //     new InstantCommand(() -> {
+            //         System.out.println("InitialLocation command end");
+            //     })
+            // );
+        }
+    }
+
+    private enum secondaryLocations {
+        NONE,
+        CHARGE_STATION,
+        GAME_PIECE
+    }
+
+    private class SecondaryLocationChooser {
+        protected SendableChooser<secondaryLocations> m_chooser;
+
+        protected SecondaryLocationChooser(int index) {
+            m_chooser = new SendableChooser<>();
+
+            m_chooser.setDefaultOption("None", secondaryLocations.NONE);
+            for (secondaryLocations s : secondaryLocations.values()) {
+                if (s != secondaryLocations.NONE) {
+                    m_chooser.addOption(s.toString().toLowerCase(), s);
+                }
+            }
+
+            SmartDashboard.putData("Secondary Location", m_chooser);
+        }
+
+        public PATH_POINTS getMidPoint() {
+            switch (m_chooser.getSelected()) {
+                case CHARGE_STATION:
+                    return PATH_POINTS.CHARGE_STATION;
+                case GAME_PIECE:
+                    switch (initialLocationChooser.getStartPoint()) {
+                        case NODE_1:
+                            return PATH_POINTS.STAGE_1;
+                        case NODE_4:
+                            return PATH_POINTS.STAGE_2;
+                        case NODE_9:
+                            return PATH_POINTS.STAGE_4;
+                        default:
+                            return PATH_POINTS.NONE;
+                    }
+                default:
+                    return PATH_POINTS.NONE;
+            }
+        }
+
+        public PATH_POINTS getEndPoint() {
+            switch (initialLocationChooser.getStartPoint()) {
+                case NODE_1:
+                    return PATH_POINTS.NODE_3;
+                case NODE_4:
+                    return PATH_POINTS.NODE_6;
+                case NODE_9:
+                    return PATH_POINTS.NODE_7;
+                default:
+                    return PATH_POINTS.NONE;
+            }
+        }
+
+        public ParallelCommandGroup getCommand() {
+            Command trajectory = AvailableTrajectories.getTrajectory(getMidPoint(), getEndPoint());
+            return new ParallelCommandGroup(
+                trajectory
+            );
         }
     }
 
     public AutoCommandChooser() {
-        choosers = new AutoActionChooser[3];
-        choosers[0] = new AutoActionChooser(0);
+        initialLocationChooser = new InitialLocationChooser(0);
+        secondaryLocationChooser = new SecondaryLocationChooser(1);
     }
 
     public Command generateCommand() {
-        CommandScheduler.getInstance().removeComposedCommand(choosers[0].getActionCommand());
-        return new ParallelCommandGroup(
-            new SequentialCommandGroup(
-                choosers[0].getWaitCommand(),
-                choosers[0].getActionCommand()),
-            new IntakeSolenoidExtendCommand());
+        CommandScheduler.getInstance().removeComposedCommand(initialLocationChooser.getCommand());
+        CommandScheduler.getInstance().removeComposedCommand(secondaryLocationChooser.getCommand());
+
+        initialLocations initialLocation = initialLocationChooser.m_chooser.getSelected();
+        secondaryLocations secondaryLocation = secondaryLocationChooser.m_chooser.getSelected();
+
+        switch (initialLocation) {
+            case GRID_0:
+                switch (secondaryLocation) {
+                    case CHARGE_STATION:
+                        return new ParallelCommandGroup(
+                            // new ConeAutoScoreHighCommandGroup(),
+
+                            // new WaitCommand(6)
+                            //         .andThen(AvailableTrajectories.getTrajectory(PATH_POINTS.NODE_1, PATH_POINTS.CHARGE_STATION))
+                            //         .andThen(new AutoBalanceCommand())
+
+                            // new WaitCommand(7)
+                            //         .andThen(new IntakeDeployCommandGroup())
+                            //         .andThen(new WaitCommand(0.75))
+                            //         .andThen(new IntakeStowCommandGroup()),
+
+                            // new WaitCommand(10)
+                            //         .andThen(AvailableTrajectories.getTrajectory(stage, null))
+                        );
+                    case GAME_PIECE:
+                        return new ParallelCommandGroup(
+                            // Scoring
+                            // new WaitCommand(0)
+                            //         .andThen(new ConeAutoScoreHighCommandGroup())
+                            //         .andThen(new WaitCommand(6))
+                            //         .andThen(new ConeAutoScoreHighCommandGroup()),
+
+                            // // Trajectory
+                            // new WaitCommand(6)
+                            //         .andThen(AvailableTrajectories.getTrajectory(PATH_POINTS.NODE_1, PATH_POINTS.STAGE_1))
+                            //         .andThen(new WaitCommand(0))
+                            //         .andThen(AvailableTrajectories.getTrajectory(null, null)),
+
+                            // // Intake
+                            // new WaitCommand(7)
+                            //         .andThen(new IntakeDeployCommandGroup())
+                            //         .andThen(new WaitCommand(0.75))
+                            //         .andThen(new IntakeStowCommandGroup())
+
+                        );
+                    default:
+                        break;
+                }
+            case GRID_1:
+                switch (secondaryLocation) {
+                    case CHARGE_STATION:
+                        break;
+                    case GAME_PIECE:
+                        break;
+                    default:
+                        break;
+                }
+            case GRID_2:
+                switch (secondaryLocation) {
+                    case CHARGE_STATION:
+                        break;
+                    case GAME_PIECE:
+                        Command trajectory1 = AvailableTrajectories.getTrajectory(PATH_POINTS.NODE_9, PATH_POINTS.STAGE_4);
+                        Command trajectory2 = AvailableTrajectories.getTrajectory(PATH_POINTS.STAGE_4, PATH_POINTS.NODE_7);
+                        Command intakeStow = new IntakeStowCommandGroup();
+                        CommandScheduler.getInstance().removeComposedCommand(trajectory1);
+                        CommandScheduler.getInstance().removeComposedCommand(trajectory2);
+                        CommandScheduler.getInstance().removeComposedCommand(intakeStow);
+
+                        return new ParallelCommandGroup(
+                            // new WaitCommand(0)
+                            //         .andThen(new ConeAutoScoreHighCommandGroup()) // abt 7 seconds
+                            //         .andThen(new IntakeDeployCommandGroup()
+                            //             .withTimeout(3))
+                            //         .andThen(intakeStow)
+                            //         .andThen(new WaitCommand(2))
+                            //         .andThen(new ConeAutoScoreHighCommandGroup()),
+
+                            new WaitCommand(0) // 6
+                                    .andThen(trajectory1) // abt 4 seconds
+                                    // .andThen(new WaitCommand(2))
+                                    // .andThen(trajectory2), // abt 4 seconds
+
+                            // new WaitCommand(8)
+                        );
+                    default:
+                        break;
+                }
+            default:
+                break;
+        }
+
+
+        return new WaitCommand(0);
     }
 }

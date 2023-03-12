@@ -154,7 +154,6 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
     }
 
     public boolean isAtRotations() {
-        System.out.println(getMotorRotations());
         return Utility.isWithinTolerance(getMotorRotations(), m_targetRotations,
                 m_config.m_rotationMotorAllowedError);
     }
