@@ -65,7 +65,7 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
         public double m_smartMotionRotationAllowedError;
 
         public double m_winchMotorAllowedError;
-        
+
         public double m_winchDeployRotations;
         public double m_winchStowRotations;
     }
@@ -117,19 +117,19 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
     }
 
     private void configureWinchPID(SparkMaxPIDController pidController) {
-       // set PID coefficients for extension
-       pidController.setP(m_config.m_winchDeployP, m_config.m_winchDeployPidSlot);
-       pidController.setI(m_config.m_winchDeployI, m_config.m_winchDeployPidSlot);
-       pidController.setD(m_config.m_winchDeployD, m_config.m_winchDeployPidSlot);
-       pidController.setIZone(m_config.m_winchDeployIZone, m_config.m_winchDeployPidSlot);
-       pidController.setFF(m_config.m_winchDeployFF, m_config.m_winchDeployPidSlot);
+        // set PID coefficients for extension
+        pidController.setP(m_config.m_winchDeployP, m_config.m_winchDeployPidSlot);
+        pidController.setI(m_config.m_winchDeployI, m_config.m_winchDeployPidSlot);
+        pidController.setD(m_config.m_winchDeployD, m_config.m_winchDeployPidSlot);
+        pidController.setIZone(m_config.m_winchDeployIZone, m_config.m_winchDeployPidSlot);
+        pidController.setFF(m_config.m_winchDeployFF, m_config.m_winchDeployPidSlot);
 
-       // Set PID coefficeints for retraction
-       pidController.setP(m_config.m_winchStowP, m_config.m_winchStowPidSlot);
-       pidController.setI(m_config.m_winchStowI, m_config.m_winchStowPidSlot);
-       pidController.setD(m_config.m_winchStowD, m_config.m_winchStowPidSlot);
-       pidController.setIZone(m_config.m_winchStowIZone, m_config.m_winchStowPidSlot);
-       pidController.setFF(m_config.m_winchStowFF, m_config.m_winchStowPidSlot);
+        // Set PID coefficeints for retraction
+        pidController.setP(m_config.m_winchStowP, m_config.m_winchStowPidSlot);
+        pidController.setI(m_config.m_winchStowI, m_config.m_winchStowPidSlot);
+        pidController.setD(m_config.m_winchStowD, m_config.m_winchStowPidSlot);
+        pidController.setIZone(m_config.m_winchStowIZone, m_config.m_winchStowPidSlot);
+        pidController.setFF(m_config.m_winchStowFF, m_config.m_winchStowPidSlot);
 
         // smart motion
         configureSmartMotion(pidController, m_config.m_winchDeployPidSlot);
@@ -225,9 +225,9 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
 
     public double getAmps() {
         return m_winchMotor.getOutputCurrent();
-    } 
+    }
 
-    public void manualRotate(Double speed){
+    public void manualStow(Double speed) {
         m_winchMotor.set(speed);
     }
 
@@ -248,7 +248,10 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
             updatePID();
         }
 
-    //    SmartDashboard.putNumber("Winch rotations", m_winchMotor.getEncoder().getPosition());
+        // SmartDashboard.putNumber("Winch speed", m_winchMotor.getAppliedOutput());
+        // SmartDashboard.putNumber("Winch amps", getAmps());
+        // SmartDashboard.putNumber("Winch rotations",
+        // m_winchMotor.getEncoder().getPosition());
     }
 
     private void deployPeriodic() {
