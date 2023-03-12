@@ -58,8 +58,6 @@ public class SwerveDriveControls {
     }
 
     public void mapControls() {
-        Trigger leftTriggerAndRightTrigger = m_leftTrigger.and(m_rightTrigger);
-
         // Zero swerve drive
         m_backButton.whileTrue(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().zeroGyroscope()));
         m_startButton.whileTrue(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().setGyroScope(180)));
