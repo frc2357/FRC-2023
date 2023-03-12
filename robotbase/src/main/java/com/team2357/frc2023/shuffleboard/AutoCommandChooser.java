@@ -1,26 +1,9 @@
 package com.team2357.frc2023.shuffleboard;
 
-import java.nio.file.ProviderMismatchException;
-
-import com.fasterxml.jackson.databind.ser.std.StdKeySerializers.Default;
-import com.team2357.frc2023.commands.auto.gridtwo.GridTwoTwoConeAutoCommand;
-import com.team2357.frc2023.commands.drive.AutoBalanceCommand;
-import com.team2357.frc2023.commands.drive.ZeroDriveCommand;
-import com.team2357.frc2023.commands.intake.IntakeDeployCommandGroup;
-import com.team2357.frc2023.commands.intake.IntakeSolenoidExtendCommand;
-import com.team2357.frc2023.commands.intake.IntakeStowCommandGroup;
-import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
-import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreMidCommandGroup;
-import com.team2357.frc2023.trajectoryutil.AvailableTrajectories;
-import com.team2357.frc2023.trajectoryutil.AvailableTrajectoryCommands;
-import com.team2357.frc2023.trajectoryutil.TrajectoryUtil;
+import com.team2357.frc2023.commands.auto.gridzero.GridZeroTwoConeAutoCommand;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 public class AutoCommandChooser {
@@ -87,42 +70,9 @@ public class AutoCommandChooser {
             case GRID_0:
                 switch (secondaryLocation) {
                     case CHARGE_STATION:
-                        return new ParallelCommandGroup(
-                            // new ConeAutoScoreHighCommandGroup(),
-
-                            // new WaitCommand(6)
-                            //         .andThen(AvailableTrajectories.getTrajectory(PATH_POINTS.NODE_1, PATH_POINTS.CHARGE_STATION))
-                            //         .andThen(new AutoBalanceCommand())
-
-                            // new WaitCommand(7)
-                            //         .andThen(new IntakeDeployCommandGroup())
-                            //         .andThen(new WaitCommand(0.75))
-                            //         .andThen(new IntakeStowCommandGroup()),
-
-                            // new WaitCommand(10)
-                            //         .andThen(AvailableTrajectories.getTrajectory(stage, null))
-                        );
+                        break;
                     case GAME_PIECE:
-                        return new ParallelCommandGroup(
-                            // Scoring
-                            // new WaitCommand(0)
-                            //         .andThen(new ConeAutoScoreHighCommandGroup())
-                            //         .andThen(new WaitCommand(6))
-                            //         .andThen(new ConeAutoScoreHighCommandGroup()),
-
-                            // // Trajectory
-                            // new WaitCommand(6)
-                            //         .andThen(AvailableTrajectories.getTrajectory(PATH_POINTS.NODE_1, PATH_POINTS.STAGE_1))
-                            //         .andThen(new WaitCommand(0))
-                            //         .andThen(AvailableTrajectories.getTrajectory(null, null)),
-
-                            // // Intake
-                            // new WaitCommand(7)
-                            //         .andThen(new IntakeDeployCommandGroup())
-                            //         .andThen(new WaitCommand(0.75))
-                            //         .andThen(new IntakeStowCommandGroup())
-
-                        );
+                        return new GridZeroTwoConeAutoCommand();
                     default:
                         break;
                 }
@@ -140,36 +90,13 @@ public class AutoCommandChooser {
                     case CHARGE_STATION:
                         break;
                     case GAME_PIECE:
-                        Command trajectory1 = AvailableTrajectories.getTrajectory(PATH_POINTS.NODE_9, PATH_POINTS.STAGE_4);
-                        Command trajectory2 = AvailableTrajectories.getTrajectory(PATH_POINTS.STAGE_4, PATH_POINTS.NODE_7);
-                        Command intakeStow = new IntakeStowCommandGroup();
-                        CommandScheduler.getInstance().removeComposedCommand(trajectory1);
-                        CommandScheduler.getInstance().removeComposedCommand(trajectory2);
-                        CommandScheduler.getInstance().removeComposedCommand(intakeStow);
-
-                        return new ParallelCommandGroup(
-                            // new WaitCommand(0)
-                            //         .andThen(new ConeAutoScoreHighCommandGroup()) // abt 7 seconds
-                            //         .andThen(new IntakeDeployCommandGroup()
-                            //             .withTimeout(3))
-                            //         .andThen(intakeStow)
-                            //         .andThen(new WaitCommand(2))
-                            //         .andThen(new ConeAutoScoreHighCommandGroup()),
-
-                            new WaitCommand(0) // 6
-                                    .andThen(trajectory1) // abt 4 seconds
-                                    // .andThen(new WaitCommand(2))
-                                    // .andThen(trajectory2), // abt 4 seconds
-
-                            // new WaitCommand(8)
-                        );
+                        break;
                     default:
                         break;
                 }
             default:
                 break;
         }
-
 
         return new WaitCommand(0);
     }
