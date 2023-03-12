@@ -129,7 +129,7 @@ public final class Constants {
             config.m_translationXFeedForward = new SimpleMotorFeedforward(0.244, 0);
             config.m_translationYFeedForward = new SimpleMotorFeedforward(0.244, 0.00);
 
-            config.m_rotateTargetController = new PIDController(0.01, 0, 0);
+            config.m_rotateTargetController = new PIDController(0.5, 0, 0.0001);
             config.m_rotateToTargetFeedforward = 0.6;
 
             config.m_openLoopRampRateSeconds = 1;
