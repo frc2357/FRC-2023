@@ -165,6 +165,7 @@ public class GunnerControls {
         yButton.whileTrue(new ConeAutoScoreHighCommandGroup());
         xButton.whileTrue(new ConeAutoScoreMidCommandGroup());
         aButton.whileTrue(new AutoScoreLowCommandGroup());
+        
         rightDPadAndY.onTrue(new InstantCommand(() -> {
             IntakeArmSubsystem.getInstance().resetEncoders();
             ArmRotationSubsystem.getInstance().resetEncoders();

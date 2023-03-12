@@ -367,7 +367,7 @@ public final class Constants {
         public static final double RETRACTED_ROTATIONS = 0;
 
         public static final double AUTO_SCORE_MID_ROTATIONS = 45;
-        public static final double AUTO_SCORE_HIGH_ROTATIONS = 58;
+        public static final double AUTO_SCORE_HIGH_ROTATIONS = 62;
 
         public static final double ARM_ROTATION_GEAR_RATIO  = 190.91;
         public static final double ARM_HANDOFF_ROTATIONS = ARM_ROTATION_GEAR_RATIO / 8;

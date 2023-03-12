@@ -16,7 +16,7 @@ public class WinchAmpZeroCommand extends CommandBase{
     
     @Override
     public void initialize() {
-        IntakeArmSubsystem.getInstance().manualStow(Constants.INTAKE_ARM.WINCH_AMP_ZERO_PERCENT_OUTPUT);
+        IntakeArmSubsystem.getInstance().manualRotate(Constants.INTAKE_ARM.WINCH_AMP_ZERO_PERCENT_OUTPUT);
     }
     
     @Override

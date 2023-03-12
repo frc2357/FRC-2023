@@ -5,6 +5,7 @@
 package com.team2357.frc2023;
 
 import com.pathplanner.lib.server.PathPlannerServer;
+import com.team2357.frc2023.commands.auto.gridzero.GridZeroTwoConeAutoCommand;
 import com.team2357.frc2023.commands.drive.DefaultDriveCommand;
 import com.team2357.frc2023.controls.GunnerControls;
 import com.team2357.frc2023.controls.SwerveDriveControls;
@@ -107,8 +108,7 @@ public class RobotContainer {
       case -2:
         return AvailableTrajectories.flipTrajectory;
       case -3:
-        System.out.println("Hit here");
-        return TrajectoryUtil.createTrajectoryPathCommand("node0 to stage0", true);
+        return new GridZeroTwoConeAutoCommand();
       default:
         return m_autoCommandChooser.generateCommand();
     }

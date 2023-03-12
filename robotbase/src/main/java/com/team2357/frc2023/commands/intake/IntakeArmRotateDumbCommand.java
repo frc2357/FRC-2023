@@ -9,11 +9,21 @@ public class IntakeArmRotateDumbCommand extends CommandBase {
     double m_speedPercent;
 
     public IntakeArmRotateDumbCommand(double speedPercent) {
-
+        m_speedPercent = speedPercent;
     }
 
     @Override
     public void initialize() {
-   //     IntakeArmSubsystem.getInstance().set
+        IntakeArmSubsystem.getInstance().manualRotate(m_speedPercent);
+    }
+
+    @Override
+    public boolean isFinished() {
+        return false;
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        IntakeArmSubsystem.getInstance().manualRotate(0.0);
     }
 }
