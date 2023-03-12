@@ -34,13 +34,13 @@ public class GridZeroTwoConeAutoCommand extends ParallelCommandGroup {
                                 new WaitCommand(0)
                                                 .andThen(new ConeAutoScoreHighCommandGroup(false)
                                                                 .deadlineWith(new WaitCommand(7)))
-                                                .andThen(new WaitCommand(0.5))
+                                                .andThen(new WaitCommand(1))
                                                 .andThen(new ParallelCommandGroup(
-                                                                new IntakeArmRotateDumbCommand(0.4).withTimeout(1),
+                                                                new IntakeArmRotateDumbCommand(0.4).withTimeout(0.75),
 
                                                                 new WaitCommand(1.5).andThen(
                                                                                 new IntakeRollerRunCommand()
-                                                                                                .withTimeout(1.5)))),
+                                                                                                .withTimeout(2)))),
 
                                 new WaitCommand(7).andThen(
                                                 TrajectoryUtil.createTrajectoryPathCommand("node0 to stage0", true)));
