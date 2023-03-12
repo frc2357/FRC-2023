@@ -68,6 +68,7 @@ class CameraVision:
         self.readConfig(configFile)  # sets team, server, cameraConfigs[]
         self.ntinst = ntinst = NetworkTableInstance.getDefault()
         CameraServer.enableLogging()
+        self.outputstream = CameraServer.putVideo("Processed", 1280, 360)
         # TODO: define networks table variable for passing json
         # good start: https://docs.wpilib.org/en/stable/docs/software/networktables/client-side-program.html
         if self.server:
@@ -98,7 +99,7 @@ class CameraVision:
             c.camera = None
             c.config = camConfig
             c.sink = None
-            c.outstream = CameraServer.putVideo("VideoStream", camConfig.width, camConfig.height)
+            c.outstream = CameraServer.putVideo("SIMULATE", camConfig.width, camConfig.height)
             c.images = imgs
             c.cal = image_cal  # bandaid for now
             self.cameras.append(c)
@@ -201,7 +202,7 @@ class CameraVision:
 
         print("Starting camera '{}' on {}".format(config.name, config.path))
         camera = UsbCamera(config.name, config.path)
-        CameraServer.addCamera(camera)
+        CameraServer.startAutomaticCapture(camera)
 
         camera.setConfigJson(json.dumps(config.config))
         camera.setConnectionStrategy(VideoSource.ConnectionStrategy.kConnectionKeepOpen)
@@ -215,7 +216,7 @@ class CameraVision:
         c = CameraObject()
         c.camera = camera
         c.config = config
-        c.outstream = CameraServer.putVideo(config.name, config.width, config.height)
+        c.outstream = None  # not needed when using startAutomaticCapture CameraServer.putVideo(config.name, config.width, config.height)
         c.sink = CameraServer.getVideo(camera)
         c.cal = config.calibration
         return c

@@ -30,6 +30,7 @@ import detect_colors
 
 # class used to encapsulate Camera + Calibration information
 from cameravision import CameraVision
+from calibration import CameraCalibration
 from gamepiece import gamepiecetracker as gptracker
 
 fmt = logging.Formatter("%(asctime)s,%(levelname)10s:%(name)20s,%(message)s")
@@ -50,6 +51,57 @@ log.addHandler(ch)
 global g_avg
 g_avg = 1000.0
 
+cam0_cal = CameraCalibration.load_cal_dict(
+    {
+        "mtx": [1057.3980959579437, 0.0, 656.8556544891763, 0.0, 1058.2448544114698, 375.100928453989, 0.0, 0.0, 1.0],
+        "dst": [
+            0.03932968718495995,
+            -0.05757208162810665,
+            -0.0016503334944551454,
+            -0.000619417970035607,
+            -0.016908101094226472,
+        ],
+        "img_size": [1280, 720],
+        "newmtx": [
+            1059.6776123046875,
+            0.0,
+            655.8676984252452,
+            0.0,
+            1060.1087646484375,
+            373.6184770146283,
+            0.0,
+            0.0,
+            1.0,
+        ],
+        "roi": [2, 1, 1275, 716],
+    }
+)
+cam1_cal = CameraCalibration.load_cal_dict(
+    {
+        "mtx": [1057.3980959579437, 0.0, 656.8556544891763, 0.0, 1058.2448544114698, 375.100928453989, 0.0, 0.0, 1.0],
+        "dst": [
+            0.03932968718495995,
+            -0.05757208162810665,
+            -0.0016503334944551454,
+            -0.000619417970035607,
+            -0.016908101094226472,
+        ],
+        "img_size": [1280, 720],
+        "newmtx": [
+            1059.6776123046875,
+            0.0,
+            655.8676984252452,
+            0.0,
+            1060.1087646484375,
+            373.6184770146283,
+            0.0,
+            0.0,
+            1.0,
+        ],
+        "roi": [2, 1, 1275, 716],
+    }
+)
+
 
 def add_text_toimg(frame, txt):
     cv2.putText(frame, f"{txt}", (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 5)
@@ -69,10 +121,15 @@ if __name__ == "__main__":
     # this class automatically creates all camera + calibration objects
     camvis = CameraVision(cfgfile, simulate=simulate)
     cam0 = camvis.cameras[0]
+
     if simulate:
         cam1 = camvis.cameras[0]
     else:
         cam1 = camvis.cameras[1]
+        cam0.cal = cam0_cal
+        cam1.cal = cam1_cal
+    log.info(cam0.cal.to_json())
+    log.info(cam1.cal.to_json())
 
     # configure networks tables
     nt_table = camvis.ntinst.getTable("gridcam")
@@ -148,7 +205,9 @@ if __name__ == "__main__":
             frame = add_text_toimg(frame, f"{1/g_avg:0.2f}/sec")
             stacked = cv2.resize(np.hstack((frame, frame1)), None, fx=0.5, fy=0.5)
 
-            cam0.outstream.putFrame(stacked)
+            #send stacked frame to DS
+            camvis.outputstream.putFrame(stacked)
+
             # track processing time, average ten updates.
             end = time.perf_counter()
             avg += end - capture_start

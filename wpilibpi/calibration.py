@@ -90,4 +90,5 @@ class CameraCalibration:
 image_cal = CameraCalibration(
     mtx=np.array([1000, 0, 1280 / 2, 0, 1000, 720 / 2, 0, 0, 1]).reshape(3, 3), dst=np.float32([0, 0, 0, 0])
 )
+
 # cam0 = CameraCalibration.load_cal_json("left_camera_cal.json")  # load calibration data in CameraCalibration class

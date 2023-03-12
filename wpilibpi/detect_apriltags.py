@@ -350,7 +350,7 @@ class AprilTagDetector:
                 #    rqua.Y(),
                 #    rqua.Z(),
                 # ]
-                if tag_id in range(1,8+1):
+                if tag_id in range(1, 8 + 1):
                     self.taglocs["tags"][tag_id - 1]["pose"]["translation"] = {"x": tvec.x, "y": tvec.y, "z": tvec.z}
                     self.taglocs["tags"][tag_id - 1]["pose"]["rotation"]["quaternion"] = {
                         "W": rqua.W(),
