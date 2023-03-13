@@ -225,10 +225,25 @@ class CameraVision:
 if __name__ == "__main__":
     import sys
 
+    if len(sys.argv) == 1:
+        print("usage: python cameravision.py cfgfile [sample_interval]")
+        print("    where cfgfile is a json file to configure camera properties")
+        print("    optional sample_interval, when provided enables storing camera frames to disk")
+        print("    and is an integer representing the number of frames per capture")
+        sys.exit()
     cfgfile = sys.argv[1]
+    sample_interval = None
+    if len(sys.argv) > 2:
+        sample_interval = int(sys.argv[2])
+    basename = "./images"
     c = CameraVision(cfgfile)
     frame = np.zeros(shape=(720, 1280, 3), dtype="uint8")
+    count = 0
     while True:
-        for cam in c.cameras:
+        for id, cam in enumerate(c.cameras):
             cam.sink.grabFrame(frame)
-            cam.outstream.putFrame(frame)
+            if sample_interval is not None and (count % sample_interval) == 0:
+                fstr = f"{basename}/cam{id:02d}_{count}.png"
+                print(f"writing {fstr}")
+                cv2.imwrite(fstr, frame)
+        count += 1
