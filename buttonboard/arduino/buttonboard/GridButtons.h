@@ -313,7 +313,7 @@ private:
   }
 
   uint32_t getColorDisconnectedBlue() {
-    return m_neoPixels.Color(125, 0, 0);
+    return m_neoPixels.Color(0, 0, 125);
   }
 
   uint32_t getColorEmptyRed() {
