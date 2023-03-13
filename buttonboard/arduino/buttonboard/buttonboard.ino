@@ -34,7 +34,7 @@ char keys[GRID_ROWS][GRID_COLS] = {
 // --- Globals ---
 char grid[NODE_COUNT + 1];
 int8_t target[2];
-int8_t alliance;
+const char *alliance;
 Adafruit_NeoPXL8 neoPixels(NEOPIXEL_STRIP_MAXLEN, neoPixelPins, COLOR_ORDER);
 Adafruit_Keypad keypad = Adafruit_Keypad(makeKeymap(keys), rowPins, colPins, GRID_ROWS, GRID_COLS);
 SensorDevice_Adafruit_RP2040_Scorpio<3> device("buttonboard");
@@ -42,13 +42,17 @@ GridButtons gridButtons(neoPixels, 0, keypad);
 // ---------------
 
 // "alliance" sensor
-int updateAlliance(const SensorSettings& settings) {
-  int nextAlliance = settings["value"].asInt();
-  if (nextAlliance != alliance) {
-    alliance = nextAlliance;
-    gridButtons.setAlliance(alliance);
+const char *updateAlliance(const SensorSettings& settings) {
+  const char *nextAlliance = settings["value"].asString();
+  if (strcmp(nextAlliance, ALLIANCE_RED) == 0) {
+    alliance = ALLIANCE_RED;
+  } else if (strcmp(nextAlliance, ALLIANCE_BLUE) == 0) {
+    alliance = ALLIANCE_BLUE;
+  } else {
+    alliance = ALLIANCE_UNSET;
   }
-  return alliance;
+  gridButtons.setAlliance(alliance);
+  return nextAlliance;
 }
 
 // "grid" sensor
@@ -104,7 +108,7 @@ void setup() {
   gridButtons.begin();
 
   // Set up JSON device
-  device.initSensor("alliance", updateAlliance);
+  device.initSensor("alliance", updateAlliance, (size_t) 5);
   device.initSensor("grid", updateGrid, (size_t) (NODE_COUNT + 1));
   device.initSensor("target", readTarget, (size_t) 2);
   device.begin();

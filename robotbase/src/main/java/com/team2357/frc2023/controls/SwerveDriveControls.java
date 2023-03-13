@@ -1,8 +1,10 @@
 package com.team2357.frc2023.controls;
 
+import com.team2357.frc2023.commands.drive.AutoBalanceCommand;
 import com.team2357.frc2023.arduino.GamepieceLED;
 import com.team2357.frc2023.arduino.GamepieceLED.SIGNAL_COLOR;
 import com.team2357.frc2023.commands.intake.IntakeDeployCommandGroup;
+import com.team2357.frc2023.commands.intake.IntakeDumpCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakeRollerReverseCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
 import com.team2357.frc2023.commands.intake.IntakeStowCommandGroup;
@@ -17,14 +19,17 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class SwerveDriveControls {
     private XboxController m_controller;
     private double m_deadband;
+
     private JoystickButton m_backButton;
     private JoystickButton m_rightBumper;
     private JoystickButton m_leftBumper;
     private JoystickButton m_aButton;
+    private JoystickButton m_xButton;
     private JoystickButton m_startButton;
 
     private AxisThresholdTrigger m_leftTrigger;
@@ -36,6 +41,9 @@ public class SwerveDriveControls {
         m_controller = controller;
         m_deadband = deadband;
 
+        m_aButton = new JoystickButton(m_controller, XboxRaw.A.value);
+        m_xButton = new JoystickButton(m_controller, XboxRaw.X.value);
+        
         m_backButton = new JoystickButton(m_controller, XboxRaw.Back.value);
         m_startButton = new JoystickButton(m_controller, XboxRaw.Start.value);
         m_aButton = new JoystickButton(m_controller, XboxRaw.A.value);
