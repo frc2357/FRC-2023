@@ -3,6 +3,7 @@ package com.team2357.frc2023.controls;
 import com.team2357.frc2023.commands.drive.AutoBalanceCommand;
 import com.team2357.frc2023.arduino.GamepieceLED;
 import com.team2357.frc2023.arduino.GamepieceLED.SIGNAL_COLOR;
+import com.team2357.frc2023.commands.auto.RotateToDegreeCommand;
 import com.team2357.frc2023.commands.intake.IntakeDeployCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakeDumpCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakeRollerReverseCommand;
@@ -62,9 +63,6 @@ public class SwerveDriveControls {
         m_backButton.whileTrue(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().zeroGyroscope()));
         m_startButton.whileTrue(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().setGyroScope(180)));
         // Intake commands
-        // TODO: Remove these bindings
-        m_rightBumper.whileTrue(new IntakeRollerRunCommand());
-        m_leftBumper.whileTrue(new IntakeRollerReverseCommand());
 
         // Intake deploy/stow
         m_leftTrigger.whileTrue(new IntakeDeployCommandGroup().alongWith(new InstantCommand(() -> GamepieceLED.getInstance().setSignalColor(SIGNAL_COLOR.PURPLE))));
@@ -74,8 +72,9 @@ public class SwerveDriveControls {
         m_rightTrigger.onFalse(new IntakeStowCommandGroup());
 
         //Teleop auto
-        m_rightBumper.whileTrue(new HeartlandAutoTranslateCommand(m_controller));
-        m_leftBumper.whileTrue(new HeartlandAutoScoreCommand());
+        //m_rightBumper.whileTrue(new HeartlandAutoTranslateCommand(m_controller));
+        //m_leftBumper.whileTrue(new HeartlandAutoScoreCommand());
+        m_rightBumper.whileTrue(new RotateToDegreeCommand(0));
 
     }
 
