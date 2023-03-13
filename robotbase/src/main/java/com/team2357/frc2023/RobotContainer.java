@@ -108,7 +108,8 @@ public class RobotContainer {
       case -2:
         return AvailableTrajectories.flipTrajectory;
       case -3:
-        return new GridZeroTwoConeAutoCommand();
+        //return new GridZeroTwoConeAutoCommand();
+        return TrajectoryUtil.createTrajectoryPathCommand("grid1 1 cone balance", true);
         // return TrajectoryUtil.createTrajectoryPathCommand("grid0 2 cone", true);
       default:
         return m_autoCommandChooser.generateCommand();

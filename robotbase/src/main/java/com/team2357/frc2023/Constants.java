@@ -101,8 +101,8 @@ public final class Constants {
                     Math.hypot(config.m_trackwidthMeters / 2.0, config.m_wheelbaseMeters / 2.0);
             config.m_maxAngularAccelerationRadiansPerSecondSquared = config.m_maxAngularVelocityRadiansPerSecond / 3.0;
 
-            config.m_trajectoryMaxVelocityMetersPerSecond = 2;
-            config.m_trajectoryMaxAccelerationMetersPerSecond = 1;
+            config.m_trajectoryMaxVelocityMetersPerSecond = 2.5; // 2 for grid0 2 cone
+            config.m_trajectoryMaxAccelerationMetersPerSecond = 1.5; // 1 for grid0 two cone
             config.m_xController = new PIDController(2.2, 0, 0); //.56122   2.2
             config.m_yController = new PIDController(2.2, 0, 0); //.56122
             config.m_thetaController = new PIDController(2.15, 0, 0); //2.15
