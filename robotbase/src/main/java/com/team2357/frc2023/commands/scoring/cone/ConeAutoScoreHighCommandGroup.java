@@ -12,12 +12,23 @@ import com.team2357.frc2023.commands.intake.WinchRotateToPositionCommand;
 import com.team2357.frc2023.commands.wrist.WristInstantExtendCommand;
 import com.team2357.frc2023.commands.wrist.WristInstantRetractCommand;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 public class ConeAutoScoreHighCommandGroup extends ParallelCommandGroup {
-    public ConeAutoScoreHighCommandGroup() {
+
+        public ConeAutoScoreHighCommandGroup() {
+                this(true);
+        }
+
+    public ConeAutoScoreHighCommandGroup(boolean stowIntake) {
         
+        Command intakeStow = new WaitCommand(0);
+        if(stowIntake) {
+                intakeStow = new IntakeArmStowCommand();
+        } 
+
         addCommands(
                 // Move mechanisms to score
                 new WaitCommand(0.25)
@@ -25,7 +36,7 @@ public class ConeAutoScoreHighCommandGroup extends ParallelCommandGroup {
                         .andThen(new WaitCommand(4.5))
                         .andThen(new ArmRotateToPositionCommand(Constants.ARM_ROTATION.RETRACTED_ROTATIONS)),
 
-                new WaitCommand(1)
+                new WaitCommand(1.25)
                         .andThen(new WristInstantExtendCommand())
                         .andThen(new WaitCommand(2.5))
                         .andThen(new WristInstantRetractCommand()),
@@ -46,7 +57,7 @@ public class ConeAutoScoreHighCommandGroup extends ParallelCommandGroup {
                 new WaitCommand(0)
                         .andThen(new WinchRotateToPositionCommand(Constants.INTAKE_ARM.INTAKE_HANDOFF_WINCH_ROTATIONS))
                         .andThen(new WaitCommand(0.75))
-                        .andThen(new IntakeArmStowCommand()),
+                        .andThen(intakeStow),
 
                 new WaitCommand(0)
                         .andThen(new IntakeRollerReverseCommand()

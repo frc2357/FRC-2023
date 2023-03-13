@@ -101,11 +101,11 @@ public final class Constants {
                     Math.hypot(config.m_trackwidthMeters / 2.0, config.m_wheelbaseMeters / 2.0);
             config.m_maxAngularAccelerationRadiansPerSecondSquared = config.m_maxAngularVelocityRadiansPerSecond / 3.0;
 
-            config.m_trajectoryMaxVelocityMetersPerSecond = 2;
-            config.m_trajectoryMaxAccelerationMetersPerSecond = 3;
-            config.m_xController = new PIDController(.56122, 0, 0);
-            config.m_yController = new PIDController(.56122, 0, 0);
-            config.m_thetaController = new PIDController(2.15, 0, 0);
+            config.m_trajectoryMaxVelocityMetersPerSecond = 2.5; // 2 for grid0 2 cone
+            config.m_trajectoryMaxAccelerationMetersPerSecond = 1.5; // 1 for grid0 two cone
+            config.m_xController = new PIDController(2.2, 0, 0); //.56122   2.2
+            config.m_yController = new PIDController(2.2, 0, 0); //.56122
+            config.m_thetaController = new PIDController(2.15, 0, 0); //2.15
 
             config.m_sensorPositionCoefficient = 2.0 * Math.PI / Constants.DRIVE.TICKS_PER_ROTATION
                     * SdsModuleConfigurations.MK4I_L2.getSteerReduction();
@@ -363,17 +363,17 @@ public final class Constants {
     }
 
     public static final class ARM_ROTATION {
-        public static final double CHAIN_BACKLASH_ROTATIONS = 12;
+        public static final double CHAIN_BACKLASH_ROTATIONS = 15;
 
         public static final double RETRACTED_ROTATIONS = 0;
 
-        public static final double AUTO_SCORE_MID_ROTATIONS = 45 + CHAIN_BACKLASH_ROTATIONS;
-        public static final double AUTO_SCORE_HIGH_ROTATIONS = 58 + CHAIN_BACKLASH_ROTATIONS;
+        public static final double AUTO_SCORE_MID_ROTATIONS = 45;
+        public static final double AUTO_SCORE_HIGH_ROTATIONS = 62;
 
         public static final double ARM_ROTATION_GEAR_RATIO  = 190.91;
-        public static final double ARM_HANDOFF_ROTATIONS = ARM_ROTATION_GEAR_RATIO / 8 + CHAIN_BACKLASH_ROTATIONS;
+        public static final double ARM_HANDOFF_ROTATIONS = ARM_ROTATION_GEAR_RATIO / 8;
 
-        public static final double ARM_ROTATION_AMP_ZERO_PERCENT_OUTPUT = -0.25;
+        public static final double ARM_ROTATION_AMP_ZERO_PERCENT_OUTPUT = -0.1;
         public static final int ARM_ROTATION_AMP_ZERO_MAX_AMPS = 25;
 
 
@@ -424,7 +424,7 @@ public final class Constants {
             config.m_feedforwardKa = 0;
 
             // TODO: Calculate
-            config.m_armHorizontalRotations = ARM_ROTATION_GEAR_RATIO / 4 + CHAIN_BACKLASH_ROTATIONS; // 90 degrees
+            config.m_armHorizontalRotations = ARM_ROTATION_GEAR_RATIO / 4; // 90 degrees
             config.m_rotationsPerRadian = ARM_ROTATION_GEAR_RATIO / (2 * Math.PI);
 
             return config;

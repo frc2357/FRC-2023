@@ -363,7 +363,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		double difference = Math.abs(steerMotor.getSelectedSensorPosition() * m_config.m_sensorPositionCoefficient
 				- steerEncoder.getAbsoluteAngle());
 		difference %= Math.PI;
-		System.out.println(difference);
+		// System.out.println(difference);
 		return difference < Constants.DRIVE.ENCODER_SYNC_ACCURACY_RADIANS
 				|| Math.abs(difference - Math.PI) < Constants.DRIVE.ENCODER_SYNC_ACCURACY_RADIANS;
 	}
@@ -459,7 +459,6 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		}
 
 		m_chassisSpeeds = chassisSpeeds;
-
 	}
 
 	public void updatePoseEstimator() {
@@ -468,10 +467,10 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 						m_frontRightModule.getPosition(),
 						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
 
-		Pose2d visionPose = AprilTagPose.getInstance().getPose();
-		if (visionPose != null) {
-			m_poseEstimator.addVisionMeasurement(visionPose, Timer.getFPGATimestamp());
-		}
+		// Pose2d visionPose = AprilTagPose.getInstance().getPose();
+		// if (visionPose != null) {
+		// 	m_poseEstimator.addVisionMeasurement(visionPose, Timer.getFPGATimestamp());
+		// }
 	}
 
 	public void balance() {
@@ -568,7 +567,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	 *                       view AprilTag
 	 */
 	public void trackTarget(SwerveDriveSubsystem.COLUMN_TARGET column, int targetAprilTag) {
-		System.out.println("track target");
+		// System.out.println("track target");
 		setClosedLoopEnabled(true);
 
 		DualLimelightManagerSubsystem limelightManager = DualLimelightManagerSubsystem.getInstance();
@@ -664,7 +663,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		m_targetColumn = COLUMN_TARGET.NONE;
 		m_isSeeking = false;
 
-		System.out.println("Ending Tracking -----------------");
+		// System.out.println("Ending Tracking -----------------");
 		disableOpenLoopRamp();
 		drive(0, 0, 0);
 	}
@@ -679,10 +678,17 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		// SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
 
 		// SmartDashboard.putNumber("Yaw", m_pigeon.getYaw());
-		// SmartDashboard.putNumber("Pose X", m_odometry.getPoseMeters().getX());
-		// SmartDashboard.putNumber("Pose Y", m_odometry.getPoseMeters().getY());
-		// SmartDashboard.putNumber("Pose Angle",
-		// m_odometry.getPoseMeters().getRotation().getDegrees());
+		Pose2d pose = getPose();
+		double x = pose.getX();
+		double y = pose.getY();
+		double angle = pose.getRotation().getDegrees();
+
+		SmartDashboard.putNumber("Pose X", x);
+		SmartDashboard.putNumber("Pose Y", y);
+		SmartDashboard.putNumber("Pose Angle",
+		angle);
+
+		//System.out.println("X: " + x + ",  Y: " + y + ",  R: " + angle);
 
 		SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
 		SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxVelocityMetersPerSecond);
