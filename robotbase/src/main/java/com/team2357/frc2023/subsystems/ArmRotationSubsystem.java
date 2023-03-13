@@ -20,6 +20,8 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
     }
 
     public static class Configuration {
+        public double m_rotationZeroTolerance;
+        
         public double m_rotationAxisMaxSpeed;
 
         public IdleMode m_rotationMotorIdleMode;
@@ -112,7 +114,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
         m_feedforward = new ArmFeedforward(m_config.m_feedforwardKs, m_config.m_feedforwardKg, m_config.m_feedforwardKv,
                 m_config.m_feedforwardKa);
         
-        resetEncoders();
+        resetEncoder();
     }
 
     private void configureRotationMotor(CANSparkMax motor) {
@@ -173,7 +175,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
 
     // Method for the panic mode to rotate the arms
     public void manualRotate(double sensorUnits) {
-        m_rotationMotor.set(sensorUnits * m_config.m_maxSpeedPercent);
+        m_rotationMotor.set(sensorUnits);
     }
 
     // Method to stop the motors
@@ -182,7 +184,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
         m_rotationMotor.set(0);
     }
 
-    public void resetEncoders() {
+    public void resetEncoder() {
         m_rotationMotor.getEncoder().setPosition(0);
         m_targetRotations = 0;
     }
@@ -201,6 +203,14 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
         m_pidController.setD(m_shuffleboardPIDTuner.getDValue());
     }
 
+    public double getAmps() {
+        return m_rotationMotor.getOutputCurrent();
+    }
+
+    public boolean isZeroed() {
+        return (m_targetRotations >= -m_config.m_rotationZeroTolerance && m_targetRotations <= m_config.m_rotationZeroTolerance) && isAtRotations();
+    }
+
     @Override
     public void periodic() {
         if (isClosedLoopEnabled()) {
@@ -211,6 +221,8 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
         if (m_shuffleboardPIDTuner.arePIDsUpdated()) {
             updatePID();
         }
+
+        // System.out.println("Speed: " + m_rotationMotor.getAppliedOutput() + "Amp: " + getAmps());
 
         // System.out.println("Current rot: " + getMotorRotations());
         // SmartDashboard.putNumber("Rotations", getMotorRotations());

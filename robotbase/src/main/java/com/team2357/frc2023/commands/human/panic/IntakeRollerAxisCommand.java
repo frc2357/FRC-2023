@@ -4,10 +4,10 @@ import com.team2357.frc2023.controls.AxisInterface;
 import com.team2357.frc2023.subsystems.IntakeRollerSubsystem;
 import com.team2357.lib.commands.CommandLoggerBase;
 
-public class IntakeAxisRollerCommand extends CommandLoggerBase {
+public class IntakeRollerAxisCommand extends CommandLoggerBase {
     private AxisInterface m_axis;
 
-    public IntakeAxisRollerCommand(AxisInterface axis){
+    public IntakeRollerAxisCommand(AxisInterface axis){
         m_axis = axis;
         addRequirements(IntakeRollerSubsystem.getInstance());
     }
