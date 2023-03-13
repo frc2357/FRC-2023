@@ -40,9 +40,9 @@ public class GridZeroTwoConeAutoCommand extends ParallelCommandGroup {
                                 new ClawInstantOpenCommand(),
                                 new IntakeArmRotateDumbCommand(0.4).withTimeout(1),
 
-                                new WaitCommand(1.5).andThen(
+                                new WaitCommand(1).andThen(
                                         new IntakeRollerRunCommand()
-                                                .withTimeout(2))))
+                                                .withTimeout(2.5))))
                         .andThen(new IntakeStowCommandGroup()),
 
                 new WaitCommand(7).andThen(

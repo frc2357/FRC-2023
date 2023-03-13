@@ -101,8 +101,8 @@ public final class Constants {
                     Math.hypot(config.m_trackwidthMeters / 2.0, config.m_wheelbaseMeters / 2.0);
             config.m_maxAngularAccelerationRadiansPerSecondSquared = config.m_maxAngularVelocityRadiansPerSecond / 3.0;
 
-            config.m_trajectoryMaxVelocityMetersPerSecond = 2.5;
-            config.m_trajectoryMaxAccelerationMetersPerSecond = 1.25;
+            config.m_trajectoryMaxVelocityMetersPerSecond = 2;
+            config.m_trajectoryMaxAccelerationMetersPerSecond = 1;
             config.m_xController = new PIDController(2.2, 0, 0); //.56122   2.2
             config.m_yController = new PIDController(2.2, 0, 0); //.56122
             config.m_thetaController = new PIDController(2.15, 0, 0); //2.15
@@ -368,7 +368,7 @@ public final class Constants {
         public static final double RETRACTED_ROTATIONS = 0;
 
         public static final double AUTO_SCORE_MID_ROTATIONS = 45;
-        public static final double AUTO_SCORE_HIGH_ROTATIONS = 58;
+        public static final double AUTO_SCORE_HIGH_ROTATIONS = 62;
 
         public static final double ARM_ROTATION_GEAR_RATIO  = 190.91;
         public static final double ARM_HANDOFF_ROTATIONS = ARM_ROTATION_GEAR_RATIO / 8;
