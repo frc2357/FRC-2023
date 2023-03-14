@@ -1,6 +1,8 @@
 package com.team2357.frc2023.controls;
 
 import com.team2357.frc2023.Constants.CONTROLLER;
+import com.team2357.frc2023.commands.armextension.ArmExtendAmpZeroCommand;
+import com.team2357.frc2023.commands.armrotation.ArmRotationAmpZeroCommand;
 import com.team2357.frc2023.commands.auto.TranslateToTargetCommand;
 import com.team2357.frc2023.commands.human.panic.ArmExtensionAxisCommand;
 import com.team2357.frc2023.commands.human.panic.ArmRotationAxisCommand;
@@ -9,6 +11,7 @@ import com.team2357.frc2023.commands.human.panic.IntakeArmToggleCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeRollerAxisCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeWinchAxisCommand;
 import com.team2357.frc2023.commands.human.panic.WristToggleCommand;
+import com.team2357.frc2023.commands.intake.WinchAmpZeroCommand;
 import com.team2357.frc2023.commands.scoring.AutoScoreLowCommandGroup;
 import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
 import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreMidCommandGroup;
@@ -23,6 +26,8 @@ import com.team2357.lib.util.XboxRaw;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -160,10 +165,8 @@ public class GunnerControls {
 
         // Arm rotation
         upDPadOnly.whileTrue(new ArmRotationAxisCommand(axisRightStickY));
-        upDPadAndY.onTrue(new InstantCommand(() -> {
-            ArmRotationSubsystem.getInstance().resetEncoders();
-        }));
 
+        upDPadAndY.whileTrue(new ArmRotationAmpZeroCommand());
 
         // Arm extension / claw / wrist
         leftDPadOnly.whileTrue(new ArmExtensionAxisCommand(axisRightStickY));
@@ -171,9 +174,7 @@ public class GunnerControls {
         leftDPadAndA.onTrue(new WristToggleCommand());
         leftDPadAndB.onTrue(new ClawToggleCommand());
 
-        leftDPadAndY.onTrue(new InstantCommand(() -> {
-            ArmExtensionSubsystem.getInstance().resetEncoder();
-        }));
+        leftDPadAndY.onTrue(new ArmExtendAmpZeroCommand());
 
         // Intake
         rightDPadOnly.whileTrue(new IntakeWinchAxisCommand(axisRightStickY));
@@ -182,6 +183,7 @@ public class GunnerControls {
         rightDPadAndLeftTrigger.whileTrue(new IntakeRollerAxisCommand(intakeRollerReverseAxis));
 
         rightDPadAndA.onTrue(new IntakeArmToggleCommand());
+        rightDPadAndY.onTrue(new WinchAmpZeroCommand());
 
         // Teleop trajectory
         downDPadAndX.onTrue(new TranslateToTargetCommand(SwerveDriveSubsystem.COLUMN_TARGET.LEFT));
@@ -193,11 +195,13 @@ public class GunnerControls {
         xButton.onTrue(new ConeAutoScoreMidCommandGroup());
         aButton.onTrue(new AutoScoreLowCommandGroup());
 
-
-        m_backButton.onTrue(new InstantCommand(() -> {
-            IntakeArmSubsystem.getInstance().resetEncoders();
-            ArmRotationSubsystem.getInstance().resetEncoders();
-            ArmExtensionSubsystem.getInstance().resetEncoder();
-        }));
+        // Zero all
+        m_backButton.onTrue(new ParallelCommandGroup(
+            new SequentialCommandGroup(
+                new ArmRotationAmpZeroCommand(),
+                new ArmExtendAmpZeroCommand()
+            ),
+            new WinchAmpZeroCommand()
+        ));
     }
 }

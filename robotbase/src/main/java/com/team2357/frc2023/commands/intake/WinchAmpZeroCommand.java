@@ -27,13 +27,13 @@ public class WinchAmpZeroCommand extends CommandBase{
     @Override
     public void end(boolean interrupted) {
         IntakeArmSubsystem.getInstance().stopWinchMotor();
+
         if(interrupted){
             DriverStation.reportError("Amp Zeroing did not finish in time! Winch not zeroed.",false);
             Logger.getInstance().recordOutput("Winch Amp Zero fail", true);
         }
         else{
-            Logger.getInstance().recordOutput("Winch Amp Zero fail", false);
-        IntakeArmSubsystem.getInstance().resetEncoders();
+            IntakeArmSubsystem.getInstance().resetEncoders();
         }
     }
     }

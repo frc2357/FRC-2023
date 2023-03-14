@@ -271,6 +271,8 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
             updatePID();
         }
 
+        // SmartDashboard.putNumber("Winch speed", m_winchMotor.getAppliedOutput());
+        // SmartDashboard.putNumber("Winch amps", getAmps());
         // SmartDashboard.putNumber("Winch rotations",
         // m_winchMotor.getEncoder().getPosition());
     }

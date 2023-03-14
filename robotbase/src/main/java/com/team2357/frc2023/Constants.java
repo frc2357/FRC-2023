@@ -235,8 +235,8 @@ public final class Constants {
         public static final int WINCH_DEPLOY_PID_SLOT = 0;
         public static final int WINCH_STOW_PID_SLOT = 1;
 
-        public static final double WINCH_AMP_ZERO_PERCENT_OUTPUT = 0;
-        public static final int WINCH_AMP_ZERO_MAX_AMPS = 0;
+        public static final double WINCH_AMP_ZERO_PERCENT_OUTPUT = -0.4;
+        public static final int WINCH_AMP_ZERO_MAX_AMPS = 15;
 
         public static final int WINCH_STOW_TIMEOUT_MILLIS = 5000;
         public static final int WINCH_MAX_BURNUP_AMPS = 40;
@@ -249,7 +249,7 @@ public final class Constants {
 
             config.m_isInverted = true;
 
-            config.m_winchAxisMaxSpeed = 0.4;
+            config.m_winchAxisMaxSpeed = 0.7;
 
             config.m_winchMotorIdleMode = IdleMode.kBrake;
 
@@ -319,8 +319,8 @@ public final class Constants {
         public static final double AUTO_SCORE_MID_ROTATIONS = 0;
         public static final double AUTO_SCORE_HIGH_ROTATIONS = 260;
 
-        public static final int ARM_EXTENSION_AMP_ZERO_PERCENT_OUTPUT = 0;
-        public static final int ARM_EXTENSION_AMP_ZERO_MAX_AMPS = 0;
+        public static final double ARM_EXTENSION_AMP_ZERO_PERCENT_OUTPUT = -0.2;
+        public static final int ARM_EXTENSION_AMP_ZERO_MAX_AMPS = 25;
 
         public static ArmExtensionSubsystem.Configuration GET_EXTENSION_CONFIG() {
             ArmExtensionSubsystem.Configuration config = new ArmExtensionSubsystem.Configuration();
@@ -366,22 +366,28 @@ public final class Constants {
     }
 
     public static final class ARM_ROTATION {
-        
+        public static final double CHAIN_BACKLASH_ROTATIONS = 12;
+
         public static final double RETRACTED_ROTATIONS = 0;
 
-        public static final double AUTO_SCORE_MID_ROTATIONS = 45;
-        public static final double AUTO_SCORE_HIGH_ROTATIONS = 58;
+        public static final double AUTO_SCORE_MID_ROTATIONS = 45 + CHAIN_BACKLASH_ROTATIONS;
+        public static final double AUTO_SCORE_HIGH_ROTATIONS = 58 + CHAIN_BACKLASH_ROTATIONS;
 
         public static final double ARM_ROTATION_GEAR_RATIO  = 190.91;
-        public static final double ARM_HANDOFF_ROTATIONS = ARM_ROTATION_GEAR_RATIO / 8;
+        public static final double ARM_HANDOFF_ROTATIONS = ARM_ROTATION_GEAR_RATIO / 8 + CHAIN_BACKLASH_ROTATIONS;
 
-        public static final int ARM_ROTATION_AMP_ZERO_PERCENT_OUTPUT = 0;
-        public static final int ARM_ROTATION_AMP_ZERO_MAX_AMPS = 0;
+        public static final double ARM_ROTATION_AMP_ZERO_PERCENT_OUTPUT = -0.25;
+        public static final int ARM_ROTATION_AMP_ZERO_MAX_AMPS = 25;
+
+
+        public static final double ARM_ROTATION_AMP_ZERO_TIME_MILLIS = 1000;
 
         public static ArmRotationSubsystem.Configuration GET_ROTATION_CONFIG() {
             ArmRotationSubsystem.Configuration config = new ArmRotationSubsystem.Configuration();
 
-            config.m_rotationAxisMaxSpeed = 0.4;
+            config.m_rotationZeroTolerance = 2.5;
+            
+            config.m_rotationAxisMaxSpeed = 0.7;
             config.m_maxSpeedPercent = 0.4;
 
             config.m_rotationMotorIdleMode = IdleMode.kBrake;
@@ -421,7 +427,7 @@ public final class Constants {
             config.m_feedforwardKa = 0;
 
             // TODO: Calculate
-            config.m_armHorizontalRotations = ARM_ROTATION_GEAR_RATIO / 4; // 90 degrees
+            config.m_armHorizontalRotations = ARM_ROTATION_GEAR_RATIO / 4 + CHAIN_BACKLASH_ROTATIONS; // 90 degrees
             config.m_rotationsPerRadian = ARM_ROTATION_GEAR_RATIO / (2 * Math.PI);
 
             return config;
@@ -439,10 +445,18 @@ public final class Constants {
 
     public static final class BUTTONBOARD {
         public static final String BUTTONBOARD_TABLE_NAME = "buttonboard";
-        public static final String ROW_TOPIC_NAME = "row";
-        public static final String COLUMN_TOPIC_NAME = "col";
+        public static final String ROW_TOPIC_NAME = "targetRow";
+        public static final String COLUMN_TOPIC_NAME = "targetCol";
         public static final String ALLIANCE_TOPIC_NAME = "alliance";
-    
+
+        public static final String INTAKE_WINCH_TOPIC_NAME = "intakeWinch";
+        public static final String INTAKE_SPEED_TOPIC_NAME = "intakeSpeed";
+        public static final String ARM_ROTATION_TOPIC_NAME = "armRotation";
+        public static final String ARM_EXTENSION_TOPIC_NAME = "armExtension";
+
+        public static final String INTAKE_EXTEND_TOPIC_NAME = "intakeExtend";
+        public static final String WRIST_TOPIC_NAME = "wrist";
+        public static final String CLAW_TOGGLE_TOPIC_NAME = "clamp";
     }
 
     public static final class APRILTAG_POSE {
@@ -455,7 +469,7 @@ public final class Constants {
         public static final int GUNNER_CONTROLLER_PORT = 1;
 
         public static final double DRIVE_CONTROLLER_DEADBAND = 0.05;
-        public static final double GUNNER_CONTROLLER_DEADBAND = 0.05;
+        public static final double GUNNER_CONTROLLER_DEADBAND = 0.1;
 
         public static final double RUMBLE_INTENSITY = 0.5;
         public static final double RUMBLE_TIMEOUT_SECONDS_ON_TELEOP_AUTO = 0.5;

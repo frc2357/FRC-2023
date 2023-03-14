@@ -4,6 +4,7 @@ import org.littletonrobotics.junction.Logger;
 
 import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.subsystems.ArmExtensionSubsystem;
+import com.team2357.frc2023.subsystems.ArmRotationSubsystem;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -20,7 +21,7 @@ public class ArmExtendAmpZeroCommand extends CommandBase{
     
     @Override
     public boolean isFinished() {
-        return Math.abs(ArmExtensionSubsystem.getInstance().getAmps()) >= Constants.ARM_EXTENSION.ARM_EXTENSION_AMP_ZERO_MAX_AMPS;
+        return (Math.abs(ArmExtensionSubsystem.getInstance().getAmps()) >= Constants.ARM_EXTENSION.ARM_EXTENSION_AMP_ZERO_MAX_AMPS) || !ArmRotationSubsystem.getInstance().isZeroed();
     }
     
     @Override
@@ -32,7 +33,7 @@ public class ArmExtendAmpZeroCommand extends CommandBase{
         }
         else{
             Logger.getInstance().recordOutput("Amp Zero fail", false);
-        ArmExtensionSubsystem.getInstance().resetEncoder();
+            ArmExtensionSubsystem.getInstance().resetEncoder();
         }
     }
 }
