@@ -21,6 +21,7 @@ import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreMidCommandGroup;
 import com.team2357.frc2023.commands.scoring.cube.CubeAutoScoreHighCommandGroup;
 import com.team2357.frc2023.commands.scoring.cube.CubeAutoScoreMidCommandGroup;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
+import com.team2357.lib.util.Utility;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
@@ -236,6 +237,10 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		public Matrix<N3, N1> m_stateStdDevs;
 		public Matrix<N3, N1> m_visionMeasurementStdDevs;
 
+		/**
+		 * Error tolerance in meters for vision estimate from encoder estimate in meters
+		 */
+		public double m_visionToleranceMeters;
 	}
 
 	public SwerveDriveSubsystem(int pigeonId, int[] frontLeftIds, int[] frontRightIds,
@@ -476,13 +481,29 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	public void addVisionPoseEstimate(AprilTagEstimate estimate) {
 
+		if(estimate == null) {
+			return;
+		}
+
 		Pose2d pose = estimate.getPose();
 		System.out.println(
 				"Vision x: " + pose.getX() + ", Y: " + pose.getY() + ", Rot: " + pose.getRotation().getDegrees());
-		// if (estimate != null) {
-		// m_poseEstimator.addVisionMeasurement(estimate.getPose(),
-		// estimate.getTimeStamp());
-		// }
+
+		Pose2d robotPose = getPose();
+		System.out.println(
+				"robot x: " + robotPose.getX() + ", Y: " + robotPose.getY() + ", Rot: "
+						+ robotPose.getRotation().getDegrees());
+
+		double xError = robotPose.getX() - pose.getX();
+		double yError = robotPose.getY() - pose.getY();
+
+		System.out.println("Error X: " + xError + " Y: " + yError);
+
+		if (estimate != null && Utility.isWithinTolerance(pose.getX(), robotPose.getX(), m_config.m_visionToleranceMeters) &&
+		 Utility.isWithinTolerance(robotPose.getY(), pose.getY(), m_config.m_visionToleranceMeters)) {
+			m_poseEstimator.addVisionMeasurement(estimate.getPose(),
+					estimate.getTimeStamp());
+		}
 	}
 
 	public void balance() {
