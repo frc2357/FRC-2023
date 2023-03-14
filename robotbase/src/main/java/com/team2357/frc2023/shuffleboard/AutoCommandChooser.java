@@ -1,108 +1,82 @@
 package com.team2357.frc2023.shuffleboard;
 
+import com.team2357.frc2023.commands.auto.gridone.GridOneScoreOneAndBalance;
+import com.team2357.frc2023.commands.auto.gridone.GridOneTwoConeAutoCommand;
+import com.team2357.frc2023.commands.auto.gridone.GridOneTwoConeBalanceAutoCommand;
+import com.team2357.frc2023.commands.auto.gridtwo.GridTwoTwoConeAutoCommand;
+import com.team2357.frc2023.commands.auto.gridtwo.GridTwoTwoConeBalanceAutoCommand;
 import com.team2357.frc2023.commands.auto.gridzero.GridZeroTwoConeAutoCommand;
+import com.team2357.frc2023.commands.auto.gridzero.GridZeroTwoConeBalanceAutoCommand;
+import com.team2357.frc2023.commands.intake.IntakeSolenoidExtendCommand;
 import com.team2357.frc2023.trajectoryutil.AvailableTrajectoryCommands;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 public class AutoCommandChooser {
 
-    private InitialLocationChooser initialLocationChooser;
-    private SecondaryLocationChooser secondaryLocationChooser;
+    private AutoActionChooser autoChooser;
 
-    private enum initialLocations {
+    private enum automodes {
         NONE,
-        GRID_0,
-        GRID_1,
-        GRID_2
+        GRID_0_TWO_CONE,
+        GRID_0_TWO_CONE_BALANCE,
+        GRID_1_TWO_CONE,
+        GRID_1_TWO_CONE_BALANCE,
+        GRID_2_TWO_CONE,
+        GRID_2_TWO_CONE_BALANCE
     }
 
-    private class InitialLocationChooser {
-        protected SendableChooser<initialLocations> m_chooser;
+    private class AutoActionChooser {
+        protected SendableChooser<automodes> m_chooser;
 
-        protected InitialLocationChooser(int index) {
+        protected AutoActionChooser() {
             m_chooser = new SendableChooser<>();
 
-            m_chooser.setDefaultOption("None", initialLocations.NONE);
-            for (initialLocations s : initialLocations.values()) {
-                if (s != initialLocations.NONE)
-                    m_chooser.addOption(s.toString().toLowerCase(), s);
-            }
-
-            SmartDashboard.putData("Initial Location", m_chooser);
-        }
-    }
-
-    private enum secondaryLocations {
-        NONE,
-        CHARGE_STATION,
-        GAME_PIECE
-    }
-
-    private class SecondaryLocationChooser {
-        protected SendableChooser<secondaryLocations> m_chooser;
-
-        protected SecondaryLocationChooser(int index) {
-            m_chooser = new SendableChooser<>();
-
-            m_chooser.setDefaultOption("None", secondaryLocations.NONE);
-            for (secondaryLocations s : secondaryLocations.values()) {
-                if (s != secondaryLocations.NONE) {
-                    m_chooser.addOption(s.toString().toLowerCase(), s);
+            m_chooser.setDefaultOption("None", automodes.NONE);
+            for (automodes automode : automodes.values()) {
+                if (automode != automodes.NONE) {
+                    m_chooser.addOption(automode.toString().toLowerCase(), automode);
                 }
             }
 
-            SmartDashboard.putData("Secondary Location", m_chooser);
+            SmartDashboard.putData("Auto chooser", m_chooser);
         }
+
+        public Command getActionCommand() {
+            switch (m_chooser.getSelected()) {
+                case GRID_0_TWO_CONE:
+                    return new GridZeroTwoConeAutoCommand();
+                case GRID_0_TWO_CONE_BALANCE:
+                    return new GridZeroTwoConeBalanceAutoCommand();
+                case GRID_1_TWO_CONE:
+                    return new GridOneTwoConeAutoCommand();
+                case GRID_1_TWO_CONE_BALANCE:
+                    return new GridOneTwoConeBalanceAutoCommand();
+                case GRID_2_TWO_CONE:
+                    return new GridTwoTwoConeAutoCommand();
+                case GRID_2_TWO_CONE_BALANCE:
+                    return new GridTwoTwoConeBalanceAutoCommand();
+                default:
+                    return new WaitCommand(0);
+            }
+        }
+        
     }
 
     public AutoCommandChooser() {
-        initialLocationChooser = new InitialLocationChooser(0);
-        secondaryLocationChooser = new SecondaryLocationChooser(1);
+        autoChooser = new AutoActionChooser();
     }
 
     public Command generateCommand() {
-        initialLocations initialLocation = initialLocationChooser.m_chooser.getSelected();
-        secondaryLocations secondaryLocation = secondaryLocationChooser.m_chooser.getSelected();
-
-        switch (initialLocation) {
-            case GRID_0:
-                switch (secondaryLocation) {
-                    case CHARGE_STATION:
-                        break;
-                    case GAME_PIECE:
-                        Command autoCommand = AvailableTrajectoryCommands.GridZeroTwoConeAuto;
-                        CommandScheduler.getInstance().removeComposedCommand(autoCommand);
-                        return autoCommand;
-                    default:
-                        break;
-                }
-            case GRID_1:
-                switch (secondaryLocation) {
-                    case CHARGE_STATION:
-                        break;
-                    case GAME_PIECE:
-                        break;
-                    default:
-                        break;
-                }
-            case GRID_2:
-                switch (secondaryLocation) {
-                    case CHARGE_STATION:
-                        break;
-                    case GAME_PIECE:
-                        break;
-                    default:
-                        break;
-                }
-            default:
-                break;
-        }
-
-        return new WaitCommand(0);
+        CommandScheduler.getInstance().removeComposedCommand(autoChooser.getActionCommand());
+        return new ParallelCommandGroup(
+            new IntakeSolenoidExtendCommand(),
+            autoChooser.getActionCommand()
+        );
     }
 }
