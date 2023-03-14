@@ -23,12 +23,15 @@ public class AutoCommandChooser {
 
     private enum automodes {
         NONE,
-        GRID_0_TWO_CONE,
-        GRID_0_TWO_CONE_BALANCE,
-        GRID_1_TWO_CONE,
-        GRID_1_TWO_CONE_BALANCE,
-        GRID_2_TWO_CONE,
-        GRID_2_TWO_CONE_BALANCE
+        // GRID_0_TWO_CONE,
+        // GRID_0_TWO_CONE_BALANCE,
+        // GRID_1_TWO_CONE,
+        // GRID_1_TWO_CONE_BALANCE,
+        // GRID_2_TWO_CONE,
+        // GRID_2_TWO_CONE_BALANCE
+        GRID_ZERO,
+        GRID_ONE,
+        GRID_TWO
     }
 
     private class AutoActionChooser {
@@ -49,18 +52,24 @@ public class AutoCommandChooser {
 
         public Command getActionCommand() {
             switch (m_chooser.getSelected()) {
-                case GRID_0_TWO_CONE:
+                // case GRID_0_TWO_CONE:
+                //     return new GridZeroTwoConeAutoCommand();
+                // case GRID_0_TWO_CONE_BALANCE:
+                //     return new GridZeroTwoConeBalanceAutoCommand();
+                // case GRID_1_TWO_CONE:
+                //     return new GridOneTwoConeAutoCommand();
+                // case GRID_1_TWO_CONE_BALANCE:
+                //     return new GridOneTwoConeBalanceAutoCommand();
+                // case GRID_2_TWO_CONE:
+                //     return new GridTwoTwoConeAutoCommand();
+                // case GRID_2_TWO_CONE_BALANCE:
+                //     return new GridTwoTwoConeBalanceAutoCommand();
+                case GRID_ZERO:
                     return new GridZeroTwoConeAutoCommand();
-                case GRID_0_TWO_CONE_BALANCE:
-                    return new GridZeroTwoConeBalanceAutoCommand();
-                case GRID_1_TWO_CONE:
-                    return new GridOneTwoConeAutoCommand();
-                case GRID_1_TWO_CONE_BALANCE:
-                    return new GridOneTwoConeBalanceAutoCommand();
-                case GRID_2_TWO_CONE:
-                    return new GridTwoTwoConeAutoCommand();
-                case GRID_2_TWO_CONE_BALANCE:
-                    return new GridTwoTwoConeBalanceAutoCommand();
+                case GRID_ONE:
+                    return new GridOneScoreOneAndBalance();
+                case GRID_TWO:
+                    return new WaitCommand(0); // TODO: Create this auto
                 default:
                     return new WaitCommand(0);
             }
