@@ -47,7 +47,22 @@ public class Buttonboard {
                         break;
                 }
                 break;
-        };
+            case Constants.BUTTONBOARD.INTAKE_WINCH_TOPIC_NAME:
+                break;
+            case Constants.BUTTONBOARD.INTAKE_SPEED_TOPIC_NAME:
+                break;
+            case Constants.BUTTONBOARD.ARM_ROTATION_TOPIC_NAME:
+                break;
+            case Constants.BUTTONBOARD.ARM_EXTENSION_TOPIC_NAME:
+                break;
+            case Constants.BUTTONBOARD.INTAKE_EXTEND_TOPIC_NAME:
+                break;
+            case Constants.BUTTONBOARD.WRIST_TOPIC_NAME:
+                break;
+            case Constants.BUTTONBOARD.CLAW_TOGGLE_TOPIC_NAME:
+                break;
+        }
+        ;
     };
 
     public static Buttonboard getInstance() {
