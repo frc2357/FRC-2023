@@ -6,12 +6,13 @@ import java.util.ArrayList;
 import org.littletonrobotics.junction.Logger;
 
 import com.team2357.frc2023.Constants;
-import com.team2357.frc2023.networktables.GridCam;
 import com.team2357.frc2023.networktables.GridCam.GRID_CAM;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public class GridCamEstimator {
     public static GridCamEstimator m_instance;
@@ -32,13 +33,18 @@ public class GridCamEstimator {
         } catch (IOException e) {
             Logger.getInstance().recordOutput("APRIL TAG FIELD FAILED TO LOAD", true);
         }
+
+    }
+
+    public void configureField(Alliance alliance) {
+        m_field.setOrigin(alliance == Alliance.Red ? OriginPosition.kRedAllianceWallRightSide :  OriginPosition.kBlueAllianceWallRightSide);
     }
 
     public AprilTagEstimate estimateRobotPose(ArrayList<AprilTagEstimate> estimates) {
         if(estimates == null) {
             return null;
         }
-        
+
         AprilTagEstimate bestEstimate = findBestEstimate(estimates);
         return transformEstimateToField(bestEstimate);
     }
@@ -49,7 +55,7 @@ public class GridCamEstimator {
         for (int i = 1; i < estimates.size(); i++) {
             AprilTagEstimate estimate = estimates.get(i);
 
-            if(estimate.getAmbiguity() > bestEstimate.getAmbiguity()) {
+            if(estimate.getAmbiguity() < bestEstimate.getAmbiguity()) {
                 bestEstimate = estimate;
             }
         }
