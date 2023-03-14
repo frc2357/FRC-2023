@@ -14,17 +14,17 @@ import com.swervedrivespecialties.swervelib.AbsoluteEncoder;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
-import com.team2357.frc2023.commands.controller.RumbleCommand;
+import com.team2357.frc2023.apriltag.AprilTagEstimate;
 import com.team2357.frc2023.commands.scoring.AutoScoreLowCommandGroup;
 import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
 import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreMidCommandGroup;
 import com.team2357.frc2023.commands.scoring.cube.CubeAutoScoreHighCommandGroup;
 import com.team2357.frc2023.commands.scoring.cube.CubeAutoScoreMidCommandGroup;
-import com.team2357.frc2023.util.Utility;
-import com.team2357.frc2023.networktables.AprilTagPose;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
+import com.team2357.lib.util.Utility;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -35,8 +35,9 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -232,6 +233,14 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		 */
 		public double m_sensorPositionCoefficient;
 
+		// Standard deviations for pose estimation
+		public Matrix<N3, N1> m_stateStdDevs;
+		public Matrix<N3, N1> m_visionMeasurementStdDevs;
+
+		/**
+		 * Error tolerance in meters for vision estimate from encoder estimate in meters
+		 */
+		public double m_visionToleranceMeters;
 	}
 
 	public SwerveDriveSubsystem(int pigeonId, int[] frontLeftIds, int[] frontRightIds,
@@ -311,7 +320,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
 						m_frontRightModule.getPosition(),
 						m_backLeftModule.getPosition(), m_backRightModule.getPosition() },
-				new Pose2d(0.0, 0.0, getGyroscopeRotation()));
+				new Pose2d(0.0, 0.0, getGyroscopeRotation()), m_config.m_stateStdDevs,
+				m_config.m_visionMeasurementStdDevs);
 
 		m_pathConstraints = new PathConstraints(m_config.m_trajectoryMaxVelocityMetersPerSecond,
 				m_config.m_trajectoryMaxAccelerationMetersPerSecond);
@@ -466,11 +476,33 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
 						m_frontRightModule.getPosition(),
 						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
+	}
 
-		// Pose2d visionPose = AprilTagPose.getInstance().getPose();
-		// if (visionPose != null) {
-		// 	m_poseEstimator.addVisionMeasurement(visionPose, Timer.getFPGATimestamp());
-		// }
+	public void addVisionPoseEstimate(AprilTagEstimate estimate) {
+
+		if(estimate == null) {
+			return;
+		}
+
+		Pose2d pose = estimate.getPose();
+		System.out.println(
+				"Vision x: " + pose.getX() + ", Y: " + pose.getY() + ", Rot: " + pose.getRotation().getDegrees());
+
+		Pose2d robotPose = getPose();
+		System.out.println(
+				"robot x: " + robotPose.getX() + ", Y: " + robotPose.getY() + ", Rot: "
+						+ robotPose.getRotation().getDegrees());
+
+		double xError = robotPose.getX() - pose.getX();
+		double yError = robotPose.getY() - pose.getY();
+
+		System.out.println("Error X: " + xError + " Y: " + yError);
+
+		if (estimate != null && Utility.isWithinTolerance(pose.getX(), robotPose.getX(), m_config.m_visionToleranceMeters) &&
+		 Utility.isWithinTolerance(robotPose.getY(), pose.getY(), m_config.m_visionToleranceMeters)) {
+			m_poseEstimator.addVisionMeasurement(estimate.getPose(),
+					estimate.getTimeStamp());
+		}
 	}
 
 	public void balance() {
@@ -675,20 +707,11 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 		SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
 
-		// SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
-
-		// SmartDashboard.putNumber("Yaw", m_pigeon.getYaw());
-		Pose2d pose = getPose();
-		double x = pose.getX();
-		double y = pose.getY();
-		double angle = pose.getRotation().getDegrees();
-
-		SmartDashboard.putNumber("Pose X", x);
-		SmartDashboard.putNumber("Pose Y", y);
+		SmartDashboard.putNumber("Yaw", m_pigeon.getYaw());
+		SmartDashboard.putNumber("Pose X", m_poseEstimator.getEstimatedPosition().getX());
+		SmartDashboard.putNumber("Pose Y", m_poseEstimator.getEstimatedPosition().getY());
 		SmartDashboard.putNumber("Pose Angle",
-		angle);
-
-		//System.out.println("X: " + x + ",  Y: " + y + ",  R: " + angle);
+				m_poseEstimator.getEstimatedPosition().getRotation().getDegrees());
 
 		SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
 		SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxVelocityMetersPerSecond);

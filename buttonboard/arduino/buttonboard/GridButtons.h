@@ -22,11 +22,6 @@ enum NodeState {
   NodeEmpty,
   NodeCone,
   NodeCube,
-  NodeLinkCone,
-  NodeLinkCube,
-  NodeLinkOpportunity,
-  NodeTargetCone,
-  NodeTargetCube
 };
 
 class GridButtons {
@@ -107,12 +102,16 @@ public:
     return m_nodes[0][0] != NodeDisconnected;
   }
 
-  uint8_t getSelectedRow() {
+  int8_t getSelectedRow() {
     return m_selectedRow;
   }
 
-  uint8_t getSelectedCol() {
+  int8_t getSelectedCol() {
     return m_selectedCol;
+  }
+
+  bool isSelectedCube() {
+    return m_selectedIsCube;
   }
 
   void clearSelected() {
@@ -154,6 +153,10 @@ private:
   }
 
   void onKeyPress(uint8_t row, uint8_t col) {
+    if (!isConnected()) {
+      return;
+    }
+
     if (m_selectedCol == col && m_selectedRow == row) {
       // We already selected this key.
       if (row == 2 && m_selectedIsCube) {
@@ -183,6 +186,46 @@ private:
     }
   }
 
+  bool isNodeScored(uint8_t row, uint8_t col) {
+    if (row < 0 || row >= GRID_ROWS || col < 0 || col >= GRID_COLS) {
+      return false;
+    }
+
+    NodeState node = m_nodes[row][col];
+    return node == NodeCone || node == NodeCube;
+  }
+
+  size_t countNodesScoredLeft(uint8_t row, uint8_t col) {
+    size_t scoredLeft = 0;
+
+    while (isNodeScored(row, col - scoredLeft - 1)) {
+      scoredLeft++;
+    }
+    return scoredLeft;
+  }
+
+  size_t countNodesScoredRight(uint8_t row, uint8_t col) {
+    size_t scoredRight = 0;
+
+    while (isNodeScored(row, col + scoredRight + 1)) {
+      scoredRight++;
+    }
+    return scoredRight;
+  }
+
+  bool isNodeLinkOpportunity(uint8_t row, uint8_t col) {
+    if (isNodeScored(row, col)) {
+      return false;
+    }
+    size_t scoredLeft = countNodesScoredLeft(row, col);
+    size_t scoredRight = countNodesScoredRight(row, col);
+
+    // If the nodes scored on either side plus this one add up to a multiple of 3, it's a link
+    return (((scoredLeft + 1) % 3) == 0) ||
+          (((scoredRight + 1) % 3) == 0) ||
+          (((scoredLeft + scoredRight + 1) % 3) == 0);
+  }
+
   void updatePixelColors() {
     uint32_t colorEmptyCoop = getColorEmptyCoop();
     uint32_t colorEmptyAlliance;
@@ -206,10 +249,14 @@ private:
 
         switch (m_nodes[row][col]) {
           case NodeEmpty:
-            if (col >= 3 && col <=5) {
-              setPixelColor(ledIndex, colorEmptyCoop);
+            if (isNodeLinkOpportunity(row, col)) {
+                setPixelColor(ledIndex, getColorLinkOpportunity());
             } else {
-              setPixelColor(ledIndex, colorEmptyAlliance);
+              if (col >= 3 && col <=5) {
+                setPixelColor(ledIndex, colorEmptyCoop);
+              } else {
+                setPixelColor(ledIndex, colorEmptyAlliance);
+              }
             }
             break;
           case NodeCone:
@@ -218,18 +265,15 @@ private:
           case NodeCube:
             setPixelColor(ledIndex, getColorCube());
             break;
-          case NodeLinkCone:
-            setPixelColor(ledIndex, getColorLinkCone());
-            break;
-          case NodeLinkCube:
-            setPixelColor(ledIndex, getColorLinkCube());
-            break;
-          case NodeLinkOpportunity:
-            setPixelColor(ledIndex, getColorLinkOpportunity());
-            break;
           case NodeDisconnected:
           default:
-            setPixelColor(ledIndex, getColorDisconnected());
+            if (strcmp(m_alliance, ALLIANCE_RED) == 0) {
+              setPixelColor(ledIndex, getColorDisconnectedRed());
+            } else if (strcmp(m_alliance, ALLIANCE_BLUE) == 0) {
+              setPixelColor(ledIndex, getColorDisconnectedBlue());
+            } else {
+              setPixelColor(ledIndex, getColorDisconnected());
+            }
             break;
         }
       }
@@ -260,6 +304,18 @@ private:
     }
   }
 
+  uint32_t getColorDisconnected() {
+    return m_neoPixels.Color(125, 125, 125);
+  }
+
+  uint32_t getColorDisconnectedRed() {
+    return m_neoPixels.Color(125, 0, 0);
+  }
+
+  uint32_t getColorDisconnectedBlue() {
+    return m_neoPixels.Color(0, 0, 125);
+  }
+
   uint32_t getColorEmptyRed() {
     return m_neoPixels.Color(4, 0, 0);
   }
@@ -272,10 +328,6 @@ private:
     return m_neoPixels.Color(2, 2, 2);
   }
 
-  uint32_t getColorDisconnected() {
-    return m_neoPixels.Color(125, 125, 125);
-  }
-
   uint32_t getColorCone() {
     return m_neoPixels.Color(175, 125, 0);
   }
@@ -284,16 +336,16 @@ private:
     return m_neoPixels.Color(100, 0, 200);
   }
 
-  uint32_t getColorLinkCone() {
-    return m_neoPixels.Color(87, 62, 0);
-  }
-
-  uint32_t getColorLinkCube() {
-    return m_neoPixels.Color(60, 0, 100);
-  }
-
   uint32_t getColorLinkOpportunity() {
-    return m_neoPixels.Color(255, 255, 255);
+    unsigned long cycleMillis = millis() % 2000;
+
+    if (cycleMillis < 1000) {
+      float factor = ((float)cycleMillis) / 1000.0;
+      return m_neoPixels.Color(255 * factor, 255 * factor, 255 * factor);
+    } else {
+      float factor = ((float)2000 - cycleMillis) / 1000.0;
+      return m_neoPixels.Color(255 * factor, 255 * factor, 255 * factor);
+    }
   }
 
   uint32_t getColorTargetCone() {
