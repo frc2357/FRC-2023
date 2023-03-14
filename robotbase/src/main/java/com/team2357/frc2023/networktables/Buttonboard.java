@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import com.team2357.frc2023.Constants;
+import com.team2357.frc2023.commands.util.ConfigureAllianceCommand;
 
 import edu.wpi.first.networktables.MultiSubscriber;
 import edu.wpi.first.networktables.NetworkTableEvent;
@@ -46,6 +47,7 @@ public class Buttonboard {
                         m_allianceValue.set(DriverStation.Alliance.Invalid);
                         break;
                 }
+                new ConfigureAllianceCommand(getAlliance()).schedule();
                 break;
             case Constants.BUTTONBOARD.INTAKE_WINCH_TOPIC_NAME:
                 break;
