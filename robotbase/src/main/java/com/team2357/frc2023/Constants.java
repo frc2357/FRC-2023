@@ -16,6 +16,7 @@ import com.team2357.frc2023.subsystems.WristSubsystem;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -135,6 +136,16 @@ public final class Constants {
 
             config.m_openLoopRampRateSeconds = 1;
 
+            /** State measurement standard deviations. Left encoder, right encoder, gyro
+             * Increase these numbers to trust them less
+             */ 
+            config.m_stateStdDevs = VecBuilder.fill(0.1, 0.1, 0.1);
+
+            /** Local measurement standard deviations. Vision X, Y, theta.
+             * Increase these numbers to trust them less
+             */
+			config.m_visionMeasurementStdDevs = VecBuilder.fill(0.9, 0.9, 0.9); 
+
             return config;
         }
 
@@ -169,7 +180,6 @@ public final class Constants {
         public static final double ROTATE_MAXSPEED_RADIANS_PER_SECOND = 0.91;
         public static final double SYNC_ENCODER_LIMIT_MS = 10000;
 
-
         public static final double DEFAULT_Y_ANGLE_SETPOINT = 20;
         public static final double DEFAULT_X_ANGLE_SETPOINT = -9;
 
@@ -196,7 +206,7 @@ public final class Constants {
     public static final class INTAKE_ROLLER {
         public static final double AUTO_SCORE_LOW_REVERSE_TIME = 1;
 
-        //TODO: Tune these
+        // TODO: Tune these
         public static final double MID_SHOT_PERCENT_OUTPUT = 0;
         public static final double MID_SHOT_DELAY_SECONDS = .25;
         public static final double HIGH_SHOT_PERCENT_OUTPUT = 0;
@@ -223,7 +233,6 @@ public final class Constants {
             return config;
         }
 
-        
     }
 
     public static final class INTAKE_ARM {
@@ -233,7 +242,7 @@ public final class Constants {
         public static final double AUTO_SCORE_LOW_ROTATIONS = 70;
 
         // Cube shooting
-        //TODO: Tune these
+        // TODO: Tune these
         public static final double MID_SHOT_SETPOINT_ROTATIONS = 0;
         public static final double HIGH_SHOT_SETPOINT_ROTATIONS = 0;
 
@@ -292,7 +301,6 @@ public final class Constants {
             return config;
         }
 
-       
     }
 
     public static final class WRIST {
@@ -358,7 +366,7 @@ public final class Constants {
             config.m_pidMinOutput = -1;
             config.m_smartMotionMaxVelRPM = 8700;
             config.m_smartMotionMinVelRPM = 0;
-            config.m_smartMotionMaxAccRPM = 8700*2;
+            config.m_smartMotionMaxAccRPM = 8700 * 2;
             config.m_smartMotionRotationAllowedError = 0.5;
             config.m_rotationAllowedError = 0.5;
 
@@ -366,7 +374,6 @@ public final class Constants {
             return config;
         }
 
-        
     }
 
     public static final class ARM_ROTATION {
@@ -377,12 +384,11 @@ public final class Constants {
         public static final double AUTO_SCORE_MID_ROTATIONS = 45 + CHAIN_BACKLASH_ROTATIONS;
         public static final double AUTO_SCORE_HIGH_ROTATIONS = 58 + CHAIN_BACKLASH_ROTATIONS;
 
-        public static final double ARM_ROTATION_GEAR_RATIO  = 190.91;
+        public static final double ARM_ROTATION_GEAR_RATIO = 190.91;
         public static final double ARM_HANDOFF_ROTATIONS = ARM_ROTATION_GEAR_RATIO / 8 + CHAIN_BACKLASH_ROTATIONS;
 
         public static final double ARM_ROTATION_AMP_ZERO_PERCENT_OUTPUT = -0.25;
         public static final int ARM_ROTATION_AMP_ZERO_MAX_AMPS = 25;
-
 
         public static final double ARM_ROTATION_AMP_ZERO_TIME_MILLIS = 1000;
 
@@ -390,7 +396,7 @@ public final class Constants {
             ArmRotationSubsystem.Configuration config = new ArmRotationSubsystem.Configuration();
 
             config.m_rotationZeroTolerance = 2.5;
-            
+
             config.m_rotationAxisMaxSpeed = 0.7;
             config.m_maxSpeedPercent = 0.4;
 
@@ -443,7 +449,7 @@ public final class Constants {
     public static final class LIMELIGHT {
         public static final String LEFT_LIMELIGHT_NAME = "limelight-left";
         public static final String RIGHT_LIMELIGHT_NAME = "limelight-right";
-        
+
         public static final double LEFT_LIMELIGHT_TX_SETPOINT = Double.NaN;
         public static final double RIGHT_LIMELIGHT_TX_SETPOINT = Double.NaN;
     }
@@ -488,7 +494,8 @@ public final class Constants {
         public static final int MIN_PRESSURE_PSI = 90;
         public static final int MAX_PRESSURE_PSI = 100;
     }
-    public static final class AMP_ZERO{
+
+    public static final class AMP_ZERO {
         public static final int AMP_ZERO_DEADLINE_SECONDS = 1;
     }
 
@@ -505,7 +512,9 @@ public final class Constants {
         public static final double FRONT_CAM_YAW_DEGREES = 0.0;
         public static final double REAR_CAM_YAW_DEGREES = 180;
 
-        public static final Pose2d FRONT_CAM_POSE = new Pose2d(FRONT_CAM_X_METERS, FRONT_CAM_Y_METERS, Rotation2d.fromDegrees(FRONT_CAM_YAW_DEGREES));
-        public static final Pose2d REAR_CAM_POSE = new Pose2d(REAR_CAM_X_METERS, REAR_CAM_Y_METERS, Rotation2d.fromDegrees(REAR_CAM_YAW_DEGREES));
+        public static final Pose2d FRONT_CAM_POSE = new Pose2d(FRONT_CAM_X_METERS, FRONT_CAM_Y_METERS,
+                Rotation2d.fromDegrees(FRONT_CAM_YAW_DEGREES));
+        public static final Pose2d REAR_CAM_POSE = new Pose2d(REAR_CAM_X_METERS, REAR_CAM_Y_METERS,
+                Rotation2d.fromDegrees(REAR_CAM_YAW_DEGREES));
     }
 }
