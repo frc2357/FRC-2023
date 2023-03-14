@@ -13,11 +13,8 @@ public class AprilTagPoseTest {
 
     String testString = "{\"timestamp\":0.0,\"tags\": [{\"ID\": 1,\"ambiguity\":1.0,\"pose\": {\"translation\": {\"x\": 15.513558,\"y\": 1.071626,\"z\": 0.462788},\"rotation\": {\"quaternion\": {\"W\": 0.0,\"X\": 0.0,\"Y\": 0.0,\"Z\": 1.0}}}},{\"ID\": 2,\"ambiguity\":1.0,\"pose\": {\"translation\": {\"x\": 15.513558,\"y\": 2.748026,\"z\": 0.462788},\"rotation\": {\"quaternion\": {\"W\": 0.7071081,\"X\": 0.0,\"Y\": 0.0,\"Z\": 0.7071081}}}},{\"ID\": 3,\"ambiguity\":1.0,\"pose\": {\"translation\": {\"x\": 15.513558,\"y\": 4.424426,\"z\": 0.462788},\"rotation\": {\"quaternion\": {\"W\": 0.9659258,\"X\": 0.0,\"Y\": 0.0,\"Z\": 0.258819}}}},{\"ID\": 4,\"ambiguity\":1.0,\"pose\": {\"translation\": {\"x\": 16.178784,\"y\": 6.749796,\"z\": 0.695452},\"rotation\": {\"quaternion\": {\"W\": -0.7071068,\"X\": 0.0,\"Y\": 0.0,\"Z\": 0.7071068}}}},{\"ID\": 5,\"ambiguity\":1.0,\"pose\": {\"translation\": {\"x\": 0.36195,\"y\": 6.749796,\"z\": 0.695452},\"rotation\": {\"quaternion\": {\"W\": -0.7986355,\"X\": 0.0,\"Y\": 0.0,\"Z\": 0.601815}}}},{\"ID\": 6,\"ambiguity\":1.0,\"pose\": {\"translation\": {\"x\": 1.02743,\"y\": 4.424426,\"z\": 0.462788},\"rotation\": {\"quaternion\": {\"W\": 0.9986295,\"X\": 0.0,\"Y\": 0.0,\"Z\": 0.052336}}}},{\"ID\": 7,\"ambiguity\":1.0,\"pose\": {\"translation\": {\"x\": 1.02743,\"y\": 2.748026,\"z\": 0.462788},\"rotation\": {\"quaternion\": {\"W\": 0.4461978,\"X\": 0.0,\"Y\": 0.0,\"Z\": 0.8949344}}}},{\"ID\": 8,\"ambiguity\":1.0,\"pose\": {\"translation\": {\"x\": 1.02743,\"y\": 1.071626,\"z\": 0.462788},\"rotation\": {\"quaternion\": {\"W\": -0.9832549,\"X\": 0.0,\"Y\": 0.0,\"Z\": 0.1822355}}}}]}";
     JSONObject testObj = parseObject(testString);
-    // String emptyString = "";
-    // JSONObject emptyObj = parseObject(emptyString);
 
     JSONArray testTags = (JSONArray) testObj.get("tags");
-    // JSONArray emptyTags = (JSONArray) emptyObj.get("tags");
         
     JSONObject pose0 = (JSONObject) ((JSONObject) testTags.get(0)).get("pose");
     JSONObject pose1 = (JSONObject) ((JSONObject) testTags.get(1)).get("pose");
@@ -30,7 +27,6 @@ public class AprilTagPoseTest {
 
     JSONObject emptyPose = parseObject("");
 
-    // TODO: Update tests
     @Test
     public void testGetTranslation() {
         
@@ -90,8 +86,6 @@ public class AprilTagPoseTest {
         try {
             obj = (JSONObject) parser.parse(str);
         } catch (ParseException e) {
-            // TODO Auto-generated catch block
-            // e.printStackTrace();
             return new JSONObject();
         }
         return obj;
