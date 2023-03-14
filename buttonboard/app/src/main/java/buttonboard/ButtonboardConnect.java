@@ -8,9 +8,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import buttonboard.test.GridPubClient;
+import buttonboard.arduino.ArduinoButtonboard;
 
 public class ButtonboardConnect {
-    private static final String ARG_TEST_ARDUINO = "test:arduino";
+    private static final String ARG_TEST_ARDUINO = "test:buttonboard";
     private static final String ARG_TEST_NTCLIENT = "test:ntclient";
     private static final String ARG_TEST_NTSERVER = "test:ntserver";
     private static final String ARG_TEST_GRIDPUB = "test:gridpub";
@@ -20,7 +21,7 @@ public class ButtonboardConnect {
             if (args.length > 0 && args[0].length() > 0) {
                 switch(args[0]) {
                     case ARG_TEST_ARDUINO:
-                        testArduino();
+                        testButtonboard();
                         System.exit(0);
                     case ARG_TEST_NTCLIENT:
                         testNetworkTablesClient();
@@ -43,8 +44,15 @@ public class ButtonboardConnect {
         }
     }
 
-    private static void testArduino() {
-        ArduinoUSB.scan();
+    private static void testButtonboard() {
+        ArduinoButtonboard buttonboard = new ArduinoButtonboard();
+        try {
+            while (true) {
+                Thread.sleep(1000);
+            }
+        } catch (InterruptedException ie) {
+            return;
+        }
     }
 
     private static void testNetworkTablesClient() {

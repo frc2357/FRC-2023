@@ -51,6 +51,7 @@ dependencies {
 
     // This dependency is used by the application.
     implementation 'com.google.guava:guava:31.0.1-jre'
+    implementation 'com.fazecast:jSerialComm:[2.0.0,3.0.0)'
 }
 
 application {
