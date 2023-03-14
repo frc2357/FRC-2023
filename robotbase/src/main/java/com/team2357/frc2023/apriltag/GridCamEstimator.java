@@ -34,11 +34,11 @@ public class GridCamEstimator {
         }
     }
 
-    public AprilTagEstimate estimateRobotPose() {
-        return getEstimate(GridCam.getInstance().getCamRelativePoses());
-    }
-
-    public AprilTagEstimate getEstimate(ArrayList<AprilTagEstimate> estimates) {
+    public AprilTagEstimate estimateRobotPose(ArrayList<AprilTagEstimate> estimates) {
+        if(estimates == null) {
+            return null;
+        }
+        
         AprilTagEstimate bestEstimate = findBestEstimate(estimates);
         return transformEstimateToField(bestEstimate);
     }
@@ -49,7 +49,7 @@ public class GridCamEstimator {
         for (int i = 1; i < estimates.size(); i++) {
             AprilTagEstimate estimate = estimates.get(i);
 
-            if(estimate.getM_ambiguity() > bestEstimate.getM_ambiguity()) {
+            if(estimate.getAmbiguity() > bestEstimate.getAmbiguity()) {
                 bestEstimate = estimate;
             }
         }
@@ -61,7 +61,7 @@ public class GridCamEstimator {
         Pose2d pose = estimate.getPose();
 
         Pose2d fieldPose = m_field.getTagPose(estimate.getId()).get().toPose2d();
-        switch(estimate.getgridCam()) {
+        switch(estimate.getGridCam()) {
             case FRONT: 
                 pose.relativeTo((Constants.GRIDCAM.FRONT_CAM_POSE)).relativeTo(fieldPose);
                 break;
@@ -72,6 +72,6 @@ public class GridCamEstimator {
                 return null;
         }
 
-        return new AprilTagEstimate(estimate.getId(), estimate.getTimeStamp(), pose, estimate.getM_ambiguity(), GRID_CAM.NONE, true);
+        return new AprilTagEstimate(estimate.getId(), estimate.getTimeStamp(), pose, estimate.getAmbiguity(), GRID_CAM.NONE, true);
     }
 }

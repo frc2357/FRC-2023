@@ -1,6 +1,8 @@
 package com.team2357.frc2023.networktables;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.function.Consumer;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -8,18 +10,22 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import com.team2357.frc2023.Constants;
-import com.team2357.frc2023.Constants.GRIDCAM;
 import com.team2357.frc2023.apriltag.AprilTagEstimate;
+import com.team2357.frc2023.apriltag.GridCamEstimator;
+import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringSubscriber;
 
 public class GridCam {
     private static GridCam m_instance;
+
+    private int m_poseListenerHandle;
 
     public static GridCam getInstance() {
         if (m_instance == null) {
@@ -41,10 +47,30 @@ public class GridCam {
 
     private JSONParser m_parser = new JSONParser();
 
+    public final Consumer<NetworkTableEvent> m_onValueChange = (NetworkTableEvent event) -> {
+        String jsonPoses = event.valueData.value.getString();
+
+        ArrayList<AprilTagEstimate> estimates;
+        try {
+            estimates = toEstimates(jsonPoses);
+        } catch (NullPointerException e) {
+            return;
+        }
+        AprilTagEstimate robotEstimate = GridCamEstimator.getInstance().estimateRobotPose(estimates);
+        SwerveDriveSubsystem.getInstance().addVisionPoseEstimate(robotEstimate);
+    };
+
     private GridCam() {
+        NetworkTableInstance inst = NetworkTableInstance.getDefault();
+
         m_poseSub = m_table.getStringTopic(Constants.APRILTAG_POSE.POSE_TOPIC_NAME).subscribe("");
 
         m_instance = this;
+
+        m_poseListenerHandle = inst.addListener(
+                m_poseSub,
+                EnumSet.of(NetworkTableEvent.Kind.kValueAll),
+                m_onValueChange);
     }
 
     /**
@@ -52,10 +78,14 @@ public class GridCam {
      * @return List of estimates at a given time relative to the camera
      */
     public ArrayList<AprilTagEstimate> getCamRelativePoses() {
-        return toEstimates(m_poseSub.get());
+        try {
+            return toEstimates(m_poseSub.get());
+        } catch (NullPointerException e) {
+            return null;
+        }
     }
 
-    public ArrayList<AprilTagEstimate> toEstimates(String jsonString) {
+    public ArrayList<AprilTagEstimate> toEstimates(String jsonString) throws NullPointerException {
         JSONObject obj;
         try {
             obj = (JSONObject) m_parser.parse(jsonString);
@@ -65,7 +95,7 @@ public class GridCam {
 
         System.out.println(obj);
 
-        Long timestamp = (long) obj.get("timestamp");
+        double timestamp = (double) obj.get("timestamp");
         JSONArray jsonTagPoses = (JSONArray) obj.get("tags");
 
         ArrayList<AprilTagEstimate> aprilTagEstimates = new ArrayList<AprilTagEstimate>();
@@ -105,13 +135,10 @@ public class GridCam {
         }
     }
 
-    public Translation2d getTranslation(JSONObject obj) {
+    public Translation2d getTranslation(JSONObject obj) throws NullPointerException {
         JSONObject translation;
-        try {
-            translation = (JSONObject) obj.get("translation");
-        } catch (NullPointerException e) {
-            return new Translation2d(Double.NaN, Double.NaN);
-        }
+
+        translation = (JSONObject) obj.get("translation");
 
         double translationX = (double) translation.get("x");
         double translationY = (double) translation.get("y");
@@ -119,13 +146,10 @@ public class GridCam {
         return new Translation2d(translationX, translationY);
     }
 
-    public Rotation2d getRotation(JSONObject obj) {
+    public Rotation2d getRotation(JSONObject obj) throws NullPointerException {
         JSONObject quaternion;
-        try {
-            quaternion = (JSONObject) ((JSONObject) obj.get("rotation")).get("quaternion");
-        } catch (NullPointerException e) {
-            return Rotation2d.fromRadians(Double.NaN);
-        }
+        quaternion = (JSONObject) ((JSONObject) obj.get("rotation")).get("quaternion");
+
         double w = (double) quaternion.get("W");
         double x = (double) quaternion.get("X");
         double y = (double) quaternion.get("Y");
@@ -138,6 +162,8 @@ public class GridCam {
     }
 
     public void close() {
+        NetworkTableInstance inst = NetworkTableInstance.getDefault();
+        inst.removeListener(m_poseListenerHandle);
         m_poseSub.close();
     }
 }

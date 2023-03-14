@@ -6,7 +6,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 
 public class AprilTagEstimate {
     private int m_id;
-    private long m_timeStamp;
+    private double m_timeStamp;
     private Pose2d m_pose;
 
     private GRID_CAM m_gridCam;
@@ -15,7 +15,7 @@ public class AprilTagEstimate {
 
     boolean m_isFieldRelative;
 
-    public AprilTagEstimate(int id, long timeStamp, Pose2d pose, double ambiguity, GRID_CAM gridCam, boolean isFieldRelative) {
+    public AprilTagEstimate(int id, double timeStamp, Pose2d pose, double ambiguity, GRID_CAM gridCam, boolean isFieldRelative) {
         m_id = id;
         m_timeStamp = timeStamp;
         m_pose = pose;
@@ -32,7 +32,7 @@ public class AprilTagEstimate {
         m_id = id;
     }
 
-    public long getTimeStamp() {
+    public double getTimeStamp() {
         return m_timeStamp;
     }
 
@@ -48,19 +48,19 @@ public class AprilTagEstimate {
         m_pose = estimate;
     }
 
-    public double getM_ambiguity() {
+    public double getAmbiguity() {
         return m_ambiguity;
     }
 
-    public void setM_ambiguity(double ambiguity) {
+    public void setAmbiguity(double ambiguity) {
         m_ambiguity = ambiguity;
     }
 
-    public GRID_CAM getgridCam() {
+    public GRID_CAM getGridCam() {
         return m_gridCam;
     }
 
-    public void setgridCam(GRID_CAM gridCam) {
+    public void setGridCam(GRID_CAM gridCam) {
         m_gridCam = gridCam;
     }
 

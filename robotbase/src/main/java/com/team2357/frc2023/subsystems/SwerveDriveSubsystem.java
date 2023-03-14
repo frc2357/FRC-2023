@@ -15,6 +15,7 @@ import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.commands.controller.RumbleCommand;
+import com.team2357.frc2023.apriltag.AprilTagEstimate;
 import com.team2357.frc2023.apriltag.GridCamEstimator;
 import com.team2357.frc2023.commands.scoring.AutoScoreLowCommandGroup;
 import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
@@ -466,11 +467,15 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
 						m_frontRightModule.getPosition(),
 						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
+	}
 
-		Pose2d visionPose = GridCamEstimator.getInstance().estimateRobotPose().getPose();
-		if (visionPose != null) {
-			m_poseEstimator.addVisionMeasurement(visionPose, Timer.getFPGATimestamp());	
-		}
+	public void addVisionPoseEstimate(AprilTagEstimate estimate) {		
+
+		Pose2d pose = estimate.getPose();
+		System.out.println("Vision x: " + pose.getX() + ", Y: " + pose.getY() + ", Rot: " + pose.getRotation().getDegrees());
+		// if (estimate != null) {
+		// 	m_poseEstimator.addVisionMeasurement(estimate.getPose(), estimate.getTimeStamp());	
+		// }
 	}
 
 	public void balance() {
@@ -675,13 +680,11 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 		SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
 
-		// SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
-
-		// SmartDashboard.putNumber("Yaw", m_pigeon.getYaw());
-		// SmartDashboard.putNumber("Pose X", m_odometry.getPoseMeters().getX());
-		// SmartDashboard.putNumber("Pose Y", m_odometry.getPoseMeters().getY());
-		// SmartDashboard.putNumber("Pose Angle",
-		// m_odometry.getPoseMeters().getRotation().getDegrees());
+		SmartDashboard.putNumber("Yaw", m_pigeon.getYaw());
+		SmartDashboard.putNumber("Pose X", m_poseEstimator.getEstimatedPosition().getX());
+		SmartDashboard.putNumber("Pose Y", m_poseEstimator.getEstimatedPosition().getY());
+		SmartDashboard.putNumber("Pose Angle",
+		m_poseEstimator.getEstimatedPosition().getRotation().getDegrees());
 
 		SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
 		SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxVelocityMetersPerSecond);
