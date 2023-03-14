@@ -11,6 +11,7 @@ import com.team2357.frc2023.commands.intake.IntakeStowCommandGroup;
 import com.team2357.frc2023.commands.scoring.HeartlandAutoScoreCommand;
 import com.team2357.frc2023.commands.scoring.HeartlandAutoTranslateCommand;
 import com.team2357.frc2023.commands.scoring.TeleopAutoScoreCommandGroup;
+import com.team2357.frc2023.commands.util.SignalGamepieceCommand;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.lib.triggers.AxisThresholdTrigger;
 import com.team2357.lib.util.XboxRaw;
@@ -18,6 +19,7 @@ import com.team2357.lib.util.XboxRaw;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -67,10 +69,16 @@ public class SwerveDriveControls {
         m_leftBumper.whileTrue(new IntakeRollerReverseCommand());
 
         // Intake deploy/stow
-        m_leftTrigger.whileTrue(new IntakeDeployCommandGroup().alongWith(new InstantCommand(() -> GamepieceLED.getInstance().setSignalColor(SIGNAL_COLOR.PURPLE))));
+        m_leftTrigger.whileTrue(new SequentialCommandGroup(
+            new IntakeDeployCommandGroup().alongWith(new SignalGamepieceCommand(SIGNAL_COLOR.PURPLE)),
+            new IntakeStowCommandGroup()
+        ));
         m_leftTrigger.onFalse(new IntakeStowCommandGroup());
 
-        m_rightTrigger.whileTrue(new IntakeDeployCommandGroup().alongWith(new InstantCommand(() -> GamepieceLED.getInstance().setSignalColor(SIGNAL_COLOR.YELLOW))));
+        m_rightTrigger.whileTrue(new SequentialCommandGroup(
+            new IntakeDeployCommandGroup().alongWith(new SignalGamepieceCommand(SIGNAL_COLOR.YELLOW)),
+            new IntakeStowCommandGroup()
+        ));
         m_rightTrigger.onFalse(new IntakeStowCommandGroup());
 
         //Teleop auto

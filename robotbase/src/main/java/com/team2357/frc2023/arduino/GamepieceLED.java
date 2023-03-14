@@ -3,6 +3,7 @@ package com.team2357.frc2023.arduino;
 public class GamepieceLED {
 
     public enum SIGNAL_COLOR{
+        NONE,
         PURPLE,
         YELLOW
     }

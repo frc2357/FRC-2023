@@ -83,7 +83,7 @@ public class IntakeRollerSubsystem extends SubsystemBase {
         m_masterIntakeMotor.set(ControlMode.PercentOutput, percentOutput);
     }
 
-    public double getCurrent(){
+    public double getAmps(){
         return m_masterIntakeMotor.getStatorCurrent();
     }
 

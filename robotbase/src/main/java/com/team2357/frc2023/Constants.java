@@ -194,8 +194,8 @@ public final class Constants {
         public static final double MID_SHOT_DELAY_SECONDS = .25;
         public static final double HIGH_SHOT_PERCENT_OUTPUT = 0;
         public static final double HIGH_SHOT_DELAY_SECONDS = .25;
-        public static final int AUTO_INTAKE_CURRENT_LIMIT = 0;
-        public static final double AUTO_INTAKE_WAIT_TIME = 0;
+
+        public static final int INTAKE_ROLLER_AMP_LIMIT = 20;
 
         public static IntakeRollerSubsystem.Configuration GET_INTAKE_CONFIG() {
             IntakeRollerSubsystem.Configuration config = new IntakeRollerSubsystem.Configuration();
