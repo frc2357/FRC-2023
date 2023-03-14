@@ -135,30 +135,39 @@ public class GridCam {
         }
     }
 
-    public Translation2d getTranslation(JSONObject obj) throws NullPointerException {
+    public Translation2d getTranslation(JSONObject obj) {
         JSONObject translation;
 
-        translation = (JSONObject) obj.get("translation");
+        try {
+            translation = (JSONObject) obj.get("translation");
 
-        double translationX = (double) translation.get("x");
-        double translationY = (double) translation.get("y");
+            double translationX = (double) translation.get("x");
+            double translationY = (double) translation.get("y");
 
-        return new Translation2d(translationX, translationY);
+            return new Translation2d(translationX, translationY);
+        } catch (NullPointerException e) {
+            return null;
+        }
     }
 
     public Rotation2d getRotation(JSONObject obj) throws NullPointerException {
         JSONObject quaternion;
-        quaternion = (JSONObject) ((JSONObject) obj.get("rotation")).get("quaternion");
 
-        double w = (double) quaternion.get("W");
-        double x = (double) quaternion.get("X");
-        double y = (double) quaternion.get("Y");
-        double z = (double) quaternion.get("Z");
+        try {
+            quaternion = (JSONObject) ((JSONObject) obj.get("rotation")).get("quaternion");
 
-        double rotation = Math.atan2(2 * (w * z + x * y), 1 - 2 * (Math.pow(y, 2) + Math.pow(z, 2)));
-        rotation += rotation < 0 ? 2 * Math.PI : 0;
+            double w = (double) quaternion.get("W");
+            double x = (double) quaternion.get("X");
+            double y = (double) quaternion.get("Y");
+            double z = (double) quaternion.get("Z");
 
-        return Rotation2d.fromRadians(rotation);
+            double rotation = Math.atan2(2 * (w * z + x * y), 1 - 2 * (Math.pow(y, 2) + Math.pow(z, 2)));
+            rotation += rotation < 0 ? 2 * Math.PI : 0;
+
+            return Rotation2d.fromRadians(rotation);
+        } catch (NullPointerException e) {
+            return null;
+        }
     }
 
     public void close() {
