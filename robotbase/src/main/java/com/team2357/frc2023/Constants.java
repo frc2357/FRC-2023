@@ -80,7 +80,7 @@ public final class Constants {
 
     public static final class PH_ID {
 
-        public static final int WRIST_FORWARD_SOLENOID_CHANNEL = 3; // Red
+        public static final int WRIST_FORWARD_SOLENOID_CHANNEL = 7; // Red
         public static final int WRIST_REVERSE_SOLENOID_CHANNEL = 0;
 
         public static final int CLAW_FORWARD_SOLENOID_CHANNEL = 4;
