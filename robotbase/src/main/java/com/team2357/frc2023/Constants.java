@@ -297,7 +297,7 @@ public final class Constants {
             config.m_smartMotionRotationAllowedError = 2;
 
             config.m_winchMotorAllowedError = 2;
-            config.m_winchDeployRotations = 140;
+            config.m_winchDeployRotations = 135;
             config.m_winchStowRotations = 0.0;
 
             return config;
@@ -330,7 +330,7 @@ public final class Constants {
     public static final class ARM_EXTENSION {
         public static final double RETRACTED_ROTATIONS = 0;
 
-        public static final double AUTO_SCORE_MID_ROTATIONS = 0;
+        public static final double AUTO_SCORE_MID_ROTATIONS = 15;
         public static final double AUTO_SCORE_HIGH_ROTATIONS = 260;
 
         public static final double ARM_EXTENSION_AMP_ZERO_PERCENT_OUTPUT = -0.2;
@@ -379,15 +379,13 @@ public final class Constants {
     }
 
     public static final class ARM_ROTATION {
-        public static final double CHAIN_BACKLASH_ROTATIONS = 12;
-
         public static final double RETRACTED_ROTATIONS = 0;
 
-        public static final double AUTO_SCORE_MID_ROTATIONS = 45 + CHAIN_BACKLASH_ROTATIONS;
-        public static final double AUTO_SCORE_HIGH_ROTATIONS = 58 + CHAIN_BACKLASH_ROTATIONS;
+        public static final double AUTO_SCORE_MID_ROTATIONS = 50;
+        public static final double AUTO_SCORE_HIGH_ROTATIONS = 58;
 
-        public static final double ARM_ROTATION_GEAR_RATIO = 190.91;
-        public static final double ARM_HANDOFF_ROTATIONS = ARM_ROTATION_GEAR_RATIO / 8 + CHAIN_BACKLASH_ROTATIONS;
+        public static final double ARM_ROTATION_GEAR_RATIO  = 190.91;
+        public static final double ARM_HANDOFF_ROTATIONS = ARM_ROTATION_GEAR_RATIO / 8;
 
         public static final double ARM_ROTATION_AMP_ZERO_PERCENT_OUTPUT = -0.25;
         public static final int ARM_ROTATION_AMP_ZERO_MAX_AMPS = 25;
@@ -440,7 +438,7 @@ public final class Constants {
             config.m_feedforwardKa = 0;
 
             // TODO: Calculate
-            config.m_armHorizontalRotations = ARM_ROTATION_GEAR_RATIO / 4 + CHAIN_BACKLASH_ROTATIONS; // 90 degrees
+            config.m_armHorizontalRotations = ARM_ROTATION_GEAR_RATIO / 4; // 90 degrees
             config.m_rotationsPerRadian = ARM_ROTATION_GEAR_RATIO / (2 * Math.PI);
 
             return config;
