@@ -101,20 +101,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    int auto = -3;
-
-    switch (auto) {
-      case -1:
-        return AvailableTrajectories.lineTrajectory;
-      case -2:
-        return AvailableTrajectories.flipTrajectory;
-      case -3:
-        //return new GridZeroTwoConeAutoCommand();
-        //return TrajectoryUtil.createTrajectoryPathCommand("grid1 1 cone balance", true);
-        //return TrajectoryUtil.createTrajectoryPathCommand("180 balance", true);
-        return new GridOneScoreOneAndBalance();
-      default:
-        return m_autoCommandChooser.generateCommand();
-    }
+    return m_autoCommandChooser.generateCommand();
   }
 }

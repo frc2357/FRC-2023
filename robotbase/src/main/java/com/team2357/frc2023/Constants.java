@@ -107,9 +107,9 @@ public final class Constants {
                     Math.hypot(config.m_trackwidthMeters / 2.0, config.m_wheelbaseMeters / 2.0);
             config.m_maxAngularAccelerationRadiansPerSecondSquared = config.m_maxAngularVelocityRadiansPerSecond / 3.0;
 
-            config.m_xController = new PIDController(2.2, 0, 0); // .56122 2.2
-            config.m_yController = new PIDController(2.2, 0, 0); // .56122
-            config.m_thetaController = new PIDController(2.15, 0, 0); // 2.15
+            config.m_xController = new PIDController(8.0, 0, 0); // .56122 2.2
+            config.m_yController = new PIDController(8.0, 0, 0); // .56122
+            config.m_thetaController = new PIDController(6.0, 0, 0); // 2.15
 
             config.m_sensorPositionCoefficient = 2.0 * Math.PI / Constants.DRIVE.TICKS_PER_ROTATION
                     * SdsModuleConfigurations.MK4I_L2.getSteerReduction();

@@ -37,9 +37,9 @@ public class ConeAutoScoreHighCommandGroup extends ParallelCommandGroup {
                                                 .andThen(new ArmRotateToPositionCommand(
                                                                 Constants.ARM_ROTATION.RETRACTED_ROTATIONS)),
 
-                                new WaitCommand(1.25)
+                                new WaitCommand(1)
                                                 .andThen(new WristInstantExtendCommand())
-                                                .andThen(new WaitCommand(2.5))
+                                                .andThen(new WaitCommand(2.75))
                                                 .andThen(new WristInstantRetractCommand()),
 
                                 new WaitCommand(1)

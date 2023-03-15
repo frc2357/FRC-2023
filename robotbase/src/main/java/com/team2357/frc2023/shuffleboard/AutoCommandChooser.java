@@ -69,7 +69,7 @@ public class AutoCommandChooser {
                 case GRID_ONE:
                     return new GridOneScoreOneAndBalance();
                 case GRID_TWO:
-                    return new WaitCommand(0); // TODO: Create this auto
+                    return new GridTwoTwoConeAutoCommand();
                 default:
                     return new WaitCommand(0);
             }
@@ -84,7 +84,6 @@ public class AutoCommandChooser {
     public Command generateCommand() {
         CommandScheduler.getInstance().removeComposedCommand(autoChooser.getActionCommand());
         return new ParallelCommandGroup(
-            new IntakeSolenoidExtendCommand(),
             autoChooser.getActionCommand()
         );
     }

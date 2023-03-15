@@ -1,13 +1,16 @@
 package com.team2357.frc2023.commands.auto.gridtwo;
 
+import com.team2357.frc2023.commands.claw.ClawInstantOpenCommand;
 import com.team2357.frc2023.commands.intake.IntakeArmRotateDumbCommand;
 import com.team2357.frc2023.commands.intake.IntakeDeployCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
+import com.team2357.frc2023.commands.intake.IntakeSolenoidExtendCommand;
 import com.team2357.frc2023.commands.intake.IntakeStowCommandGroup;
 import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
 import com.team2357.frc2023.trajectoryutil.TrajectoryUtil;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 public class GridTwoTwoConeAutoCommand extends ParallelCommandGroup {
@@ -31,18 +34,33 @@ public class GridTwoTwoConeAutoCommand extends ParallelCommandGroup {
         // new WaitCommand(8));
 
         addCommands(
-                new WaitCommand(0)
-                        .andThen(new ConeAutoScoreHighCommandGroup(false)
-                                .deadlineWith(new WaitCommand(7)))
-                        .andThen(new WaitCommand(1))
-                        .andThen(new ParallelCommandGroup(
-                                new IntakeArmRotateDumbCommand(0.4).withTimeout(0.75),
+            new SequentialCommandGroup(
+                // Initialize
+                new IntakeSolenoidExtendCommand(),
 
-                                new WaitCommand(1.5).andThen(
-                                        new IntakeRollerRunCommand()
-                                                .withTimeout(2)))),
+                // Score cone high
+                new WaitCommand(0),
+                new ConeAutoScoreHighCommandGroup(true).withTimeout(7.0),
 
-                new WaitCommand(7).andThen(
-                        TrajectoryUtil.createTrajectoryPathCommand("grid2 2 cone", true)));
+                // Then deploy intake
+                new WaitCommand(1.25),
+                new ParallelCommandGroup(
+                  new ClawInstantOpenCommand(),
+                  new IntakeArmRotateDumbCommand(0.4).withTimeout(2.0),
+                  new SequentialCommandGroup(
+                    new WaitCommand(0.75),
+                    new IntakeRollerRunCommand().withTimeout(1.5)
+                  )
+                ),
+
+                // Then stow intake
+                new IntakeStowCommandGroup()
+            ),
+            // Path movement
+            new SequentialCommandGroup(
+                new WaitCommand(7),
+                TrajectoryUtil.createTrajectoryPathCommand("grid2 2 cone", true)
+            )
+        );
     }
 }
