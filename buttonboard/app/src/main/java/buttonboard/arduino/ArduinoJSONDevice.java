@@ -10,6 +10,9 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class ArduinoJSONDevice {
+  private static final String FIELD_VALUE = "value";
+  private static final String FIELD_ARRAY = "array";
+
   public static interface DeviceListener {
     public void onConnect();
     public void onDisconnect();
@@ -17,11 +20,17 @@ public class ArduinoJSONDevice {
   }
 
   public class Sensor {
+
     private String m_name;
     private JsonNode m_valueNode;
 
-    private Sensor(String name) {
+    private Sensor(String name, JsonNode valueNode) {
       m_name = name;
+      m_valueNode = valueNode;
+    }
+
+    public void updateValueNode(JsonNode valueNode) {
+      m_valueNode = valueNode;
     }
 
     public String getName() {
@@ -40,11 +49,11 @@ public class ArduinoJSONDevice {
       return m_valueNode.asText();
     }
 
-    public int[] getIntArrayValue() {
+    public int[] getIntArray() {
       return m_objectMapper.convertValue(m_valueNode, int[].class);
     }
 
-    public double[] getFloatArrayValue() {
+    public double[] getFloatArray() {
       return m_objectMapper.convertValue(m_valueNode, double[].class);
     }
   }
@@ -96,11 +105,16 @@ public class ArduinoJSONDevice {
     return m_timeoutMs;
   }
 
+  public boolean hasSensor(String sensorName) {
+    return m_sensors.containsKey(sensorName);
+  }
+
   public Sensor getSensor(String sensorName) {
     return m_sensors.get(sensorName);
   }
 
   public void onStateReceived(JsonNode state) {
+    System.out.println("state received" + state);
     Iterator<String> fieldNameIter = state.fieldNames();
     while (fieldNameIter.hasNext()) {
       String fieldName = fieldNameIter.next();
@@ -126,8 +140,13 @@ public class ArduinoJSONDevice {
     Iterator<String> sensorNameIter = sensors.fieldNames();
     while (sensorNameIter.hasNext()) {
       String sensorName = sensorNameIter.next();
+      JsonNode sensorNode = sensors.get(sensorName);
+      JsonNode valueNode = sensorNode.has(FIELD_VALUE) ? sensorNode.get(FIELD_VALUE) : sensorNode.get(FIELD_ARRAY);
       if (!m_sensors.containsKey(sensorName)) {
-        m_sensors.put(sensorName, new Sensor(sensorName));
+        m_sensors.put(sensorName, new Sensor(sensorName, valueNode));
+      } else {
+        Sensor sensor = m_sensors.get(sensorName);
+        sensor.updateValueNode(valueNode);
       }
     }
   }
