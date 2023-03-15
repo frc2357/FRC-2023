@@ -24,16 +24,11 @@ public class ConeAutoScoreHighCommandGroup extends ParallelCommandGroup {
 
     public ConeAutoScoreHighCommandGroup(boolean stowIntake) {
         
-        Command intakeStow = new WaitCommand(0);
         if(stowIntake) {
                 intakeStow = new IntakeArmStowCommand();
         } 
 
         addCommands(
-                // Move mechanisms to score
-                new WaitCommand(0.25)
-                        .andThen(new ArmRotateToPositionCommand(Constants.ARM_ROTATION.AUTO_SCORE_HIGH_ROTATIONS))
-                        .andThen(new WaitCommand(4.5))
                         .andThen(new ArmRotateToPositionCommand(Constants.ARM_ROTATION.RETRACTED_ROTATIONS)),
 
                 new WaitCommand(1.25)
