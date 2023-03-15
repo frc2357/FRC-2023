@@ -5,6 +5,7 @@
 package com.team2357.frc2023;
 
 import com.pathplanner.lib.server.PathPlannerServer;
+import com.team2357.frc2023.commands.auto.gridone.GridOneScoreOneAndBalance;
 import com.team2357.frc2023.commands.auto.gridzero.GridZeroTwoConeAutoCommand;
 import com.team2357.frc2023.commands.drive.DefaultDriveCommand;
 import com.team2357.frc2023.controls.GunnerControls;
@@ -109,8 +110,9 @@ public class RobotContainer {
         return AvailableTrajectories.flipTrajectory;
       case -3:
         //return new GridZeroTwoConeAutoCommand();
-        return TrajectoryUtil.createTrajectoryPathCommand("grid1 1 cone balance", true);
-        // return TrajectoryUtil.createTrajectoryPathCommand("grid0 2 cone", true);
+        //return TrajectoryUtil.createTrajectoryPathCommand("grid1 1 cone balance", true);
+        //return TrajectoryUtil.createTrajectoryPathCommand("180 balance", true);
+        return new GridOneScoreOneAndBalance();
       default:
         return m_autoCommandChooser.generateCommand();
     }
