@@ -109,8 +109,17 @@ void clearTarget() {
 void setAlliance(const char *newAlliance) {
   alliance = newAlliance;
   gridButtons.setAlliance(alliance);
-  redAllianceButton.setLit(alliance == ALLIANCE_RED);
-  blueAllianceButton.setLit(alliance == ALLIANCE_BLUE);
+
+  if (newAlliance == ALLIANCE_RED) {
+    redAllianceButton.setLEDMode(LED_ON);
+    blueAllianceButton.setLEDMode(LED_OFF);
+  } else if (newAlliance == ALLIANCE_BLUE) {
+    redAllianceButton.setLEDMode(LED_OFF);
+    blueAllianceButton.setLEDMode(LED_ON);
+  } else {
+    redAllianceButton.setLEDMode(LED_FLASH_FAST);
+    blueAllianceButton.setLEDMode(LED_FLASH_FAST);
+  }
 }
 
 void updateTargetCol(int8_t prevCol, int8_t ntCol) {
@@ -190,6 +199,8 @@ void setup() {
   device.initSensor("grid", updateGrid, (size_t) (NODE_COUNT + 1));
   device.initSensor("target", readTarget, (size_t) 3);
   device.begin();
+
+  setAlliance(ALLIANCE_UNSET);
 }
 
 void loop() {
