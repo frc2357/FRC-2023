@@ -9,17 +9,18 @@ import org.littletonrobotics.junction.Logger;
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
-import com.pathplanner.lib.PathConstraints;
 import com.swervedrivespecialties.swervelib.AbsoluteEncoder;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.apriltag.AprilTagEstimate;
+import com.team2357.frc2023.apriltag.GridCamEstimator;
 import com.team2357.frc2023.commands.scoring.AutoScoreLowCommandGroup;
 import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
 import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreMidCommandGroup;
 import com.team2357.frc2023.commands.scoring.cube.CubeAutoScoreHighCommandGroup;
 import com.team2357.frc2023.commands.scoring.cube.CubeAutoScoreMidCommandGroup;
+import com.team2357.frc2023.networktables.GridCam;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 import com.team2357.lib.util.Utility;
 
@@ -127,8 +128,6 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	private SwerveDrivePoseEstimator m_poseEstimator;
 
-	private PathConstraints m_pathConstraints;
-
 	// Controller for robot movement along the y-axis
 	private PIDController m_translateXController;
 
@@ -176,10 +175,6 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		public double m_maxAngularVelocityRadiansPerSecond;
 
 		public double m_maxAngularAccelerationRadiansPerSecondSquared;
-
-		public double m_trajectoryMaxVelocityMetersPerSecond;
-
-		public double m_trajectoryMaxAccelerationMetersPerSecond;
 
 		/**
 		 * These are the maximum speeds that the targeting methods should achieve in
@@ -323,10 +318,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 				new Pose2d(0.0, 0.0, getGyroscopeRotation()), m_config.m_stateStdDevs,
 				m_config.m_visionMeasurementStdDevs);
 
-		m_pathConstraints = new PathConstraints(m_config.m_trajectoryMaxVelocityMetersPerSecond,
-				m_config.m_trajectoryMaxAccelerationMetersPerSecond);
-		m_translateXController = m_config.m_translateXController;
-		m_translateYController = m_config.m_translateYController;
+		m_translateXController=m_config.m_translateXController;m_translateYController=m_config.m_translateYController;
 	}
 
 	public PIDController getXController() {
@@ -343,10 +335,6 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	public SwerveDriveKinematics getKinematics() {
 		return m_kinematics;
-	}
-
-	public PathConstraints getPathConstraints() {
-		return m_pathConstraints;
 	}
 
 	public void syncEncoders() {
@@ -472,6 +460,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	public void updatePoseEstimator() {
+		addVisionPoseEstimate(GridCamEstimator.getInstance().estimateRobotPose(GridCam.getInstance().getCamRelativePoses()));
+
 		m_poseEstimator.update(getGyroscopeRotation(),
 				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
 						m_frontRightModule.getPosition(),
@@ -500,8 +490,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 		if (estimate != null && Utility.isWithinTolerance(pose.getX(), robotPose.getX(), m_config.m_visionToleranceMeters) &&
 		 Utility.isWithinTolerance(robotPose.getY(), pose.getY(), m_config.m_visionToleranceMeters)) {
-			m_poseEstimator.addVisionMeasurement(estimate.getPose(),
-					estimate.getTimeStamp());
+			// m_poseEstimator.addVisionMeasurement(estimate.getPose(),
+					// estimate.getTimeStamp());
 		}
 	}
 

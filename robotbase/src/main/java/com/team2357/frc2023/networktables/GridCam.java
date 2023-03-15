@@ -57,7 +57,7 @@ public class GridCam {
             return;
         }
         AprilTagEstimate robotEstimate = GridCamEstimator.getInstance().estimateRobotPose(estimates);
-        SwerveDriveSubsystem.getInstance().addVisionPoseEstimate(robotEstimate);
+        // SwerveDriveSubsystem.getInstance().addVisionPoseEstimate(robotEstimate);
     };
 
     private GridCam() {
@@ -79,6 +79,7 @@ public class GridCam {
      */
     public ArrayList<AprilTagEstimate> getCamRelativePoses() {
         try {
+            // System.out.println(m_poseSub.get());
             return toEstimates(m_poseSub.get());
         } catch (NullPointerException e) {
             return null;
