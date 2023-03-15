@@ -43,6 +43,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	private static SwerveDriveSubsystem instance = null;
@@ -110,8 +111,10 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 				// 	default:
 				// 		return new AutoScoreLowCommandGroup(); // Potentially default to ConeAutoScoreHighCommandGroup
 				// }
-			default:
+			case 2:
 				return new AutoScoreLowCommandGroup();
+			default:
+					return new WaitCommand(0);
 		}
 
 	}
