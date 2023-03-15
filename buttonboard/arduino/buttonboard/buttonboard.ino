@@ -8,10 +8,16 @@
 #include <Sensor2357.h>
 #include <Adafruit_Keypad.h>
 #include <Adafruit_NeoPXL8.h>
+#include <Adafruit_MCP23X17.h>
 #include "GridButtons.h"
+#include "LightedButton.h"
 
 // --- Pin Definitions ---
 #define NEOPIXEL_PIN             16
+#define ALLIANCE_RED_LED         0
+#define ALLIANCE_RED_BUTTON      1
+#define ALLIANCE_BLUE_LED        2
+#define ALLIANCE_BLUE_BUTTON     3
 
 uint8_t rowPins[GRID_ROWS] = {5, 6, 9};
 uint8_t colPins[GRID_COLS] = {26, 27, 28, 29, 24, 25, 14, 15, 8};
@@ -26,6 +32,7 @@ int8_t neoPixelPins[8] = { 16, 17, 18, 19, 20, 21, 22, 23 };  // Can be used wit
 #define TARGET_GRID_NONE         -1
 #define COLOR_ORDER              NEO_GRB // NeoPixel color format (see Adafruit_NeoPixel)
 #define NEOPIXEL_STRIP_MAXLEN    27      // The longest neopixel "strip" we have
+#define MCP23017_I2C_ADDRESS     0x20
 const size_t TARGET_COL_INDEX = 0;
 const size_t TARGET_ROW_INDEX = 1;
 const size_t TARGET_TYPE_INDEX = 2;
@@ -40,24 +47,36 @@ char keys[GRID_ROWS][GRID_COLS] = {
 char grid[NODE_COUNT + 1];
 int8_t target[2];
 const char *alliance;
+bool allianceButtonPressed;
 Adafruit_NeoPXL8 neoPixels(NEOPIXEL_STRIP_MAXLEN, neoPixelPins, COLOR_ORDER);
 Adafruit_Keypad keypad = Adafruit_Keypad(makeKeymap(keys), rowPins, colPins, GRID_ROWS, GRID_COLS);
+Adafruit_MCP23X17 mcp;
 SensorDevice_Adafruit_RP2040_Scorpio<3> device("buttonboard");
 GridButtons gridButtons(neoPixels, 0, keypad);
-// ---------------
+LightedButton redAllianceButton(mcp, ALLIANCE_RED_LED, ALLIANCE_RED_BUTTON);
+LightedButton blueAllianceButton(mcp, ALLIANCE_BLUE_LED, ALLIANCE_BLUE_BUTTON);
+// ---------------------
 
 // "alliance" sensor
 const char *updateAlliance(const SensorSettings& settings) {
   const char *nextAlliance = settings["value"].asString();
-  if (strcmp(nextAlliance, ALLIANCE_RED) == 0) {
-    alliance = ALLIANCE_RED;
-  } else if (strcmp(nextAlliance, ALLIANCE_BLUE) == 0) {
-    alliance = ALLIANCE_BLUE;
-  } else {
-    alliance = ALLIANCE_UNSET;
+
+  if (allianceButtonPressed) {
+    allianceButtonPressed = false;
+    return alliance;
   }
-  gridButtons.setAlliance(alliance);
-  return nextAlliance;
+
+  if (strcmp(nextAlliance, alliance) != 0) {
+    // We got a new alliance setting from the host
+    if (strcmp(nextAlliance, ALLIANCE_RED) == 0) {
+      setAlliance(ALLIANCE_RED);
+    } else if (strcmp(nextAlliance, ALLIANCE_BLUE) == 0) {
+      setAlliance(ALLIANCE_BLUE);
+    } else {
+      setAlliance(ALLIANCE_UNSET);
+    }
+  }
+  return alliance;
 }
 
 // "grid" sensor
@@ -85,6 +104,13 @@ void clearTarget() {
   target[TARGET_COL_INDEX] = -1;
   target[TARGET_ROW_INDEX] = -1;
   target[TARGET_TYPE_INDEX] = -1;
+}
+
+void setAlliance(const char *newAlliance) {
+  alliance = newAlliance;
+  gridButtons.setAlliance(alliance);
+  redAllianceButton.setLit(alliance == ALLIANCE_RED);
+  blueAllianceButton.setLit(alliance == ALLIANCE_BLUE);
 }
 
 void updateTargetCol(int8_t prevCol, int8_t ntCol) {
@@ -149,6 +175,14 @@ void setup() {
 
   keypad.begin();
 
+  mcp.begin_I2C(MCP23017_I2C_ADDRESS, &Wire1);
+  mcp.pinMode(ALLIANCE_RED_LED, OUTPUT);
+  mcp.digitalWrite(ALLIANCE_RED_LED, LOW);
+  mcp.pinMode(ALLIANCE_RED_BUTTON, INPUT_PULLUP);
+  mcp.pinMode(ALLIANCE_BLUE_LED, OUTPUT);
+  mcp.digitalWrite(ALLIANCE_BLUE_LED, LOW);
+  mcp.pinMode(ALLIANCE_BLUE_BUTTON, INPUT_PULLUP);
+
   gridButtons.begin();
 
   // Set up JSON device
@@ -163,6 +197,15 @@ void loop() {
 
   keypad.tick();
   gridButtons.update();
+
+  if (redAllianceButton.update()) {
+    allianceButtonPressed = true;
+    setAlliance(ALLIANCE_RED);
+  }
+  if (blueAllianceButton.update()) {
+    allianceButtonPressed = true;
+    setAlliance(ALLIANCE_BLUE);
+  }
 
   if (gridButtons.updateLEDs()) {
     ledsChanged = true;
