@@ -3,7 +3,6 @@ package com.team2357.frc2023.commands.scoring;
 import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.commands.auto.TranslateToTargetCommandGroup;
 import com.team2357.frc2023.commands.controller.RumbleCommand;
-import com.team2357.frc2023.networktables.AprilTagPose;
 import com.team2357.frc2023.networktables.Buttonboard;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.frc2023.trajectoryutil.AvailableTeleopTrajectories;
@@ -38,7 +37,7 @@ public class TeleopAutoScoreCommandGroup extends CommandBase {
     @Override
     public void execute() {
         if (m_teleopCommand == null) {
-            Pose2d currentPose = AprilTagPose.getInstance().getPose();
+            Pose2d currentPose = SwerveDriveSubsystem.getInstance().getPose();
             int col = Buttonboard.getInstance().getColValue();
             Command teleopTrajectory = AvailableTeleopTrajectories.buildTrajectory(col,
                     currentPose);
