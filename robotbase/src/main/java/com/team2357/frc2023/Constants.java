@@ -304,7 +304,7 @@ public final class Constants {
             config.m_smartMotionRotationAllowedError = 2;
 
             config.m_winchMotorAllowedError = 2;
-            config.m_winchDeployRotations = 140;
+            config.m_winchDeployRotations = 135;
             config.m_winchStowRotations = 0.0;
 
             return config;
