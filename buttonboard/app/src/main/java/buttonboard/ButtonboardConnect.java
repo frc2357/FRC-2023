@@ -45,6 +45,7 @@ public class ButtonboardConnect {
     }
 
     private static void testButtonboard() {
+        System.out.println("TEST: Buttonboard");
         ArduinoButtonboard buttonboard = new ArduinoButtonboard();
         try {
             while (true) {
@@ -56,6 +57,7 @@ public class ButtonboardConnect {
     }
 
     private static void testNetworkTablesClient() {
+        System.out.println("TEST: Network Tables Client");
         NetworkTablesClient nt = new NetworkTablesClient("localhost");
         nt.open();
         try {
@@ -74,6 +76,7 @@ public class ButtonboardConnect {
     }
 
     private static void testGridPubClient() {
+        System.out.println("TEST: Grid Publisher Client");
         GridPubClient nt = new GridPubClient("localhost");
         nt.open();
         try {
@@ -108,6 +111,7 @@ public class ButtonboardConnect {
     }
 
     private static void testNetworkTablesServer() {
+        System.out.println("TEST: Network Tables Server");
         NetworkTablesServer nt = new NetworkTablesServer();
         nt.open();
         try {

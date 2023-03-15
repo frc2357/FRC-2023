@@ -1,11 +1,54 @@
 package buttonboard.arduino;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class ArduinoJSONDevice {
+  public static interface DeviceListener {
+    public void onConnect();
+    public void onDisconnect();
+    public void onStateReceived();
+  }
+
+  public class Sensor {
+    private String m_name;
+    private JsonNode m_valueNode;
+
+    private Sensor(String name) {
+      m_name = name;
+    }
+
+    public String getName() {
+      return m_name;
+    }
+
+    public int getIntValue() {
+      return m_valueNode.asInt();
+    }
+
+    public double getFloatValue() {
+      return m_valueNode.asDouble();
+    }
+
+    public String getStringValue() {
+      return m_valueNode.asText();
+    }
+
+    public int[] getIntArrayValue() {
+      return m_objectMapper.convertValue(m_valueNode, int[].class);
+    }
+
+    public double[] getFloatArrayValue() {
+      return m_objectMapper.convertValue(m_valueNode, double[].class);
+    }
+  }
+
   public static final String ERROR = "error";
   public static final String TIMEOUT_MS = "timeoutMs";
   public static final String MAX_UPDATE_HZ = "maxUpdateHz";
@@ -13,11 +56,18 @@ public class ArduinoJSONDevice {
 
   private ObjectMapper m_objectMapper;
   private String m_deviceName;
-  private JsonNode m_state;
+  private String m_error;
+  private int m_timeoutMs;
+  private Map<String, Sensor> m_sensors;
+  private DeviceListener m_deviceListener;
 
-  public ArduinoJSONDevice(String deviceName) {
+  public ArduinoJSONDevice(String deviceName, DeviceListener listener) {
+    m_error = "";
+    m_timeoutMs = -1;
+    m_sensors = new HashMap<String, Sensor>();
     m_objectMapper = new ObjectMapper();
     m_deviceName = deviceName;
+    m_deviceListener = listener;
     ArduinoSerialPortProvider.subscribe(deviceName, this);
   }
 
@@ -26,43 +76,68 @@ public class ArduinoJSONDevice {
   }
 
   public void onConnect() {
-    System.out.println("device onConnect");
     ArduinoSerialPortProvider.sendQuery(m_deviceName);
+    if (m_deviceListener != null) {
+      m_deviceListener.onConnect();
+    }
   }
 
   public void onDisconnect() {
-    System.out.println("device onDisconnect");
-  }
-
-  public void onStateReceived(JsonNode state) {
-    System.out.println("device state received:" + state);
-    m_state = state;
+    if (m_deviceListener != null) {
+      m_deviceListener.onDisconnect();
+    }
   }
 
   public String getError() {
-    return getStringDeviceField(ERROR);
+    return m_error;
+  }
+
+  public int getTimeoutMs() {
+    return m_timeoutMs;
+  }
+
+  public Sensor getSensor(String sensorName) {
+    return m_sensors.get(sensorName);
+  }
+
+  public void onStateReceived(JsonNode state) {
+    Iterator<String> fieldNameIter = state.fieldNames();
+    while (fieldNameIter.hasNext()) {
+      String fieldName = fieldNameIter.next();
+      switch (fieldName) {
+        case ERROR:
+          m_error = state.get(ERROR).asText();
+          break;
+        case TIMEOUT_MS:
+          m_timeoutMs = state.get(TIMEOUT_MS).asInt();
+          break;
+        case SENSORS:
+          updateSensors(state.get(SENSORS));
+          break;
+      }
+    }
+
+    if (m_deviceListener != null) {
+      m_deviceListener.onStateReceived();
+    }
+  }
+
+  private void updateSensors(JsonNode sensors) {
+    Iterator<String> sensorNameIter = sensors.fieldNames();
+    while (sensorNameIter.hasNext()) {
+      String sensorName = sensorNameIter.next();
+      if (!m_sensors.containsKey(sensorName)) {
+        m_sensors.put(sensorName, new Sensor(sensorName));
+      }
+    }
   }
 
   public void clearError() {
     setDeviceField(ERROR, "");
   }
 
-  public int getTimeoutMs() {
-    return getIntDeviceField(TIMEOUT_MS);
-  }
-
   public void setTimeoutMs(int timeoutMs) {
     setDeviceField(TIMEOUT_MS, timeoutMs);
-  }
-
-  public String getStringDeviceField(String name) {
-    JsonNode node = m_state.get(name);
-    return node != null ? node.asText() : null;
-  }
-
-  public int getIntDeviceField(String name) {
-    JsonNode node = m_state.get(name);
-    return node != null ? node.asInt() : -1;
   }
 
   public void setDeviceField(String name, String value) {
@@ -75,41 +150,6 @@ public class ArduinoJSONDevice {
     ObjectNode state = m_objectMapper.createObjectNode();
     state.put(name, value);
     ArduinoSerialPortProvider.write(m_deviceName, state);
-  }
-
-  public String getStringSensorField(String sensorName, String fieldName) {
-    JsonNode sensorsNode = m_state.get(SENSORS);
-    JsonNode sensorNode = sensorsNode != null ? sensorsNode.get(sensorName) : null;
-    JsonNode fieldNode = sensorNode != null ? sensorNode.get(fieldName) : null;
-    return fieldNode != null ? fieldNode.asText() : null;
-  }
-
-  public int getIntSensorField(String sensorName, String fieldName) {
-    JsonNode sensorsNode = m_state.get(SENSORS);
-    JsonNode sensorNode = sensorsNode != null ? sensorsNode.get(sensorName) : null;
-    JsonNode fieldNode = sensorNode != null ? sensorNode.get(fieldName) : null;
-    return fieldNode != null ? fieldNode.asInt() : null;
-  }
-
-  public double getFloatSensorField(String sensorName, String fieldName) {
-    JsonNode sensorsNode = m_state.get(SENSORS);
-    JsonNode sensorNode = sensorsNode != null ? sensorsNode.get(sensorName) : null;
-    JsonNode fieldNode = sensorNode != null ? sensorNode.get(fieldName) : null;
-    return fieldNode != null ? fieldNode.asDouble() : null;
-  }
-
-  public int[] getIntArraySensorField(String sensorName, String fieldName) {
-    JsonNode sensorsNode = m_state.get(SENSORS);
-    JsonNode sensorNode = sensorsNode != null ? sensorsNode.get(sensorName) : null;
-    JsonNode fieldNode = sensorNode != null ? sensorNode.get(fieldName) : null;
-    return fieldNode != null ? m_objectMapper.convertValue(fieldNode, int[].class) : null;
-  }
-
-  public float[] getFloatArraySensorField(String sensorName, String fieldName) {
-    JsonNode sensorsNode = m_state.get(SENSORS);
-    JsonNode sensorNode = sensorsNode != null ? sensorsNode.get(sensorName) : null;
-    JsonNode fieldNode = sensorNode != null ? sensorNode.get(fieldName) : null;
-    return fieldNode != null ? m_objectMapper.convertValue(fieldNode, float[].class) : null;
   }
 
   public void setSensorField(String sensorName, String fieldName, String value) {
