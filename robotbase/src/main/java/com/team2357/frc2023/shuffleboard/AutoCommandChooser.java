@@ -1,13 +1,5 @@
 package com.team2357.frc2023.shuffleboard;
 
-import com.team2357.frc2023.commands.auto.gridone.GridOneScoreOneAndBalance;
-import com.team2357.frc2023.commands.auto.gridone.GridOneTwoConeAutoCommand;
-import com.team2357.frc2023.commands.auto.gridone.GridOneTwoConeBalanceAutoCommand;
-import com.team2357.frc2023.commands.auto.gridtwo.GridTwoTwoConeAutoCommand;
-import com.team2357.frc2023.commands.auto.gridtwo.GridTwoTwoConeBalanceAutoCommand;
-import com.team2357.frc2023.commands.auto.gridzero.GridZeroTwoConeAutoCommand;
-import com.team2357.frc2023.commands.auto.gridzero.GridZeroTwoConeBalanceAutoCommand;
-import com.team2357.frc2023.commands.intake.IntakeSolenoidExtendCommand;
 import com.team2357.frc2023.trajectoryutil.AvailableTrajectoryCommands;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -65,11 +57,11 @@ public class AutoCommandChooser {
                 // case GRID_2_TWO_CONE_BALANCE:
                 //     return new GridTwoTwoConeBalanceAutoCommand();
                 case GRID_ZERO:
-                    return new GridZeroTwoConeAutoCommand();
+                    return AvailableTrajectoryCommands.GridZeroTwoConeAuto;
                 case GRID_ONE:
-                    return new GridOneScoreOneAndBalance();
+                    return AvailableTrajectoryCommands.GridOneScoreOneAndBalance;
                 case GRID_TWO:
-                    return new GridTwoTwoConeAutoCommand();
+                    return AvailableTrajectoryCommands.GridTwoTwoConeAuto;
                 default:
                     return new WaitCommand(0);
             }
