@@ -67,10 +67,10 @@ public class GridCam {
 
         m_instance = this;
 
-        m_poseListenerHandle = inst.addListener(
-                m_poseSub,
-                EnumSet.of(NetworkTableEvent.Kind.kValueAll),
-                m_onValueChange);
+        // m_poseListenerHandle = inst.addListener(
+        //         m_poseSub,
+        //         EnumSet.of(NetworkTableEvent.Kind.kValueAll),
+        //         m_onValueChange);
     }
 
     /**

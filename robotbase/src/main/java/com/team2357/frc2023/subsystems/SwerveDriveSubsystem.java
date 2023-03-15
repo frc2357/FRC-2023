@@ -460,7 +460,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	public void updatePoseEstimator() {
-		addVisionPoseEstimate(GridCamEstimator.getInstance().estimateRobotPose(GridCam.getInstance().getCamRelativePoses()));
+		//addVisionPoseEstimate(GridCamEstimator.getInstance().estimateRobotPose(GridCam.getInstance().getCamRelativePoses()));
 
 		m_poseEstimator.update(getGyroscopeRotation(),
 				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
@@ -692,7 +692,6 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	@Override
 	public void periodic() {
-		// setOdemetryFromApriltag();
 		updatePoseEstimator();
 
 		SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
