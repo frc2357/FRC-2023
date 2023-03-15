@@ -5,10 +5,10 @@ import com.team2357.frc2023.subsystems.IntakeArmSubsystem;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class IntakeWinchCommand extends CommandBase{
+public class IntakeWinchAxisCommand extends CommandBase{
     private AxisInterface m_axis;
 
-    public IntakeWinchCommand(AxisInterface axis){
+    public IntakeWinchAxisCommand(AxisInterface axis){
         m_axis = axis;
         addRequirements(IntakeArmSubsystem.getInstance());
     }

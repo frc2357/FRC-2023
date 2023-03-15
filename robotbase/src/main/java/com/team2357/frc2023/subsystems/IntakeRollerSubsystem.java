@@ -31,6 +31,7 @@ public class IntakeRollerSubsystem extends SubsystemBase {
         
         public boolean m_masterInverted;
         public boolean m_followerInverted;
+
     }
 
     public Configuration m_config;
@@ -80,6 +81,10 @@ public class IntakeRollerSubsystem extends SubsystemBase {
 
     public void manualRunIntake(double percentOutput) {
         m_masterIntakeMotor.set(ControlMode.PercentOutput, percentOutput);
+    }
+
+    public double getCurrent(){
+        return m_masterIntakeMotor.getStatorCurrent();
     }
 
     public void stopIntake() {

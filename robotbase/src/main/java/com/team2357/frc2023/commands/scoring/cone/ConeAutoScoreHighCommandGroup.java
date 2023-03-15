@@ -18,6 +18,8 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 public class ConeAutoScoreHighCommandGroup extends ParallelCommandGroup {
     public ConeAutoScoreHighCommandGroup() {
         
+        // TODO: Make this faster
+        
         addCommands(
                 // Move mechanisms to score
                 new WaitCommand(0.25)

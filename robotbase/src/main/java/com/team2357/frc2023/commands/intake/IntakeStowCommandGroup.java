@@ -15,7 +15,6 @@ public class IntakeStowCommandGroup extends ParallelCommandGroup {
                 new ParallelCommandGroup(
                         new IntakeRollerStopCommand(),
                         new IntakeArmStowCommand()),
-
                 new CloseClawCommand()));
     }
 }
