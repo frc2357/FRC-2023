@@ -74,7 +74,7 @@ public class SwerveDriveControls {
         m_rightTrigger.onFalse(new IntakeStowCommandGroup());
 
         //Teleop auto
-        m_rightBumper.whileTrue(new HeartlandAutoTranslateCommand(m_controller));
+        //m_rightBumper.whileTrue(new HeartlandAutoTranslateCommand(m_controller));
         m_leftBumper.whileTrue(new HeartlandAutoScoreCommand());
 
     }

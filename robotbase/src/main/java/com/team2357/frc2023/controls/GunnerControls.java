@@ -185,9 +185,9 @@ public class GunnerControls {
         rightDPadAndY.onTrue(new WinchAmpZeroCommand());
 
         // Teleop trajectory
-        downDPadAndX.whileTrue(new TranslateToTargetCommand(SwerveDriveSubsystem.COLUMN_TARGET.LEFT));
-        downDPadAndA.whileTrue(new TranslateToTargetCommand(SwerveDriveSubsystem.COLUMN_TARGET.MIDDLE));
-        downDPadAndB.whileTrue(new TranslateToTargetCommand(SwerveDriveSubsystem.COLUMN_TARGET.RIGHT));
+        // downDPadAndX.whileTrue(new TranslateToTargetCommand(SwerveDriveSubsystem.COLUMN_TARGET.LEFT));
+        // downDPadAndA.whileTrue(new TranslateToTargetCommand(SwerveDriveSubsystem.COLUMN_TARGET.MIDDLE));
+        // downDPadAndB.whileTrue(new TranslateToTargetCommand(SwerveDriveSubsystem.COLUMN_TARGET.RIGHT));
 
         // Auto score
         yButton.whileTrue(new ConeAutoScoreHighCommandGroup());
