@@ -7,6 +7,8 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
+import com.team2357.frc2023.networktables.Buttonboard;
+import com.team2357.frc2023.shuffleboard.AutoCommandChooser;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -57,7 +59,7 @@ public class TrajectoryUtil {
 		pathCommand.addCommands(new InstantCommand(() -> {
 			if (resetOdometry) {
 				PathPlannerState initialState = trajectory.getInitialState();
-				initialState = PathPlannerTrajectory.transformStateForAlliance(initialState, DriverStation.getAlliance());
+				initialState = PathPlannerTrajectory.transformStateForAlliance(initialState, AutoCommandChooser.getInstance().getAlliance());
 				Pose2d initialPose = new Pose2d(initialState.poseMeters.getTranslation(),
 				initialState.holonomicRotation);
 				swerveDrive.resetPoseEstimator(initialPose);

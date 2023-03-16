@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 
 import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.commands.util.ConfigureAllianceCommand;
+import com.team2357.frc2023.shuffleboard.AutoCommandChooser;
 
 import edu.wpi.first.networktables.MultiSubscriber;
 import edu.wpi.first.networktables.NetworkTableEvent;
@@ -101,6 +102,9 @@ public class Buttonboard {
     }
 
     public DriverStation.Alliance getAlliance() {
+        if (m_allianceValue.get() == DriverStation.Alliance.Invalid) {
+            return AutoCommandChooser.getInstance().getAlliance();
+        }
         return m_allianceValue.get();
     }
 

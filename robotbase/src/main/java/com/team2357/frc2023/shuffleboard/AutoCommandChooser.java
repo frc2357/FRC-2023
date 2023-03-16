@@ -1,11 +1,12 @@
 package com.team2357.frc2023.shuffleboard;
 
-import com.team2357.frc2023.commands.auto.blue.grid3.BlueGridThreeTwoConeAutoCommand;
-import com.team2357.frc2023.commands.drive.ZeroDriveCommand;
+import java.util.function.Consumer;
+
 import com.team2357.frc2023.commands.intake.IntakeSolenoidExtendCommand;
 import com.team2357.frc2023.trajectoryutil.AvailableTrajectoryCommands;
-import com.team2357.frc2023.trajectoryutil.TrajectoryUtil;
 
+import edu.wpi.first.networktables.NetworkTableEvent;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -16,7 +17,45 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 public class AutoCommandChooser {
 
-    private AutoActionChooser[] choosers;
+    private static AutoCommandChooser m_instance = null;
+
+    public static AutoCommandChooser getInstance() {
+        if (m_instance == null) {
+            m_instance = new AutoCommandChooser();
+        }
+        return m_instance;
+    }
+
+    // private AutoActionChooser[] choosers;
+    private AutoActionChooser actionChooser;
+    private AllianceChooser allianceChooser;
+
+    private enum alliances {
+        NONE,
+        BLUE,
+        RED
+    }
+
+    private class AllianceChooser {
+        protected SendableChooser<alliances> m_chooser;
+        
+        protected AllianceChooser() {
+            m_chooser = new SendableChooser<>();
+
+            m_chooser.setDefaultOption("None", alliances.NONE);
+            for (alliances s : alliances.values()) {
+                if (s != alliances.NONE) {
+                    m_chooser.addOption(s.toString().toLowerCase(), s);
+                }
+            }
+
+            SmartDashboard.putData("Alliance", m_chooser);
+        }
+
+        public alliances getAlliance() {
+            return m_chooser.getSelected();
+        }
+    }
 
     private enum automodes {
         NONE,
@@ -58,16 +97,31 @@ public class AutoCommandChooser {
     }
 
     public AutoCommandChooser() {
-        choosers = new AutoActionChooser[3];
-        choosers[0] = new AutoActionChooser(0);
+        actionChooser = new AutoActionChooser(0);
+        allianceChooser = new AllianceChooser();
+        // choosers = new AutoActionChooser[3];
+        // choosers[0] = new AutoActionChooser(0);
+        m_instance = this;
     }
 
     public Command generateCommand() {
-        CommandScheduler.getInstance().removeComposedCommand(choosers[0].getActionCommand());
+        CommandScheduler.getInstance().removeComposedCommand(actionChooser.getActionCommand());
         return new ParallelCommandGroup(
             new SequentialCommandGroup(
-                choosers[0].getWaitCommand(),
-                choosers[0].getActionCommand()),
+                // choosers[0].getWaitCommand(),
+                actionChooser.getActionCommand()),
             new IntakeSolenoidExtendCommand());
+    }
+
+    public DriverStation.Alliance getAlliance() {
+        switch (allianceChooser.getAlliance()) {
+            case BLUE:
+                return DriverStation.Alliance.Blue;
+            case RED:
+                return DriverStation.Alliance.Red;
+            default:
+                return DriverStation.Alliance.Invalid;
+
+        }
     }
 }
