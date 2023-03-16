@@ -338,7 +338,7 @@ public final class Constants {
         public static final double RETRACTED_ROTATIONS = 0;
 
         public static final double AUTO_SCORE_MID_ROTATIONS = 15;
-        public static final double AUTO_SCORE_HIGH_ROTATIONS = 260;
+        public static final double AUTO_SCORE_HIGH_ROTATIONS = 245;
 
         public static final double ARM_EXTENSION_AMP_ZERO_PERCENT_OUTPUT = -0.2;
         public static final int ARM_EXTENSION_AMP_ZERO_MAX_AMPS = 25;
