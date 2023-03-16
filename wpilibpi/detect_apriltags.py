@@ -310,7 +310,10 @@ class AprilTagDetector:
             return self.black_frame, []
         try:
             # get alliance update if there is one
-            self.match_tags = self.NT_alliance.get()
+            try:
+                self.match_tags = self.NT_alliance.get()
+            except:
+                pass
             # Convert the frame to grayscale
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             tags = self.detector.detect(gray)

@@ -53,52 +53,42 @@ g_avg = 1000.0
 
 cam0_cal = CameraCalibration.load_cal_dict(
     {
-        "mtx": [1057.3980959579437, 0.0, 656.8556544891763, 0.0, 1058.2448544114698, 375.100928453989, 0.0, 0.0, 1.0],
+        "mtx": [911.424067477301, 0.0, 713.8769225688438, 0.0, 914.3959334705401, 331.0440107788305, 0.0, 0.0, 1.0],
         "dst": [
-            0.03932968718495995,
-            -0.05757208162810665,
-            -0.0016503334944551454,
-            -0.000619417970035607,
-            -0.016908101094226472,
+            0.043635681303603034,
+            -0.03869905321945732,
+            -0.007039532851637899,
+            -0.0058404588116693626,
+            0.001758340632447729,
         ],
         "img_size": [1280, 720],
         "newmtx": [
-            1059.6776123046875,
+            918.4147338867188,
             0.0,
-            655.8676984252452,
+            705.0359130240649,
             0.0,
-            1060.1087646484375,
-            373.6184770146283,
+            913.0012817382812,
+            326.65768869504063,
             0.0,
             0.0,
             1.0,
         ],
-        "roi": [2, 1, 1275, 716],
+        "roi": [8, 9, 1265, 704],
     }
 )
 cam1_cal = CameraCalibration.load_cal_dict(
     {
-        "mtx": [1057.3980959579437, 0.0, 656.8556544891763, 0.0, 1058.2448544114698, 375.100928453989, 0.0, 0.0, 1.0],
+        "mtx": [934.6621237941703, 0.0, 691.4435720100407, 0.0, 935.8448952233725, 312.6243916947416, 0.0, 0.0, 1.0],
         "dst": [
-            0.03932968718495995,
-            -0.05757208162810665,
-            -0.0016503334944551454,
-            -0.000619417970035607,
-            -0.016908101094226472,
+            0.1399030918638301,
+            -0.3529700852096354,
+            0.00427705498057264,
+            -0.015428783659568061,
+            0.4776956619701835,
         ],
         "img_size": [1280, 720],
-        "newmtx": [
-            1059.6776123046875,
-            0.0,
-            655.8676984252452,
-            0.0,
-            1060.1087646484375,
-            373.6184770146283,
-            0.0,
-            0.0,
-            1.0,
-        ],
-        "roi": [2, 1, 1275, 716],
+        "newmtx": [968.441650390625, 0.0, 669.3759763489797, 0.0, 945.6002807617188, 314.9049061216647, 0.0, 0.0, 1.0],
+        "roi": [19, 18, 1248, 673],
     }
 )
 
@@ -135,6 +125,7 @@ if __name__ == "__main__":
     nt_table = camvis.ntinst.getTable("gridcam")
     apriltag_NT = nt_table.getStringTopic("tags").publish()
     nt_btnboard = camvis.ntinst.getTable("buttonboard")
+    nt_capture = nt_table.getBooleanTopic("capture_image")
     frame = np.zeros(shape=(cam0.config.height, cam0.config.width, 3), dtype=np.uint8)
     frame1 = np.zeros_like(frame)
     # retrieve the camera calibration information needed by apriltags
@@ -148,6 +139,7 @@ if __name__ == "__main__":
 
     count = 0
     avg = 0
+    time_offset = time.time() + camvis.ntinst.getServerTimeOffset()/1_000_000.0
     while True:
 
         try:
@@ -158,13 +150,16 @@ if __name__ == "__main__":
                 frame = copy.copy(cam0.images[int(count) % (len(cam0.images))])
                 frame1 = copy.copy(cam0.images[int(count + 12) % (len(cam0.images))])
             else:
-                cam0.sink.grabFrame(frame)
-                cam1.sink.grabFrame(frame1)
+                #TODO: Worthwhile to thread this so both captures occur ~same time
+                ct0 = cam0.sink.grabFrame(frame)
+                ct1 = cam1.sink.grabFrame(frame1)
 
             # get server time for which last frame was captured
-            timeoffset = camvis.ntinst.getServerTimeOffset()
+            t = time.time()
+            o = camvis.ntinst.getServerTimeOffset()
+            timeoffset = t + o/1_000_000.0
             offset_start = time.perf_counter()
-
+            log.info(f"TIME: SYS={t},t0={ct0},t1={ct1},offset={o},first_offset={time_offset}")
             # reset tag locations on every loop
             apriltag.reset_taglocs()
 
@@ -205,7 +200,7 @@ if __name__ == "__main__":
             frame = add_text_toimg(frame, f"{1/g_avg:0.2f}/sec")
             stacked = cv2.resize(np.hstack((frame, frame1)), None, fx=0.5, fy=0.5)
 
-            #send stacked frame to DS
+            # send stacked frame to DS
             camvis.outputstream.putFrame(stacked)
 
             # track processing time, average ten updates.

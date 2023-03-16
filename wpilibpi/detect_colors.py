@@ -18,10 +18,7 @@ log.addHandler(logging.NullHandler())
 
 
 class GamePieceDetector:
-    # the following are all singletons
-    # gamepiece_results = np.zeros((3,9,2),dtype=float)
-    # gamepiece_chars = np.chararray((3,9),unicode=True)
-    # gamepiece_chars[:] = '-' #set default value
+    # the following are singletons
     color_violet = (255, 0, 217)  # BGR for 'COLORIZING' game pieces
     color_yellow = (28, 215, 215)  # BGR for 'COLORIZING' game pieces
     _yel_lower = np.array((8, 100, 140), "uint8")  # HSV
@@ -29,6 +26,16 @@ class GamePieceDetector:
     _vio_lower = np.array((100, 55, 55), "uint8")  # HSV
     _vio_upper = np.array((153, 255, 255), "uint8")  # HSV
     last_NT_update = 0
+    
+    # Testing with dothecam
+    # Yellow (  8,100,140) -- (100,255,237)
+    # Violet (100, 55, 55) -- (153,255,255)
+    # Orange (  0,128,128) -- ( 10,255,255)
+
+    # Testing with ArduCam
+    # Yellow (  0,130,130) -- ( 64,255,255)
+    # Violet (100,100,143) -- (153,255,255)
+    # Orange (  0,128,128) -- ( 10,255,255)    
 
     def __init__(self):
         """ """

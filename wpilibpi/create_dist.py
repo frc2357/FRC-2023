@@ -24,6 +24,7 @@ files = [
     "detect_apriltags.py",
     "detect_colors.py",
     "gamepiece.py",
+    "frc.json",
 ]
 
 if __name__ == "__main__":

@@ -17,13 +17,14 @@ import glob
 def nothing(x):
     pass
 
-simulate = False
+simulate = True
 
 
 if simulate:
     # Use pre-captured images
     imgs = []
-    fimages = glob.glob(".\\images\\*.png")
+    fimages = glob.glob(r"d:\\temp\\cam1\\*.png")
+    #fimages = glob.glob(".\\images\\*.png")
     print(fimages)
     for fname in fimages:
         imgs.append(np.ascontiguousarray(cv2.imread(fname)))
@@ -98,8 +99,15 @@ while True:
     if key == 27:
         break
 
-    if key == ord('n'):
+    if key == ord('p'): #previous
+        count -= 1
+    if key == ord('n'): #next
         count += 1
+
+    if count > len(fimages)-1:
+        count = 0
+    elif count < 0:
+        count = len(fimages)-1
 
     
     # If the user presses `s` then print this array.
