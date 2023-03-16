@@ -91,7 +91,6 @@ public class WristSubsystem extends SubsystemBase {
 
     private void retractedPeriodic() {
         long now = System.currentTimeMillis();
-
         if (m_lastActionMillis == 0) {
             m_wristeSolenoid.set(Value.kReverse);
             m_lastActionMillis = now;
