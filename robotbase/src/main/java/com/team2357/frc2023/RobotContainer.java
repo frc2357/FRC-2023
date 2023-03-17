@@ -81,7 +81,7 @@ public class RobotContainer {
     // Configure Shuffleboard
     configureShuffleboard();
 
-    PathPlannerServer.startServer(5811); // 5811 = port number. adjust this according to your needs
+   // PathPlannerServer.startServer(5811); // 5811 = port number. adjust this according to your needs
   }
 
   /**

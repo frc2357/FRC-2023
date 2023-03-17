@@ -694,13 +694,13 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	public void periodic() {
 		updatePoseEstimator();
 
-		SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
+		// SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
 
-		SmartDashboard.putNumber("Yaw", m_pigeon.getYaw());
-		SmartDashboard.putNumber("Pose X", m_poseEstimator.getEstimatedPosition().getX());
-		SmartDashboard.putNumber("Pose Y", m_poseEstimator.getEstimatedPosition().getY());
-		SmartDashboard.putNumber("Pose Angle",
-				m_poseEstimator.getEstimatedPosition().getRotation().getDegrees());
+		// SmartDashboard.putNumber("Yaw", m_pigeon.getYaw());
+		// SmartDashboard.putNumber("Pose X", m_poseEstimator.getEstimatedPosition().getX());
+		// SmartDashboard.putNumber("Pose Y", m_poseEstimator.getEstimatedPosition().getY());
+		// SmartDashboard.putNumber("Pose Angle",
+		//		m_poseEstimator.getEstimatedPosition().getRotation().getDegrees());
 
 		SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
 		SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxVelocityMetersPerSecond);
