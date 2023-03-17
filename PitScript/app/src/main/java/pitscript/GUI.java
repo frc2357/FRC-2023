@@ -10,7 +10,8 @@ import javax.swing.ScrollPaneConstants;
 public class GUI extends JButton {
     public static JTextArea text = new JTextArea("No operation performed",1000,1000);
     public static JFrame frame;
-    public static JButton button = new GUI("Transfer Files");
+    public static JButton transferButton = new GUI("Transfer Files");
+    public static JButton deleteButton = new JButton("Delete Files");
     public static JScrollPane scroll = new JScrollPane(text);
     public static JButton endButton = new JButton("End program");
 
@@ -22,18 +23,25 @@ public class GUI extends JButton {
         text.setEditable(true);
         text.setText(message);
         text.setEditable(false);
+        text.updateUI();
     }
 
-    public static void buttonPressed() {
-        if (App.TransferFiles()) {
-            button.setBackground(Color.RED);
+    public static void transferButtonPressed() {
+        if (!App.TransferFiles()) {
+            transferButton.setBackground(Color.RED);
         }
         else{
-            button.setBackground(Color.GREEN);
+            transferButton.setBackground(Color.GREEN);
         }
     }
-    public static void killProgram(){
-        System.exit(0);
+
+    public static void deleteButtonPressed(){
+        if (!App.deleteFiles()) {
+            deleteButton.setBackground(Color.RED);
+        }
+        else{
+            deleteButton.setBackground(Color.GREEN);
+        }
     }
 
     public static void MakeGUI() {
@@ -41,14 +49,14 @@ public class GUI extends JButton {
         frame.setLayout(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(400, 400);
-        frame.add(button);
-        frame.add(endButton);
+        frame.add(transferButton);
+        frame.add(deleteButton);
         frame.add(scroll);
         scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        button.setBounds(0, 0, 145, 145);
-        endButton.setBounds(241, 0, 145, 145);
-        button.addActionListener(e -> GUI.buttonPressed());
-        endButton.addActionListener(e -> GUI.killProgram());
+        transferButton.setBounds(0, 0, 145, 145);
+        deleteButton.setBounds(241,0,145,145);
+        transferButton.addActionListener(e -> GUI.transferButtonPressed());
+        deleteButton.addActionListener(e -> GUI.deleteButtonPressed());
         text.setEditable(false);
         text.setLineWrap(true);
         scroll.setBounds(0, 145, 750, 500);

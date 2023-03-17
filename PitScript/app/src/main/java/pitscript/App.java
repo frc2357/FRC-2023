@@ -42,6 +42,12 @@ public class App {
     }
 
     public static boolean TransferFiles() {
+        return fileManager(2);
+    }
+    public static boolean deleteFiles(){
+        return fileManager(0);
+    }
+    public static boolean fileManager(int operation){
         try {
             // The port should always be 22, because thats what SSH uses normally.
             // Its also what happens if we dont give it a port, so dont worry about it.
@@ -60,17 +66,31 @@ public class App {
                     String actualFileName = (REMOTE_FILE_PATH + e.getFilename());
                     GUI.writeToText("Downloading: " + e.getFilename());
                     GUI.writeToText("Real file name: " + actualFileName);
+                    if(operation >0){
                     sftp.get(actualFileName, LOCAL_FILE_DESTINATION);
-                    GUI.writeToText("Downloaded file.\nDeleting: " + e.getFilename());
-                    sftp.rm(actualFileName);
-                    GUI.writeToText("File deleted.");
-                }
-            }
+                    }
+                    if(operation == 0 | operation ==2){
+                        GUI.writeToText("Deleting: " + e.getFilename());
+                        try {
+                            sftp.rm(actualFileName);
+                        } catch (SftpException uhoh) {
+                            GUI.writeToText("File Delete failed");
+                            StringWriter sw = new StringWriter();
+                            uhoh.printStackTrace(new PrintWriter(sw));
+                            GUI.writeToText("Could not transfer files, read the stack trace below\n" + sw.toString());
+                            try {
+                                sw.close();
+                            } catch (IOException e1) {
+                                System.out.println("String writer didnt close properly, its probably gonna be fine though.");
+                            }
+                        }
+                        GUI.writeToText("File deleted.");                    }
+            }}
 
             System.out.println("All files downloaded, closing connections and ending programs");
             channel.disconnect();
             session.disconnect();
-            return false;
+            return true;
         } catch (SftpException | JSchException uhoh) {
             System.out.println("the thing broke somewhere, so start fixing it, or make somebody else fix it.");
             StringWriter sw = new StringWriter();
@@ -79,10 +99,10 @@ public class App {
             try {
                 sw.close();
             } catch (IOException e) {
-                System.out.println("String writed didnt close properly, its probably gonna be fine though.");
+                System.out.println("String writer didnt close properly, its probably gonna be fine though.");
             }
             uhoh.printStackTrace();
-            return true;
-        }
+        } 
+        return false;
     }
 }
