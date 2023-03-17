@@ -18,6 +18,11 @@ public class ButtonboardConnect {
 
     public static void main(String[] args) {
         try {
+            if (args.length == 0) {
+                // Run normally
+                run();
+            }
+
             if (args.length > 0 && args[0].length() > 0) {
                 switch(args[0]) {
                     case ARG_TEST_ARDUINO:
@@ -44,9 +49,27 @@ public class ButtonboardConnect {
         }
     }
 
+    private static void run() {
+        System.out.println("----- Buttonboard FRC 2357 -----");
+        NetworkTablesClient nt = new NetworkTablesClient();
+        ArduinoButtonboard buttonboard = new ArduinoButtonboard(nt);
+        nt.open();
+        try {
+            while (true) {
+                Thread.sleep(1000);
+            }
+        } catch (InterruptedException ie) {
+            System.out.println("Client exiting");
+            nt.close();
+            return;
+        }
+    }
+
     private static void testButtonboard() {
         System.out.println("TEST: Buttonboard");
-        ArduinoButtonboard buttonboard = new ArduinoButtonboard();
+        NetworkTablesClient nt = new NetworkTablesClient("localhost");
+        ArduinoButtonboard buttonboard = new ArduinoButtonboard(nt);
+        nt.open();
         try {
             while (true) {
                 Thread.sleep(1000);
@@ -101,7 +124,7 @@ public class ButtonboardConnect {
                 nodeChars[col] = nodeChar;
                 rows[row] = new String(nodeChars);
                 nt.setGrid(rows);
-                Thread.sleep(1000);
+                Thread.sleep(5000);
             }
         } catch (InterruptedException ie) {
             System.out.println("Client exiting");

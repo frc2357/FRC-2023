@@ -1,6 +1,9 @@
 package buttonboard.arduino;
 
-public class ArduinoButtonboard implements ArduinoJSONDevice.DeviceListener {
+import buttonboard.NetworkTablesClient;
+import buttonboard.NetworkTablesClient.GridListener;
+
+public class ArduinoButtonboard implements ArduinoJSONDevice.DeviceListener, NetworkTablesClient.GridListener {
   private static String SENSOR_ALLIANCE = "alliance";
   private static String SENSOR_GRID = "grid";
   private static String SENSOR_TARGET = "target";
@@ -10,10 +13,15 @@ public class ArduinoButtonboard implements ArduinoJSONDevice.DeviceListener {
   private int m_targetRow;
   private int m_targetCol;
   private int m_targetType;
+  private String m_gridString;
+  private NetworkTablesClient m_ntClient;
 
-  public ArduinoButtonboard() {
+  public ArduinoButtonboard(NetworkTablesClient nt) {
     m_device = new ArduinoJSONDevice("buttonboard", this);
     m_alliance = "unset";
+
+    m_ntClient = nt;
+    m_ntClient.setGridListener(this);
   }
 
   @Override
@@ -35,6 +43,7 @@ public class ArduinoButtonboard implements ArduinoJSONDevice.DeviceListener {
   private void updateAlliance(String alliance) {
     if (m_alliance != alliance) {
       m_alliance = alliance;
+      m_ntClient.setAlliance(alliance);
       System.out.println("alliance set: '" + m_alliance + "'");
     }
   }
@@ -57,6 +66,17 @@ public class ArduinoButtonboard implements ArduinoJSONDevice.DeviceListener {
     if (m_targetType != targetType) {
       m_targetType = targetType;
       System.out.println("targetType set: '" + m_targetType + "'");
+    }
+  }
+
+  @Override
+  public void gridUpdated(String high, String mid, String low) {
+    String gridString = high + mid + low;
+    if (gridString != m_gridString) {
+      if (m_device.isConnected()) {
+        m_device.setSensorField(SENSOR_GRID, "value", gridString);
+        m_gridString = gridString;
+      }
     }
   }
 }

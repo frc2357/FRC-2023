@@ -114,7 +114,6 @@ public class ArduinoJSONDevice {
   }
 
   public void onStateReceived(JsonNode state) {
-    System.out.println("state received" + state);
     Iterator<String> fieldNameIter = state.fieldNames();
     while (fieldNameIter.hasNext()) {
       String fieldName = fieldNameIter.next();

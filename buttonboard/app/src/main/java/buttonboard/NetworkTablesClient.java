@@ -1,10 +1,7 @@
 package buttonboard;
 
 import java.io.IOException;
-import java.lang.Math;
 import java.util.EnumSet;
-
-import com.google.common.graph.Network;
 
 import edu.wpi.first.cscore.CameraServerJNI;
 import edu.wpi.first.math.WPIMathJNI;
@@ -14,18 +11,28 @@ import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.networktables.StringArraySubscriber;
+import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.util.CombinedRuntimeLoader;
 import edu.wpi.first.util.WPIUtilJNI;
 
 public class NetworkTablesClient {
-    private String[] m_grid = {"", "", ""};
+    public static interface GridListener {
+        public void gridUpdated(String high, String mid, String low);
+    }
+
     private String m_serverName;
     private int m_connListenerHandle;
     private NetworkTable m_buttonboardTable;
     private NetworkTable m_gridCamTable;
     private StringArraySubscriber m_gridSub;
+    private StringPublisher m_alliancePub;
     private IntegerPublisher m_targetRowPub;
     private IntegerPublisher m_targetColPub;
+    private GridListener m_gridListener;
+
+    public NetworkTablesClient() {
+        this(null);
+    }
 
     public NetworkTablesClient(String serverName) {
         m_serverName = serverName;
@@ -49,8 +56,11 @@ public class NetworkTablesClient {
         }
     }
 
+    public void setGridListener(GridListener l) {
+        m_gridListener = l;
+    }
+
     public void open() {
-        System.out.println("NetworkTablesClient.open");
         NetworkTableInstance inst = NetworkTableInstance.getDefault();
 
         m_connListenerHandle = inst.addConnectionListener(
@@ -65,7 +75,11 @@ public class NetworkTablesClient {
         );
 
         inst.startClient4(Constants.NT4_CLIENT_IDENTITY);
-        inst.setServer(m_serverName);
+        if (m_serverName != null) {
+            inst.setServer(m_serverName);
+        } else {
+            inst.setServerTeam(Constants.TEAM_NUMBER);
+        }
         inst.startDSClient(); 
 
         m_gridCamTable = inst.getTable(Constants.NT_GRIDCAM_TABLE);
@@ -77,11 +91,10 @@ public class NetworkTablesClient {
             m_gridSub,
             EnumSet.of(NetworkTableEvent.Kind.kValueAll),
             event -> {
-                m_grid = event.valueData.value.getStringArray();
-                System.out.println("grid set to:");
-                System.out.println(m_grid[0]);
-                System.out.println(m_grid[1]);
-                System.out.println(m_grid[2]);
+                String grid[] = event.valueData.value.getStringArray();
+                if (m_gridListener != null) {
+                    m_gridListener.gridUpdated(grid[0], grid[1], grid[2]);
+                }
             }
         );
 
@@ -90,6 +103,9 @@ public class NetworkTablesClient {
 
         m_targetColPub = m_buttonboardTable.getIntegerTopic(Constants.NT_TARGET_COL_TOPIC).publish();
         m_targetColPub.setDefault(-1);
+
+        m_alliancePub = m_buttonboardTable.getStringTopic(Constants.NT_ALLIANCE_TOPIC).publish();
+        m_alliancePub.setDefault(Constants.ALLIANCE_UNSET);
     }
 
     public void close() {
@@ -105,5 +121,10 @@ public class NetworkTablesClient {
         System.out.println("Set grid target to (row=" + row + ", col=" + col + ")");
         m_targetRowPub.set(row);
         m_targetColPub.set(col);
+    }
+
+    public void setAlliance(String alliance) {
+        System.out.println("Set alliance to " + alliance);
+        m_alliancePub.set(alliance);
     }
 }

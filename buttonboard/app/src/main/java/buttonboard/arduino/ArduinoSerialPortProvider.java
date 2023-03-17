@@ -6,6 +6,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
 public class ArduinoSerialPortProvider implements ArduinoSerialPort.Listener, Runnable {
+  private static final String HEADER = "||v1||";
   public static final int SLEEP_MS = 500;
   public static final int TIMEOUT_MS = 60 * 1000; // Set timeout to 1 minute
   public static final String MSG_HEADER = "||v1||";
@@ -36,7 +37,8 @@ public class ArduinoSerialPortProvider implements ArduinoSerialPort.Listener, Ru
 
   public static void write(String deviceName, JsonNode state) {
     ArduinoSerialPort port = getInstance().m_deviceNamesByPort.inverse().get(deviceName);
-    getInstance().write(port, state.toString());
+    String message = HEADER + state.toString();
+    getInstance().write(port, message);
   }
 
   public static void sendQuery(String deviceName) {
