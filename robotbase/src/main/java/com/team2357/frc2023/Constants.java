@@ -4,6 +4,7 @@
 
 package com.team2357.frc2023;
 
+import com.pathplanner.lib.PathConstraints;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.team2357.frc2023.subsystems.ArmExtensionSubsystem;
@@ -106,11 +107,9 @@ public final class Constants {
                     Math.hypot(config.m_trackwidthMeters / 2.0, config.m_wheelbaseMeters / 2.0);
             config.m_maxAngularAccelerationRadiansPerSecondSquared = config.m_maxAngularVelocityRadiansPerSecond / 3.0;
 
-            config.m_trajectoryMaxVelocityMetersPerSecond = 2;
-            config.m_trajectoryMaxAccelerationMetersPerSecond = 3;
-            config.m_xController = new PIDController(.56122, 0, 0);
-            config.m_yController = new PIDController(.56122, 0, 0);
-            config.m_thetaController = new PIDController(2.15, 0, 0);
+            config.m_xController = new PIDController(8.0, 0, 0); // .56122 2.2
+            config.m_yController = new PIDController(8.0, 0, 0); // .56122
+            config.m_thetaController = new PIDController(6.0, 0, 0); // 2.15
 
             config.m_sensorPositionCoefficient = 2.0 * Math.PI / Constants.DRIVE.TICKS_PER_ROTATION
                     * SdsModuleConfigurations.MK4I_L2.getSteerReduction();
@@ -136,15 +135,17 @@ public final class Constants {
 
             config.m_openLoopRampRateSeconds = 1;
 
-            /** State measurement standard deviations. Left encoder, right encoder, gyro
-             * Increase these numbers to trust them less
-             */ 
-            config.m_stateStdDevs = VecBuilder.fill(0.1, 0.1, 0.0);
-
-            /** Local measurement standard deviations. Vision X, Y, theta.
+            /**
+             * State measurement standard deviations. Left encoder, right encoder, gyro
              * Increase these numbers to trust them less
              */
-			config.m_visionMeasurementStdDevs = VecBuilder.fill(0.9, 0.9, 1); 
+            config.m_stateStdDevs = VecBuilder.fill(0.1, 0.1, 0.0);
+
+            /**
+             * Local measurement standard deviations. Vision X, Y, theta.
+             * Increase these numbers to trust them less
+             */
+            config.m_visionMeasurementStdDevs = VecBuilder.fill(0.9, 0.9, 1);
 
             config.m_visionToleranceMeters = 0.1524;
 
@@ -177,7 +178,7 @@ public final class Constants {
 
         public static final double ENCODER_SYNC_ACCURACY_RADIANS = 0.05;
 
-        public static final PIDController ROTATE_TO_TARGET_CONTROLLER = new PIDController(0.1, 0, 0);
+        public static final PIDController ROTATE_TO_TARGET_CONTROLLER = new PIDController(0.5, 0, 0.0001);
 
         public static final double ROTATE_MAXSPEED_RADIANS_PER_SECOND = 0.91;
         public static final double SYNC_ENCODER_LIMIT_MS = 10000;
@@ -203,6 +204,12 @@ public final class Constants {
 
         // Tolerance for out-of-range poses on auto-mapping
         public static final double TRAJECTORY_MAP_TOLERANCE_METERS = 0.1;
+
+        // Path constraints
+        public static final PathConstraints DEFAULT_PATH_CONSTRAINTS = new PathConstraints(2.5,
+                1.5);
+        public static final PathConstraints GRID_ZERO_PATH_CONSTRAINTS = new PathConstraints(2, 1);
+
     }
 
     public static final class INTAKE_ROLLER {
@@ -331,7 +338,7 @@ public final class Constants {
         public static final double RETRACTED_ROTATIONS = 0;
 
         public static final double AUTO_SCORE_MID_ROTATIONS = 15;
-        public static final double AUTO_SCORE_HIGH_ROTATIONS = 260;
+        public static final double AUTO_SCORE_HIGH_ROTATIONS = 245;
 
         public static final double ARM_EXTENSION_AMP_ZERO_PERCENT_OUTPUT = -0.2;
         public static final int ARM_EXTENSION_AMP_ZERO_MAX_AMPS = 25;
@@ -382,12 +389,12 @@ public final class Constants {
         public static final double RETRACTED_ROTATIONS = 0;
 
         public static final double AUTO_SCORE_MID_ROTATIONS = 50;
-        public static final double AUTO_SCORE_HIGH_ROTATIONS = 58;
+        public static final double AUTO_SCORE_HIGH_ROTATIONS = 65;
 
         public static final double ARM_ROTATION_GEAR_RATIO  = 190.91;
         public static final double ARM_HANDOFF_ROTATIONS = ARM_ROTATION_GEAR_RATIO / 8;
 
-        public static final double ARM_ROTATION_AMP_ZERO_PERCENT_OUTPUT = -0.25;
+        public static final double ARM_ROTATION_AMP_ZERO_PERCENT_OUTPUT = -0.1;
         public static final int ARM_ROTATION_AMP_ZERO_MAX_AMPS = 25;
 
         public static final double ARM_ROTATION_AMP_ZERO_TIME_MILLIS = 1000;
@@ -472,7 +479,7 @@ public final class Constants {
 
     public static final class APRILTAG_POSE {
         public static final String APRILTAG_TABLE_NAME = "apriltag";
-        public static final String POSE_TOPIC_NAME = "pose";
+        public static final String POSE_TOPIC_NAME = "tags";
     }
 
     public static final class CONTROLLER {

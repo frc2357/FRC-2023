@@ -2,11 +2,13 @@ package com.team2357.frc2023.trajectoryutil;
 
 import java.util.ArrayList;
 
+import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.PathPoint;
 import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
+import com.pathplanner.lib.PathPoint;
 import com.pathplanner.lib.commands.PPSwerveControllerCommand;
+import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -25,7 +27,16 @@ public class TrajectoryUtil {
 
 	public static PathPlannerTrajectory createPathPlannerTrajectory(String trajectoryFileName) {
 		return PathPlanner.loadPath(trajectoryFileName,
-				SwerveDriveSubsystem.getInstance().getPathConstraints());
+				Constants.DRIVE.DEFAULT_PATH_CONSTRAINTS);
+	}
+
+	public static SequentialCommandGroup createTrajectoryPathCommand(String trajectoryFileName, PathConstraints constraints,
+			final boolean resetOdometry) {		
+		return createDrivePathCommand(createPathPlannerTrajectory(trajectoryFileName, constraints), resetOdometry);
+	}
+
+	public static PathPlannerTrajectory createPathPlannerTrajectory(String trajectoryFileName, PathConstraints constraints) {
+		return PathPlanner.loadPath(trajectoryFileName, constraints);
 	}
 
 	public static SequentialCommandGroup CreateTwoPointTrajectoryPathCommand(Pose2d startPose, Pose2d endPose,
@@ -41,7 +52,7 @@ public class TrajectoryUtil {
 		points.add(endPoint);
 
 		PathPlannerTrajectory trajectory = PathPlanner.generatePath(
-				SwerveDriveSubsystem.getInstance().getPathConstraints(), false, points);
+				Constants.DRIVE.DEFAULT_PATH_CONSTRAINTS, false, points);
 
 		return createDrivePathCommand(trajectory, resetOdometry);
 	}

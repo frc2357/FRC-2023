@@ -4,6 +4,9 @@
 
 package com.team2357.frc2023;
 
+import com.pathplanner.lib.server.PathPlannerServer;
+import com.team2357.frc2023.commands.auto.gridone.GridOneScoreOneAndBalance;
+import com.team2357.frc2023.commands.auto.gridzero.GridZeroTwoConeAutoCommand;
 import com.team2357.frc2023.commands.drive.DefaultDriveCommand;
 import com.team2357.frc2023.controls.GunnerControls;
 import com.team2357.frc2023.controls.SwerveDriveControls;
@@ -14,11 +17,13 @@ import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.frc2023.trajectoryutil.AvailableTeleopTrajectories;
 import com.team2357.frc2023.trajectoryutil.AvailableTrajectories;
 import com.team2357.frc2023.trajectoryutil.AvailableTrajectoryCommands;
+import com.team2357.frc2023.trajectoryutil.TrajectoryUtil;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -79,6 +84,8 @@ public class RobotContainer {
 
     // Configure Shuffleboard
     configureShuffleboard();
+
+    PathPlannerServer.startServer(5811); // 5811 = port number. adjust this according to your needs
   }
 
   /**
@@ -94,14 +101,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    int auto = 1;
-
-    switch (auto) {
-      case -1:
-        return AvailableTrajectories.lineTrajectory;
-      default:
-        return m_autoCommandChooser.generateCommand();
-    }
+    return m_autoCommandChooser.generateCommand();
   }
-
 }

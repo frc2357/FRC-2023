@@ -1,6 +1,5 @@
 package com.team2357.frc2023.commands.intake;
 
-import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.subsystems.IntakeArmSubsystem;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -20,11 +19,9 @@ public class IntakeSolenoidExtendCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return System.currentTimeMillis() - m_startMillis >= Constants.INTAKE_ARM.SOLENOID_EXTEND_WAIT_MILLIS;
+        return true;
     }
 
     @Override
-    public void end(boolean interrupted) {
-        IntakeArmSubsystem.getInstance().stopSolenoid();
-    }
+    public void end(boolean interrupted) {}
 }
