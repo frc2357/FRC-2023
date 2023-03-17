@@ -46,7 +46,9 @@ public class RotateToDegreeCommand extends CommandBase {
     public void execute() {
         double newSpeed = m_pidController.calculate(m_swerve.getGyroscopeRotation().getDegrees());
 
-        newSpeed = MathUtil.clamp(newSpeed, Constants.DRIVE.ROTATE_MAXSPEED_RADIANS_PER_SECOND*-1, Constants.DRIVE.ROTATE_MAXSPEED_RADIANS_PER_SECOND*-1);
+        newSpeed += Math.copySign(0.6, newSpeed);
+
+        newSpeed = MathUtil.clamp(newSpeed, -Constants.DRIVE.ROTATE_MAXSPEED_RADIANS_PER_SECOND, Constants.DRIVE.ROTATE_MAXSPEED_RADIANS_PER_SECOND);
         m_swerve.drive(new ChassisSpeeds(0, 0, newSpeed));
     }
 
