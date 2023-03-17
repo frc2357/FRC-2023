@@ -8,7 +8,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 public class AutoBalanceCommand extends CommandLoggerBase {
 
-    private double m_error, m_angle, m_power, m_yaw, m_direction;
+    private double prevAngle = Double.NaN;
     
     public AutoBalanceCommand() {
         addRequirements(SwerveDriveSubsystem.getInstance());
@@ -21,7 +21,7 @@ public class AutoBalanceCommand extends CommandLoggerBase {
 
     @Override
     public void execute() {
-        SwerveDriveSubsystem.getInstance().balance();
+        prevAngle = SwerveDriveSubsystem.getInstance().balance(prevAngle);
     }
 
     @Override

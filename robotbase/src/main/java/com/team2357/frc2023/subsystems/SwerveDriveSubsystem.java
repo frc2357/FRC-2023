@@ -495,7 +495,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		}
 	}
 
-	public void balance() {
+	public double balance(double prevAngle) {
 		double yaw, direction, angle, error, power;
 		angle = 0;
 		direction = 0;
@@ -505,20 +505,22 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		angle = getTilt(yaw);
 		direction = getDirection(yaw);
 
-		if (angle > Constants.DRIVE.BALANCE_FULL_TILT_DEGREES) {
-			return;
+		if (angle <= Constants.DRIVE.BALANCE_FULL_TILT_DEGREES) {
+			// System.out.println("angle: " + angle);
+			// System.out.println("direction: " + direction);
+
+			error = Math.copySign(Constants.DRIVE.BALANCE_LEVEL_DEGREES + Math.abs(angle), angle);
+			power = Math.min(Math.abs(Constants.DRIVE.BALANCE_KP * error), Constants.DRIVE.BALANCE_MAX_POWER);
+			power = Math.copySign(power, error);
+
+			power *= direction;
+
+			if (Math.abs(prevAngle - angle) < Constants.DRIVE.STOP_DRIVING_TILT_DIFFERENCE) {
+				drive(power, 0, 0);
+			}
 		}
 
-		System.out.println("angle: " + angle);
-		System.out.println("direction: " + direction);
-
-		error = Math.copySign(Constants.DRIVE.BALANCE_LEVEL_DEGREES + Math.abs(angle), angle);
-		power = Math.min(Math.abs(Constants.DRIVE.BALANCE_KP * error), Constants.DRIVE.BALANCE_MAX_POWER);
-		power = Math.copySign(power, error);
-
-		power *= direction;
-
-		drive(power, 0, 0);
+		return angle;
 	}
 
 	public boolean isBalanced() {
