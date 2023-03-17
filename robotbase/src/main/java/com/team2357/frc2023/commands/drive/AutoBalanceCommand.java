@@ -26,7 +26,7 @@ public class AutoBalanceCommand extends CommandLoggerBase {
 
     @Override
     public boolean isFinished() {
-        return false;
+        return SwerveDriveSubsystem.getInstance().isBalanced();
     }
     
     @Override
