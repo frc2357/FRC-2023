@@ -29,7 +29,7 @@ public class GridZeroTwoConeAutoCommand extends ParallelCommandGroup {
                 // Then deploy intake after we're back on the floor
                 new ParallelCommandGroup(
                   new ClawInstantOpenCommand(),
-                  new IntakeArmRotateDumbCommand(0.4).withTimeout(2.0),
+                  new IntakeArmRotateDumbCommand(0.6).withTimeout(2.0),
                   new SequentialCommandGroup(
                     new IntakeRollerRunCommand().withTimeout(2)
                   )

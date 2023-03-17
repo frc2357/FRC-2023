@@ -18,7 +18,7 @@ public class GridOneTwoConeAutoCommand extends ParallelCommandGroup {
                                 .deadlineWith(new WaitCommand(7)))
                         .andThen(new WaitCommand(1))
                         .andThen(new ParallelCommandGroup(
-                                new IntakeArmRotateDumbCommand(0.4).withTimeout(0.75),
+                                new IntakeArmRotateDumbCommand(0.6).withTimeout(0.75),
 
                                 new WaitCommand(1.5).andThen(
                                         new IntakeRollerRunCommand()

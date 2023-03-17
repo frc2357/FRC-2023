@@ -14,6 +14,7 @@ public class IntakeArmRotateDumbCommand extends CommandBase {
 
     @Override
     public void initialize() {
+        IntakeArmSubsystem.getInstance().extendSolenoid();
         IntakeArmSubsystem.getInstance().manualStow(m_speedPercent);
     }
 
@@ -24,6 +25,7 @@ public class IntakeArmRotateDumbCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
+        IntakeArmSubsystem.getInstance().stowSolenoid();
         IntakeArmSubsystem.getInstance().manualStow(0.0);
     }
 }

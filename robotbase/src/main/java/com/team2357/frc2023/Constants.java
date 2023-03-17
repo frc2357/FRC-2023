@@ -300,7 +300,7 @@ public final class Constants {
             config.m_pidMinOutput = -1;
             config.m_smartMotionMaxVelRPM = 10000;
             config.m_smartMotionMinVelRPM = 0;
-            config.m_smartMotionMaxAccRPM = 10000;
+            config.m_smartMotionMaxAccRPM = 5000;
             config.m_smartMotionRotationAllowedError = 2;
 
             config.m_winchMotorAllowedError = 2;
