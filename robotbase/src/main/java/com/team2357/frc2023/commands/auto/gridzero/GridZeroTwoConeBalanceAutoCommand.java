@@ -24,7 +24,7 @@ public class GridZeroTwoConeBalanceAutoCommand extends ParallelCommandGroup {
                                                 .withTimeout(2)))),
 
                 new WaitCommand(7)
-                        .andThen(TrajectoryUtil.createTrajectoryPathCommand("grid0 2 cone", true))
+                        .andThen(TrajectoryUtil.createTrajectoryPathCommand("grid0 2 cone", true)));
                         // .andThen(new Test1AutoBalanceCommand()));
     }
 }
