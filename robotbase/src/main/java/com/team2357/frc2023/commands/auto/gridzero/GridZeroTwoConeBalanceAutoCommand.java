@@ -1,6 +1,6 @@
 package com.team2357.frc2023.commands.auto.gridzero;
 
-import com.team2357.frc2023.commands.drive.AutoBalanceCommand;
+import com.team2357.frc2023.commands.drive.Test1AutoBalanceCommand;
 import com.team2357.frc2023.commands.intake.IntakeArmRotateDumbCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
 import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
@@ -25,6 +25,6 @@ public class GridZeroTwoConeBalanceAutoCommand extends ParallelCommandGroup {
 
                 new WaitCommand(7)
                         .andThen(TrajectoryUtil.createTrajectoryPathCommand("grid0 2 cone", true))
-                        .andThen(new AutoBalanceCommand()));
+                        // .andThen(new Test1AutoBalanceCommand()));
     }
 }

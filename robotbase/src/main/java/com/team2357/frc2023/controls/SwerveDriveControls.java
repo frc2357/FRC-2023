@@ -1,16 +1,14 @@
 package com.team2357.frc2023.controls;
 
-import com.team2357.frc2023.commands.drive.AutoBalanceCommand;
 import com.team2357.frc2023.arduino.GamepieceLED;
 import com.team2357.frc2023.arduino.GamepieceLED.SIGNAL_COLOR;
+import com.team2357.frc2023.commands.drive.Test1AutoBalanceCommand;
+import com.team2357.frc2023.commands.drive.Test2AutoBalanceCommand;
+import com.team2357.frc2023.commands.drive.Test3AutoBalanceCommand;
 import com.team2357.frc2023.commands.intake.IntakeDeployCommandGroup;
-import com.team2357.frc2023.commands.intake.IntakeDumpCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakeRollerReverseCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
 import com.team2357.frc2023.commands.intake.IntakeStowCommandGroup;
-import com.team2357.frc2023.commands.scoring.HeartlandAutoScoreCommand;
-import com.team2357.frc2023.commands.scoring.HeartlandAutoTranslateCommand;
-import com.team2357.frc2023.commands.scoring.TeleopAutoScoreCommandGroup;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.lib.triggers.AxisThresholdTrigger;
 import com.team2357.lib.util.XboxRaw;
@@ -19,7 +17,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class SwerveDriveControls {
     private XboxController m_controller;
@@ -29,7 +26,8 @@ public class SwerveDriveControls {
     private JoystickButton m_rightBumper;
     private JoystickButton m_leftBumper;
     private JoystickButton m_aButton;
-    private JoystickButton m_xButton;
+    private JoystickButton m_bButton;
+    private JoystickButton m_yButton;
     private JoystickButton m_startButton;
 
     private AxisThresholdTrigger m_leftTrigger;
@@ -42,7 +40,8 @@ public class SwerveDriveControls {
         m_deadband = deadband;
 
         m_aButton = new JoystickButton(m_controller, XboxRaw.A.value);
-        m_xButton = new JoystickButton(m_controller, XboxRaw.X.value);
+        m_bButton = new JoystickButton(m_controller, XboxRaw.B.value);
+        m_yButton = new JoystickButton(m_controller, XboxRaw.Y.value);
         
         m_backButton = new JoystickButton(m_controller, XboxRaw.Back.value);
         m_startButton = new JoystickButton(m_controller, XboxRaw.Start.value);
@@ -73,7 +72,9 @@ public class SwerveDriveControls {
         m_rightTrigger.whileTrue(new IntakeDeployCommandGroup().alongWith(new InstantCommand(() -> GamepieceLED.getInstance().setSignalColor(SIGNAL_COLOR.YELLOW))));
         m_rightTrigger.onFalse(new IntakeStowCommandGroup());
 
-        m_aButton.whileTrue(new AutoBalanceCommand());
+        m_aButton.whileTrue(new Test1AutoBalanceCommand());
+        m_bButton.whileTrue(new Test2AutoBalanceCommand());
+        m_yButton.whileTrue(new Test3AutoBalanceCommand());
 
         //Teleop auto
         //m_rightBumper.whileTrue(new HeartlandAutoTranslateCommand(m_controller));

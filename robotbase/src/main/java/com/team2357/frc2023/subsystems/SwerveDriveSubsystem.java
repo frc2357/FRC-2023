@@ -495,38 +495,38 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		}
 	}
 
-	public double balance(double prevAngle) {
-		double yaw, direction, angle, error, power;
-		angle = 0;
-		direction = 0;
+	// public double balance(double prevAngle) {
+	// 	double yaw, direction, angle, error, power;
+	// 	angle = 0;
+	// 	direction = 0;
 
-		yaw = Math.abs(getYaw() % 360);
+	// 	yaw = Math.abs(getYaw() % 360);
 
-		angle = getTilt(yaw);
-		direction = getDirection(yaw);
+	// 	angle = getTilt(yaw);
+	// 	direction = getDirection(yaw);
 
-		if (angle <= Constants.DRIVE.BALANCE_FULL_TILT_DEGREES) {
-			// System.out.println("angle: " + angle);
-			// System.out.println("direction: " + direction);
+	// 	if (angle <= Constants.DRIVE.BALANCE_FULL_TILT_DEGREES) {
+	// 		// System.out.println("angle: " + angle);
+	// 		// System.out.println("direction: " + direction);
 
-			error = Math.copySign(Constants.DRIVE.BALANCE_LEVEL_DEGREES + Math.abs(angle), angle);
-			power = Math.min(Math.abs(Constants.DRIVE.BALANCE_KP * error), Constants.DRIVE.BALANCE_MAX_POWER);
-			power = Math.copySign(power, error);
+	// 		error = Math.copySign(Constants.DRIVE.BALANCE_LEVEL_DEGREES + Math.abs(angle), angle);
+	// 		power = Math.min(Math.abs(Constants.DRIVE.BALANCE_KP * error), Constants.DRIVE.BALANCE_MAX_POWER);
+	// 		power = Math.copySign(power, error);
 
-			power *= direction;
+	// 		power *= direction;
 
-			if (Math.abs(prevAngle - angle) < Constants.DRIVE.STOP_DRIVING_TILT_DIFFERENCE) {
-				drive(power, 0, 0);
-			}
-		}
+	// 		if (Math.abs(prevAngle - angle) < Constants.DRIVE.STOP_DRIVING_TILT_DIFFERENCE) {
+	// 			drive(power, 0, 0);
+	// 		}
+	// 	}
 
-		return angle;
-	}
+	// 	return angle;
+	// }
 
-	public boolean isBalanced() {
-		double yaw = Math.abs(getYaw() % 360);
-		return getTilt(yaw) < Constants.DRIVE.BALANCE_LEVEL_DEGREES;
-	}
+	// public boolean isBalanced() {
+	// 	double yaw = Math.abs(getYaw() % 360);
+	// 	return getTilt(yaw) < Constants.DRIVE.BALANCE_LEVEL_DEGREES;
+	// }
 
 	public double getTilt(double yaw) {
 		double angle = 0;
