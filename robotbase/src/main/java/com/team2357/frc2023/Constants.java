@@ -499,7 +499,7 @@ public final class Constants {
 
     public static final class COMPRESSOR {
         public static final int MIN_PRESSURE_PSI = 90;
-        public static final int MAX_PRESSURE_PSI = 100;
+        public static final int MAX_PRESSURE_PSI = 120;
     }
 
     public static final class AMP_ZERO {
