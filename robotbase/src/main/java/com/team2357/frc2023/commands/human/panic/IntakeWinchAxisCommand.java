@@ -16,6 +16,11 @@ public class IntakeWinchAxisCommand extends CommandBase{
     @Override
     public void execute(){
         double axisValue = m_axis.getValue();
+        if(axisValue >= 0.0) {
+            IntakeArmSubsystem.getInstance().stowSolenoid();
+        } else {
+            IntakeArmSubsystem.getInstance().extendSolenoid();
+        }
         IntakeArmSubsystem.getInstance().setWinchAxisSpeed(axisValue);
     }
 

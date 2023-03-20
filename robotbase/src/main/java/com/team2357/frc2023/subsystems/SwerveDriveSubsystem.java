@@ -502,19 +502,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 		yaw = Math.abs(getYaw() % 360);
 
-		if ((0 <= yaw && yaw < 45) || (315 <= yaw && yaw <= 360)) {
-			direction = 1;
-			angle = getRoll();
-		} else if (45 <= yaw && yaw < 135) {
-			direction = 1;
-			angle = getPitch();
-		} else if (135 <= yaw && yaw < 225) {
-			direction = -1;
-			angle = getRoll();
-		} else if (225 <= yaw && yaw < 315) {
-			direction = -1;
-			angle = getPitch();
-		}
+		angle = getTilt(yaw);
+		direction = getDirection(yaw);
 
 		if (angle > Constants.DRIVE.BALANCE_FULL_TILT_DEGREES) {
 			return;
@@ -527,6 +516,40 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		power *= direction;
 
 		drive(power, 0, 0);
+	}
+
+	public boolean isBalanced() {
+		double yaw = Math.abs(getYaw() % 360);
+		return getTilt(yaw) < Constants.DRIVE.BALANCE_LEVEL_DEGREES;
+	}
+
+	public double getTilt(double yaw) {
+		double angle = 0;
+		if ((0 <= yaw && yaw < 45) || (315 <= yaw && yaw <= 360)) {
+			angle = getRoll();
+		} else if (45 <= yaw && yaw < 135) {
+			angle = getPitch();
+		} else if (135 <= yaw && yaw < 225) {
+			angle = getRoll();
+		} else if (225 <= yaw && yaw < 315) {
+			angle = getPitch();
+		}
+
+		return angle;
+	}
+
+	public int getDirection(double yaw) {
+		int direction;
+		if ((0 <= yaw && yaw < 45) || (315 <= yaw && yaw <= 360)) {
+			direction = 1;
+		} else if (45 <= yaw && yaw < 135) {
+			direction = 1;
+		} else if (135 <= yaw && yaw < 225) {
+			direction = -1;
+		} else if (225 <= yaw && yaw < 315) {
+			direction = -1;
+		}
+		return direction = 0;
 	}
 
 	public void enableOpenLoopRamp() {
@@ -694,13 +717,13 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	public void periodic() {
 		updatePoseEstimator();
 
-		SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
+		// SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
 
-		SmartDashboard.putNumber("Yaw", m_pigeon.getYaw());
-		SmartDashboard.putNumber("Pose X", m_poseEstimator.getEstimatedPosition().getX());
-		SmartDashboard.putNumber("Pose Y", m_poseEstimator.getEstimatedPosition().getY());
-		SmartDashboard.putNumber("Pose Angle",
-				m_poseEstimator.getEstimatedPosition().getRotation().getDegrees());
+		// SmartDashboard.putNumber("Yaw", m_pigeon.getYaw());
+		// SmartDashboard.putNumber("Pose X", m_poseEstimator.getEstimatedPosition().getX());
+		// SmartDashboard.putNumber("Pose Y", m_poseEstimator.getEstimatedPosition().getY());
+		// SmartDashboard.putNumber("Pose Angle",
+		//		m_poseEstimator.getEstimatedPosition().getRotation().getDegrees());
 
 		SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
 		SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxVelocityMetersPerSecond);

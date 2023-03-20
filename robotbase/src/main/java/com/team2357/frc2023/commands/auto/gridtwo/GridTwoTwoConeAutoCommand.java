@@ -26,7 +26,7 @@ public class GridTwoTwoConeAutoCommand extends ParallelCommandGroup {
                 // Then deploy intake
                 new ParallelCommandGroup(
                   new ClawInstantOpenCommand(),
-                  new IntakeArmRotateDumbCommand(0.4).withTimeout(1.0),
+                  new IntakeArmRotateDumbCommand(0.6).withTimeout(1.0),
                   new SequentialCommandGroup(
                     new WaitCommand(0.5),
                     new IntakeRollerRunCommand().withTimeout(1.5)

@@ -170,7 +170,7 @@ public final class Constants {
         public static final double BALANCE_FULL_TILT_DEGREES = 15;
         public static final double BACKWARDS_BALANCING_EXTRA_POWER_MULTIPLIER = 1.35;
         public static final double BALANCE_KP = 0.01;
-        public static final double BALANCE_MAX_POWER = 0.4;
+        public static final double BALANCE_MAX_POWER = 0.2;
 
         public static final double TICKS_PER_ROTATION = 2048.0;
 
@@ -300,7 +300,7 @@ public final class Constants {
             config.m_pidMinOutput = -1;
             config.m_smartMotionMaxVelRPM = 10000;
             config.m_smartMotionMinVelRPM = 0;
-            config.m_smartMotionMaxAccRPM = 10000;
+            config.m_smartMotionMaxAccRPM = 5000;
             config.m_smartMotionRotationAllowedError = 2;
 
             config.m_winchMotorAllowedError = 2;
