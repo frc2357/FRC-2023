@@ -11,6 +11,7 @@ import com.team2357.frc2023.subsystems.ArmExtensionSubsystem;
 import com.team2357.frc2023.subsystems.ArmRotationSubsystem;
 import com.team2357.frc2023.subsystems.ClawSubsystem;
 import com.team2357.frc2023.subsystems.EverybotClawSubsystem;
+import com.team2357.frc2023.subsystems.EverybotWristSubsystem;
 import com.team2357.frc2023.subsystems.IntakeArmSubsystem;
 import com.team2357.frc2023.subsystems.IntakeRollerSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
@@ -347,6 +348,23 @@ public final class Constants {
 
             config.m_rollerAxisMaxSpeed = 0.7;
 
+            return config;
+        }
+    }
+
+    public static final class EVERYBOT_WRIST {
+        public static EverybotWristSubsystem.Configuration GET_EVERYBOT_WRIST_CONFIG() {
+            EverybotWristSubsystem.Configuration config = new EverybotWristSubsystem.Configuration();
+
+            config.m_wristAxisMaxSpeed = 0.5;
+
+            config.m_wristMotorStallLimitAmps = 10;
+            config.m_wristMotorFreeLimitAmps = 20;
+            
+            config.m_isInverted = false;
+
+            // smart motion config
+            
             return config;
         }
     }
