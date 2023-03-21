@@ -10,6 +10,7 @@ import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.team2357.frc2023.subsystems.ArmExtensionSubsystem;
 import com.team2357.frc2023.subsystems.ArmRotationSubsystem;
 import com.team2357.frc2023.subsystems.ClawSubsystem;
+import com.team2357.frc2023.subsystems.EverybotClawSubsystem;
 import com.team2357.frc2023.subsystems.IntakeArmSubsystem;
 import com.team2357.frc2023.subsystems.IntakeRollerSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
@@ -77,6 +78,9 @@ public final class Constants {
         public static final int ARM_ROTATION_MOTOR_ID = 26;
 
         public static final int ARM_EXTENSION_MOTOR_ID = 27;
+
+        public static final int EVERYBOT_CLAW_ROLLER_MOTOR_ID = 28;
+        public static final int EVERYBOT_WRIST_ROTATION_MOTOR_ID = 29;
     }
 
     public static final class PH_ID {
@@ -329,6 +333,19 @@ public final class Constants {
 
             config.m_openMilliseconds = 500;
             config.m_closeMilliseconds = 500;
+
+            return config;
+        }
+    }
+
+    public static final class EVERYBOT_CLAW {
+        public static EverybotClawSubsystem.Configuration GET_EVERYBOT_CLAW_CONFIG() {
+            EverybotClawSubsystem.Configuration config = new EverybotClawSubsystem.Configuration();
+
+            config.m_forwardPercentOutput = 0.5;
+            config.m_reversePercentOutput = -0.5;
+
+            config.m_rollerAxisMaxSpeed = 0.7;
 
             return config;
         }

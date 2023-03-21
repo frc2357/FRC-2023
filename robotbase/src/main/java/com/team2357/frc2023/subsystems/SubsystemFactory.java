@@ -48,10 +48,22 @@ public class SubsystemFactory {
                 return subsystem;
         }
 
+        public EverybotClawSubsystem createEverybotWristSubsystem() {
+                EverybotClawSubsystem subsystem = new EverybotClawSubsystem(Constants.CAN_ID.EVERYBOT_CLAW_ROLLER_MOTOR_ID);
+                subsystem.configure(Constants.EVERYBOT_CLAW.GET_EVERYBOT_CLAW_CONFIG());
+                return subsystem;
+        }
+
         public ClawSubsystem CreateClawSubsystem() {
                 ClawSubsystem subsystem = new ClawSubsystem(Constants.PH_ID.CLAW_FORWARD_SOLENOID_CHANNEL,
                                 Constants.PH_ID.CLAW_REVERSE_SOLENOID_CHANNEL);
                 subsystem.configure(Constants.CLAW.GET_CLAW_CONFIG());
+                return subsystem;
+        }
+
+        public EverybotClawSubsystem createEverybotClawSubsystem() {
+                EverybotClawSubsystem subsystem = new EverybotClawSubsystem(Constants.CAN_ID.EVERYBOT_CLAW_ROLLER_MOTOR_ID);
+                subsystem.configure(Constants.EVERYBOT_CLAW.GET_EVERYBOT_CLAW_CONFIG());
                 return subsystem;
         }
 
