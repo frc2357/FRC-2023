@@ -42,7 +42,7 @@ public class Test3AutoBalanceCommand extends CommandBase {
 
         if (angle <= Constants.DRIVE.BALANCE_FULL_TILT_DEGREES) {
 
-            m_swerve.drive(m_pidController.calculate(angle) * direction, 0, 0);
+            m_swerve.drive(-m_pidController.calculate(angle), 0, 0);
 
         }
 
