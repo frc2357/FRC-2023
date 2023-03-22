@@ -383,12 +383,12 @@ public final class Constants {
 
         public static ArmExtensionSubsystem.Configuration GET_EXTENSION_CONFIG() {
             ArmExtensionSubsystem.Configuration config = new ArmExtensionSubsystem.Configuration();
-            config.m_extendAxisMaxSpeed = 0;
+            config.m_extendAxisMaxSpeed = 0.5;
 
             config.m_extendMotorIdleMode = IdleMode.kBrake;
 
-            config.m_extendMotorStallLimitAmps = 30;
-            config.m_extendMotorFreeLimitAmps = 30;
+            config.m_extendMotorStallLimitAmps = 50;
+            config.m_extendMotorFreeLimitAmps = 50;
 
             config.m_isInverted = true;
 
@@ -417,7 +417,7 @@ public final class Constants {
             config.m_smartMotionRotationAllowedError = 0.5;
             config.m_rotationAllowedError = 0.5;
 
-            config.m_maxSpeedPercent = 0.7;
+            config.m_maxSpeedPercent = 1;
             return config;
         }
 
