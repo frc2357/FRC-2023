@@ -353,6 +353,9 @@ public final class Constants {
     }
 
     public static final class EVERYBOT_WRIST {
+        public static final double WRIST_AMP_ZERO_PERCENT_OUTPUT = 0.1;
+        public static final double WRIST_ZERO_MAX_AMPS = 10;
+        
         public static EverybotWristSubsystem.Configuration GET_EVERYBOT_WRIST_CONFIG() {
             EverybotWristSubsystem.Configuration config = new EverybotWristSubsystem.Configuration();
 

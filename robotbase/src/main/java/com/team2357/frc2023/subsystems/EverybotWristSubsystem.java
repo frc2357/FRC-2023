@@ -107,6 +107,12 @@ public class EverybotWristSubsystem extends ClosedLoopSubsystem {
         return m_wristMotor.getOutputCurrent();
     }
 
+    public void setWristAxisSpeed(double axisSpeed) {
+        setClosedLoopEnabled(false);
+        double motorSpeed = (-axisSpeed) * m_config.m_wristAxisMaxSpeed;
+        m_wristMotor.set(motorSpeed);
+    }
+
     public void manualRotate(double speed) {
         m_wristMotor.set(speed);
     }
