@@ -109,7 +109,7 @@ public class Robot extends LoggedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    new IntakeSolenoidExtendCommand().schedule();
+    // new IntakeSolenoidExtendCommand().schedule();
   }
 
   /** This function is called periodically during operator control. */
