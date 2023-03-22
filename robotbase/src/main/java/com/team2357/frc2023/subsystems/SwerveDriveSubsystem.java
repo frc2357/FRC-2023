@@ -27,6 +27,7 @@ import com.team2357.lib.util.Utility;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -236,6 +237,16 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		 * Error tolerance in meters for vision estimate from encoder estimate in meters
 		 */
 		public double m_visionToleranceMeters;
+
+		/**
+		 * Profiled PID controller for translation for autoAlign 
+		 */
+		public ProfiledPIDController m_autoAlignDriveController;
+
+		 /**
+		  * Profiled PID controller for rotation for autoAlign
+		  */
+		public ProfiledPIDController m_autoAlignThetaController;
 	}
 
 	public SwerveDriveSubsystem(int pigeonId, int[] frontLeftIds, int[] frontRightIds,
@@ -331,6 +342,14 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	public PIDController getThetaController() {
 		return m_config.m_thetaController;
+	}
+
+	public ProfiledPIDController getAutoAlignDriveController() {
+		return m_config.m_autoAlignDriveController;
+	}
+
+	public ProfiledPIDController getAutoAlignThetaController() {
+		return m_config.m_autoAlignThetaController;
 	}
 
 	public SwerveDriveKinematics getKinematics() {

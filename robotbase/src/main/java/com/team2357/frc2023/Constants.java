@@ -15,16 +15,14 @@ import com.team2357.frc2023.subsystems.IntakeRollerSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.frc2023.subsystems.WristSubsystem;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -149,6 +147,12 @@ public final class Constants {
 
             config.m_visionToleranceMeters = 0.1524;
 
+            config.m_autoAlignDriveController = new ProfiledPIDController(
+                0.0, 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0));
+
+            config.m_autoAlignThetaController = new ProfiledPIDController(
+                0.0, 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0));  
+                    
             return config;
         }
 
@@ -391,7 +395,7 @@ public final class Constants {
         public static final double AUTO_SCORE_MID_ROTATIONS = 50;
         public static final double AUTO_SCORE_HIGH_ROTATIONS = 65;
 
-        public static final double ARM_ROTATION_GEAR_RATIO  = 190.91;
+        public static final double ARM_ROTATION_GEAR_RATIO = 190.91;
         public static final double ARM_HANDOFF_ROTATIONS = ARM_ROTATION_GEAR_RATIO / 8;
 
         public static final double ARM_ROTATION_AMP_ZERO_PERCENT_OUTPUT = -0.1;
