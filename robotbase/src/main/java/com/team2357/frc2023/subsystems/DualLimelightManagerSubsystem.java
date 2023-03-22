@@ -176,4 +176,10 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
     public double getSecondaryTX() {
         return m_secondaryLimelight.getTX();
     }
+
+    @Override
+    public void periodic() {
+        Pose2d pose = m_rightLimelight.getLimelightPose2d();
+       // System.out.println("Right: "+ " X:" + pose.getX() + " Y: " + pose.getY() + " Rot: " + pose.getRotation().getDegrees());
+    }
 }
