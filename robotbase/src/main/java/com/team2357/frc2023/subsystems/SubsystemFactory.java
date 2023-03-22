@@ -41,29 +41,15 @@ public class SubsystemFactory {
                 return subsystem;
         }
 
-        public WristSubsystem CreateWristSubsystem() {
-                WristSubsystem subsystem = new WristSubsystem(Constants.PH_ID.WRIST_FORWARD_SOLENOID_CHANNEL,
-                                Constants.PH_ID.WRIST_REVERSE_SOLENOID_CHANNEL);
-                subsystem.configure(Constants.WRIST.GET_WRIST_CONFIG());
-                return subsystem;
-        }
-
-        public EverybotClawSubsystem createEverybotWristSubsystem() {
-                EverybotClawSubsystem subsystem = new EverybotClawSubsystem(Constants.CAN_ID.EVERYBOT_CLAW_ROLLER_MOTOR_ID);
-                subsystem.configure(Constants.EVERYBOT_CLAW.GET_EVERYBOT_CLAW_CONFIG());
-                return subsystem;
-        }
-
-        public ClawSubsystem CreateClawSubsystem() {
-                ClawSubsystem subsystem = new ClawSubsystem(Constants.PH_ID.CLAW_FORWARD_SOLENOID_CHANNEL,
-                                Constants.PH_ID.CLAW_REVERSE_SOLENOID_CHANNEL);
+        public ClawSubsystem createEverybotWristSubsystem() {
+                ClawSubsystem subsystem = new ClawSubsystem(Constants.CAN_ID.CLAW_ROLLER_MOTOR_ID);
                 subsystem.configure(Constants.CLAW.GET_CLAW_CONFIG());
                 return subsystem;
         }
 
-        public EverybotClawSubsystem createEverybotClawSubsystem() {
-                EverybotClawSubsystem subsystem = new EverybotClawSubsystem(Constants.CAN_ID.EVERYBOT_CLAW_ROLLER_MOTOR_ID);
-                subsystem.configure(Constants.EVERYBOT_CLAW.GET_EVERYBOT_CLAW_CONFIG());
+        public ClawSubsystem createEverybotClawSubsystem() {
+                ClawSubsystem subsystem = new ClawSubsystem(Constants.CAN_ID.CLAW_ROLLER_MOTOR_ID);
+                subsystem.configure(Constants.CLAW.GET_CLAW_CONFIG());
                 return subsystem;
         }
 

@@ -1,7 +1,7 @@
 package com.team2357.frc2023.commands.human.panic;
 
 import com.team2357.frc2023.controls.AxisInterface;
-import com.team2357.frc2023.subsystems.EverybotClawSubsystem;
+import com.team2357.frc2023.subsystems.ClawSubsystem;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
@@ -10,13 +10,13 @@ public class EverybotClawRollerAxisCommand extends CommandBase {
 
     public EverybotClawRollerAxisCommand(AxisInterface axis) {
         m_axis = axis;
-        addRequirements(EverybotClawSubsystem.getInstance());
+        addRequirements(ClawSubsystem.getInstance());
     }
 
     @Override
     public void execute() {
         double axisSpeed = m_axis.getValue();
-        EverybotClawSubsystem.getInstance().setAxisRollerSpeed(axisSpeed);
+        ClawSubsystem.getInstance().setAxisRollerSpeed(axisSpeed);
     }
 
     @Override
@@ -26,7 +26,7 @@ public class EverybotClawRollerAxisCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        EverybotClawSubsystem.getInstance().stopRollers();
+        ClawSubsystem.getInstance().stopRollers();
     }
     
 }

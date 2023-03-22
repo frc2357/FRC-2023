@@ -10,8 +10,8 @@ import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.team2357.frc2023.subsystems.ArmExtensionSubsystem;
 import com.team2357.frc2023.subsystems.ArmRotationSubsystem;
 import com.team2357.frc2023.subsystems.ClawSubsystem;
-import com.team2357.frc2023.subsystems.EverybotClawSubsystem;
-import com.team2357.frc2023.subsystems.EverybotWristSubsystem;
+import com.team2357.frc2023.subsystems.ClawSubsystem;
+import com.team2357.frc2023.subsystems.WristSubsystem;
 import com.team2357.frc2023.subsystems.IntakeArmSubsystem;
 import com.team2357.frc2023.subsystems.IntakeRollerSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
@@ -80,8 +80,8 @@ public final class Constants {
 
         public static final int ARM_EXTENSION_MOTOR_ID = 27;
 
-        public static final int EVERYBOT_CLAW_ROLLER_MOTOR_ID = 28;
-        public static final int EVERYBOT_WRIST_ROTATION_MOTOR_ID = 29;
+        public static final int CLAW_ROLLER_MOTOR_ID = 28;
+        public static final int WRIST_ROTATION_MOTOR_ID = 29;
     }
 
     public static final class PH_ID {
@@ -317,31 +317,9 @@ public final class Constants {
 
     }
 
-    public static final class WRIST {
-        public static WristSubsystem.Configuration GET_WRIST_CONFIG() {
-            WristSubsystem.Configuration config = new WristSubsystem.Configuration();
-
-            config.m_extendMilliseconds = 500;
-            config.m_retractMilliseconds = 2000;
-
-            return config;
-        }
-    }
-
     public static final class CLAW {
         public static ClawSubsystem.Configuration GET_CLAW_CONFIG() {
             ClawSubsystem.Configuration config = new ClawSubsystem.Configuration();
-
-            config.m_openMilliseconds = 500;
-            config.m_closeMilliseconds = 500;
-
-            return config;
-        }
-    }
-
-    public static final class EVERYBOT_CLAW {
-        public static EverybotClawSubsystem.Configuration GET_EVERYBOT_CLAW_CONFIG() {
-            EverybotClawSubsystem.Configuration config = new EverybotClawSubsystem.Configuration();
 
             config.m_forwardPercentOutput = 0.5;
             config.m_reversePercentOutput = -0.5;
@@ -352,12 +330,12 @@ public final class Constants {
         }
     }
 
-    public static final class EVERYBOT_WRIST {
+    public static final class WRIST {
         public static final double WRIST_AMP_ZERO_PERCENT_OUTPUT = 0.1;
         public static final double WRIST_ZERO_MAX_AMPS = 10;
         
-        public static EverybotWristSubsystem.Configuration GET_EVERYBOT_WRIST_CONFIG() {
-            EverybotWristSubsystem.Configuration config = new EverybotWristSubsystem.Configuration();
+        public static WristSubsystem.Configuration GET_WRIST_CONFIG() {
+            WristSubsystem.Configuration config = new WristSubsystem.Configuration();
 
             config.m_wristAxisMaxSpeed = 0.5;
 

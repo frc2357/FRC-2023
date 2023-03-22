@@ -6,11 +6,9 @@ import com.team2357.frc2023.commands.auto.RotateToDegreeCommand;
 import com.team2357.frc2023.commands.auto.TranslateToTargetCommand;
 import com.team2357.frc2023.commands.human.panic.ArmExtensionAxisCommand;
 import com.team2357.frc2023.commands.human.panic.ArmRotationAxisCommand;
-import com.team2357.frc2023.commands.human.panic.ClawToggleCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeArmToggleCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeRollerAxisCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeWinchAxisCommand;
-import com.team2357.frc2023.commands.human.panic.WristToggleCommand;
 import com.team2357.frc2023.commands.intake.WinchAmpZeroCommand;
 import com.team2357.frc2023.commands.scoring.AutoScoreLowCommandGroup;
 import com.team2357.frc2023.commands.scoring.HomeMechanismsCommand;
@@ -172,8 +170,8 @@ public class GunnerControls {
         // Arm extension / claw / wrist
         leftDPadOnly.whileTrue(new ArmExtensionAxisCommand(axisRightStickY));
         
-        leftDPadAndA.onTrue(new WristToggleCommand());
-        leftDPadAndB.onTrue(new ClawToggleCommand());
+        // leftDPadAndA.onTrue(new WristToggleCommand());
+        // leftDPadAndB.onTrue(new ClawToggleCommand());
 
         leftDPadAndY.onTrue(new ArmExtendAmpZeroCommand());
 

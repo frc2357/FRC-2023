@@ -46,8 +46,8 @@ public class RobotContainer {
     SubsystemFactory subsystemFactory = new SubsystemFactory();
     subsystemFactory.CreateIntakeRollerSubsystem();
     subsystemFactory.CreateIntakeArmSubsystem();
-    subsystemFactory.CreateClawSubsystem();
-    subsystemFactory.CreateWristSubsystem();
+    // subsystemFactory.CreateClawSubsystem();
+    // subsystemFactory.CreateWristSubsystem();
     subsystemFactory.CreateArmRotationSubsystem();
     subsystemFactory.CreateArmExtensionSubsystem();
     subsystemFactory.CreateDualLimelightManagerSubsystem();

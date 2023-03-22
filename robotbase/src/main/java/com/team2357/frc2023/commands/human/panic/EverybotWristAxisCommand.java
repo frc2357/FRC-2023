@@ -1,7 +1,7 @@
 package com.team2357.frc2023.commands.human.panic;
 
 import com.team2357.frc2023.controls.AxisInterface;
-import com.team2357.frc2023.subsystems.EverybotWristSubsystem;
+import com.team2357.frc2023.subsystems.WristSubsystem;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import pabeles.concurrency.IntOperatorTask.Max;
@@ -11,14 +11,14 @@ public class EverybotWristAxisCommand extends CommandBase {
 
     public EverybotWristAxisCommand(AxisInterface axis) {
         m_axis = axis;
-        addRequirements(EverybotWristSubsystem.getInstance());
+        addRequirements(WristSubsystem.getInstance());
     }
 
     @Override
     public void execute() {
         double axisValue = m_axis.getValue();
 
-        EverybotWristSubsystem.getInstance().setWristAxisSpeed(axisValue);
+        WristSubsystem.getInstance().setWristAxisSpeed(axisValue);
     }
 
     @Override
@@ -28,6 +28,6 @@ public class EverybotWristAxisCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        EverybotWristSubsystem.getInstance().stopMotor();
+        WristSubsystem.getInstance().stopMotor();
     }
 }

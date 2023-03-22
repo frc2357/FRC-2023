@@ -1,8 +1,10 @@
 package com.team2357.frc2023.subsystems;
 
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ClawSubsystem extends SubsystemBase {
@@ -13,89 +15,50 @@ public class ClawSubsystem extends SubsystemBase {
     }
 
     public static class Configuration {
-        public int m_openMilliseconds = 0;
-        public int m_closeMilliseconds = 0;
+        public double m_forwardPercentOutput;
+        public double m_reversePercentOutput;
+
+        public double m_rollerAxisMaxSpeed;
+
+        public boolean m_isInverted;
     }
 
     public Configuration m_config;
 
-    private enum ClawState { Unknown, Open, Closed };
+    private CANSparkMax m_rollerMotor;
 
-    private DoubleSolenoid m_clawSolenoid;
-    private ClawState m_currentState;
-    private ClawState m_desiredState;
-    private long m_lastActionMillis;
-    
-    public ClawSubsystem(int forwardChannel, int reverseChannel) {
-        m_clawSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, forwardChannel, reverseChannel);
+    public ClawSubsystem(int clawMotorID) {
+        m_rollerMotor = new CANSparkMax(clawMotorID, MotorType.kBrushless);
+
         instance = this;
     }
 
     public void configure(Configuration config) {
         m_config = config;
+
+        m_rollerMotor.setInverted(m_config.m_isInverted);
+
+        m_rollerMotor.setIdleMode(IdleMode.kBrake);
     }
 
-    public boolean isOpening() {
-        return (m_desiredState == ClawState.Open && m_currentState != ClawState.Open);
-    }
-
-    public boolean isOpen() {
-        return (m_desiredState == ClawState.Open && m_currentState == ClawState.Open);
-    }
-
-    public boolean isClosing() {
-        return (m_desiredState == ClawState.Closed && m_currentState != ClawState.Closed);
-    }
-
-    public boolean isClosed() {
-        return (m_desiredState == ClawState.Closed && m_currentState == ClawState.Closed);
-    }
-
-    public void open() {
-        m_currentState = ClawState.Unknown;
-        m_desiredState = ClawState.Open;
-        m_lastActionMillis = 0; 
-    }
-
-    public void close() {
-        m_currentState = ClawState.Unknown;
-        m_desiredState = ClawState.Closed;
-        m_lastActionMillis = 0;
-    }
-
-    @Override
-    public void periodic() {
-        if (m_currentState != m_desiredState) {
-            if (m_desiredState == ClawState.Open) {
-                openPeriodic();
-            } else if (m_desiredState == ClawState.Closed) {
-                closedPeriodic();
-            }
+    public void runRollers(boolean reverse) {
+        if (reverse) {
+            m_rollerMotor.set(m_config.m_reversePercentOutput);
+        } else {
+            m_rollerMotor.set(m_config.m_forwardPercentOutput);
         }
     }
 
-    private void openPeriodic() {
-        long now = System.currentTimeMillis();
-        if (m_lastActionMillis == 0) {
-            m_clawSolenoid.set(Value.kForward);
-            m_lastActionMillis = now;
-        } else if (now > m_lastActionMillis + m_config.m_openMilliseconds) {
-            m_clawSolenoid.set(Value.kOff);
-            m_currentState = ClawState.Open;
-            m_lastActionMillis = 0;
-        }
+    public void setAxisRollerSpeed(double axisSpeed) {
+        double motorSpeed = (-axisSpeed) * m_config.m_rollerAxisMaxSpeed;
+        m_rollerMotor.set(motorSpeed);
     }
 
-    private void closedPeriodic() {
-        long now = System.currentTimeMillis();
+    public void manualRunRollers(double percentOutput) {
+        m_rollerMotor.set(percentOutput);
+    }
 
-        if (m_lastActionMillis == 0) {
-            m_clawSolenoid.set(Value.kReverse);
-            m_lastActionMillis = now;
-        } else if (now > m_lastActionMillis + m_config.m_openMilliseconds) {
-            m_clawSolenoid.set(Value.kOff);
-            m_currentState = ClawState.Closed;
-            m_lastActionMillis = 0;
-        }
+    public void stopRollers() {
+        m_rollerMotor.set(0.0);
     }
 }

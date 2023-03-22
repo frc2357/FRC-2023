@@ -1,18 +1,18 @@
 package com.team2357.frc2023.commands.everybot;
 
-import com.team2357.frc2023.subsystems.EverybotClawSubsystem;
+import com.team2357.frc2023.subsystems.ClawSubsystem;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class ClawRollerReverseCommand extends CommandBase {
     
     public ClawRollerReverseCommand() {
-        addRequirements(EverybotClawSubsystem.getInstance());
+        addRequirements(ClawSubsystem.getInstance());
     }
 
     @Override
     public void execute() {
-        EverybotClawSubsystem.getInstance().runRollers(true);
+        ClawSubsystem.getInstance().runRollers(true);
     }
 
     @Override
@@ -22,7 +22,7 @@ public class ClawRollerReverseCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        EverybotClawSubsystem.getInstance().stopRollers();
+        ClawSubsystem.getInstance().stopRollers();
     }
     
 }

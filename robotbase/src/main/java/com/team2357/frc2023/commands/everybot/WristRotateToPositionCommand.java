@@ -1,6 +1,6 @@
 package com.team2357.frc2023.commands.everybot;
 
-import com.team2357.frc2023.subsystems.EverybotWristSubsystem;
+import com.team2357.frc2023.subsystems.WristSubsystem;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
@@ -9,21 +9,21 @@ public class WristRotateToPositionCommand extends CommandBase {
 
     public WristRotateToPositionCommand(double rotations) {
         m_rotations = rotations;
-        addRequirements(EverybotWristSubsystem.getInstance());
+        addRequirements(WristSubsystem.getInstance());
     }
 
     @Override
     public void initialize() {
-        EverybotWristSubsystem.getInstance().setRotations(m_rotations);
+        WristSubsystem.getInstance().setRotations(m_rotations);
     }
 
     @Override
     public boolean isFinished() {
-        return EverybotWristSubsystem.getInstance().isAtRotations();
+        return WristSubsystem.getInstance().isAtRotations();
     }
 
     @Override
     public void end(boolean interrupted) {
-        EverybotWristSubsystem.getInstance().stopMotor();
+        WristSubsystem.getInstance().stopMotor();
     }
 }
