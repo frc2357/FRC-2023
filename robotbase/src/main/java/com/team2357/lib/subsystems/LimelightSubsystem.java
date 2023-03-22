@@ -102,7 +102,7 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
     m_TvertSub = m_table.getDoubleTopic("tvert").subscribe(m_Configuration.m_DefaultReturnValue);
     m_Tid = m_table.getIntegerTopic("tid").subscribe(-1);
 
-    DoubleArrayTopic limelightPoseInfo = m_table.getDoubleArrayTopic("botpose");
+    DoubleArrayTopic limelightPoseInfo = m_table.getDoubleArrayTopic("botpose_targetspace");
     m_limelightPoseInfoSub = limelightPoseInfo.subscribe(null,
     PubSubOption.keepDuplicates(true));
 
