@@ -1,15 +1,14 @@
 package com.team2357.frc2023.commands.auto;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import java.util.function.Supplier;
 
+import com.team2357.frc2023.subsystems.DualLimelightManagerSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
-import com.team2357.frc2023.util.Utility;
+import com.team2357.frc2023.subsystems.DualLimelightManagerSubsystem.LIMELIGHT;
+import com.team2357.lib.subsystems.LimelightSubsystem;
 
 /**
  * Command to auto align the robot to a target pose based on the distance
@@ -23,14 +22,14 @@ public class DriveToPoseWithAngleCommand extends CommandBase {
     private final SwerveDriveSubsystem m_swerve;
     private final double m_tXTarget;
     private final double m_tYTarget;
-    private final Supplier<Double> m_tXCurrentSupplier;
-    private final Supplier<Double> m_tYCurrentSupplier;
-
+    
     private boolean m_running = false;
 
     private final ProfiledPIDController m_xDriveController;
     private final ProfiledPIDController m_yDriveController;
     private final ProfiledPIDController m_thetaController;
+
+    private final LimelightSubsystem m_limelight;
 
     /**
      * 
@@ -40,29 +39,31 @@ public class DriveToPoseWithAngleCommand extends CommandBase {
      *                            pose to be at to score on the middle row relative
      *                            to the april-tag in fron of it
      */
-    public DriveToPoseWithAngleCommand(Supplier<Double> tXCurrentSupplier, Supplier<Double> tYCurrentSupplier,
+    public DriveToPoseWithAngleCommand(
             double tXTarget, double tYTarget) {
         m_swerve = SwerveDriveSubsystem.getInstance();
 
         m_tXTarget = tXTarget;
-        m_tXCurrentSupplier = tXCurrentSupplier;
         m_tYTarget = tYTarget;
-        m_tYCurrentSupplier = tYCurrentSupplier;
 
         // m_driveController = m_swerve.getAutoAlignDriveController();
 
         // m_thetaController = m_swerve.getAutoAlignThetaController();
 
         m_xDriveController = new ProfiledPIDController(
-                0.0, 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0));
+                0.0, 0.0, 0.0, new TrapezoidProfile.Constraints(1, 0.5));
+        m_xDriveController.setTolerance(0.5);
 
         m_yDriveController = new ProfiledPIDController(
-                0.0, 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0));
+                0.0, 0.0, 0.0, new TrapezoidProfile.Constraints(1, 0.5));
+        m_yDriveController.setTolerance(0.5);
 
         m_thetaController = new ProfiledPIDController(
-                0.0, 0.0, 0.0, new TrapezoidProfile.Constraints(0.0, 0.0));
+                0.0, 0.0, 0.0, new TrapezoidProfile.Constraints(1, 0.5));
+        m_thetaController.setTolerance(0.5);
 
         m_thetaController.enableContinuousInput(-Math.PI, Math.PI);
+        m_limelight = DualLimelightManagerSubsystem.getInstance().getLimelight(LIMELIGHT.RIGHT);
 
         addRequirements(m_swerve);
     }
@@ -70,8 +71,9 @@ public class DriveToPoseWithAngleCommand extends CommandBase {
     @Override
     public void initialize() {
         // Reset all controllers
-        m_xDriveController.reset(m_tYCurrentSupplier.get());
-        m_yDriveController.reset(m_tXCurrentSupplier.get());
+        DualLimelightManagerSubsystem.getInstance().setAprilTagPipelineActive();
+        m_xDriveController.reset(m_limelight.getTY());
+        m_yDriveController.reset(m_limelight.getTX());
         m_thetaController.reset(m_swerve.getYaw());
     }
 
@@ -80,8 +82,8 @@ public class DriveToPoseWithAngleCommand extends CommandBase {
         m_running = true;
 
         // Get current and target pose
-        double tXCurrent = m_tXCurrentSupplier.get();
-        double tYCurrent = m_tYCurrentSupplier.get();
+        double tXCurrent = m_limelight.getTX();
+        double tYCurrent = m_limelight.getTY();
 
         // Calculate drive speed
         double tYError = tYCurrent - m_tYTarget;
@@ -99,10 +101,11 @@ public class DriveToPoseWithAngleCommand extends CommandBase {
         if (m_thetaController.atGoal())
             thetaVelocity = 0.0;
 
-        m_swerve.drive(
-        ChassisSpeeds.fromFieldRelativeSpeeds(
-            xVelMetersPerSecond, yVelMetersPerSecond, thetaVelocity,
-        m_swerve.getGyroscopeRotation()));
+        System.out.println("X speed: " + xVelMetersPerSecond);
+        // m_swerve.drive(
+        // ChassisSpeeds.fromFieldRelativeSpeeds(
+        //     xVelMetersPerSecond, yVelMetersPerSecond, thetaVelocity,
+        // m_swerve.getGyroscopeRotation()));
     }
 
     @Override
@@ -113,7 +116,7 @@ public class DriveToPoseWithAngleCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return atGoal();
+        return atGoal() || m_limelight.validTargetExists();
     }
 
     /** Checks if the robot is stopped at the final pose. */

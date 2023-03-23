@@ -1,5 +1,6 @@
 package com.team2357.frc2023.controls;
 
+import com.team2357.frc2023.commands.auto.DriveToPoseWithAngleCommand;
 import com.team2357.frc2023.commands.drive.AutoBalanceCommand;
 import com.team2357.frc2023.arduino.GamepieceLED;
 import com.team2357.frc2023.arduino.GamepieceLED.SIGNAL_COLOR;
@@ -11,7 +12,9 @@ import com.team2357.frc2023.commands.intake.IntakeStowCommandGroup;
 import com.team2357.frc2023.commands.scoring.HeartlandAutoScoreCommand;
 import com.team2357.frc2023.commands.scoring.HeartlandAutoTranslateCommand;
 import com.team2357.frc2023.commands.scoring.TeleopAutoScoreCommandGroup;
+import com.team2357.frc2023.subsystems.DualLimelightManagerSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
+import com.team2357.frc2023.subsystems.DualLimelightManagerSubsystem.LIMELIGHT;
 import com.team2357.lib.triggers.AxisThresholdTrigger;
 import com.team2357.lib.util.XboxRaw;
 
@@ -73,7 +76,8 @@ public class SwerveDriveControls {
         m_rightTrigger.whileTrue(new IntakeDeployCommandGroup().alongWith(new InstantCommand(() -> GamepieceLED.getInstance().setSignalColor(SIGNAL_COLOR.YELLOW))));
         m_rightTrigger.onFalse(new IntakeStowCommandGroup());
 
-        m_aButton.whileTrue(new AutoBalanceCommand());
+        m_aButton.whileTrue(new DriveToPoseWithAngleCommand(
+         0.0, 0.0));
 
         //Teleop auto
         //m_rightBumper.whileTrue(new HeartlandAutoTranslateCommand(m_controller));
