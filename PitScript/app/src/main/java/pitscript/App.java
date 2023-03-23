@@ -42,12 +42,7 @@ public class App {
     }
 
     public static boolean TransferFiles() {
-        return fileManager(2);
-    }
-    public static boolean deleteFiles(){
-        return fileManager(0);
-    }
-    public static boolean fileManager(int operation){
+        System.out.println("made it to file transfer");
         try {
             // The port should always be 22, because thats what SSH uses normally.
             // Its also what happens if we dont give it a port, so dont worry about it.
@@ -59,17 +54,13 @@ public class App {
             Channel channel = session.openChannel("sftp");
             channel.connect();
             ChannelSftp sftp = (ChannelSftp) channel;
-            Vector ls = sftp.ls(REMOTE_FILE_PATH);
+            Vector<String> ls = sftp.ls(REMOTE_FILE_PATH);
             for (Object entry : ls) {
                 ChannelSftp.LsEntry e = (ChannelSftp.LsEntry) entry;
                 if (e.getFilename().endsWith(".wpilog")) {
                     String actualFileName = (REMOTE_FILE_PATH + e.getFilename());
                     GUI.writeToText("Downloading: " + e.getFilename());
-                    GUI.writeToText("Real file name: " + actualFileName);
-                    if(operation >0){
                     sftp.get(actualFileName, LOCAL_FILE_DESTINATION);
-                    }
-                    if(operation == 0 | operation ==2){
                         GUI.writeToText("Deleting: " + e.getFilename());
                         try {
                             sftp.rm(actualFileName);
@@ -85,8 +76,7 @@ public class App {
                             }
                         }
                         GUI.writeToText("File deleted.");                    }
-            }}
-
+            }
             System.out.println("All files downloaded, closing connections and ending programs");
             channel.disconnect();
             session.disconnect();
