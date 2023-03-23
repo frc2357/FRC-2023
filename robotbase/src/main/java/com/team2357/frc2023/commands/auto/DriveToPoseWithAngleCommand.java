@@ -116,7 +116,7 @@ public class DriveToPoseWithAngleCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return atGoal() || m_limelight.validTargetExists();
+        return atGoal() || !m_limelight.validTargetExists();
     }
 
     /** Checks if the robot is stopped at the final pose. */
