@@ -93,7 +93,7 @@ public class DriveToPoseWithAngleCommand extends CommandBase {
 
         double tXError = tXCurrent - m_tXTarget;
         double yVelMetersPerSecond = m_yDriveController.calculate(tXError, 0.0);
-        if (m_xDriveController.atGoal())
+        if (m_yDriveController.atGoal())
             yVelMetersPerSecond = 0.0;
         
         // Calculate theta speed
