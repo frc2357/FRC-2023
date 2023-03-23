@@ -345,12 +345,12 @@ public final class Constants {
 
         public static ArmExtensionSubsystem.Configuration GET_EXTENSION_CONFIG() {
             ArmExtensionSubsystem.Configuration config = new ArmExtensionSubsystem.Configuration();
-            config.m_extendAxisMaxSpeed = 0;
+            config.m_extendAxisMaxSpeed = 1.0;
 
             config.m_extendMotorIdleMode = IdleMode.kBrake;
 
-            config.m_extendMotorStallLimitAmps = 30;
-            config.m_extendMotorFreeLimitAmps = 30;
+            config.m_extendMotorStallLimitAmps = 60;
+            config.m_extendMotorFreeLimitAmps = 60;
 
             config.m_isInverted = true;
 
@@ -363,23 +363,23 @@ public final class Constants {
             // smart motion config
 
             // extend PID
-            config.m_extendP = 0.00001;
+            config.m_extendP = 0.0005;
             config.m_extendI = 0;
             config.m_extendD = 0;
             config.m_extendIZone = 0;
-            config.m_extendFF = 0.00011;
+            config.m_extendFF = 0.0003;
             config.m_extendPidSlot = 0;
 
             // Smart motion
             config.m_pidMaxOutput = 1;
             config.m_pidMinOutput = -1;
-            config.m_smartMotionMaxVelRPM = 8700;
+            config.m_smartMotionMaxVelRPM = 4600;
             config.m_smartMotionMinVelRPM = 0;
-            config.m_smartMotionMaxAccRPM = 8700 * 2;
-            config.m_smartMotionRotationAllowedError = 0.5;
-            config.m_rotationAllowedError = 0.5;
+            config.m_smartMotionMaxAccRPM = 4600 * 4;
+            config.m_smartMotionRotationAllowedError = 0.1;
+            config.m_rotationAllowedError = 0.1;
 
-            config.m_maxSpeedPercent = 0.7;
+            config.m_maxSpeedPercent = 1.0;
             return config;
         }
 
