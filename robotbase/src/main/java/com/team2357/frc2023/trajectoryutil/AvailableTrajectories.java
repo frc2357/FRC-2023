@@ -8,15 +8,21 @@ public class AvailableTrajectories {
     public static SequentialCommandGroup figure8Trajectory;
     public static SequentialCommandGroup lineTrajectory;
     public static SequentialCommandGroup exampleTwoPointTrajectory;
+    public static SequentialCommandGroup flipTrajectory;
 
     public static void generateTrajectories() {
         figure8Trajectory = createFigure8Trajectory();
         lineTrajectory = createLineTrajectory();
         exampleTwoPointTrajectory = createExampleTwoPointTrajectory();
+        flipTrajectory = createFlipTrajectory();
     }
-
+  
     public static SequentialCommandGroup createFigure8Trajectory() {
         return TrajectoryUtil.createTrajectoryPathCommand("figure8", true);
+    }
+
+    public static SequentialCommandGroup createFlipTrajectory() {
+        return TrajectoryUtil.createTrajectoryPathCommand("flip", true);
     }
 
     public static SequentialCommandGroup createLineTrajectory() {
@@ -26,5 +32,5 @@ public class AvailableTrajectories {
     public static SequentialCommandGroup createExampleTwoPointTrajectory() {
         return TrajectoryUtil.CreateTwoPointTrajectoryPathCommand(new Pose2d(1, 1, Rotation2d.fromDegrees(0)),
                 new Pose2d(2, 1, Rotation2d.fromDegrees(90)), true);
-    }
+    }    
 }

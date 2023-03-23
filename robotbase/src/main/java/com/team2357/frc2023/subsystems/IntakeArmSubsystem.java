@@ -150,11 +150,17 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
     }
 
     public void setWinchRotations(double rotations) {
-        int pidSlot = getWinchRotations() > rotations ? m_config.m_winchStowPidSlot : m_config.m_deployMilliseconds;
+
+        boolean isStow = (getWinchRotations() > rotations);
+        int pidSlot = isStow ? m_config.m_winchStowPidSlot : m_config.m_winchDeployPidSlot;
         setWinchRotations(rotations, pidSlot);
     }
 
     public void setWinchRotations(double rotations, int pidSlot) {
+        boolean isStow = (getWinchRotations() > rotations);
+        Value solenoidAct = isStow ?  Value.kReverse : Value.kForward;
+        m_intakeSolenoid.set(solenoidAct);
+        
         setClosedLoopEnabled(true);
         m_targetRotations = rotations;
         m_winchPIDController.setReference(m_targetRotations, CANSparkMax.ControlType.kSmartMotion, pidSlot);
@@ -219,9 +225,14 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
         setWinchRotations(m_config.m_winchStowRotations, m_config.m_winchStowPidSlot);
     }
 
+    public void stowSolenoid() {
+        m_intakeSolenoid.set(Value.kReverse);
+    }
+
     public void extendSolenoid() {
         m_intakeSolenoid.set(Value.kForward);
     }
+
 
     public void stopSolenoid() {
         m_intakeSolenoid.set(Value.kOff);
@@ -271,10 +282,10 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
             updatePID();
         }
 
-        // SmartDashboard.putNumber("Winch speed", m_winchMotor.getAppliedOutput());
-        // SmartDashboard.putNumber("Winch amps", getAmps());
-        // SmartDashboard.putNumber("Winch rotations",
-        // m_winchMotor.getEncoder().getPosition());
+        SmartDashboard.putNumber("Winch speed", m_winchMotor.getAppliedOutput());
+        SmartDashboard.putNumber("Winch amps", getAmps());
+        SmartDashboard.putNumber("Winch rotations",
+        m_winchMotor.getEncoder().getPosition());
     }
 
     private void deployPeriodic() {
