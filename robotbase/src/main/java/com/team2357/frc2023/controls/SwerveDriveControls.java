@@ -73,9 +73,11 @@ public class SwerveDriveControls {
         m_rightTrigger.whileTrue(new IntakeDeployCommandGroup().alongWith(new InstantCommand(() -> GamepieceLED.getInstance().setSignalColor(SIGNAL_COLOR.YELLOW))));
         m_rightTrigger.onFalse(new IntakeStowCommandGroup());
 
+        m_aButton.whileTrue(new AutoBalanceCommand());
+
         //Teleop auto
-        m_rightBumper.whileTrue(new HeartlandAutoTranslateCommand(m_controller));
-        m_leftBumper.whileTrue(new HeartlandAutoScoreCommand());
+        //m_rightBumper.whileTrue(new HeartlandAutoTranslateCommand(m_controller));
+        //m_leftBumper.whileTrue(new HeartlandAutoScoreCommand());
 
     }
 

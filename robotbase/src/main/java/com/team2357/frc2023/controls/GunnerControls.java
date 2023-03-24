@@ -2,7 +2,7 @@ package com.team2357.frc2023.controls;
 
 import com.team2357.frc2023.Constants.CONTROLLER;
 import com.team2357.frc2023.commands.armextension.ArmExtendAmpZeroCommand;
-import com.team2357.frc2023.commands.armrotation.ArmRotationAmpZeroCommand;
+import com.team2357.frc2023.commands.auto.RotateToDegreeCommand;
 import com.team2357.frc2023.commands.auto.TranslateToTargetCommand;
 import com.team2357.frc2023.commands.human.panic.ArmExtensionAxisCommand;
 import com.team2357.frc2023.commands.human.panic.ArmRotationAxisCommand;
@@ -13,11 +13,10 @@ import com.team2357.frc2023.commands.human.panic.IntakeWinchAxisCommand;
 import com.team2357.frc2023.commands.human.panic.WristToggleCommand;
 import com.team2357.frc2023.commands.intake.WinchAmpZeroCommand;
 import com.team2357.frc2023.commands.scoring.AutoScoreLowCommandGroup;
+import com.team2357.frc2023.commands.scoring.HomeMechanismsCommand;
 import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
 import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreMidCommandGroup;
-import com.team2357.frc2023.subsystems.ArmExtensionSubsystem;
 import com.team2357.frc2023.subsystems.ArmRotationSubsystem;
-import com.team2357.frc2023.subsystems.IntakeArmSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.lib.triggers.AxisThresholdTrigger;
 import com.team2357.lib.util.Utility;
@@ -166,7 +165,9 @@ public class GunnerControls {
         // Arm rotation
         upDPadOnly.whileTrue(new ArmRotationAxisCommand(axisRightStickY));
 
-        upDPadAndY.whileTrue(new ArmRotationAmpZeroCommand());
+        upDPadAndY.onTrue(new InstantCommand(() -> {
+            ArmRotationSubsystem.getInstance().resetEncoder();
+        }));
 
         // Arm extension / claw / wrist
         leftDPadOnly.whileTrue(new ArmExtensionAxisCommand(axisRightStickY));
@@ -186,22 +187,26 @@ public class GunnerControls {
         rightDPadAndY.onTrue(new WinchAmpZeroCommand());
 
         // Teleop trajectory
-        downDPadAndX.onTrue(new TranslateToTargetCommand(SwerveDriveSubsystem.COLUMN_TARGET.LEFT));
-        downDPadAndA.onTrue(new TranslateToTargetCommand(SwerveDriveSubsystem.COLUMN_TARGET.MIDDLE));
-        downDPadAndB.onTrue(new TranslateToTargetCommand(SwerveDriveSubsystem.COLUMN_TARGET.RIGHT));
+        downDPadAndX.whileTrue(new TranslateToTargetCommand(SwerveDriveSubsystem.COLUMN_TARGET.LEFT));
+        downDPadAndA.whileTrue(new TranslateToTargetCommand(SwerveDriveSubsystem.COLUMN_TARGET.MIDDLE));
+        downDPadAndB.whileTrue(new TranslateToTargetCommand(SwerveDriveSubsystem.COLUMN_TARGET.RIGHT));
 
         // Auto score
-        yButton.onTrue(new ConeAutoScoreHighCommandGroup());
-        xButton.onTrue(new ConeAutoScoreMidCommandGroup());
-        aButton.onTrue(new AutoScoreLowCommandGroup());
+        yButton.whileTrue(new ConeAutoScoreHighCommandGroup());
+        xButton.whileTrue(new ConeAutoScoreMidCommandGroup());
+        aButton.whileTrue(new AutoScoreLowCommandGroup());
 
         // Zero all
         m_backButton.onTrue(new ParallelCommandGroup(
             new SequentialCommandGroup(
-                new ArmRotationAmpZeroCommand(),
+                new InstantCommand(() -> {
+                    ArmRotationSubsystem.getInstance().resetEncoder();
+                }),
                 new ArmExtendAmpZeroCommand()
             ),
             new WinchAmpZeroCommand()
         ));
+
+        m_startButton.whileTrue(new HomeMechanismsCommand());
     }
 }

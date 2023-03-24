@@ -4,6 +4,7 @@
 
 package com.team2357.frc2023;
 
+import com.pathplanner.lib.PathConstraints;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.team2357.frc2023.subsystems.ArmExtensionSubsystem;
@@ -14,8 +15,13 @@ import com.team2357.frc2023.subsystems.IntakeRollerSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.frc2023.subsystems.WristSubsystem;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -75,9 +81,9 @@ public final class Constants {
 
     public static final class PH_ID {
 
-        public static final int WRIST_FORWARD_SOLENOID_CHANNEL = 3; // Red
+        public static final int WRIST_FORWARD_SOLENOID_CHANNEL = 7; // Red
         public static final int WRIST_REVERSE_SOLENOID_CHANNEL = 0;
-        
+
         public static final int CLAW_FORWARD_SOLENOID_CHANNEL = 4;
         public static final int CLAW_REVERSE_SOLENOID_CHANNEL = 1; // Black
 
@@ -101,11 +107,9 @@ public final class Constants {
                     Math.hypot(config.m_trackwidthMeters / 2.0, config.m_wheelbaseMeters / 2.0);
             config.m_maxAngularAccelerationRadiansPerSecondSquared = config.m_maxAngularVelocityRadiansPerSecond / 3.0;
 
-            config.m_trajectoryMaxVelocityMetersPerSecond = 2;
-            config.m_trajectoryMaxAccelerationMetersPerSecond = 3;
-            config.m_xController = new PIDController(.56122, 0, 0);
-            config.m_yController = new PIDController(.56122, 0, 0);
-            config.m_thetaController = new PIDController(2.15, 0, 0);
+            config.m_xController = new PIDController(8.0, 0, 0); // .56122 2.2
+            config.m_yController = new PIDController(8.0, 0, 0); // .56122
+            config.m_thetaController = new PIDController(6.0, 0, 0); // 2.15
 
             config.m_sensorPositionCoefficient = 2.0 * Math.PI / Constants.DRIVE.TICKS_PER_ROTATION
                     * SdsModuleConfigurations.MK4I_L2.getSteerReduction();
@@ -131,6 +135,20 @@ public final class Constants {
 
             config.m_openLoopRampRateSeconds = 1;
 
+            /**
+             * State measurement standard deviations. Left encoder, right encoder, gyro
+             * Increase these numbers to trust them less
+             */
+            config.m_stateStdDevs = VecBuilder.fill(0.1, 0.1, 0.0);
+
+            /**
+             * Local measurement standard deviations. Vision X, Y, theta.
+             * Increase these numbers to trust them less
+             */
+            config.m_visionMeasurementStdDevs = VecBuilder.fill(0.9, 0.9, 1);
+
+            config.m_visionToleranceMeters = 0.1524;
+
             return config;
         }
 
@@ -140,11 +158,11 @@ public final class Constants {
         // sensorDirection = false;
         // initializationStrategy = bootToAbsValue;
 
-        public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(8.79+180);
-        public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(314.38-180); 
-        public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(306.3-180); 
-        public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(163.04+180);
-        
+        public static final double FRONT_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(8.79 + 180);
+        public static final double FRONT_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(314.38 - 180);
+        public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(306.3 - 180);
+        public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(163.04 + 180);
+
         public static final PIDController CHARGE_STATION_BALANCE_ANGLE_CONTROLLER = new PIDController(0.5, 0, 0);
         public static final PIDController CHARGE_STATION_DISTANCE_CONTROLLER = new PIDController(0.5, 0, 0);
 
@@ -152,7 +170,7 @@ public final class Constants {
         public static final double BALANCE_FULL_TILT_DEGREES = 15;
         public static final double BACKWARDS_BALANCING_EXTRA_POWER_MULTIPLIER = 1.35;
         public static final double BALANCE_KP = 0.01;
-        public static final double BALANCE_MAX_POWER = 0.4;
+        public static final double BALANCE_MAX_POWER = 0.2;
 
         public static final double TICKS_PER_ROTATION = 2048.0;
 
@@ -160,11 +178,10 @@ public final class Constants {
 
         public static final double ENCODER_SYNC_ACCURACY_RADIANS = 0.05;
 
-        public static final PIDController ROTATE_TO_TARGET_CONTROLLER = new PIDController(0.1, 0, 0);
+        public static final PIDController ROTATE_TO_TARGET_CONTROLLER = new PIDController(0.5, 0, 0.0001);
 
         public static final double ROTATE_MAXSPEED_RADIANS_PER_SECOND = 0.91;
         public static final double SYNC_ENCODER_LIMIT_MS = 10000;
-
 
         public static final double DEFAULT_Y_ANGLE_SETPOINT = 20;
         public static final double DEFAULT_X_ANGLE_SETPOINT = -9;
@@ -176,20 +193,29 @@ public final class Constants {
         public static final double DEAD_RECKONING_TRANSLATION_METERS_PER_SECOND = 1;
         public static final double DEAD_RECKONING_ROTATION_RADIANS_PER_SECOND = 0.1;
 
-        public static final ChassisSpeeds DEAD_RECKONING_X_CHASSIS_SPEEDS = new ChassisSpeeds(DEAD_RECKONING_TRANSLATION_METERS_PER_SECOND, 0, 0);
-        public static final ChassisSpeeds DEAD_RECKONING_Y_CHASSIS_SPEEDS = new ChassisSpeeds(0, DEAD_RECKONING_TRANSLATION_METERS_PER_SECOND, 0);
-        public static final ChassisSpeeds DEAD_RECKONING_ROTATION_CHASSIS_SPEEDS = new ChassisSpeeds(0, 0, DEAD_RECKONING_ROTATION_RADIANS_PER_SECOND);
+        public static final ChassisSpeeds DEAD_RECKONING_X_CHASSIS_SPEEDS = new ChassisSpeeds(
+                DEAD_RECKONING_TRANSLATION_METERS_PER_SECOND, 0, 0);
+        public static final ChassisSpeeds DEAD_RECKONING_Y_CHASSIS_SPEEDS = new ChassisSpeeds(0,
+                DEAD_RECKONING_TRANSLATION_METERS_PER_SECOND, 0);
+        public static final ChassisSpeeds DEAD_RECKONING_ROTATION_CHASSIS_SPEEDS = new ChassisSpeeds(0, 0,
+                DEAD_RECKONING_ROTATION_RADIANS_PER_SECOND);
 
         public static final String SWERVE_MODULE_SHUFFLEBOARD_TAB_NAME = "Drivetrain";
-    
+
         // Tolerance for out-of-range poses on auto-mapping
         public static final double TRAJECTORY_MAP_TOLERANCE_METERS = 0.1;
+
+        // Path constraints
+        public static final PathConstraints DEFAULT_PATH_CONSTRAINTS = new PathConstraints(2.5,
+                1.5);
+        public static final PathConstraints GRID_ZERO_PATH_CONSTRAINTS = new PathConstraints(2, 1);
+
     }
 
     public static final class INTAKE_ROLLER {
         public static final double AUTO_SCORE_LOW_REVERSE_TIME = 1;
 
-        //TODO: Tune these
+        // TODO: Tune these
         public static final double MID_SHOT_PERCENT_OUTPUT = 0;
         public static final double MID_SHOT_DELAY_SECONDS = .25;
         public static final double HIGH_SHOT_PERCENT_OUTPUT = 0;
@@ -216,7 +242,6 @@ public final class Constants {
             return config;
         }
 
-        
     }
 
     public static final class INTAKE_ARM {
@@ -226,7 +251,7 @@ public final class Constants {
         public static final double AUTO_SCORE_LOW_ROTATIONS = 70;
 
         // Cube shooting
-        //TODO: Tune these
+        // TODO: Tune these
         public static final double MID_SHOT_SETPOINT_ROTATIONS = 0;
         public static final double HIGH_SHOT_SETPOINT_ROTATIONS = 0;
 
@@ -236,7 +261,7 @@ public final class Constants {
         public static final int WINCH_STOW_PID_SLOT = 1;
 
         public static final double WINCH_AMP_ZERO_PERCENT_OUTPUT = -0.4;
-        public static final int WINCH_AMP_ZERO_MAX_AMPS = 15;
+        public static final int WINCH_AMP_ZERO_MAX_AMPS = 10;
 
         public static IntakeArmSubsystem.Configuration GET_INTAKE_ARM_CONFIG() {
             IntakeArmSubsystem.Configuration config = new IntakeArmSubsystem.Configuration();
@@ -259,7 +284,7 @@ public final class Constants {
             config.m_winchDeployI = 0;
             config.m_winchDeployD = 0;
             config.m_winchDeployIZone = 0;
-            config.m_winchDeployFF = 0.0001;
+            config.m_winchDeployFF = 0.00015;
             config.m_winchDeployPidSlot = WINCH_DEPLOY_PID_SLOT;
 
             // retract PID
@@ -275,17 +300,16 @@ public final class Constants {
             config.m_pidMinOutput = -1;
             config.m_smartMotionMaxVelRPM = 10000;
             config.m_smartMotionMinVelRPM = 0;
-            config.m_smartMotionMaxAccRPM = 10000;
+            config.m_smartMotionMaxAccRPM = 4000;
             config.m_smartMotionRotationAllowedError = 2;
 
             config.m_winchMotorAllowedError = 2;
-            config.m_winchDeployRotations = 140;
+            config.m_winchDeployRotations = 135;
             config.m_winchStowRotations = 0.0;
 
             return config;
         }
 
-       
     }
 
     public static final class WRIST {
@@ -313,20 +337,20 @@ public final class Constants {
     public static final class ARM_EXTENSION {
         public static final double RETRACTED_ROTATIONS = 0;
 
-        public static final double AUTO_SCORE_MID_ROTATIONS = 0;
-        public static final double AUTO_SCORE_HIGH_ROTATIONS = 260;
+        public static final double AUTO_SCORE_MID_ROTATIONS = 15;
+        public static final double AUTO_SCORE_HIGH_ROTATIONS = 245;
 
         public static final double ARM_EXTENSION_AMP_ZERO_PERCENT_OUTPUT = -0.2;
         public static final int ARM_EXTENSION_AMP_ZERO_MAX_AMPS = 25;
 
         public static ArmExtensionSubsystem.Configuration GET_EXTENSION_CONFIG() {
             ArmExtensionSubsystem.Configuration config = new ArmExtensionSubsystem.Configuration();
-            config.m_extendAxisMaxSpeed = 0;
+            config.m_extendAxisMaxSpeed = 1.0;
 
             config.m_extendMotorIdleMode = IdleMode.kBrake;
 
-            config.m_extendMotorStallLimitAmps = 30;
-            config.m_extendMotorFreeLimitAmps = 30;
+            config.m_extendMotorStallLimitAmps = 60;
+            config.m_extendMotorFreeLimitAmps = 60;
 
             config.m_isInverted = true;
 
@@ -339,43 +363,39 @@ public final class Constants {
             // smart motion config
 
             // extend PID
-            config.m_extendP = 0.00001;
+            config.m_extendP = 0.0005;
             config.m_extendI = 0;
             config.m_extendD = 0;
             config.m_extendIZone = 0;
-            config.m_extendFF = 0.00011;
+            config.m_extendFF = 0.0003;
             config.m_extendPidSlot = 0;
 
             // Smart motion
             config.m_pidMaxOutput = 1;
             config.m_pidMinOutput = -1;
-            config.m_smartMotionMaxVelRPM = 8700;
+            config.m_smartMotionMaxVelRPM = 4600;
             config.m_smartMotionMinVelRPM = 0;
-            config.m_smartMotionMaxAccRPM = 8700*2;
-            config.m_smartMotionRotationAllowedError = 0.5;
-            config.m_rotationAllowedError = 0.5;
+            config.m_smartMotionMaxAccRPM = 4600 * 4;
+            config.m_smartMotionRotationAllowedError = 0.1;
+            config.m_rotationAllowedError = 0.1;
 
-            config.m_maxSpeedPercent = 0.7;
+            config.m_maxSpeedPercent = 1.0;
             return config;
         }
 
-        
     }
 
     public static final class ARM_ROTATION {
-        public static final double CHAIN_BACKLASH_ROTATIONS = 12;
-
         public static final double RETRACTED_ROTATIONS = 0;
 
-        public static final double AUTO_SCORE_MID_ROTATIONS = 45 + CHAIN_BACKLASH_ROTATIONS;
-        public static final double AUTO_SCORE_HIGH_ROTATIONS = 58 + CHAIN_BACKLASH_ROTATIONS;
+        public static final double AUTO_SCORE_MID_ROTATIONS = 50;
+        public static final double AUTO_SCORE_HIGH_ROTATIONS = 65;
 
         public static final double ARM_ROTATION_GEAR_RATIO  = 190.91;
-        public static final double ARM_HANDOFF_ROTATIONS = ARM_ROTATION_GEAR_RATIO / 8 + CHAIN_BACKLASH_ROTATIONS;
+        public static final double ARM_HANDOFF_ROTATIONS = ARM_ROTATION_GEAR_RATIO / 8;
 
-        public static final double ARM_ROTATION_AMP_ZERO_PERCENT_OUTPUT = -0.25;
+        public static final double ARM_ROTATION_AMP_ZERO_PERCENT_OUTPUT = -0.1;
         public static final int ARM_ROTATION_AMP_ZERO_MAX_AMPS = 25;
-
 
         public static final double ARM_ROTATION_AMP_ZERO_TIME_MILLIS = 1000;
 
@@ -383,7 +403,7 @@ public final class Constants {
             ArmRotationSubsystem.Configuration config = new ArmRotationSubsystem.Configuration();
 
             config.m_rotationZeroTolerance = 2.5;
-            
+
             config.m_rotationAxisMaxSpeed = 0.7;
             config.m_maxSpeedPercent = 0.4;
 
@@ -414,7 +434,8 @@ public final class Constants {
             // Static gain, will likely be zero
             config.m_feedforwardKs = 0;
 
-            // Gravity gain, should be the gain required to keep the arm parallel with the floor
+            // Gravity gain, should be the gain required to keep the arm parallel with the
+            // floor
             config.m_feedforwardKg = 0.64;
 
             // Velocity gain, will be zero
@@ -424,7 +445,7 @@ public final class Constants {
             config.m_feedforwardKa = 0;
 
             // TODO: Calculate
-            config.m_armHorizontalRotations = ARM_ROTATION_GEAR_RATIO / 4 + CHAIN_BACKLASH_ROTATIONS; // 90 degrees
+            config.m_armHorizontalRotations = ARM_ROTATION_GEAR_RATIO / 4; // 90 degrees
             config.m_rotationsPerRadian = ARM_ROTATION_GEAR_RATIO / (2 * Math.PI);
 
             return config;
@@ -435,7 +456,7 @@ public final class Constants {
     public static final class LIMELIGHT {
         public static final String LEFT_LIMELIGHT_NAME = "limelight-left";
         public static final String RIGHT_LIMELIGHT_NAME = "limelight-right";
-        
+
         public static final double LEFT_LIMELIGHT_TX_SETPOINT = Double.NaN;
         public static final double RIGHT_LIMELIGHT_TX_SETPOINT = Double.NaN;
     }
@@ -458,7 +479,7 @@ public final class Constants {
 
     public static final class APRILTAG_POSE {
         public static final String APRILTAG_TABLE_NAME = "apriltag";
-        public static final String POSE_TOPIC_NAME = "pose";
+        public static final String POSE_TOPIC_NAME = "tags";
     }
 
     public static final class CONTROLLER {
@@ -478,10 +499,29 @@ public final class Constants {
 
     public static final class COMPRESSOR {
         public static final int MIN_PRESSURE_PSI = 90;
-        public static final int MAX_PRESSURE_PSI = 100;
+        public static final int MAX_PRESSURE_PSI = 120;
     }
-    public static final class AMP_ZERO{
+
+    public static final class AMP_ZERO {
         public static final int AMP_ZERO_DEADLINE_SECONDS = 1;
     }
 
+    public static final class GRIDCAM {
+        public static final double FRONT_CAM_HEIGHT_METERS = 1.183482768666;
+        public static final double REAR_CAM_HIEGHT_METERS = 1.183482768666;
+
+        public static final double FRONT_CAM_X_METERS = -0.10795;
+        public static final double REAR_CAM_X_METERS = -0.10795;
+
+        public static final double FRONT_CAM_Y_METERS = 0.078725095534;
+        public static final double REAR_CAM_Y_METERS = 0.226074904466;
+
+        public static final double FRONT_CAM_YAW_DEGREES = 0.0;
+        public static final double REAR_CAM_YAW_DEGREES = 180;
+
+        public static final Pose2d FRONT_CAM_POSE = new Pose2d(FRONT_CAM_X_METERS, FRONT_CAM_Y_METERS,
+                Rotation2d.fromDegrees(FRONT_CAM_YAW_DEGREES));
+        public static final Pose2d REAR_CAM_POSE = new Pose2d(REAR_CAM_X_METERS, REAR_CAM_Y_METERS,
+                Rotation2d.fromDegrees(REAR_CAM_YAW_DEGREES));
+    }
 }
