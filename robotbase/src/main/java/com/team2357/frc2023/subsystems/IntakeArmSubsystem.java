@@ -12,6 +12,7 @@ import com.team2357.lib.util.Utility;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class IntakeArmSubsystem extends ClosedLoopSubsystem {
     private static IntakeArmSubsystem instance = null;
