@@ -3,6 +3,7 @@ package com.team2357.frc2023.commands.scoring.cone;
 import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.commands.armextension.ArmExtendToPositionCommand;
 import com.team2357.frc2023.commands.armrotation.ArmRotateToPositionCommand;
+import com.team2357.frc2023.commands.armrotation.ArmRotationZeroCommand;
 import com.team2357.frc2023.commands.claw.ClawInstantCloseCommand;
 import com.team2357.frc2023.commands.claw.ClawInstantOpenCommand;
 import com.team2357.frc2023.commands.intake.IntakeArmStowCommand;
@@ -33,10 +34,9 @@ public class ConeAutoScoreHighCommandGroup extends ParallelCommandGroup {
                         // Arm Rotation
                         new WaitCommand(0.3)
                                         .andThen(new ArmRotateToPositionCommand(
-                                                        Constants.ARM_ROTATION.AUTO_SCORE_HIGH_ROTATIONS))
+                                                        Constants.ARM_ROTATION.AUTO_SCORE_HIGH_POSITION))
                                         .andThen(new WaitCommand(2.5))
-                                        .andThen(new ArmRotateToPositionCommand(
-                                                        Constants.ARM_ROTATION.RETRACTED_ROTATIONS)),
+                                        .andThen(new ArmRotationZeroCommand()),
 
                         // Wrist
                         new WaitCommand(0.9)

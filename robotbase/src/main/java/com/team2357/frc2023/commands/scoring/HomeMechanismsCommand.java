@@ -3,6 +3,7 @@ package com.team2357.frc2023.commands.scoring;
 import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.commands.armextension.ArmExtendToPositionCommand;
 import com.team2357.frc2023.commands.armrotation.ArmRotateToPositionCommand;
+import com.team2357.frc2023.commands.armrotation.ArmRotationZeroCommand;
 import com.team2357.frc2023.commands.claw.ClawInstantCloseCommand;
 import com.team2357.frc2023.commands.intake.IntakeArmStowCommand;
 import com.team2357.frc2023.commands.wrist.WristInstantRetractCommand;
@@ -21,10 +22,10 @@ public class HomeMechanismsCommand extends SequentialCommandGroup {
                         new ArmExtendToPositionCommand(Constants.ARM_EXTENSION.RETRACTED_ROTATIONS),
                         new WaitCommand(1.5)));
 
-        addCommands(new ArmRotateToPositionCommand(Constants.ARM_ROTATION.AUTO_SCORE_MID_ROTATIONS));
+        addCommands(new ArmRotateToPositionCommand(Constants.ARM_ROTATION.AUTO_SCORE_MID_POSITION));
 
         addCommands(new IntakeArmStowCommand());
 
-        addCommands(new ArmRotateToPositionCommand(Constants.ARM_ROTATION.RETRACTED_ROTATIONS));
+        addCommands(new ArmRotationZeroCommand());
     }
 }

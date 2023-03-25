@@ -386,10 +386,9 @@ public final class Constants {
     }
 
     public static final class ARM_ROTATION {
-        public static final double RETRACTED_ROTATIONS = 0;
-
-        public static final double AUTO_SCORE_MID_ROTATIONS = 50;
-        public static final double AUTO_SCORE_HIGH_ROTATIONS = 65;
+        // TODO: TUNE
+        public static final double AUTO_SCORE_MID_POSITION = 0;
+        public static final double AUTO_SCORE_HIGH_POSITION = 0;
 
         public static final double ARM_POSITION_GEAR_RATIO  = 2.333;
 
