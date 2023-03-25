@@ -87,7 +87,7 @@ public class Robot extends TimedRobot {
     kI = 0;
     kD = 0; 
     kIz = 0; 
-    kFF = 0.00015; 
+    kFF = 0.0001; 
     kMaxOutput = 1; 
     kMinOutput = -1;
     maxRPM = 5700;
@@ -95,6 +95,8 @@ public class Robot extends TimedRobot {
     // Smart Motion Coefficients
     maxVel = 8700; // rpm
     maxAcc = 8700 * 1.5;
+
+    allowedErr = 0.01;
 
     // set PID coefficients
     m_pidController.setP(kP);
