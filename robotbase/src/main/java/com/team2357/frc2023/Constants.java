@@ -391,8 +391,7 @@ public final class Constants {
         public static final double AUTO_SCORE_MID_ROTATIONS = 50;
         public static final double AUTO_SCORE_HIGH_ROTATIONS = 65;
 
-        public static final double ARM_ROTATION_GEAR_RATIO  = 190.91;
-        public static final double ARM_HANDOFF_ROTATIONS = ARM_ROTATION_GEAR_RATIO / 8;
+        public static final double ARM_POSITION_GEAR_RATIO  = 2.333;
 
         public static final double ARM_ROTATION_AMP_ZERO_PERCENT_OUTPUT = -0.1;
         public static final int ARM_ROTATION_AMP_ZERO_MAX_AMPS = 25;
@@ -402,7 +401,8 @@ public final class Constants {
         public static ArmRotationSubsystem.Configuration GET_ROTATION_CONFIG() {
             ArmRotationSubsystem.Configuration config = new ArmRotationSubsystem.Configuration();
 
-            config.m_rotationZeroTolerance = 2.5;
+            // TODO: RETUNE
+            config.m_positionZeroTolerance = 2.5;
 
             config.m_rotationAxisMaxSpeed = 0.7;
             config.m_maxSpeedPercent = 0.4;
@@ -414,20 +414,21 @@ public final class Constants {
 
             config.m_isInverted = true;
 
+            // TODO: RETUNE
             // smart motion config
-            config.m_rotationMotorP = 0.00075;
-            config.m_rotationMotorI = 0;
-            config.m_rotationMotorD = 0;
-            config.m_rotationMotorIZone = 0;
-            config.m_rotationMotorFF = 0.001;
+            config.m_positionP = 0.00075;
+            config.m_positionI = 0;
+            config.m_positionD = 0;
+            config.m_positionIZone = 0;
+            config.m_positionFF = 0.001;
 
-            config.m_rotationMotorMaxOutput = 1;
-            config.m_rotationMotorMinOutput = -1;
-            config.m_rotationMotorMaxRPM = 5676;
-            config.m_rotationMotorMaxVel = 4600;
-            config.m_rotationMotorMinVel = 0;
-            config.m_rotationMotorMaxAcc = 4600;
-            config.m_rotationMotorAllowedError = 0.5;
+            config.m_positionMaxOutput = 1;
+            config.m_positionMinOutput = -1;
+            config.m_positionMaxRPM = 5676;
+            config.m_positionMaxVel = 4600;
+            config.m_positionMinVel = 0;
+            config.m_positionMaxAcc = 4600;
+            config.m_positionAllowedError = 0.5;
 
             config.m_smartMotionSlot = 0;
 
@@ -444,9 +445,17 @@ public final class Constants {
             // Acceleration gain, will be zero
             config.m_feedforwardKa = 0;
 
+            config.m_zeroPosition = 0;
+
             // TODO: Calculate
-            config.m_armHorizontalRotations = ARM_ROTATION_GEAR_RATIO / 4; // 90 degrees
-            config.m_rotationsPerRadian = ARM_ROTATION_GEAR_RATIO / (2 * Math.PI);
+            config.m_armHorizontalPosition = (ARM_POSITION_GEAR_RATIO / 4) + config.m_zeroPosition; // 90 degrees
+            config.m_positionToRadian = ARM_POSITION_GEAR_RATIO / (2 * Math.PI);
+
+            config.m_isEncoderInverted = false;
+            config.m_encoderOffset = 0;
+
+            config.m_lowerPositionLimit = 0.5;
+            config.m_upperPositionLimit = 0.5;
 
             return config;
         }

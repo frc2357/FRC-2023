@@ -14,15 +14,15 @@ public class ArmRotateToPositionCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        ArmRotationSubsystem.getInstance().setRotations(m_rotations);
+        ArmRotationSubsystem.getInstance().setPosition(m_rotations);
     }
     @Override
     public void end(boolean interrupted){
-        ArmRotationSubsystem.getInstance().setTargetRotationsToCurrentRotations();
+        ArmRotationSubsystem.getInstance().setTargetPositionToCurrentPosition();
     }
     @Override
     public boolean isFinished() {
-        return ArmRotationSubsystem.getInstance().isAtRotations();
+        return ArmRotationSubsystem.getInstance().isAtPosition();
     }
     
 }

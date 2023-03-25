@@ -1,16 +1,18 @@
 package com.team2357.frc2023.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import com.revrobotics.SparkMaxPIDController;
 import com.team2357.frc2023.shuffleboard.ShuffleboardPIDTuner;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 import com.team2357.lib.util.Utility;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.DriverStation;
 
 public class ArmRotationSubsystem extends ClosedLoopSubsystem {
     private static ArmRotationSubsystem instance = null;
@@ -20,8 +22,8 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
     }
 
     public static class Configuration {
-        public double m_rotationZeroTolerance;
-        
+        public double m_positionZeroTolerance;
+
         public double m_rotationAxisMaxSpeed;
 
         public IdleMode m_rotationMotorIdleMode;
@@ -36,19 +38,19 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
         public double m_shuffleboardTunerDRange;
 
         // smart motion config
-        public double m_rotationMotorP;
-        public double m_rotationMotorI;
-        public double m_rotationMotorD;
+        public double m_positionP;
+        public double m_positionI;
+        public double m_positionD;
 
-        public double m_rotationMotorIZone;
-        public double m_rotationMotorFF;
-        public double m_rotationMotorMaxOutput;
-        public double m_rotationMotorMinOutput;
-        public double m_rotationMotorMaxRPM;
-        public double m_rotationMotorMaxVel;
-        public double m_rotationMotorMinVel;
-        public double m_rotationMotorMaxAcc;
-        public double m_rotationMotorAllowedError;
+        public double m_positionIZone;
+        public double m_positionFF;
+        public double m_positionMaxOutput;
+        public double m_positionMinOutput;
+        public double m_positionMaxRPM;
+        public double m_positionMaxVel;
+        public double m_positionMinVel;
+        public double m_positionMaxAcc;
+        public double m_positionAllowedError;
         public double m_maxSpeedPercent;
         public int m_smartMotionSlot;
 
@@ -75,23 +77,49 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
         public double m_feedforwardKa;
 
         /**
-         * Number of rotations the arm is at when parallel with the floor
+         * Zero position for the arm
          */
-        public double m_armHorizontalRotations;
+        public double m_zeroPosition;
 
         /**
-         * How many motor rotations = 1 radian
+         * Position the arm is at when parallel with the floor
          */
-        public double m_rotationsPerRadian;
+        public double m_armHorizontalPosition;
+
+        /**
+         * How many motor position = 1 radian
+         */
+        public double m_positionToRadian;
+
+        /**
+         * Is absolute encoder inverted
+         */
+        public boolean m_isEncoderInverted;
+
+        /**
+         * The offset for the absolute encoder
+         */
+        public double m_encoderOffset;
+
+        /**
+         * The lower allowable limit of position from 0-1
+         */
+        public double m_lowerPositionLimit;
+
+        /**
+         * The upper allowable limit of position from 0-1
+         */
+        public double m_upperPositionLimit;
     }
 
     private Configuration m_config;
     private CANSparkMax m_rotationMotor;
 
     private SparkMaxPIDController m_pidController;
+    private SparkMaxAbsoluteEncoder m_encoder;
     private ArmFeedforward m_feedforward;
 
-    private double m_targetRotations;
+    private double m_targetPosition;
     private ShuffleboardPIDTuner m_shuffleboardPIDTuner;
 
     public ArmRotationSubsystem(int motorId) {
@@ -102,19 +130,22 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
     public void configure(Configuration config) {
         m_config = config;
         m_shuffleboardPIDTuner = new ShuffleboardPIDTuner("Arm Rotation", config.m_shuffleboardTunerPRange,
-                m_config.m_shuffleboardTunerIRange, m_config.m_shuffleboardTunerDRange, m_config.m_rotationMotorP,
-                m_config.m_rotationMotorI, m_config.m_rotationMotorD);
+                m_config.m_shuffleboardTunerIRange, m_config.m_shuffleboardTunerDRange, m_config.m_positionP,
+                m_config.m_positionI, m_config.m_positionD);
         configureRotationMotor(m_rotationMotor);
 
         m_pidController = m_rotationMotor.getPIDController();
-        configureRotationPID(m_pidController);
+        configurePositionPID(m_pidController);
 
         m_rotationMotor.setInverted(m_config.m_isInverted);
 
         m_feedforward = new ArmFeedforward(m_config.m_feedforwardKs, m_config.m_feedforwardKg, m_config.m_feedforwardKv,
                 m_config.m_feedforwardKa);
-        
-        resetEncoder();
+
+        m_encoder = m_rotationMotor.getAbsoluteEncoder(Type.kDutyCycle);
+        m_encoder.setInverted(m_config.m_isEncoderInverted);
+        m_encoder.setZeroOffset(m_config.m_encoderOffset);
+        m_pidController.setFeedbackDevice(m_encoder);
     }
 
     private void configureRotationMotor(CANSparkMax motor) {
@@ -123,41 +154,48 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
                 m_config.m_rotationMotorFreeLimitAmps);
     }
 
-    private void configureRotationPID(SparkMaxPIDController pidController) {
+    private void configurePositionPID(SparkMaxPIDController pidController) {
         // set PID coefficients
-        pidController.setP(m_config.m_rotationMotorP);
-        pidController.setI(m_config.m_rotationMotorI);
-        pidController.setD(m_config.m_rotationMotorD);
-        pidController.setIZone(m_config.m_rotationMotorIZone);
-        pidController.setFF(m_config.m_rotationMotorFF);
-        pidController.setOutputRange(m_config.m_rotationMotorMinOutput, m_config.m_rotationMotorMaxOutput);
+        pidController.setP(m_config.m_positionP);
+        pidController.setI(m_config.m_positionI);
+        pidController.setD(m_config.m_positionD);
+        pidController.setIZone(m_config.m_positionIZone);
+        pidController.setFF(m_config.m_positionFF);
+        pidController.setOutputRange(m_config.m_positionMinOutput, m_config.m_positionMaxOutput);
 
         // Configure smart motion
-        pidController.setSmartMotionMaxVelocity(m_config.m_rotationMotorMaxVel, m_config.m_smartMotionSlot);
-        pidController.setSmartMotionMinOutputVelocity(m_config.m_rotationMotorMinVel, m_config.m_smartMotionSlot);
-        pidController.setSmartMotionMaxAccel(m_config.m_rotationMotorMaxAcc, m_config.m_smartMotionSlot);
-        pidController.setSmartMotionAllowedClosedLoopError(m_config.m_rotationMotorAllowedError,
+        pidController.setSmartMotionMaxVelocity(m_config.m_positionMaxVel, m_config.m_smartMotionSlot);
+        pidController.setSmartMotionMinOutputVelocity(m_config.m_positionMinVel, m_config.m_smartMotionSlot);
+        pidController.setSmartMotionMaxAccel(m_config.m_positionMaxAcc, m_config.m_smartMotionSlot);
+        pidController.setSmartMotionAllowedClosedLoopError(m_config.m_positionAllowedError,
                 m_config.m_smartMotionSlot);
     }
 
-    public void setRotations(double rotations) {
+    public double getZeroPosition() {
+        return m_config.m_zeroPosition;
+    }
+
+    public void setPosition(double position) {
+        if (position < m_config.m_lowerPositionLimit || position > m_config.m_upperPositionLimit) {
+            DriverStation.reportError("ARM TRYING TO GO BEYOND LIMITS", false);
+            return;
+        }
         setClosedLoopEnabled(true);
-        m_targetRotations = rotations;
+        m_targetPosition = position;
     }
 
     /**
      * 
-     * @param rotations The rotation setpoint
+     * @param position The position setpoint
      * @return The radians to input into feed forward calculation
      */
-    public double calculateFeedforwardRadians(double rotations) {
-
-        return (rotations - m_config.m_armHorizontalRotations) / m_config.m_rotationsPerRadian;
+    public double calculateFeedforwardRadians(double position) {
+        return (position - m_config.m_armHorizontalPosition) / m_config.m_positionToRadian;
     }
 
-    public boolean isAtRotations() {
-        return Utility.isWithinTolerance(getMotorRotations(), m_targetRotations,
-                m_config.m_rotationMotorAllowedError);
+    public boolean isAtPosition() {
+        return Utility.isWithinTolerance(getMotorPosition(), m_targetPosition,
+                m_config.m_positionAllowedError);
     }
 
     public void setRotationAxisSpeed(double axisSpeed) {
@@ -168,7 +206,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
 
     public void endAxisCommand() {
         stopRotationMotors();
-        m_targetRotations = getMotorRotations();
+        setTargetPositionToCurrentPosition();
         setClosedLoopEnabled(true);
     }
 
@@ -183,17 +221,12 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
         m_rotationMotor.set(0);
     }
 
-    public void resetEncoder() {
-        m_rotationMotor.getEncoder().setPosition(0);
-        m_targetRotations = 0;
+    public double getMotorPosition() {
+        return m_encoder.getPosition();
     }
 
-    public double getMotorRotations() {
-        return m_rotationMotor.getEncoder().getPosition();
-    }
-
-    public void setTargetRotationsToCurrentRotations(){
-        m_targetRotations = m_rotationMotor.getEncoder().getPosition();
+    public void setTargetPositionToCurrentPosition() {
+        m_targetPosition = getMotorPosition();
     }
 
     public void updatePID() {
@@ -207,23 +240,25 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
     }
 
     public boolean isZeroed() {
-        return (m_targetRotations >= -m_config.m_rotationZeroTolerance && m_targetRotations <= m_config.m_rotationZeroTolerance) && isAtRotations();
+        return (m_targetPosition >= -m_config.m_positionZeroTolerance
+                && m_targetPosition <= m_config.m_positionZeroTolerance) && isAtPosition();
     }
 
     @Override
     public void periodic() {
         if (isClosedLoopEnabled()) {
-            double feedforwardVolts = m_feedforward.calculate(calculateFeedforwardRadians(m_targetRotations), 0);
-            m_pidController.setReference(m_targetRotations, CANSparkMax.ControlType.kSmartMotion,
+            double feedforwardVolts = m_feedforward.calculate(calculateFeedforwardRadians(m_targetPosition), 0);
+            m_pidController.setReference(m_targetPosition, CANSparkMax.ControlType.kSmartMotion,
                     m_config.m_smartMotionSlot, feedforwardVolts, ArbFFUnits.kVoltage);
         }
         if (m_shuffleboardPIDTuner.arePIDsUpdated()) {
             updatePID();
         }
 
-        // System.out.println("Speed: " + m_rotationMotor.getAppliedOutput() + "Amp: " + getAmps());
+        // System.out.println("Speed: " + m_rotationMotor.getAppliedOutput() + "Amp: " +
+        // getAmps());
 
         // System.out.println("Current rot: " + getMotorRotations());
-        //SmartDashboard.putNumber("Rotations", getMotorRotations());
+        // SmartDashboard.putNumber("Rotations", getMotorRotations());
     }
 }
