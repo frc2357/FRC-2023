@@ -23,7 +23,9 @@ public class AutoCommandChooser {
         // GRID_2_TWO_CONE_BALANCE
         GRID_ZERO,
         GRID_ONE,
-        GRID_TWO
+        GRID_TWO,
+        GRID_ONE_MOBILITY,
+        SCORE
     }
 
     private class AutoActionChooser {
@@ -62,6 +64,10 @@ public class AutoCommandChooser {
                     return AvailableTrajectoryCommands.GridOneScoreOneAndBalance;
                 case GRID_TWO:
                     return AvailableTrajectoryCommands.GridTwoTwoConeAuto;
+                case SCORE:
+                    return AvailableTrajectoryCommands.Score;
+                case GRID_ONE_MOBILITY:
+                    return AvailableTrajectoryCommands.GridOneMobility;
                 default:
                     return new WaitCommand(0);
             }
