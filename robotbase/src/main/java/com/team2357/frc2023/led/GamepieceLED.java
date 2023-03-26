@@ -26,6 +26,8 @@ public class GamepieceLED {
         HEARTBEAT_SLOW_C1(0.03),
         HEARTBEAT_MEDIUM_C1(0.05),
         HERTBEAT_FAST_C1(0.07),
+        BREATH_SLOW_C1(0.09),
+        BREATH_FAST_C1(0.11),
         SHOT_C1(0.13),
         STROBE_C1(0.15),
 
@@ -34,6 +36,8 @@ public class GamepieceLED {
         HEARTBEAT_SLOW_C2(0.23),
         HEARTBEAT_MEDIUM_C2(0.25),
         HERTBEAT_FAST_C2(0.27),
+        BREATH_SLOW_C2(0.29),
+        BREATH_FAST_C2(0.31),
         SHOT_C2(0.33),
         STROBE_C2(0.35);
 
