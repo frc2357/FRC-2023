@@ -7,6 +7,7 @@ import edu.wpi.first.cscore.CameraServerJNI;
 import edu.wpi.first.math.WPIMathJNI;
 import edu.wpi.first.networktables.IntegerSubscriber;
 import edu.wpi.first.networktables.StringArraySubscriber;
+import edu.wpi.first.networktables.StringSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -22,10 +23,12 @@ public class NetworkTablesServer {
     private int m_gridListenerHandle;
     private int m_targetRowListenerHandle;
     private int m_targetColListenerHandle;
+    private int m_allianceListenerHandle;
 
     private NetworkTable m_buttonboardTable;
     private NetworkTable m_gridCamTable;
     private StringArraySubscriber m_gridSub;
+    private StringSubscriber m_allianceSub;
     private IntegerSubscriber m_targetRowSub;
     private IntegerSubscriber m_targetColSub;
 
@@ -54,6 +57,7 @@ public class NetworkTablesServer {
         m_gridSub = m_gridCamTable.getStringArrayTopic(Constants.NT_GRID_TOPIC).subscribe(new String[] {"", "", ""});
 
         m_buttonboardTable = inst.getTable(Constants.NT_BUTTONBOARD_TABLE);
+        m_allianceSub = m_buttonboardTable.getStringTopic(Constants.NT_ALLIANCE_TOPIC).subscribe(Constants.ALLIANCE_UNSET);
         m_targetRowSub = m_buttonboardTable.getIntegerTopic(Constants.NT_TARGET_ROW_TOPIC).subscribe(-1);
         m_targetColSub = m_buttonboardTable.getIntegerTopic(Constants.NT_TARGET_COL_TOPIC).subscribe(-1);
 
@@ -74,6 +78,15 @@ public class NetworkTablesServer {
                 System.out.println(grid[0]);
                 System.out.println(grid[1]);
                 System.out.println(grid[2]);
+            }
+        );
+
+        m_allianceListenerHandle = inst.addListener(
+            m_allianceSub,
+            EnumSet.of(NetworkTableEvent.Kind.kValueAll),
+            event -> {
+                String alliance = event.valueData.value.getString();
+                System.out.println("alliance set to:" + alliance);
             }
         );
 
