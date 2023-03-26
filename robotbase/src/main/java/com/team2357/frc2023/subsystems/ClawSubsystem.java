@@ -46,12 +46,12 @@ public class ClawSubsystem extends SubsystemBase {
         m_rollerMotor.setIdleMode(IdleMode.kBrake);
     }
 
-    public void runRollers(boolean reverse) {
-        if (reverse) {
-            m_rollerMotor.set(m_config.m_cubePercentOutput);
-        } else {
-            m_rollerMotor.set(m_config.m_conePercentOutput);
-        }
+    public void intakeCone() {
+        m_rollerMotor.set(m_config.m_conePercentOutput);
+    }
+
+    public void intakeCube() {
+        m_rollerMotor.set(m_config.m_cubePercentOutput);
     }
 
     public void setAxisRollerSpeed(double axisSpeed) {
@@ -65,5 +65,9 @@ public class ClawSubsystem extends SubsystemBase {
 
     public void stopRollers() {
         m_rollerMotor.set(0.0);
+    }
+
+    public double getAmps() {
+        return m_rollerMotor.getOutputCurrent();
     }
 }

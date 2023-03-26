@@ -318,6 +318,9 @@ public final class Constants {
     }
 
     public static final class CLAW {
+        public static final int CONE_INTAKE_AMP_LIMIT = 10;
+        public static final int CUBE_INTAKE_AMP_LIMIT = 10;
+
         public static ClawSubsystem.Configuration GET_CLAW_CONFIG() {
             ClawSubsystem.Configuration config = new ClawSubsystem.Configuration();
 
