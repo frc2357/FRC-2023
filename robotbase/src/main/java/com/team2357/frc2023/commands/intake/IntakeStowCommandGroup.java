@@ -1,6 +1,5 @@
 package com.team2357.frc2023.commands.intake;
 
-import com.team2357.frc2023.commands.claw.CloseClawCommand;
 import com.team2357.frc2023.subsystems.DualLimelightManagerSubsystem;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -14,7 +13,6 @@ public class IntakeStowCommandGroup extends ParallelCommandGroup {
         addCommands(new SequentialCommandGroup(
                 new ParallelCommandGroup(
                         new IntakeRollerStopCommand(),
-                        new IntakeArmStowCommand()),
-                new CloseClawCommand()));
+                        new IntakeArmStowCommand())));
     }
 }
