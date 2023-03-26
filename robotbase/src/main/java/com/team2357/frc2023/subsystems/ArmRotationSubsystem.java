@@ -1,9 +1,11 @@
 package com.team2357.frc2023.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import com.revrobotics.SparkMaxPIDController;
 import com.team2357.frc2023.shuffleboard.ShuffleboardPIDTuner;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
@@ -20,6 +22,9 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
     }
 
     public static class Configuration {
+        public boolean m_isEncoderInverted;
+        public double m_encoderOffset;
+        
         public double m_rotationZeroTolerance;
         
         public double m_rotationAxisMaxSpeed;
@@ -89,6 +94,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
     private CANSparkMax m_rotationMotor;
 
     private SparkMaxPIDController m_pidController;
+    private SparkMaxAbsoluteEncoder m_encoder;
     private ArmFeedforward m_feedforward;
 
     private double m_targetRotations;
@@ -113,6 +119,10 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
 
         m_feedforward = new ArmFeedforward(m_config.m_feedforwardKs, m_config.m_feedforwardKg, m_config.m_feedforwardKv,
                 m_config.m_feedforwardKa);
+
+        m_encoder = m_rotationMotor.getAbsoluteEncoder(Type.kDutyCycle);
+        m_encoder.setInverted(m_config.m_isEncoderInverted);
+        m_encoder.setZeroOffset(m_config.m_encoderOffset);
         
         resetEncoder();
     }
@@ -208,6 +218,10 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
 
     public boolean isZeroed() {
         return (m_targetRotations >= -m_config.m_rotationZeroTolerance && m_targetRotations <= m_config.m_rotationZeroTolerance) && isAtRotations();
+    }
+
+    public double getAbsoluteEncoderPosition() {
+        return m_encoder.getPosition();
     }
 
     @Override

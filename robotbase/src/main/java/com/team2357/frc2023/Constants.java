@@ -442,6 +442,9 @@ public final class Constants {
 
         public static final double ARM_ROTATION_AMP_ZERO_TIME_MILLIS = 1000;
 
+        public static final double ENCODER_ZERO_AXIS_SPEED = 0.1;
+        public static final double ENCODER_ZERO_END_TOLERANCE = 0.005;
+
         public static ArmRotationSubsystem.Configuration GET_ROTATION_CONFIG() {
             ArmRotationSubsystem.Configuration config = new ArmRotationSubsystem.Configuration();
 
