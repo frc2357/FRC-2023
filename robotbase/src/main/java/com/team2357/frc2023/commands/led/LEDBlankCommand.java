@@ -9,4 +9,8 @@ public class LEDBlankCommand extends CommandBase{
     public void initialize() {
         GamepieceLED.getInstance().blankLED();
     }
+    @Override
+    public boolean isFinished() {
+        return true;
+    }
 }

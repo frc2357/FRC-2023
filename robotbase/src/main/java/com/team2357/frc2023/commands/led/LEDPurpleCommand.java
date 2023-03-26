@@ -10,4 +10,8 @@ public class LEDPurpleCommand extends CommandBase{
     public void initialize() {
         GamepieceLED.getInstance().setSignalColor(SIGNAL_COLOR.PURPLE);
     }
+    @Override
+    public boolean isFinished() {
+        return true;
+    }
 }
