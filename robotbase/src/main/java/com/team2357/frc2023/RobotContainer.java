@@ -8,8 +8,8 @@ import com.pathplanner.lib.server.PathPlannerServer;
 import com.team2357.frc2023.commands.drive.DefaultDriveCommand;
 import com.team2357.frc2023.controls.GunnerControls;
 import com.team2357.frc2023.controls.SwerveDriveControls;
-import com.team2357.frc2023.led.GamepieceLED;
 import com.team2357.frc2023.shuffleboard.AutoCommandChooser;
+import com.team2357.frc2023.state.LEDState;
 import com.team2357.frc2023.subsystems.DualLimelightManagerSubsystem;
 import com.team2357.frc2023.subsystems.SubsystemFactory;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
@@ -75,7 +75,7 @@ public class RobotContainer {
     // m_compressor.disable();
 
     // Init LEDs
-    new GamepieceLED(Constants.GAMEPIECE_LED.PWM_PORT);
+    new LEDState(Constants.GAMEPIECE_LED.PWM_PORT);
 
     // Build trajectory paths
     AvailableTrajectories.generateTrajectories();
