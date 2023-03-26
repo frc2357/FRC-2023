@@ -524,4 +524,8 @@ public final class Constants {
         public static final Pose2d REAR_CAM_POSE = new Pose2d(REAR_CAM_X_METERS, REAR_CAM_Y_METERS,
                 Rotation2d.fromDegrees(REAR_CAM_YAW_DEGREES));
     }
+
+    public static final class GAMEPIECE_LED {
+        public static final int PWM_PORT = 0;
+    }
 }
