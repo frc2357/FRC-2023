@@ -67,16 +67,16 @@ public class RobotContainer {
 
     // Set default pipeline
     DualLimelightManagerSubsystem.getInstance().setAprilTagPipelineActive();
-    
+
     // Setup compressor
     m_compressor = new Compressor(Constants.CAN_ID.PNEUMATICS_HUB_ID, PneumaticsModuleType.REVPH);
     m_compressor.enableAnalog(Constants.COMPRESSOR.MIN_PRESSURE_PSI,
-    Constants.COMPRESSOR.MAX_PRESSURE_PSI);
-    m_compressor.disable();
+        Constants.COMPRESSOR.MAX_PRESSURE_PSI);
+    // m_compressor.disable();
 
     // Init LEDs
     new GamepieceLED(Constants.GAMEPIECE_LED.PWM_PORT);
-    
+
     // Build trajectory paths
     AvailableTrajectories.generateTrajectories();
     AvailableTrajectoryCommands.generateTrajectories();
@@ -85,7 +85,8 @@ public class RobotContainer {
     // Configure Shuffleboard
     configureShuffleboard();
 
-   // PathPlannerServer.startServer(5811); // 5811 = port number. adjust this according to your needs
+    // PathPlannerServer.startServer(5811); // 5811 = port number. adjust this
+    // according to your needs
   }
 
   /**
