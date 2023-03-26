@@ -340,7 +340,7 @@ public final class Constants {
             config.m_wristAxisMaxSpeed = 0.5;
             config.m_maxSpeedPercent = 1;
 
-            config.m_wristMotorStallLimitAmps = 10;
+            config.m_wristMotorStallLimitAmps = 20;
             config.m_wristMotorFreeLimitAmps = 20;
 
             config.m_isInverted = true;
