@@ -36,5 +36,9 @@ public class GamepieceLED {
 
     public SIGNAL_COLOR getSignalColor() {
         return m_signalColor;
-    }    
+    }   
+    
+    public void blankLED(){
+        m_blinkIn.stopMotor();
+    }
 }
