@@ -1,6 +1,5 @@
 package com.team2357.frc2023.commands.auto.gridone;
 
-import com.team2357.frc2023.commands.claw.ClawInstantOpenCommand;
 import com.team2357.frc2023.commands.intake.IntakeArmRotateDumbCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
 import com.team2357.frc2023.commands.intake.IntakeSolenoidExtendCommand;
@@ -27,7 +26,7 @@ public class GridOneScoreOneAndMobility extends ParallelCommandGroup {
 
                 // Then deploy intake after we're back on the floor
                 new ParallelCommandGroup(
-                  new ClawInstantOpenCommand(),
+                  // new ClawInstantOpenCommand(),
                   new IntakeArmRotateDumbCommand(0.6).withTimeout(2.0),
                   new SequentialCommandGroup(
                     new IntakeRollerRunCommand().withTimeout(2)

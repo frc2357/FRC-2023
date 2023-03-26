@@ -3,14 +3,10 @@ package com.team2357.frc2023.commands.scoring.cone;
 import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.commands.armextension.ArmExtendToPositionCommand;
 import com.team2357.frc2023.commands.armrotation.ArmRotateToPositionCommand;
-import com.team2357.frc2023.commands.claw.ClawInstantCloseCommand;
-import com.team2357.frc2023.commands.claw.ClawInstantOpenCommand;
 import com.team2357.frc2023.commands.intake.IntakeArmStowCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerReverseCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerStopCommand;
 import com.team2357.frc2023.commands.intake.WinchRotateToPositionCommand;
-import com.team2357.frc2023.commands.wrist.WristInstantExtendCommand;
-import com.team2357.frc2023.commands.wrist.WristInstantRetractCommand;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -39,10 +35,10 @@ public class ConeAutoScoreHighCommandGroup extends ParallelCommandGroup {
                                                         Constants.ARM_ROTATION.RETRACTED_ROTATIONS)),
 
                         // Wrist
-                        new WaitCommand(0.9)
-                                        .andThen(new WristInstantExtendCommand())
-                                        .andThen(new WaitCommand(2.5))
-                                        .andThen(new WristInstantRetractCommand()),
+                        // new WaitCommand(0.9)
+                        //                 .andThen(new WristInstantExtendCommand())
+                        //                 .andThen(new WaitCommand(2.5))
+                        //                 .andThen(new WristInstantRetractCommand()),
 
                         // Arm Extension
                         new WaitCommand(1)
@@ -53,11 +49,11 @@ public class ConeAutoScoreHighCommandGroup extends ParallelCommandGroup {
                                                         Constants.ARM_EXTENSION.RETRACTED_ROTATIONS)),
 
                         // Clamp
-                        new ClawInstantCloseCommand() // Ensure we're clamped while we swing the arm
-                                        .andThen(new WaitCommand(2.8))
-                                        .andThen(new ClawInstantOpenCommand())
-                                        .andThen(new WaitCommand(0.6))
-                                        .andThen(new ClawInstantCloseCommand()),
+                        // new ClawInstantCloseCommand() // Ensure we're clamped while we swing the arm
+                        //                 .andThen(new WaitCommand(2.8))
+                        //                 .andThen(new ClawInstantOpenCommand())
+                        //                 .andThen(new WaitCommand(0.6))
+                        //                 .andThen(new ClawInstantCloseCommand()),
 
                         // Intake rotation
                         new WinchRotateToPositionCommand(Constants.INTAKE_ARM.INTAKE_HANDOFF_WINCH_ROTATIONS)
