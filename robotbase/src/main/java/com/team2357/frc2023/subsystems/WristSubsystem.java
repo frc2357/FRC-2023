@@ -1,6 +1,7 @@
 package com.team2357.frc2023.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxPIDController;
@@ -112,13 +113,14 @@ public class WristSubsystem extends ClosedLoopSubsystem {
     }
 
     public void manualRotate(double speed) {
+        setClosedLoopEnabled(false);
         m_wristMotor.set(speed);
     }
 
     @Override
     public void periodic() {
         if (isClosedLoopEnabled() && isAtRotations()) {
-            setClosedLoopEnabled(false);
+            m_pidController.setReference(m_targetRotations, ControlType.kSmartMotion);
         }
     }
     
