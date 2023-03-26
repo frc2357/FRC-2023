@@ -266,7 +266,7 @@ public final class Constants {
         public static final int WINCH_STOW_PID_SLOT = 1;
 
         public static final double WINCH_AMP_ZERO_PERCENT_OUTPUT = -0.4;
-        public static final int WINCH_AMP_ZERO_MAX_AMPS = 15;
+        public static final int WINCH_AMP_ZERO_MAX_AMPS = 10;
 
         public static IntakeArmSubsystem.Configuration GET_INTAKE_ARM_CONFIG() {
             IntakeArmSubsystem.Configuration config = new IntakeArmSubsystem.Configuration();
@@ -289,7 +289,7 @@ public final class Constants {
             config.m_winchDeployI = 0;
             config.m_winchDeployD = 0;
             config.m_winchDeployIZone = 0;
-            config.m_winchDeployFF = 0.0001;
+            config.m_winchDeployFF = 0.00015;
             config.m_winchDeployPidSlot = WINCH_DEPLOY_PID_SLOT;
 
             // retract PID
@@ -305,7 +305,7 @@ public final class Constants {
             config.m_pidMinOutput = -1;
             config.m_smartMotionMaxVelRPM = 10000;
             config.m_smartMotionMinVelRPM = 0;
-            config.m_smartMotionMaxAccRPM = 5000;
+            config.m_smartMotionMaxAccRPM = 4000;
             config.m_smartMotionRotationAllowedError = 2;
 
             config.m_winchMotorAllowedError = 2;
@@ -387,12 +387,12 @@ public final class Constants {
 
         public static ArmExtensionSubsystem.Configuration GET_EXTENSION_CONFIG() {
             ArmExtensionSubsystem.Configuration config = new ArmExtensionSubsystem.Configuration();
-            config.m_extendAxisMaxSpeed = 0.5;
+            config.m_extendAxisMaxSpeed = 1.0;
 
             config.m_extendMotorIdleMode = IdleMode.kBrake;
 
-            config.m_extendMotorStallLimitAmps = 50;
-            config.m_extendMotorFreeLimitAmps = 50;
+            config.m_extendMotorStallLimitAmps = 60;
+            config.m_extendMotorFreeLimitAmps = 60;
 
             config.m_isInverted = true;
 
@@ -405,23 +405,23 @@ public final class Constants {
             // smart motion config
 
             // extend PID
-            config.m_extendP = 0.00001;
+            config.m_extendP = 0.0005;
             config.m_extendI = 0;
             config.m_extendD = 0;
             config.m_extendIZone = 0;
-            config.m_extendFF = 0.00011;
+            config.m_extendFF = 0.0003;
             config.m_extendPidSlot = 0;
 
             // Smart motion
             config.m_pidMaxOutput = 1;
             config.m_pidMinOutput = -1;
-            config.m_smartMotionMaxVelRPM = 8700;
+            config.m_smartMotionMaxVelRPM = 4600;
             config.m_smartMotionMinVelRPM = 0;
-            config.m_smartMotionMaxAccRPM = 8700 * 2;
-            config.m_smartMotionRotationAllowedError = 0.5;
-            config.m_rotationAllowedError = 0.5;
+            config.m_smartMotionMaxAccRPM = 4600 * 4;
+            config.m_smartMotionRotationAllowedError = 0.1;
+            config.m_rotationAllowedError = 0.1;
 
-            config.m_maxSpeedPercent = 1;
+            config.m_maxSpeedPercent = 1.0;
             return config;
         }
 
