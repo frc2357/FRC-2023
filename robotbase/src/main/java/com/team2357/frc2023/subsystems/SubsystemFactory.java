@@ -41,15 +41,15 @@ public class SubsystemFactory {
                 return subsystem;
         }
 
-        public ClawSubsystem createEverybotWristSubsystem() {
-                ClawSubsystem subsystem = new ClawSubsystem(Constants.CAN_ID.CLAW_ROLLER_MOTOR_ID);
+        public ClawSubsystem CreateEverybotClawSubsystem() {
+                ClawSubsystem subsystem = new ClawSubsystem(Constants.CAN_ID.WRIST_ROTATION_MOTOR_ID);
                 subsystem.configure(Constants.CLAW.GET_CLAW_CONFIG());
                 return subsystem;
         }
 
-        public ClawSubsystem createEverybotClawSubsystem() {
-                ClawSubsystem subsystem = new ClawSubsystem(Constants.CAN_ID.CLAW_ROLLER_MOTOR_ID);
-                subsystem.configure(Constants.CLAW.GET_CLAW_CONFIG());
+        public WristSubsystem CreateEverybotWristSubsystem() {
+                WristSubsystem subsystem = new WristSubsystem(Constants.CAN_ID.CLAW_ROLLER_MOTOR_ID);
+                subsystem.configure(Constants.WRIST.GET_WRIST_CONFIG());
                 return subsystem;
         }
 

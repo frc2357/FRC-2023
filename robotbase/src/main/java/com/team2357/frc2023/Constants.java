@@ -80,8 +80,8 @@ public final class Constants {
 
         public static final int ARM_EXTENSION_MOTOR_ID = 27;
 
-        public static final int CLAW_ROLLER_MOTOR_ID = 28;
-        public static final int WRIST_ROTATION_MOTOR_ID = 29;
+        public static final int CLAW_ROLLER_MOTOR_ID = 29;
+        public static final int WRIST_ROTATION_MOTOR_ID = 30;
     }
 
     public static final class PH_ID {
@@ -323,6 +323,9 @@ public final class Constants {
 
             config.m_forwardPercentOutput = 0.5;
             config.m_reversePercentOutput = -0.5;
+
+            config.m_clawMotorStallLimitAmps = 20;
+            config.m_clawMotorFreeLimitAmps = 20;
 
             config.m_rollerAxisMaxSpeed = 0.7;
 
