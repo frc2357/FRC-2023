@@ -321,8 +321,11 @@ public final class Constants {
         public static ClawSubsystem.Configuration GET_CLAW_CONFIG() {
             ClawSubsystem.Configuration config = new ClawSubsystem.Configuration();
 
-            config.m_forwardPercentOutput = 0.5;
-            config.m_reversePercentOutput = -0.5;
+            //TODO: Figure this out
+            config.m_isInverted = false;
+
+            config.m_conePercentOutput = 0.5;
+            config.m_cubePercentOutput = -0.5;
 
             config.m_rollerAxisMaxSpeed = 0.7;
 

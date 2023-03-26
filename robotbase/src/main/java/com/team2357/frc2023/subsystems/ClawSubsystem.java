@@ -15,8 +15,8 @@ public class ClawSubsystem extends SubsystemBase {
     }
 
     public static class Configuration {
-        public double m_forwardPercentOutput;
-        public double m_reversePercentOutput;
+        public double m_conePercentOutput;
+        public double m_cubePercentOutput;
 
         public double m_rollerAxisMaxSpeed;
 
@@ -43,9 +43,9 @@ public class ClawSubsystem extends SubsystemBase {
 
     public void runRollers(boolean reverse) {
         if (reverse) {
-            m_rollerMotor.set(m_config.m_reversePercentOutput);
+            m_rollerMotor.set(m_config.m_cubePercentOutput);
         } else {
-            m_rollerMotor.set(m_config.m_forwardPercentOutput);
+            m_rollerMotor.set(m_config.m_conePercentOutput);
         }
     }
 
