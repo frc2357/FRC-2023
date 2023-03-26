@@ -6,11 +6,11 @@ import com.team2357.frc2023.commands.auto.RotateToDegreeCommand;
 import com.team2357.frc2023.commands.auto.TranslateToTargetCommand;
 import com.team2357.frc2023.commands.human.panic.ArmExtensionAxisCommand;
 import com.team2357.frc2023.commands.human.panic.ArmRotationAxisCommand;
-import com.team2357.frc2023.commands.human.panic.ClawToggleCommand;
+import com.team2357.frc2023.commands.human.panic.EverybotClawRollerAxisCommand;
+import com.team2357.frc2023.commands.human.panic.EverybotWristAxisCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeArmToggleCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeRollerAxisCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeWinchAxisCommand;
-import com.team2357.frc2023.commands.human.panic.WristToggleCommand;
 import com.team2357.frc2023.commands.intake.WinchAmpZeroCommand;
 import com.team2357.frc2023.commands.scoring.AutoScoreLowCommandGroup;
 import com.team2357.frc2023.commands.scoring.HomeMechanismsCommand;
@@ -157,6 +157,9 @@ public class GunnerControls {
         Trigger rightDPadAndRightTrigger = m_rightDPad.and(m_rightTrigger);
         Trigger rightDPadAndLeftTrigger = m_rightDPad.and(m_leftTrigger);
 
+        Trigger downDPadAndRightTrigger = m_downDPad.and(m_rightTrigger);
+        Trigger downDPadAndLeftTrigger = m_downDPad.and(m_leftTrigger);
+
         Trigger aButton = m_aButton.and(noDPad);
         Trigger bButton = m_bButton.and(noDPad);
         Trigger yButton = m_yButton.and(noDPad);
@@ -172,8 +175,8 @@ public class GunnerControls {
         // Arm extension / claw / wrist
         leftDPadOnly.whileTrue(new ArmExtensionAxisCommand(axisRightStickY));
         
-        leftDPadAndA.onTrue(new WristToggleCommand());
-        leftDPadAndB.onTrue(new ClawToggleCommand());
+        // leftDPadAndA.onTrue(new WristToggleCommand());
+        // leftDPadAndB.onTrue(new ClawToggleCommand());
 
         leftDPadAndY.onTrue(new ArmExtendAmpZeroCommand());
 
@@ -182,6 +185,11 @@ public class GunnerControls {
 
         rightDPadAndRightTrigger.whileTrue(new IntakeRollerAxisCommand(intakeRollerForwardAxis));
         rightDPadAndLeftTrigger.whileTrue(new IntakeRollerAxisCommand(intakeRollerReverseAxis));
+
+        // End effector
+        downDPadAndRightTrigger.whileTrue(new EverybotClawRollerAxisCommand(intakeRollerForwardAxis));
+        downDPadAndLeftTrigger.whileTrue(new EverybotClawRollerAxisCommand(intakeRollerReverseAxis));
+        downDPadOnly.whileTrue(new EverybotWristAxisCommand(axisRightStickY));
 
         rightDPadAndA.onTrue(new IntakeArmToggleCommand());
         rightDPadAndY.onTrue(new WinchAmpZeroCommand());

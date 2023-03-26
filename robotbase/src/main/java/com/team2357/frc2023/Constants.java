@@ -10,6 +10,8 @@ import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.team2357.frc2023.subsystems.ArmExtensionSubsystem;
 import com.team2357.frc2023.subsystems.ArmRotationSubsystem;
 import com.team2357.frc2023.subsystems.ClawSubsystem;
+import com.team2357.frc2023.subsystems.ClawSubsystem;
+import com.team2357.frc2023.subsystems.WristSubsystem;
 import com.team2357.frc2023.subsystems.IntakeArmSubsystem;
 import com.team2357.frc2023.subsystems.IntakeRollerSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
@@ -75,6 +77,9 @@ public final class Constants {
         public static final int ARM_ROTATION_MOTOR_ID = 26;
 
         public static final int ARM_EXTENSION_MOTOR_ID = 27;
+
+        public static final int CLAW_ROLLER_MOTOR_ID = 29;
+        public static final int WRIST_ROTATION_MOTOR_ID = 30;
     }
 
     public static final class PH_ID {
@@ -316,23 +321,60 @@ public final class Constants {
 
     }
 
-    public static final class WRIST {
-        public static WristSubsystem.Configuration GET_WRIST_CONFIG() {
-            WristSubsystem.Configuration config = new WristSubsystem.Configuration();
+    public static final class CLAW {
+        public static final int CONE_INTAKE_AMP_LIMIT = 10;
+        public static final int CUBE_INTAKE_AMP_LIMIT = 10;
 
-            config.m_extendMilliseconds = 500;
-            config.m_retractMilliseconds = 2000;
+        public static ClawSubsystem.Configuration GET_CLAW_CONFIG() {
+            ClawSubsystem.Configuration config = new ClawSubsystem.Configuration();
+
+            //TODO: Figure this out
+            config.m_isInverted = false;
+
+            config.m_conePercentOutput = 0.5;
+            config.m_cubePercentOutput = -0.5;
+
+            config.m_clawMotorStallLimitAmps = 20;
+            config.m_clawMotorFreeLimitAmps = 20;
+
+            config.m_rollerAxisMaxSpeed = 0.7;
 
             return config;
         }
     }
 
-    public static final class CLAW {
-        public static ClawSubsystem.Configuration GET_CLAW_CONFIG() {
-            ClawSubsystem.Configuration config = new ClawSubsystem.Configuration();
+    public static final class WRIST {
+        public static final double WRIST_AMP_ZERO_PERCENT_OUTPUT = 0.1;
+        public static final double WRIST_ZERO_MAX_AMPS = 10;
 
-            config.m_openMilliseconds = 500;
-            config.m_closeMilliseconds = 500;
+        public static WristSubsystem.Configuration GET_WRIST_CONFIG() {
+            WristSubsystem.Configuration config = new WristSubsystem.Configuration();
+
+            config.m_wristAxisMaxSpeed = 0.5;
+            config.m_maxSpeedPercent = 1;
+
+            config.m_wristMotorStallLimitAmps = 20;
+            config.m_wristMotorFreeLimitAmps = 20;
+
+            config.m_isInverted = true;
+
+            // smart motion config
+            config.m_wristMotorP = 0.00005;
+            config.m_wristI = 0;
+            config.m_wristD = 0;
+
+            config.m_wristIZone = 0;
+            config.m_wristFF = 0.0001;
+            config.m_wristMaxOutput = 1;
+            config.m_wristMinOutput = -1;
+            config.m_wristMaxRPM = 8700;
+            config.m_wristMaxVel = 8700;
+            config.m_wristMinVel = 0;
+            config.m_wristMaxAcc = 8700 * 1.5;
+            config.m_wristSmartMotionAllowedError = 0.01;
+            config.m_smartMotionSlot = 0;
+
+            config.m_wristAllowedError = 0.05;
 
             return config;
         }
@@ -527,5 +569,9 @@ public final class Constants {
                 Rotation2d.fromDegrees(FRONT_CAM_YAW_DEGREES));
         public static final Pose2d REAR_CAM_POSE = new Pose2d(REAR_CAM_X_METERS, REAR_CAM_Y_METERS,
                 Rotation2d.fromDegrees(REAR_CAM_YAW_DEGREES));
+    }
+
+    public static final class GAMEPIECE_LED {
+        public static final int PWM_PORT = 0;
     }
 }

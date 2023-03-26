@@ -2,13 +2,12 @@ package com.team2357.frc2023.controls;
 
 import com.team2357.frc2023.commands.auto.DriveToPoseWithAngleCommand;
 import com.team2357.frc2023.commands.drive.AutoBalanceCommand;
-import com.team2357.frc2023.arduino.GamepieceLED;
-import com.team2357.frc2023.arduino.GamepieceLED.SIGNAL_COLOR;
 import com.team2357.frc2023.commands.intake.IntakeDeployCommandGroup;
-import com.team2357.frc2023.commands.intake.IntakeDumpCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakeRollerReverseCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
 import com.team2357.frc2023.commands.intake.IntakeStowCommandGroup;
+import com.team2357.frc2023.led.GamepieceLED;
+import com.team2357.frc2023.led.GamepieceLED.SIGNAL_COLOR;
 import com.team2357.frc2023.commands.scoring.HeartlandAutoScoreCommand;
 import com.team2357.frc2023.commands.scoring.HeartlandAutoTranslateCommand;
 import com.team2357.frc2023.commands.scoring.TeleopAutoScoreCommandGroup;
@@ -22,7 +21,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class SwerveDriveControls {
     private XboxController m_controller;
