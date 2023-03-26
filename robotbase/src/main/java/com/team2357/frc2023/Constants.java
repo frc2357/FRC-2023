@@ -80,8 +80,8 @@ public final class Constants {
 
         public static final int ARM_EXTENSION_MOTOR_ID = 27;
 
-        public static final int CLAW_ROLLER_MOTOR_ID = 28;
-        public static final int WRIST_ROTATION_MOTOR_ID = 29;
+        public static final int CLAW_ROLLER_MOTOR_ID = 29;
+        public static final int WRIST_ROTATION_MOTOR_ID = 30;
     }
 
     public static final class PH_ID {
@@ -327,6 +327,9 @@ public final class Constants {
             config.m_conePercentOutput = 0.5;
             config.m_cubePercentOutput = -0.5;
 
+            config.m_clawMotorStallLimitAmps = 20;
+            config.m_clawMotorFreeLimitAmps = 20;
+
             config.m_rollerAxisMaxSpeed = 0.7;
 
             return config;
@@ -336,19 +339,36 @@ public final class Constants {
     public static final class WRIST {
         public static final double WRIST_AMP_ZERO_PERCENT_OUTPUT = 0.1;
         public static final double WRIST_ZERO_MAX_AMPS = 10;
-        
+
         public static WristSubsystem.Configuration GET_WRIST_CONFIG() {
             WristSubsystem.Configuration config = new WristSubsystem.Configuration();
 
             config.m_wristAxisMaxSpeed = 0.5;
+            config.m_maxSpeedPercent = 1;
 
-            config.m_wristMotorStallLimitAmps = 10;
+            config.m_wristMotorStallLimitAmps = 20;
             config.m_wristMotorFreeLimitAmps = 20;
-            
-            config.m_isInverted = false;
+
+            config.m_isInverted = true;
 
             // smart motion config
-            
+            config.m_wristMotorP = 0.00005;
+            config.m_wristI = 0;
+            config.m_wristD = 0;
+
+            config.m_wristIZone = 0;
+            config.m_wristFF = 0.0001;
+            config.m_wristMaxOutput = 1;
+            config.m_wristMinOutput = -1;
+            config.m_wristMaxRPM = 8700;
+            config.m_wristMaxVel = 8700;
+            config.m_wristMinVel = 0;
+            config.m_wristMaxAcc = 8700 * 1.5;
+            config.m_wristSmartMotionAllowedError = 0.01;
+            config.m_smartMotionSlot = 0;
+
+            config.m_wristAllowedError = 0.05;
+
             return config;
         }
     }
@@ -410,7 +430,7 @@ public final class Constants {
         public static final double AUTO_SCORE_MID_ROTATIONS = 50;
         public static final double AUTO_SCORE_HIGH_ROTATIONS = 65;
 
-        public static final double ARM_ROTATION_GEAR_RATIO  = 190.91;
+        public static final double ARM_ROTATION_GEAR_RATIO = 190.91;
         public static final double ARM_HANDOFF_ROTATIONS = ARM_ROTATION_GEAR_RATIO / 8;
 
         public static final double ARM_ROTATION_AMP_ZERO_PERCENT_OUTPUT = -0.1;

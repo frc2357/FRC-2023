@@ -1,9 +1,5 @@
 package com.team2357.frc2023.subsystems;
 
-import javax.lang.model.util.AbstractAnnotationValueVisitor14;
-
-import org.ejml.data.MatrixType;
-
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -20,6 +16,7 @@ public class WristSubsystem extends ClosedLoopSubsystem {
 
     public static class Configuration {
         public double m_wristAxisMaxSpeed;
+        public double m_maxSpeedPercent;
 
         public int m_wristMotorStallLimitAmps;
         public int m_wristMotorFreeLimitAmps;
@@ -28,20 +25,21 @@ public class WristSubsystem extends ClosedLoopSubsystem {
 
         // smart motion config
         public double m_wristMotorP;
-        public double m_wristMotorI;
-        public double m_wristMotorD;
+        public double m_wristI;
+        public double m_wristD;
 
-        public double m_wristMotorIZone;
-        public double m_wristMotorFF;
-        public double m_wristMotorMaxOutput;
-        public double m_wristMotorMinOutput;
-        public double m_wristMotorMaxRPM;
-        public double m_wristMotorMaxVel;
-        public double m_wristMotorMinVel;
-        public double m_wristMotorMaxAcc;
-        public double m_wristMotorAllowedError;
-        public double m_maxSpeedPercent;
+        public double m_wristIZone;
+        public double m_wristFF;
+        public double m_wristMaxOutput;
+        public double m_wristMinOutput;
+        public double m_wristMaxRPM;
+        public double m_wristMaxVel;
+        public double m_wristMinVel;
+        public double m_wristMaxAcc;
+        public double m_wristSmartMotionAllowedError;
         public int m_smartMotionSlot;
+    
+        public double m_wristAllowedError;
     }
 
     private Configuration m_config;
@@ -66,16 +64,16 @@ public class WristSubsystem extends ClosedLoopSubsystem {
         m_pidController = m_wristMotor.getPIDController();
 
         m_pidController.setP(m_config.m_wristMotorP);
-        m_pidController.setI(m_config.m_wristMotorI);
-        m_pidController.setD(m_config.m_wristMotorD);
-        m_pidController.setIZone(m_config.m_wristMotorIZone);
+        m_pidController.setI(m_config.m_wristI);
+        m_pidController.setD(m_config.m_wristD);
+        m_pidController.setIZone(m_config.m_wristIZone);
         m_pidController.setFF(m_targetRotations);
-        m_pidController.setOutputRange(m_config.m_wristMotorMinOutput, m_config.m_wristMotorMaxOutput);
+        m_pidController.setOutputRange(m_config.m_wristMinOutput, m_config.m_wristMaxOutput);
 
-        m_pidController.setSmartMotionMaxVelocity(m_config.m_wristMotorMaxVel, m_config.m_smartMotionSlot);
-        m_pidController.setSmartMotionMinOutputVelocity(m_config.m_wristMotorMinVel, m_config.m_smartMotionSlot);
-        m_pidController.setSmartMotionMaxAccel(m_config.m_wristMotorMaxAcc, m_config.m_smartMotionSlot);
-        m_pidController.setSmartMotionAllowedClosedLoopError(m_config.m_wristMotorAllowedError,
+        m_pidController.setSmartMotionMaxVelocity(m_config.m_wristMaxVel, m_config.m_smartMotionSlot);
+        m_pidController.setSmartMotionMinOutputVelocity(m_config.m_wristMinVel, m_config.m_smartMotionSlot);
+        m_pidController.setSmartMotionMaxAccel(m_config.m_wristMaxAcc, m_config.m_smartMotionSlot);
+        m_pidController.setSmartMotionAllowedClosedLoopError(m_config.m_wristSmartMotionAllowedError,
                 m_config.m_smartMotionSlot);
     }
 
@@ -100,7 +98,7 @@ public class WristSubsystem extends ClosedLoopSubsystem {
     }
 
     public boolean isAtRotations() {
-        return Utility.isWithinTolerance(getRotations(), m_targetRotations, m_config.m_wristMotorAllowedError);
+        return Utility.isWithinTolerance(getRotations(), m_targetRotations, m_config.m_wristAllowedError);
     }
 
     public double getAmps() {
