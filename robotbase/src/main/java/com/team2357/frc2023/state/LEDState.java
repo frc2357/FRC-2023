@@ -1,5 +1,6 @@
 package com.team2357.frc2023.state;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 
@@ -15,9 +16,7 @@ public class LEDState {
 
     private static enum Color {
         RAINBOW_RAINBOW(-0.99),
-        RED_BREATH(-0.17),
-        BLUE_BREATH(-0.15),
-        GRAY_BREATH(-0.13),
+        WAVES_RAINBOW(-0.45),
         YELLOW_LARSON_SCANNER(-0.01),
         YELLOW_HEARTBEAT_FAST(0.07),
         YELLOW_BREATH_SLOW(0.09),
@@ -37,11 +36,16 @@ public class LEDState {
 
     public LEDState(int pwmPort) {
         s_instance = this;
-        m_color = Color.DARK_GRAY;
+        m_color = Color.WAVES_RAINBOW;
         m_blinkIn = new Spark(pwmPort);
     }
 
     public void updateLEDs(RobotState.State robotState, Alliance alliance) {
+        if (DriverStation.isDisabled()) {
+            // The Blinkin can't be set while disabled, because it's PWM like a motor
+            return;
+        }
+
         Color newColor = getColor(robotState, alliance);
         if (newColor != m_color) {
             m_color = newColor;
@@ -52,15 +56,9 @@ public class LEDState {
     private Color getColor(RobotState.State robotState, Alliance alliance) {
         switch (robotState) {
             case ROBOT_INIT:
-                return Color.WHITE;
             case ROBOT_DISABLED:
-                if (alliance == Alliance.Red) {
-                    return Color.RED_BREATH;
-                } else if (alliance == Alliance.Blue) {
-                    return Color.BLUE_BREATH;
-                } else {
-                    return Color.GRAY_BREATH;
-                }
+                // The Blinkin can't be set while disabled, because it's PWM like a motor
+                return Color.WAVES_RAINBOW;
             case ROBOT_STOWED_EMPTY:
                 return Color.RAINBOW_RAINBOW;
             case ROBOT_STOWED_CONE:

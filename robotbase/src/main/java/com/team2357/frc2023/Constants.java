@@ -392,8 +392,8 @@ public final class Constants {
 
             config.m_extendMotorIdleMode = IdleMode.kBrake;
 
-            config.m_extendMotorStallLimitAmps = 60;
-            config.m_extendMotorFreeLimitAmps = 60;
+            config.m_extendMotorStallLimitAmps = 80;
+            config.m_extendMotorFreeLimitAmps = 80;
 
             config.m_isInverted = true;
 
