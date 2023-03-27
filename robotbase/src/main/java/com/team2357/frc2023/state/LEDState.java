@@ -15,9 +15,6 @@ public class LEDState {
 
     private static enum Color {
         RAINBOW_RAINBOW(-0.99),
-        BEATS_PER_MINUTE_OCEAN(-0.75),
-        BEATS_PER_MINUTE_LAVA(-0.73),
-        HEARTBEAT_GRAY(-0.19),
         RED_BREATH(-0.17),
         BLUE_BREATH(-0.15),
         GRAY_BREATH(-0.13),
@@ -63,14 +60,6 @@ public class LEDState {
                     return Color.BLUE_BREATH;
                 } else {
                     return Color.GRAY_BREATH;
-                }
-            case ROBOT_AUTONOMOUS:
-                if (alliance == Alliance.Red) {
-                    return Color.BEATS_PER_MINUTE_LAVA;
-                } else if (alliance == Alliance.Blue) {
-                    return Color.BEATS_PER_MINUTE_OCEAN;
-                } else {
-                    return Color.HEARTBEAT_GRAY;
                 }
             case ROBOT_STOWED_EMPTY:
                 return Color.RAINBOW_RAINBOW;

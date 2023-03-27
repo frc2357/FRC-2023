@@ -11,7 +11,6 @@ public class RobotState {
     public static enum State {
         ROBOT_INIT,                    // Robot is initializing
         ROBOT_DISABLED,                // Robot is in disabled mode and no alliance is selected
-        ROBOT_AUTONOMOUS,              // Robot is currently running its autonomous command
         ROBOT_STOWED_EMPTY,            // Robot is in teleop and has no game piece
         ROBOT_STOWED_CONE,             // Robot currently has a cone and is in stowed/transit pose
         ROBOT_STOWED_CUBE,             // Robot currently has a cube and is in stowed/transit pose
@@ -66,7 +65,7 @@ public class RobotState {
             Logger.getInstance().recordOutput("Driver Set Alliance", "not set before auto");
             s_instance.setAlliance(DriverStation.getAlliance());
         }
-        setState(State.ROBOT_AUTONOMOUS);
+        setState(State.ROBOT_STOWED_EMPTY);
     }
 
     public static void setState(State newState) {
