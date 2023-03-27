@@ -25,10 +25,8 @@ public class ArmRotationAmpZeroCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return Math.abs(
-                ArmRotationSubsystem.getInstance().getAmps()) >= Constants.ARM_ROTATION.ARM_ROTATION_AMP_ZERO_MAX_AMPS
-                &&
-                Constants.ARM_ROTATION.ARM_ROTATION_AMP_ZERO_TIME_MILLIS + m_startTime <= System.currentTimeMillis();
+        return System.currentTimeMillis() - m_startTime >= Constants.ARM_ROTATION.ARM_ROTATION_AMP_ZERO_TIME_MILLIS &&
+        ArmRotationSubsystem.getInstance().getAmps() >= Constants.ARM_ROTATION.ARM_ROTATION_AMP_ZERO_MAX_AMPS;
     }
 
     @Override
@@ -38,8 +36,7 @@ public class ArmRotationAmpZeroCommand extends CommandBase {
             DriverStation.reportError("Amp Zeroing did not finish in time! Arm Rotation not zeroed.", false);
             Logger.getInstance().recordOutput("Arm Rotation Amp Zero fail", true);
         } else {
-            ArmRotationSubsystem.getInstance().resetEncoder();
+            System.out.println("Limit hit");
         }
-        ArmRotationSubsystem.getInstance().setClosedLoopEnabled(true);
     }
 }

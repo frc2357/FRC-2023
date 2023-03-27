@@ -170,10 +170,9 @@ public class GunnerControls {
         // Arm rotation
         upDPadOnly.whileTrue(new ArmRotationAxisCommand(axisRightStickY));
 
-        // upDPadAndY.onTrue(new InstantCommand(() -> {
-        //     ArmRotationSubsystem.getInstance().resetEncoder();
-        // }));
-        upDPadAndY.onTrue(new ArmZeroCommandGroup());
+        upDPadAndY.onTrue(new InstantCommand(() -> {
+            ArmRotationSubsystem.getInstance().resetEncoder();
+        }));
 
         // Arm extension / claw / wrist
         leftDPadOnly.whileTrue(new ArmExtensionAxisCommand(axisRightStickY));

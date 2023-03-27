@@ -324,7 +324,7 @@ public final class Constants {
         public static ClawSubsystem.Configuration GET_CLAW_CONFIG() {
             ClawSubsystem.Configuration config = new ClawSubsystem.Configuration();
 
-            //TODO: Figure this out
+            // TODO: Figure this out
             config.m_isInverted = false;
 
             config.m_conePercentOutput = 0.5;
@@ -438,12 +438,12 @@ public final class Constants {
         public static final double ARM_HANDOFF_ROTATIONS = ARM_ROTATION_GEAR_RATIO / 8;
 
         public static final double ARM_ROTATION_AMP_ZERO_PERCENT_OUTPUT = -0.1;
-        public static final int ARM_ROTATION_AMP_ZERO_MAX_AMPS = 25;
+        public static final int ARM_ROTATION_AMP_ZERO_MAX_AMPS = 3;
 
-        public static final double ARM_ROTATION_AMP_ZERO_TIME_MILLIS = 1000;
+        public static final double ARM_ROTATION_AMP_ZERO_TIME_MILLIS = 60;
 
-        public static final double ENCODER_ZERO_AXIS_SPEED = 0.1;
-        public static final double ENCODER_ZERO_END_TOLERANCE = 0.005;
+        public static final double ENCODER_ZERO_SPEED = 0.1;
+        public static final double ENCODER_ZERO_POSITION = 0.1;
 
         public static ArmRotationSubsystem.Configuration GET_ROTATION_CONFIG() {
             ArmRotationSubsystem.Configuration config = new ArmRotationSubsystem.Configuration();
@@ -493,6 +493,9 @@ public final class Constants {
             // TODO: Calculate
             config.m_armHorizontalRotations = ARM_ROTATION_GEAR_RATIO / 4; // 90 degrees
             config.m_rotationsPerRadian = ARM_ROTATION_GEAR_RATIO / (2 * Math.PI);
+
+            config.m_isEncoderInverted = true;
+            config.m_encoderOffset = 0.1;
 
             return config;
         }

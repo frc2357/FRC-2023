@@ -94,7 +94,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
     private CANSparkMax m_rotationMotor;
 
     private SparkMaxPIDController m_pidController;
-    private SparkMaxAbsoluteEncoder m_encoder;
+    private SparkMaxAbsoluteEncoder m_absoluteEncoder;
     private ArmFeedforward m_feedforward;
 
     private double m_targetRotations;
@@ -120,9 +120,9 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
         m_feedforward = new ArmFeedforward(m_config.m_feedforwardKs, m_config.m_feedforwardKg, m_config.m_feedforwardKv,
                 m_config.m_feedforwardKa);
 
-        m_encoder = m_rotationMotor.getAbsoluteEncoder(Type.kDutyCycle);
-        m_encoder.setInverted(m_config.m_isEncoderInverted);
-        m_encoder.setZeroOffset(m_config.m_encoderOffset);
+        m_absoluteEncoder = m_rotationMotor.getAbsoluteEncoder(Type.kDutyCycle);
+        m_absoluteEncoder.setInverted(m_config.m_isEncoderInverted);
+        m_absoluteEncoder.setZeroOffset(m_config.m_encoderOffset);
         
         resetEncoder();
     }
@@ -176,15 +176,15 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
         m_rotationMotor.set(motorSpeed);
     }
 
-    public void endAxisCommand() {
+    public void endManualControl() {
         stopRotationMotors();
         m_targetRotations = getMotorRotations();
         setClosedLoopEnabled(true);
     }
 
     // Method for the panic mode to rotate the arms
-    public void manualRotate(double sensorUnits) {
-        m_rotationMotor.set(sensorUnits);
+    public void manualRotate(double percentSpeed) {
+        m_rotationMotor.set(percentSpeed);
     }
 
     // Method to stop the motors
@@ -221,7 +221,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
     }
 
     public double getAbsoluteEncoderPosition() {
-        return m_encoder.getPosition();
+        return m_absoluteEncoder.getPosition();
     }
 
     @Override
@@ -229,15 +229,16 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
         if (isClosedLoopEnabled()) {
             double feedforwardVolts = m_feedforward.calculate(calculateFeedforwardRadians(m_targetRotations), 0);
             m_pidController.setReference(m_targetRotations, CANSparkMax.ControlType.kSmartMotion,
-                    m_config.m_smartMotionSlot, feedforwardVolts, ArbFFUnits.kVoltage);
+                   m_config.m_smartMotionSlot, feedforwardVolts, ArbFFUnits.kVoltage);
         }
         if (m_shuffleboardPIDTuner.arePIDsUpdated()) {
             updatePID();
         }
 
-        // System.out.println("Speed: " + m_rotationMotor.getAppliedOutput() + "Amp: " + getAmps());
+        //System.out.println("Speed: " + m_rotationMotor.getAppliedOutput() + "Amp: " + getAmps());
 
-        // System.out.println("Current rot: " + getMotorRotations());
-        //SmartDashboard.putNumber("Rotations", getMotorRotations());
+        // System.out.println("Current rot: " + getMotorRotations() + " target: " + m_targetRotations );
+        // System.out.println("Angle: " + m_absoluteEncoder.getPosition());
+        // SmartDashboard.putNumber("Arm Rotations", getMotorRotations());
     }
 }
