@@ -8,11 +8,11 @@ import com.team2357.frc2023.subsystems.ArmRotationSubsystem;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class ArmRotationAmpZeroCommand extends CommandBase {
+public class ArmRotationPreZeroWithAmpCommand extends CommandBase {
 
     long m_startTime;
 
-    public ArmRotationAmpZeroCommand() {
+    public ArmRotationPreZeroWithAmpCommand() {
         addRequirements(ArmRotationSubsystem.getInstance());
     }
 
@@ -32,11 +32,5 @@ public class ArmRotationAmpZeroCommand extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         ArmRotationSubsystem.getInstance().stopRotationMotors();
-        if (interrupted) {
-            DriverStation.reportError("Amp Zeroing did not finish in time! Arm Rotation not zeroed.", false);
-            Logger.getInstance().recordOutput("Arm Rotation Amp Zero fail", true);
-        } else {
-            System.out.println("Limit hit");
-        }
     }
 }
