@@ -26,12 +26,6 @@ public class RobotState {
         ROBOT_PRE_SCORE_CUBE_LOW,      // Robot is in the "pre-score" pose to score a cube in a low node
     };
 
-    public static enum GamePiece {
-        NONE,
-        CONE,
-        CUBE
-    };
-
     public static Alliance getAlliance() {
         return s_instance.m_alliance;
     }
@@ -40,12 +34,28 @@ public class RobotState {
         return s_instance.m_currentState;
     }
 
+    public static boolean isZeroed() {
+        return s_instance.m_zeroed;
+    }
+
+    public static void setRobotZeroed(boolean zeroed) {
+        s_instance.setZeroed(zeroed);
+    }
+
     public static boolean hasCone() {
-        return s_instance.m_gamePiece == GamePiece.CONE;
+        State state = s_instance.m_currentState;
+        return state == State.ROBOT_STOWED_CONE ||
+          state == State.ROBOT_PRE_SCORE_CONE_HIGH ||
+          state == State.ROBOT_PRE_SCORE_CONE_MID ||
+          state == State.ROBOT_PRE_SCORE_CUBE_LOW;
     }
 
     public static boolean hasCube() {
-        return s_instance.m_gamePiece == GamePiece.CUBE;
+        State state = s_instance.m_currentState;
+        return state == State.ROBOT_STOWED_CUBE ||
+          state == State.ROBOT_PRE_SCORE_CUBE_HIGH ||
+          state == State.ROBOT_PRE_SCORE_CUBE_MID ||
+          state == State.ROBOT_PRE_SCORE_CUBE_LOW;
     }
 
     public static void onDriverAllianceSelect(Alliance alliance) {
@@ -72,24 +82,14 @@ public class RobotState {
         s_instance.setCurrentState(newState);
     }
 
-    public static void teleopInit() {
-        if (hasCone()) {
-            setState(State.ROBOT_STOWED_CONE);
-        } else if (hasCube()) {
-            setState(State.ROBOT_STOWED_CUBE);
-        } else {
-            setState(State.ROBOT_STOWED_EMPTY);
-        }
-    }
-
     private Alliance m_alliance;
     private State m_currentState;
-    private GamePiece m_gamePiece;
+    private boolean m_zeroed;
 
     private RobotState() {
         m_alliance = Alliance.Invalid;
         m_currentState = State.ROBOT_INIT;
-        m_gamePiece = GamePiece.NONE;
+        m_zeroed = false;
     }
 
     private void setAlliance(Alliance alliance) {
@@ -99,25 +99,13 @@ public class RobotState {
         LEDState.getInstance().updateLEDs(m_currentState, m_alliance);
     }
 
+    private void setZeroed(boolean zeroed) {
+        m_zeroed = zeroed;
+    }
+
     private void setCurrentState(State newState) {
         Logger.getInstance().recordOutput("Robot State", newState.name());
-
-        switch (newState) {
-            case ROBOT_STOWED_CONE:
-                m_gamePiece = GamePiece.CONE;
-                break;
-            case ROBOT_STOWED_CUBE:
-                m_gamePiece = GamePiece.CUBE;
-                break;
-            case ROBOT_STOWED_EMPTY:
-                m_gamePiece = GamePiece.NONE;
-                break;
-            default:
-                break;
-        }
-
         m_currentState = newState;
-
         LEDState.getInstance().updateLEDs(m_currentState, m_alliance);
     }
 }

@@ -16,6 +16,7 @@ import com.team2357.frc2023.commands.scoring.AutoScoreLowCommandGroup;
 import com.team2357.frc2023.commands.scoring.HomeMechanismsCommand;
 import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
 import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreMidCommandGroup;
+import com.team2357.frc2023.commands.util.ZeroAllCommand;
 import com.team2357.frc2023.subsystems.ArmRotationSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.lib.triggers.AxisThresholdTrigger;
@@ -205,15 +206,7 @@ public class GunnerControls {
         aButton.whileTrue(new AutoScoreLowCommandGroup());
 
         // Zero all
-        m_backButton.onTrue(new ParallelCommandGroup(
-            new SequentialCommandGroup(
-                new InstantCommand(() -> {
-                    ArmRotationSubsystem.getInstance().resetEncoder();
-                }),
-                new ArmExtendAmpZeroCommand()
-            ),
-            new WinchAmpZeroCommand()
-        ));
+        m_backButton.whileTrue(new ZeroAllCommand());
 
         m_startButton.whileTrue(new HomeMechanismsCommand());
     }
