@@ -28,6 +28,6 @@ public class EverybotWristAxisCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        WristSubsystem.getInstance().stopMotor();
+        WristSubsystem.getInstance().setRotations(WristSubsystem.getInstance().getRotations());
     }
 }

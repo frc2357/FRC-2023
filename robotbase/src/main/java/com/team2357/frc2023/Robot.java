@@ -112,6 +112,12 @@ public class Robot extends LoggedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
+    // We went from disabled to teleop
+    if (RobotState.getState() == RobotState.State.ROBOT_DISABLED) {
+      // We'll assume the robot is empty
+      RobotState.setState(RobotState.State.ROBOT_STOWED_EMPTY);
+    }
   }
 
   /** This function is called periodically during operator control. */
