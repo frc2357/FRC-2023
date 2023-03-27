@@ -1,9 +1,7 @@
 package com.team2357.frc2023.commands.auto.gridone;
 
 import com.team2357.frc2023.commands.intake.IntakeArmRotateDumbCommand;
-import com.team2357.frc2023.commands.intake.IntakeDeployCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
-import com.team2357.frc2023.commands.intake.IntakeStowCommandGroup;
 import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
 import com.team2357.frc2023.trajectoryutil.TrajectoryUtil;
 
