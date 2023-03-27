@@ -1,6 +1,7 @@
 package com.team2357.frc2023.commands.util;
 
 import com.team2357.frc2023.commands.armextension.ArmExtendAmpZeroCommand;
+import com.team2357.frc2023.commands.armrotation.ArmZeroCommandGroup;
 import com.team2357.frc2023.commands.everybot.WristAmpZeroCommand;
 import com.team2357.frc2023.commands.intake.WinchAmpZeroCommand;
 import com.team2357.frc2023.state.RobotState;
@@ -16,7 +17,8 @@ public class ZeroAllCommand extends ParallelCommandGroup {
                 new ParallelCommandGroup(
                     new WinchAmpZeroCommand(),
                     new ArmExtendAmpZeroCommand(),
-                    new WristAmpZeroCommand()
+                    new WristAmpZeroCommand(),
+                    new ArmZeroCommandGroup()
                 ),
                 new FinishedCommand(
                     new ParallelCommandGroup(
