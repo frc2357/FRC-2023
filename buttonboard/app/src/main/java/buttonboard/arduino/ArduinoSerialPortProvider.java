@@ -6,6 +6,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
 public class ArduinoSerialPortProvider implements ArduinoSerialPort.Listener, Runnable {
+  private static final String HEADER = "||v1||";
   public static final int SLEEP_MS = 500;
   public static final int TIMEOUT_MS = 60 * 1000; // Set timeout to 1 minute
   public static final String MSG_HEADER = "||v1||";
@@ -36,7 +37,8 @@ public class ArduinoSerialPortProvider implements ArduinoSerialPort.Listener, Ru
 
   public static void write(String deviceName, JsonNode state) {
     ArduinoSerialPort port = getInstance().m_deviceNamesByPort.inverse().get(deviceName);
-    getInstance().write(port, state.toString());
+    String message = HEADER + state.toString();
+    getInstance().write(port, message);
   }
 
   public static void sendQuery(String deviceName) {
@@ -71,30 +73,49 @@ public class ArduinoSerialPortProvider implements ArduinoSerialPort.Listener, Ru
 
   @Override
   public void onMessage(ArduinoSerialPort port, String message) {
-    System.out.println("handler onMessage");
     try {
-      if (message.indexOf(0) != -1) {
-        System.err.println("Message has \\0 at index " + message.indexOf(0));
-        System.err.println("'" + message + "'");
+      // Remove any '\0' bytes
+      // Add extra spaces after comments because this JSON library is picky
+      // TODO: Change Arduino code to add spaces
+      StringBuffer filteredMessage = new StringBuffer(message.length());
+      for (int i = 0; i < message.length(); i++) {
+        if (message.charAt(i) < ' ') {
+          continue;
+        } else if (message.charAt(i) == ',') {
+          filteredMessage.append(", ");
+        } else {
+          filteredMessage.append(message.charAt(i));
+        }
       }
+      message = filteredMessage.toString();
 
+      // Strip off header
       if (!message.startsWith(MSG_HEADER)) {
         System.err.println("Invalid message: '" + message + "'");
+        return;
       }
       message = message.substring(MSG_HEADER.length()).strip();
 
       JsonNode state = m_objectMapper.readTree(message);
-      JsonNode nameNode = state.get(NAME);
-      String deviceName = nameNode != null ? nameNode.asText() : NAME_UNNAMED;
+      String deviceName = m_deviceNamesByPort.get(port);
+
+      if (deviceName == null) {
+        JsonNode nameNode = state.get(NAME);
+        deviceName = nameNode != null ? nameNode.asText() : NAME_UNNAMED;
+      }
+
+      ArduinoJSONDevice device = m_devicesByName.get(deviceName);
 
       if (!m_deviceNamesByPort.containsValue(deviceName)) {
         m_deviceNamesByPort.put(port, deviceName);
 
-        ArduinoJSONDevice device = m_devicesByName.get(deviceName);
         if (device != null) {
           device.onConnect();
-          device.onStateReceived(state);
         }
+      }
+        
+      if (device != null) {
+        device.onStateReceived(state);
       }
     } catch (Exception e) {
       System.err.println("JSON Parse Exception: " + e.getMessage());
@@ -104,13 +125,11 @@ public class ArduinoSerialPortProvider implements ArduinoSerialPort.Listener, Ru
 
   @Override
   public void onConnect(ArduinoSerialPort port) {
-    System.out.println("handler onConnect");
     writeTimeout(port);
   }
 
   @Override
   public void onDisconnect(ArduinoSerialPort port) {
-    System.out.println("handler onDisconnect");
     String deviceName = m_deviceNamesByPort.get(port);
     ArduinoJSONDevice device = m_devicesByName.get(deviceName);
     if (device != null) {
@@ -124,7 +143,6 @@ public class ArduinoSerialPortProvider implements ArduinoSerialPort.Listener, Ru
   }
 
   private void write(ArduinoSerialPort port, String message) {
-    System.out.println("write: '" + message + "'");
     port.write(message);
   }
 }

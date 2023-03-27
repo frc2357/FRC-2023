@@ -9,6 +9,8 @@ import com.team2357.frc2023.commands.drive.DefaultDriveCommand;
 import com.team2357.frc2023.controls.GunnerControls;
 import com.team2357.frc2023.controls.SwerveDriveControls;
 import com.team2357.frc2023.shuffleboard.AutoCommandChooser;
+import com.team2357.frc2023.state.LEDState;
+import com.team2357.frc2023.state.RobotState;
 import com.team2357.frc2023.subsystems.DualLimelightManagerSubsystem;
 import com.team2357.frc2023.subsystems.SubsystemFactory;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
@@ -41,13 +43,17 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    // Init LEDs
+    new LEDState(Constants.GAMEPIECE_LED.PWM_PORT);
+
+    RobotState.robotInit();
 
     // Create subsystems
     SubsystemFactory subsystemFactory = new SubsystemFactory();
     subsystemFactory.CreateIntakeRollerSubsystem();
     subsystemFactory.CreateIntakeArmSubsystem();
-    subsystemFactory.CreateClawSubsystem();
-    subsystemFactory.CreateWristSubsystem();
+    subsystemFactory.CreateEverybotClawSubsystem();
+    subsystemFactory.CreateEverybotWristSubsystem();
     subsystemFactory.CreateArmRotationSubsystem();
     subsystemFactory.CreateArmExtensionSubsystem();
     subsystemFactory.CreateDualLimelightManagerSubsystem();
@@ -66,13 +72,13 @@ public class RobotContainer {
 
     // Set default pipeline
     DualLimelightManagerSubsystem.getInstance().setAprilTagPipelineActive();
-    
+
     // Setup compressor
     m_compressor = new Compressor(Constants.CAN_ID.PNEUMATICS_HUB_ID, PneumaticsModuleType.REVPH);
     m_compressor.enableAnalog(Constants.COMPRESSOR.MIN_PRESSURE_PSI,
-    Constants.COMPRESSOR.MAX_PRESSURE_PSI);
-    //m_compressor.disable();
-    
+        Constants.COMPRESSOR.MAX_PRESSURE_PSI);
+    // m_compressor.disable();
+
     // Build trajectory paths
     AvailableTrajectories.generateTrajectories();
     AvailableTrajectoryCommands.generateTrajectories();
@@ -81,7 +87,8 @@ public class RobotContainer {
     // Configure Shuffleboard
     configureShuffleboard();
 
-   // PathPlannerServer.startServer(5811); // 5811 = port number. adjust this according to your needs
+    // PathPlannerServer.startServer(5811); // 5811 = port number. adjust this
+    // according to your needs
   }
 
   /**

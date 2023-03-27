@@ -1,8 +1,6 @@
 package com.team2357.frc2023.commands.auto.gridtwo;
 
-import com.team2357.frc2023.commands.claw.ClawInstantOpenCommand;
 import com.team2357.frc2023.commands.intake.IntakeArmRotateDumbCommand;
-import com.team2357.frc2023.commands.intake.IntakeDeployCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
 import com.team2357.frc2023.commands.intake.IntakeSolenoidExtendCommand;
 import com.team2357.frc2023.commands.intake.IntakeStowCommandGroup;
@@ -25,7 +23,7 @@ public class GridTwoTwoConeAutoCommand extends ParallelCommandGroup {
 
                 // Then deploy intake
                 new ParallelCommandGroup(
-                  new ClawInstantOpenCommand(),
+                //   new ClawInstantOpenCommand(),
                   new IntakeArmRotateDumbCommand(0.6).withTimeout(1.0),
                   new SequentialCommandGroup(
                     new WaitCommand(0.5),
