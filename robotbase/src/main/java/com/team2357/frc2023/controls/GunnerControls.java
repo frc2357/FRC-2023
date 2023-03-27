@@ -2,6 +2,7 @@ package com.team2357.frc2023.controls;
 
 import com.team2357.frc2023.Constants.CONTROLLER;
 import com.team2357.frc2023.commands.armextension.ArmExtendAmpZeroCommand;
+import com.team2357.frc2023.commands.armrotation.ArmZeroCommandGroup;
 import com.team2357.frc2023.commands.auto.RotateToDegreeCommand;
 import com.team2357.frc2023.commands.auto.TranslateToTargetCommand;
 import com.team2357.frc2023.commands.human.panic.ArmExtensionAxisCommand;

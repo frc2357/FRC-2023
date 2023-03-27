@@ -8,11 +8,11 @@ import com.team2357.frc2023.subsystems.ArmRotationSubsystem;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class ArmRotationAmpZeroCommand extends CommandBase {
+public class ArmRotationPreZeroWithAmpCommand extends CommandBase {
 
     long m_startTime;
 
-    public ArmRotationAmpZeroCommand() {
+    public ArmRotationPreZeroWithAmpCommand() {
         addRequirements(ArmRotationSubsystem.getInstance());
     }
 
@@ -25,21 +25,12 @@ public class ArmRotationAmpZeroCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return Math.abs(
-                ArmRotationSubsystem.getInstance().getAmps()) >= Constants.ARM_ROTATION.ARM_ROTATION_AMP_ZERO_MAX_AMPS
-                &&
-                Constants.ARM_ROTATION.ARM_ROTATION_AMP_ZERO_TIME_MILLIS + m_startTime <= System.currentTimeMillis();
+        return System.currentTimeMillis() - m_startTime >= Constants.ARM_ROTATION.ARM_ROTATION_AMP_ZERO_TIME_MILLIS &&
+        ArmRotationSubsystem.getInstance().getAmps() >= Constants.ARM_ROTATION.ARM_ROTATION_AMP_ZERO_MAX_AMPS;
     }
 
     @Override
     public void end(boolean interrupted) {
         ArmRotationSubsystem.getInstance().stopRotationMotors();
-        if (interrupted) {
-            DriverStation.reportError("Amp Zeroing did not finish in time! Arm Rotation not zeroed.", false);
-            Logger.getInstance().recordOutput("Arm Rotation Amp Zero fail", true);
-        } else {
-            ArmRotationSubsystem.getInstance().resetEncoder();
-        }
-        ArmRotationSubsystem.getInstance().setClosedLoopEnabled(true);
     }
 }
