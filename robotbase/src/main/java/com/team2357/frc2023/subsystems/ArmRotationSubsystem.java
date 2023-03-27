@@ -114,6 +114,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
 
         m_pidController = m_rotationMotor.getPIDController();
         configureRotationPID(m_pidController);
+        m_pidController.setFeedbackDevice(m_rotationMotor.getEncoder());
 
         m_rotationMotor.setInverted(m_config.m_isInverted);
 
