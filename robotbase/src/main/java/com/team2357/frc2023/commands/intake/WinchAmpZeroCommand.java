@@ -21,19 +21,19 @@ public class WinchAmpZeroCommand extends CommandBase{
     
     @Override
     public boolean isFinished() {
-        return Math.abs(IntakeArmSubsystem.getInstance().getAmps()) >= Constants.INTAKE_ARM.WINCH_AMP_ZERO_MAX_AMPS;
+        return IntakeArmSubsystem.getInstance().getAmps() >= Constants.INTAKE_ARM.WINCH_AMP_ZERO_MAX_AMPS;
     }
     
     @Override
     public void end(boolean interrupted) {
         IntakeArmSubsystem.getInstance().stopWinchMotor();
 
-        if(interrupted){
-            DriverStation.reportError("Amp Zeroing did not finish in time! Winch not zeroed.",false);
-            Logger.getInstance().recordOutput("Winch Amp Zero fail", true);
-        }
-        else{
+        if (!interrupted) {
+            Logger.getInstance().recordOutput("Intake Winch Zero", "success");
             IntakeArmSubsystem.getInstance().resetEncoders();
+        } else {
+            DriverStation.reportError("Intake Winch Zero interrupted!", false);
+            Logger.getInstance().recordOutput("Intake Winch Zero", "interrupted");
         }
     }
-    }
+}

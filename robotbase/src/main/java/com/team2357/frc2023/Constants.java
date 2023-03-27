@@ -265,7 +265,7 @@ public final class Constants {
         public static final int WINCH_DEPLOY_PID_SLOT = 0;
         public static final int WINCH_STOW_PID_SLOT = 1;
 
-        public static final double WINCH_AMP_ZERO_PERCENT_OUTPUT = -0.4;
+        public static final double WINCH_AMP_ZERO_PERCENT_OUTPUT = -0.2;
         public static final int WINCH_AMP_ZERO_MAX_AMPS = 10;
 
         public static IntakeArmSubsystem.Configuration GET_INTAKE_ARM_CONFIG() {
@@ -340,8 +340,9 @@ public final class Constants {
     }
 
     public static final class WRIST {
-        public static final double WRIST_AMP_ZERO_PERCENT_OUTPUT = 0.1;
-        public static final double WRIST_ZERO_MAX_AMPS = 10;
+        public static final double WRIST_AMP_ZERO_PERCENT_OUTPUT = -0.2;
+        public static final double WRIST_ZERO_MAX_AMPS = 20;
+        public static final long WRIST_ZERO_WAIT_MS = 100;
 
         public static WristSubsystem.Configuration GET_WRIST_CONFIG() {
             WristSubsystem.Configuration config = new WristSubsystem.Configuration();
@@ -544,8 +545,9 @@ public final class Constants {
         public static final int MAX_PRESSURE_PSI = 120;
     }
 
-    public static final class AMP_ZERO {
-        public static final int AMP_ZERO_DEADLINE_SECONDS = 1;
+    public static final class ZEROING {
+        public static final double ZERO_ALL_WARNING_SECONDS = 0.25;
+        public static final double ZERO_ALL_DEADLINE_SECONDS = 0.50;
     }
 
     public static final class GRIDCAM {
