@@ -319,8 +319,9 @@ public final class Constants {
 
     public static final class CLAW {
         public static final long CONE_INTAKE_AMP_WAIT = 100;
+        public static final long CUBE_INTAKE_AMP_WAIT = 100;
         public static final int CONE_INTAKE_AMP_LIMIT = 40;
-        public static final int CUBE_INTAKE_AMP_LIMIT = 20;
+        public static final int CUBE_INTAKE_AMP_LIMIT = 50;
 
         public static ClawSubsystem.Configuration GET_CLAW_CONFIG() {
             ClawSubsystem.Configuration config = new ClawSubsystem.Configuration();
@@ -331,7 +332,7 @@ public final class Constants {
             config.m_cubePercentOutput = -0.5;
 
             config.m_clawMotorScoreLimitAmps = 20;
-            config.m_clawMotorIntakeLimitAmps = 40;
+            config.m_clawMotorIntakeLimitAmps = 60;
 
             config.m_rollerAxisMaxSpeed = 0.7;
 

@@ -2,6 +2,7 @@ package com.team2357.frc2023.controls;
 
 import com.team2357.frc2023.commands.drive.AutoBalanceCommand;
 import com.team2357.frc2023.commands.intake.IntakeConeCommandGroup;
+import com.team2357.frc2023.commands.intake.IntakeCubeCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakeDeployConeCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakeDeployCubeCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakePreSignalConeCommandGroup;
@@ -74,8 +75,7 @@ public class SwerveDriveControls {
         m_leftTriggerFull.whileTrue(new IntakeConeCommandGroup());
 
         // Cone Intake deploy/stow
-        m_rightTriggerFull.whileTrue(new IntakeDeployCubeCommandGroup());
-        m_rightTriggerFull.onFalse(new IntakeStowConeCommandGroup());
+        m_rightTriggerFull.whileTrue(new IntakeCubeCommandGroup());
 
         m_aButton.whileTrue(new AutoBalanceCommand());
 

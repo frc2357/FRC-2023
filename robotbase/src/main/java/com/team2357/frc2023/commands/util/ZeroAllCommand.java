@@ -14,13 +14,12 @@ public class ZeroAllCommand extends ParallelCommandGroup {
     public ZeroAllCommand() {
         super(
             new SequentialCommandGroup(
-                new ParallelInterruptCommandGroup(
-                    new LogCommand("Zero All", "User Cancelled", true),
+                new ParallelCommandGroup(
                     new WinchAmpZeroCommand(),
                     new ArmExtendAmpZeroCommand(),
                     new WristAmpZeroCommand(),
                     new ArmZeroCommandGroup()
-                ),
+                ).handleInterrupt(() -> new LogCommand("Zero All", "User Cancelled", true).schedule()),
                 new ParallelCommandGroup(
                     new InstantCommand(() -> RobotState.setRobotZeroed(true)),
                     new LogCommand("Zero All", "Success", true)

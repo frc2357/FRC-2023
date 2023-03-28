@@ -17,15 +17,16 @@ public class AutonomousZeroCommand extends ParallelDeadlineGroup {
         super(
             new WaitCommand(Constants.ZEROING.ZERO_ALL_DEADLINE_SECONDS),
             new SequentialCommandGroup(
-                new ParallelInterruptCommandGroup(
-                    new ParallelCommandGroup(
-                        new InstantCommand(() -> RobotState.setRobotZeroed(false)),
-                        new LogCommand("Zero All", "Failure", true)
-                    ),
+                new ParallelCommandGroup(
                     new WinchAmpZeroCommand(),
                     new ArmExtendAmpZeroCommand(),
                     new WristAmpZeroCommand()
-                ),
+                ).handleInterrupt(() -> {
+                    new ParallelCommandGroup(
+                        new InstantCommand(() -> RobotState.setRobotZeroed(false)),
+                        new LogCommand("Zero All", "Failure", true)
+                    ).schedule();
+                }),
                 new ParallelCommandGroup(
                     new InstantCommand(() -> RobotState.setRobotZeroed(true)),
                     new LogCommand("Zero All", "Success", true)
