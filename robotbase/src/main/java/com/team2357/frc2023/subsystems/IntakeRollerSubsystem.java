@@ -82,8 +82,13 @@ public class IntakeRollerSubsystem extends SubsystemBase {
         m_masterIntakeMotor.set(ControlMode.PercentOutput, percentOutput);
     }
 
-    public double getCurrent(){
+    public double getCurrent() {
         return m_masterIntakeMotor.getStatorCurrent();
+    }
+
+    public boolean isStalled(double stallCurrent) {
+        return (m_masterIntakeMotor.getStatorCurrent() >= stallCurrent) ||
+            (m_followerIntakeMotor.getStatorCurrent() >= stallCurrent);
     }
 
     public void stopIntake() {

@@ -225,8 +225,8 @@ public final class Constants {
         public static final double MID_SHOT_DELAY_SECONDS = .25;
         public static final double HIGH_SHOT_PERCENT_OUTPUT = 0;
         public static final double HIGH_SHOT_DELAY_SECONDS = .25;
-        public static final int AUTO_INTAKE_CURRENT_LIMIT = 0;
-        public static final double AUTO_INTAKE_WAIT_TIME = 0;
+        public static final double AUTO_INTAKE_CURRENT_LIMIT = 25;
+        public static final long AUTO_INTAKE_CONFIRMATION_MILLIS = 200;
 
         public static IntakeRollerSubsystem.Configuration GET_INTAKE_CONFIG() {
             IntakeRollerSubsystem.Configuration config = new IntakeRollerSubsystem.Configuration();
@@ -265,7 +265,7 @@ public final class Constants {
         public static final int WINCH_DEPLOY_PID_SLOT = 0;
         public static final int WINCH_STOW_PID_SLOT = 1;
 
-        public static final double WINCH_AMP_ZERO_PERCENT_OUTPUT = -0.4;
+        public static final double WINCH_AMP_ZERO_PERCENT_OUTPUT = -0.2;
         public static final int WINCH_AMP_ZERO_MAX_AMPS = 10;
 
         public static IntakeArmSubsystem.Configuration GET_INTAKE_ARM_CONFIG() {
@@ -305,11 +305,11 @@ public final class Constants {
             config.m_pidMinOutput = -1;
             config.m_smartMotionMaxVelRPM = 10000;
             config.m_smartMotionMinVelRPM = 0;
-            config.m_smartMotionMaxAccRPM = 4000;
+            config.m_smartMotionMaxAccRPM = 10000; // 10000
             config.m_smartMotionRotationAllowedError = 2;
 
             config.m_winchMotorAllowedError = 2;
-            config.m_winchDeployRotations = 135;
+            config.m_winchDeployRotations = 140;
             config.m_winchStowRotations = 0.0;
 
             return config;
@@ -318,20 +318,21 @@ public final class Constants {
     }
 
     public static final class CLAW {
-        public static final int CONE_INTAKE_AMP_LIMIT = 10;
-        public static final int CUBE_INTAKE_AMP_LIMIT = 10;
+        public static final long CONE_INTAKE_AMP_WAIT = 100;
+        public static final long CUBE_INTAKE_AMP_WAIT = 100;
+        public static final int CONE_INTAKE_AMP_LIMIT = 40;
+        public static final int CUBE_INTAKE_AMP_LIMIT = 50;
 
         public static ClawSubsystem.Configuration GET_CLAW_CONFIG() {
             ClawSubsystem.Configuration config = new ClawSubsystem.Configuration();
 
-            //TODO: Figure this out
-            config.m_isInverted = false;
+            config.m_isInverted = true;
 
             config.m_conePercentOutput = 0.5;
             config.m_cubePercentOutput = -0.5;
 
-            config.m_clawMotorStallLimitAmps = 20;
-            config.m_clawMotorFreeLimitAmps = 20;
+            config.m_clawMotorScoreLimitAmps = 20;
+            config.m_clawMotorIntakeLimitAmps = 60;
 
             config.m_rollerAxisMaxSpeed = 0.7;
 
@@ -340,8 +341,9 @@ public final class Constants {
     }
 
     public static final class WRIST {
-        public static final double WRIST_AMP_ZERO_PERCENT_OUTPUT = 0.1;
-        public static final double WRIST_ZERO_MAX_AMPS = 10;
+        public static final double WRIST_AMP_ZERO_PERCENT_OUTPUT = -0.2;
+        public static final double WRIST_ZERO_MAX_AMPS = 20;
+        public static final long WRIST_ZERO_WAIT_MS = 100;
 
         public static WristSubsystem.Configuration GET_WRIST_CONFIG() {
             WristSubsystem.Configuration config = new WristSubsystem.Configuration();
@@ -358,7 +360,6 @@ public final class Constants {
             config.m_wristMotorP = 0.00005;
             config.m_wristI = 0;
             config.m_wristD = 0;
-
             config.m_wristIZone = 0;
             config.m_wristFF = 0.0001;
             config.m_wristMaxOutput = 1;
@@ -391,8 +392,8 @@ public final class Constants {
 
             config.m_extendMotorIdleMode = IdleMode.kBrake;
 
-            config.m_extendMotorStallLimitAmps = 60;
-            config.m_extendMotorFreeLimitAmps = 60;
+            config.m_extendMotorStallLimitAmps = 80;
+            config.m_extendMotorFreeLimitAmps = 80;
 
             config.m_isInverted = true;
 
@@ -437,9 +438,12 @@ public final class Constants {
         public static final double ARM_HANDOFF_ROTATIONS = ARM_ROTATION_GEAR_RATIO / 8;
 
         public static final double ARM_ROTATION_AMP_ZERO_PERCENT_OUTPUT = -0.1;
-        public static final int ARM_ROTATION_AMP_ZERO_MAX_AMPS = 25;
+        public static final int ARM_ROTATION_AMP_ZERO_MAX_AMPS = 3;
 
-        public static final double ARM_ROTATION_AMP_ZERO_TIME_MILLIS = 1000;
+        public static final double ARM_ROTATION_AMP_ZERO_TIME_MILLIS = 60;
+
+        public static final double ENCODER_ZERO_SPEED = 0.1;
+        public static final double ENCODER_ZERO_POSITION = 0.1;
 
         public static ArmRotationSubsystem.Configuration GET_ROTATION_CONFIG() {
             ArmRotationSubsystem.Configuration config = new ArmRotationSubsystem.Configuration();
@@ -489,6 +493,9 @@ public final class Constants {
             // TODO: Calculate
             config.m_armHorizontalRotations = ARM_ROTATION_GEAR_RATIO / 4; // 90 degrees
             config.m_rotationsPerRadian = ARM_ROTATION_GEAR_RATIO / (2 * Math.PI);
+
+            config.m_isEncoderInverted = true;
+            config.m_encoderOffset = 0.1;
 
             return config;
         }
@@ -544,8 +551,9 @@ public final class Constants {
         public static final int MAX_PRESSURE_PSI = 120;
     }
 
-    public static final class AMP_ZERO {
-        public static final int AMP_ZERO_DEADLINE_SECONDS = 1;
+    public static final class ZEROING {
+        public static final double ZERO_ALL_WARNING_SECONDS = 0.25;
+        public static final double ZERO_ALL_DEADLINE_SECONDS = 0.50;
     }
 
     public static final class GRIDCAM {
