@@ -305,11 +305,11 @@ public final class Constants {
             config.m_pidMinOutput = -1;
             config.m_smartMotionMaxVelRPM = 10000;
             config.m_smartMotionMinVelRPM = 0;
-            config.m_smartMotionMaxAccRPM = 4000;
+            config.m_smartMotionMaxAccRPM = 10000; // 10000
             config.m_smartMotionRotationAllowedError = 2;
 
             config.m_winchMotorAllowedError = 2;
-            config.m_winchDeployRotations = 135;
+            config.m_winchDeployRotations = 140;
             config.m_winchStowRotations = 0.0;
 
             return config;
@@ -360,7 +360,6 @@ public final class Constants {
             config.m_wristMotorP = 0.00005;
             config.m_wristI = 0;
             config.m_wristD = 0;
-
             config.m_wristIZone = 0;
             config.m_wristFF = 0.0001;
             config.m_wristMaxOutput = 1;
