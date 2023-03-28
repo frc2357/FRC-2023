@@ -14,6 +14,7 @@ import com.team2357.frc2023.commands.drive.SyncDriveEncodersCommand;
 import com.team2357.frc2023.commands.drive.ZeroDriveCommand;
 import com.team2357.frc2023.commands.intake.IntakeSolenoidExtendCommand;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
+import com.team2357.frc2023.util.CountdownTimer;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -58,6 +59,7 @@ public class Robot extends LoggedRobot {
     m_robotContainer = new RobotContainer();
 
     (new WaitCommand(3).andThen(new SyncDriveEncodersCommand())).schedule();
+    new CountdownTimer().start();
   }
 
   /**
