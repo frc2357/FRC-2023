@@ -3,7 +3,7 @@ package com.team2357.frc2023.commands.auto.gridtwo;
 import com.team2357.frc2023.commands.intake.IntakeArmRotateDumbCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
 import com.team2357.frc2023.commands.intake.IntakeSolenoidExtendCommand;
-import com.team2357.frc2023.commands.intake.IntakeStowCommandGroup;
+import com.team2357.frc2023.commands.intake.IntakeStowConeCommandGroup;
 import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
 import com.team2357.frc2023.trajectoryutil.TrajectoryUtil;
 
@@ -32,7 +32,7 @@ public class GridTwoTwoConeAutoCommand extends ParallelCommandGroup {
                 ),
 
                 // Then stow intake
-                new IntakeStowCommandGroup(),
+                new IntakeStowConeCommandGroup(),
 
                 // Score cone high
                 new WaitCommand(1),

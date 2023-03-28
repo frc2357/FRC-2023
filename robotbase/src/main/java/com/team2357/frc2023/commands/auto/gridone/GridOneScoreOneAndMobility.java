@@ -3,7 +3,7 @@ package com.team2357.frc2023.commands.auto.gridone;
 import com.team2357.frc2023.commands.intake.IntakeArmRotateDumbCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
 import com.team2357.frc2023.commands.intake.IntakeSolenoidExtendCommand;
-import com.team2357.frc2023.commands.intake.IntakeStowCommandGroup;
+import com.team2357.frc2023.commands.intake.IntakeStowConeCommandGroup;
 import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
 import com.team2357.frc2023.trajectoryutil.TrajectoryUtil;
 
@@ -34,7 +34,7 @@ public class GridOneScoreOneAndMobility extends ParallelCommandGroup {
                 ),
 
                 // Then stow intake
-                new IntakeStowCommandGroup()
+                new IntakeStowConeCommandGroup()
             ),
             // Path movement
             new SequentialCommandGroup(
