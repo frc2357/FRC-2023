@@ -18,16 +18,14 @@ public class ZeroAllCommand extends ParallelCommandGroup {
                     new WinchAmpZeroCommand(),
                     new ArmExtendAmpZeroCommand(),
                     new WristAmpZeroCommand(),
-                    new ArmZeroCommandGroup()
-                ),
-                new FinishedCommand(
-                    new ParallelCommandGroup(
-                        new InstantCommand(() -> RobotState.setRobotZeroed(true)),
-                        new LogCommand("Zero All", "Success", true)
-                    ),
-                    new ParallelCommandGroup(
+                    new ArmZeroCommandGroup(),
+                    new InterruptCommand(
                         new LogCommand("Zero All", "User Cancelled", true)
                     )
+                ),
+                new ParallelCommandGroup(
+                    new InstantCommand(() -> RobotState.setRobotZeroed(true)),
+                    new LogCommand("Zero All", "Success", true)
                 )
             )
         );

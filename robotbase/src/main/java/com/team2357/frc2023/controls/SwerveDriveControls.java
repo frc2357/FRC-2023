@@ -1,13 +1,14 @@
 package com.team2357.frc2023.controls;
 
 import com.team2357.frc2023.commands.drive.AutoBalanceCommand;
+import com.team2357.frc2023.commands.intake.IntakeConeCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakeDeployConeCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakeDeployCubeCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakePreSignalConeCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakePreSignalCubeCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakeRollerReverseCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
-import com.team2357.frc2023.commands.intake.IntakeStowCommandGroup;
+import com.team2357.frc2023.commands.intake.IntakeStowConeCommandGroup;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.lib.triggers.AxisThresholdTrigger;
 import com.team2357.lib.util.XboxRaw;
@@ -69,12 +70,12 @@ public class SwerveDriveControls {
         m_leftTriggerPre.onTrue(new IntakePreSignalConeCommandGroup());
         m_rightTriggerPre.onTrue(new IntakePreSignalCubeCommandGroup());
 
-        // Intake deploy/stow
-        m_leftTriggerFull.whileTrue(new IntakeDeployConeCommandGroup());
-        m_leftTriggerFull.onFalse(new IntakeStowCommandGroup());
+        // Cone Intake deploy/stow
+        m_leftTriggerFull.whileTrue(new IntakeConeCommandGroup());
 
+        // Cone Intake deploy/stow
         m_rightTriggerFull.whileTrue(new IntakeDeployCubeCommandGroup());
-        m_rightTriggerFull.onFalse(new IntakeStowCommandGroup());
+        m_rightTriggerFull.onFalse(new IntakeStowConeCommandGroup());
 
         m_aButton.whileTrue(new AutoBalanceCommand());
 

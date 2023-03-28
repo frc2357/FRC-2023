@@ -225,8 +225,8 @@ public final class Constants {
         public static final double MID_SHOT_DELAY_SECONDS = .25;
         public static final double HIGH_SHOT_PERCENT_OUTPUT = 0;
         public static final double HIGH_SHOT_DELAY_SECONDS = .25;
-        public static final int AUTO_INTAKE_CURRENT_LIMIT = 0;
-        public static final double AUTO_INTAKE_WAIT_TIME = 0;
+        public static final double AUTO_INTAKE_CURRENT_LIMIT = 25;
+        public static final long AUTO_INTAKE_CONFIRMATION_MILLIS = 200;
 
         public static IntakeRollerSubsystem.Configuration GET_INTAKE_CONFIG() {
             IntakeRollerSubsystem.Configuration config = new IntakeRollerSubsystem.Configuration();
@@ -318,20 +318,20 @@ public final class Constants {
     }
 
     public static final class CLAW {
-        public static final int CONE_INTAKE_AMP_LIMIT = 10;
-        public static final int CUBE_INTAKE_AMP_LIMIT = 10;
+        public static final long CONE_INTAKE_AMP_WAIT = 100;
+        public static final int CONE_INTAKE_AMP_LIMIT = 40;
+        public static final int CUBE_INTAKE_AMP_LIMIT = 20;
 
         public static ClawSubsystem.Configuration GET_CLAW_CONFIG() {
             ClawSubsystem.Configuration config = new ClawSubsystem.Configuration();
 
-            // TODO: Figure this out
-            config.m_isInverted = false;
+            config.m_isInverted = true;
 
             config.m_conePercentOutput = 0.5;
             config.m_cubePercentOutput = -0.5;
 
-            config.m_clawMotorStallLimitAmps = 20;
-            config.m_clawMotorFreeLimitAmps = 20;
+            config.m_clawMotorScoreLimitAmps = 20;
+            config.m_clawMotorIntakeLimitAmps = 40;
 
             config.m_rollerAxisMaxSpeed = 0.7;
 

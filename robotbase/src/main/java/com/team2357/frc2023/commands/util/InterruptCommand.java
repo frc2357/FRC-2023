@@ -6,18 +6,16 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 /**
  * Runs the given command only if interrupted
  */
-public class FinishedCommand extends CommandBase {
-    private Command m_finishedCommand;
+public class InterruptCommand extends CommandBase {
     private Command m_interruptCommand;
 
-    public FinishedCommand(Command finishedCommand, Command interruptCommand) {
-        m_finishedCommand = finishedCommand;
+    public InterruptCommand(Command interruptCommand) {
         m_interruptCommand = interruptCommand;
     }
 
     @Override
     public boolean isFinished() {
-        return true;
+        return false;
     }
 
     @Override
@@ -25,10 +23,6 @@ public class FinishedCommand extends CommandBase {
         if (interrupted) {
             if (m_interruptCommand != null) {
                 m_interruptCommand.schedule();
-            }
-        } else {
-            if (m_finishedCommand != null) {
-                m_finishedCommand.schedule();
             }
         }
     }
