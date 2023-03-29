@@ -43,6 +43,7 @@ public class TeleopAutoScoreCommandGroup extends CommandBase {
                     currentPose);
 
             if (teleopTrajectory != null) {
+                /*
                 Command autoScore = SwerveDriveSubsystem.getAutoScoreCommands(Buttonboard.getInstance().getRowValue(),
                         Buttonboard.getInstance().getColValue());
                 Command translate = new TranslateToTargetCommandGroup(SwerveDriveSubsystem.getSetpoint(col % 3),
@@ -58,6 +59,7 @@ public class TeleopAutoScoreCommandGroup extends CommandBase {
                 m_teleopCommand.schedule();
                 RumbleCommand.createRumbleCommand(m_controller,
                         Constants.CONTROLLER.RUMBLE_TIMEOUT_SECONDS_ON_TELEOP_AUTO).schedule();
+                */
             }
         }
     }

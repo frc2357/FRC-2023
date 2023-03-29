@@ -17,9 +17,11 @@ public class HeartlandAutoScoreCommand extends CommandBase {
         int col = Buttonboard.getInstance().getColValue();
         int row = Buttonboard.getInstance().getRowValue();
 
+        /*
         m_teleopCommand = SwerveDriveSubsystem.getAutoScoreCommands(row,col).andThen(() -> {
             m_hasScored = true;
         });
+        */
 
         m_teleopCommand.schedule();
     }
