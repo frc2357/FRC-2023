@@ -295,6 +295,10 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
     Rotation2d r2d = new Rotation2d(SwerveDriveSubsystem.getInstance().getYaw());
     return new Pose2d(t2d, r2d);
   }
+
+  public Long getTargetID(){
+    return m_Tid.get();
+  }
   /*
    * @Override
    * public void periodic() {

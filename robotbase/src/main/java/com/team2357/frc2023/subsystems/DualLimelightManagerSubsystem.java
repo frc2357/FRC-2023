@@ -1,7 +1,10 @@
 package com.team2357.frc2023.subsystems;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.team2357.lib.subsystems.LimelightSubsystem;
 
+import edu.wpi.first.hal.CANData;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -175,5 +178,17 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
 
     public double getSecondaryTX() {
         return m_secondaryLimelight.getTX();
+    }
+
+    @Override
+    public void periodic(){
+        if(m_leftLimelight.validTargetExists()){
+            Logger.getInstance().recordOutput("Left limelight pose", m_leftLimelight.getLimelightPose2d());
+            Logger.getInstance().recordOutput("Left limelight target ID's", m_leftLimelight.getTargetID());
+        }
+        if(m_rightLimelight.validTargetExists()){
+            Logger.getInstance().recordOutput("Right limelight pose", m_rightLimelight.getLimelightPose2d());
+            Logger.getInstance().recordOutput("Right limelight target ID's", m_rightLimelight.getTargetID());
+        }
     }
 }
