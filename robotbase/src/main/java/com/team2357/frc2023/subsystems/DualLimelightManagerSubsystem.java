@@ -184,11 +184,11 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
     public void periodic(){
         if(m_leftLimelight.validTargetExists()){
             Logger.getInstance().recordOutput("Left limelight pose", m_leftLimelight.getLimelightPose2d());
-            Logger.getInstance().recordOutput("Left limelight target ID's", m_leftLimelight.getTargetID());
+            Logger.getInstance().recordOutput("Left limelight target ID's", m_leftLimelight.getLastTargetID());
         }
         if(m_rightLimelight.validTargetExists()){
             Logger.getInstance().recordOutput("Right limelight pose", m_rightLimelight.getLimelightPose2d());
-            Logger.getInstance().recordOutput("Right limelight target ID's", m_rightLimelight.getTargetID());
+            Logger.getInstance().recordOutput("Right limelight target ID's", m_rightLimelight.getLastTargetID());
         }
     }
 }

@@ -296,7 +296,7 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
     return new Pose2d(t2d, r2d);
   }
 
-  public Long getTargetID(){
+  public Long getLastTargetID(){
     return m_Tid.get();
   }
   /*
