@@ -220,11 +220,6 @@ public final class Constants {
     public static final class INTAKE_ROLLER {
         public static final double AUTO_SCORE_LOW_REVERSE_TIME = 1;
 
-        // TODO: Tune these
-        public static final double MID_SHOT_PERCENT_OUTPUT = 0;
-        public static final double MID_SHOT_DELAY_SECONDS = .25;
-        public static final double HIGH_SHOT_PERCENT_OUTPUT = 0;
-        public static final double HIGH_SHOT_DELAY_SECONDS = .25;
         public static final double AUTO_INTAKE_CURRENT_LIMIT = 25;
         public static final long AUTO_INTAKE_CONFIRMATION_MILLIS = 200;
 
@@ -254,11 +249,6 @@ public final class Constants {
 
         // Auto score low
         public static final double AUTO_SCORE_LOW_ROTATIONS = 70;
-
-        // Cube shooting
-        // TODO: Tune these
-        public static final double MID_SHOT_SETPOINT_ROTATIONS = 0;
-        public static final double HIGH_SHOT_SETPOINT_ROTATIONS = 0;
 
         public static final double INTAKE_HANDOFF_WINCH_ROTATIONS = 60;
 
@@ -329,9 +319,11 @@ public final class Constants {
             config.m_isInverted = true;
 
             config.m_coneIntakePercentOutput = 0.5;
+            config.m_coneHoldPercentOutput = 1.0;
             config.m_coneReleasePercentOutput = -0.5;
 
             config.m_cubeIntakePercentOutput = -0.5;
+            config.m_cubeHoldPercentOutput = -1.0;
             config.m_cubeReleasePercentOutput = 0.5;
 
             config.m_clawMotorScoreLimitAmps = 20;
@@ -347,6 +339,13 @@ public final class Constants {
         public static final double WRIST_AMP_ZERO_PERCENT_OUTPUT = -0.2;
         public static final double WRIST_ZERO_MAX_AMPS = 20;
         public static final long WRIST_ZERO_WAIT_MS = 100;
+
+        public static final double WRIST_RETRACT_ROTATIONS = 0;
+        public static final double WRIST_EXTENSION_RETRACT_ROTATIONS = 4;
+        public static final double SCORE_CONE_MID_ROTATIONS = 14;
+        public static final double SCORE_CUBE_MID_ROTATIONS = 15;
+        public static final double SCORE_CONE_HIGH_ROTATIONS = 21.5;
+        public static final double SCORE_CUBE_HIGH_ROTATIONS = 20;
 
         public static WristSubsystem.Configuration GET_WRIST_CONFIG() {
             WristSubsystem.Configuration config = new WristSubsystem.Configuration();
@@ -374,7 +373,7 @@ public final class Constants {
             config.m_wristSmartMotionAllowedError = 0.01;
             config.m_smartMotionSlot = 0;
 
-            config.m_wristAllowedError = 0.05;
+            config.m_wristAllowedError = 0.1;
 
             return config;
         }
@@ -384,10 +383,11 @@ public final class Constants {
         public static final double RETRACTED_ROTATIONS = 0;
 
         public static final double AUTO_SCORE_MID_ROTATIONS = 15;
-        public static final double AUTO_SCORE_HIGH_ROTATIONS = 245;
+        public static final double SCORE_CONE_HIGH_ROTATIONS = 45;
+        public static final double SCORE_CUBE_HIGH_ROTATIONS = 33;
 
         public static final double ARM_EXTENSION_AMP_ZERO_PERCENT_OUTPUT = -0.2;
-        public static final int ARM_EXTENSION_AMP_ZERO_MAX_AMPS = 25;
+        public static final int ARM_EXTENSION_AMP_ZERO_MAX_AMPS = 30;
 
         public static ArmExtensionSubsystem.Configuration GET_EXTENSION_CONFIG() {
             ArmExtensionSubsystem.Configuration config = new ArmExtensionSubsystem.Configuration();
@@ -395,8 +395,8 @@ public final class Constants {
 
             config.m_extendMotorIdleMode = IdleMode.kBrake;
 
-            config.m_extendMotorStallLimitAmps = 80;
-            config.m_extendMotorFreeLimitAmps = 80;
+            config.m_extendMotorStallLimitAmps = 60;
+            config.m_extendMotorFreeLimitAmps = 60;
 
             config.m_isInverted = true;
 
@@ -434,8 +434,12 @@ public final class Constants {
     public static final class ARM_ROTATION {
         public static final double RETRACTED_ROTATIONS = 0;
 
-        public static final double AUTO_SCORE_MID_ROTATIONS = 50;
-        public static final double AUTO_SCORE_HIGH_ROTATIONS = 65;
+        public static final double WRIST_CLEAR_INTAKE_ROTATIONS = 30;
+        public static final double EXTENSION_HIGH_START_ROTATIONS = 45;
+        public static final double SCORE_CONE_MID_ROTATIONS = 57;
+        public static final double SCORE_CONE_HIGH_ROTATIONS = 70;
+        public static final double SCORE_CUBE_MID_ROTATIONS = 45;
+        public static final double SCORE_CUBE_HIGH_ROTATIONS = 65;
 
         public static final double ARM_ROTATION_GEAR_RATIO = 190.91;
         public static final double ARM_HANDOFF_ROTATIONS = ARM_ROTATION_GEAR_RATIO / 8;
