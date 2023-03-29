@@ -295,11 +295,12 @@ public final class Constants {
             config.m_pidMinOutput = -1;
             config.m_smartMotionMaxVelRPM = 10000;
             config.m_smartMotionMinVelRPM = 0;
-            config.m_smartMotionMaxAccRPM = 10000; // 10000
+            config.m_smartMotionMaxAccRPM = 8000; // 10000
             config.m_smartMotionRotationAllowedError = 2;
 
             config.m_winchMotorAllowedError = 2;
             config.m_winchDeployRotations = 140;
+            config.m_winchHalfDeployRotations = 120;
             config.m_winchStowRotations = 0.0;
 
             return config;
@@ -344,7 +345,7 @@ public final class Constants {
         public static final double WRIST_EXTENSION_RETRACT_ROTATIONS = 4;
         public static final double SCORE_CONE_MID_ROTATIONS = 14;
         public static final double SCORE_CUBE_MID_ROTATIONS = 15;
-        public static final double SCORE_CONE_HIGH_ROTATIONS = 21.5;
+        public static final double SCORE_CONE_HIGH_ROTATIONS = 20;
         public static final double SCORE_CUBE_HIGH_ROTATIONS = 20;
 
         public static WristSubsystem.Configuration GET_WRIST_CONFIG() {
@@ -382,12 +383,12 @@ public final class Constants {
     public static final class ARM_EXTENSION {
         public static final double RETRACTED_ROTATIONS = 0;
 
-        public static final double AUTO_SCORE_MID_ROTATIONS = 15;
-        public static final double SCORE_CONE_HIGH_ROTATIONS = 45;
+        public static final double AUTO_SCORE_MID_ROTATIONS = 12;
+        public static final double SCORE_CONE_HIGH_ROTATIONS = 65;
         public static final double SCORE_CUBE_HIGH_ROTATIONS = 33;
 
         public static final double ARM_EXTENSION_AMP_ZERO_PERCENT_OUTPUT = -0.2;
-        public static final int ARM_EXTENSION_AMP_ZERO_MAX_AMPS = 30;
+        public static final int ARM_EXTENSION_AMP_ZERO_MAX_AMPS = 40;
 
         public static ArmExtensionSubsystem.Configuration GET_EXTENSION_CONFIG() {
             ArmExtensionSubsystem.Configuration config = new ArmExtensionSubsystem.Configuration();
@@ -438,7 +439,7 @@ public final class Constants {
         public static final double EXTENSION_HIGH_START_ROTATIONS = 45;
         public static final double SCORE_CONE_MID_ROTATIONS = 57;
         public static final double SCORE_CONE_HIGH_ROTATIONS = 70;
-        public static final double SCORE_CUBE_MID_ROTATIONS = 45;
+        public static final double SCORE_CUBE_MID_ROTATIONS = 50;
         public static final double SCORE_CUBE_HIGH_ROTATIONS = 65;
 
         public static final double ARM_ROTATION_GEAR_RATIO = 190.91;
