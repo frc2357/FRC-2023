@@ -78,6 +78,9 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
   private DoubleSubscriber m_ThorSub;
   private DoubleSubscriber m_TvertSub;
   private IntegerSubscriber m_Tid;
+  private IntegerSubscriber m_BotposeWpiRed;
+  private IntegerSubscriber m_BotposeWpiBlue;
+
   private DoubleArraySubscriber m_limelightPoseInfoSub;
 
   /**
@@ -101,6 +104,8 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
     m_ThorSub = m_table.getDoubleTopic("thor").subscribe(m_Configuration.m_DefaultReturnValue);
     m_TvertSub = m_table.getDoubleTopic("tvert").subscribe(m_Configuration.m_DefaultReturnValue);
     m_Tid = m_table.getIntegerTopic("tid").subscribe(-1);
+    m_BotposeWpiRed = m_table.getIntegerTopic("botpose_wpired").subscribe(-1);
+    m_BotposeWpiBlue = m_table.getIntegerTopic("botpose_wpiblue").subscribe(-1);
 
     DoubleArrayTopic limelightPoseInfo = m_table.getDoubleArrayTopic("botpose");
     m_limelightPoseInfoSub = limelightPoseInfo.subscribe(null,
@@ -299,6 +304,15 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
   public Long getLastTargetID(){
     return m_Tid.get();
   }
+
+  public Long getLimelightBotPoseWPIRed(){
+    return m_BotposeWpiRed.get();
+  }
+
+  public Long getLimelightBotPoseWPIBlue(){
+    return m_BotposeWpiBlue.get();
+  }
+  
   /*
    * @Override
    * public void periodic() {
