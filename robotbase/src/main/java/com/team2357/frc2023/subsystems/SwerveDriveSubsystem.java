@@ -14,13 +14,6 @@ import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.apriltag.AprilTagEstimate;
-import com.team2357.frc2023.apriltag.GridCamEstimator;
-import com.team2357.frc2023.commands.scoring.AutoScoreLowCommandGroup;
-import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
-import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreMidCommandGroup;
-import com.team2357.frc2023.commands.scoring.cube.CubeAutoScoreHighCommandGroup;
-import com.team2357.frc2023.commands.scoring.cube.CubeAutoScoreMidCommandGroup;
-import com.team2357.frc2023.networktables.GridCam;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 import com.team2357.lib.util.Utility;
 
@@ -43,7 +36,6 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 
 public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	private static SwerveDriveSubsystem instance = null;
@@ -79,38 +71,6 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 			}
 		}
 		return COLUMN_TARGET.NONE;
-	}
-
-	/**
-	 * @param row row to score on (low: 2, mid: 1, high: 0)
-	 * @return Auto score command to run
-	 */
-	public static Command getAutoScoreCommands(int row, int col) {
-		switch (row) {
-			case 0:
-				switch (col % 3) {
-					case 0:
-					case 2:
-						return new ConeAutoScoreHighCommandGroup();
-					case 1:
-						return new CubeAutoScoreHighCommandGroup();
-					default:
-						return new AutoScoreLowCommandGroup(); // Potentially default to ConeAutoScoreHighCommandGroup
-				}
-			case 1:
-				switch (col % 3) {
-					case 0:
-					case 2:
-						return new ConeAutoScoreMidCommandGroup();
-					case 1:
-						return new CubeAutoScoreMidCommandGroup();
-					default:
-						return new AutoScoreLowCommandGroup(); // Potentially default to ConeAutoScoreHighCommandGroup
-				}
-			default:
-				return new AutoScoreLowCommandGroup();
-		}
-
 	}
 
 	private SwerveDriveKinematics m_kinematics;

@@ -328,8 +328,11 @@ public final class Constants {
 
             config.m_isInverted = true;
 
-            config.m_conePercentOutput = 0.5;
-            config.m_cubePercentOutput = -0.5;
+            config.m_coneIntakePercentOutput = 0.5;
+            config.m_coneReleasePercentOutput = -0.5;
+
+            config.m_cubeIntakePercentOutput = -0.5;
+            config.m_cubeReleasePercentOutput = 0.5;
 
             config.m_clawMotorScoreLimitAmps = 20;
             config.m_clawMotorIntakeLimitAmps = 60;
