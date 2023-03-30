@@ -11,7 +11,9 @@ import com.team2357.frc2023.commands.human.panic.IntakeArmToggleCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeRollerAxisCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeWinchAxisCommand;
 import com.team2357.frc2023.commands.intake.WinchAmpZeroCommand;
+import com.team2357.frc2023.commands.scoring.GunnerScoreHighCommand;
 import com.team2357.frc2023.commands.scoring.GunnerScoreLowCommand;
+import com.team2357.frc2023.commands.scoring.GunnerScoreMidCommand;
 import com.team2357.frc2023.commands.scoring.HomeMechanismsCommand;
 import com.team2357.frc2023.commands.util.ZeroAllCommand;
 import com.team2357.frc2023.subsystems.ArmRotationSubsystem;
@@ -196,8 +198,8 @@ public class GunnerControls {
         downDPadAndB.whileTrue(new TranslateToTargetCommand(SwerveDriveSubsystem.COLUMN_TARGET.RIGHT));
 
         // Auto score
-        //yButton.whileTrue(new ConeAutoScoreHighCommandGroup());
-        //xButton.whileTrue(new ConeAutoScoreMidCommandGroup());
+        yButton.whileTrue(new GunnerScoreHighCommand());
+        xButton.whileTrue(new GunnerScoreMidCommand());
         aButton.whileTrue(new GunnerScoreLowCommand());
 
         // Zero all

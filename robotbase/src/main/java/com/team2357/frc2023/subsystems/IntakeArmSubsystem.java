@@ -1,5 +1,7 @@
 package com.team2357.frc2023.subsystems;
 
+import javax.print.attribute.standard.MediaSize;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
@@ -66,6 +68,7 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
 
         public double m_winchMotorAllowedError;
 
+        public double m_winchHalfDeployRotations;
         public double m_winchDeployRotations;
         public double m_winchStowRotations;
     }
@@ -73,7 +76,7 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
     public Configuration m_config;
 
     private enum ArmState {
-        Unknown, Deployed, Stowed
+        Unknown, HalfDeployed, Deployed, Stowed
     };
 
     private CANSparkMax m_winchMotor;
@@ -193,6 +196,14 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
                 m_config.m_winchMotorAllowedError);
     }
 
+    public boolean isHalfDeploying() {
+        return (m_desiredState == ArmState.HalfDeployed && m_currentState != ArmState.HalfDeployed);
+    }
+
+    public boolean isHalfDeployed() {
+        return (m_desiredState == ArmState.HalfDeployed && m_currentState == ArmState.HalfDeployed);
+    }
+
     public boolean isDeploying() {
         return (m_desiredState == ArmState.Deployed && m_currentState != ArmState.Deployed);
     }
@@ -207,6 +218,12 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
 
     public boolean isStowed() {
         return (m_desiredState == ArmState.Stowed && m_currentState == ArmState.Stowed);
+    }
+
+    public void halfDeploy() {
+        m_currentState = ArmState.Unknown;
+        m_desiredState = ArmState.HalfDeployed;
+        setWinchRotations(m_config.m_winchHalfDeployRotations, m_config.m_winchDeployPidSlot);
     }
 
     public void deploy() {
@@ -249,6 +266,8 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
                 deployPeriodic();
             } else if (m_desiredState == ArmState.Stowed) {
                 stowPeriodic();
+            } else if (m_desiredState == ArmState.HalfDeployed) {
+                halfDeployPeriodic();
             }
         }
 
@@ -263,6 +282,13 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
         SmartDashboard.putNumber("Winch amps", getAmps());
         SmartDashboard.putNumber("Winch rotations",
         m_winchMotor.getEncoder().getPosition());
+    }
+
+    private void halfDeployPeriodic() {
+        if (!isWinchAtRotations()) {
+        } else if (isWinchAtRotations()) {
+            m_currentState = ArmState.HalfDeployed;
+        }
     }
 
     private void deployPeriodic() {
