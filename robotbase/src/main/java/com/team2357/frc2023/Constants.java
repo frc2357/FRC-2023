@@ -388,7 +388,7 @@ public final class Constants {
         public static final double SCORE_CUBE_HIGH_ROTATIONS = 33;
 
         public static final double ARM_EXTENSION_AMP_ZERO_PERCENT_OUTPUT = -0.2;
-        public static final int ARM_EXTENSION_AMP_ZERO_MAX_AMPS = 40;
+        public static final int ARM_EXTENSION_AMP_ZERO_MAX_AMPS = 50;
 
         public static ArmExtensionSubsystem.Configuration GET_EXTENSION_CONFIG() {
             ArmExtensionSubsystem.Configuration config = new ArmExtensionSubsystem.Configuration();
