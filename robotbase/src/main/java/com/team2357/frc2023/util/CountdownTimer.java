@@ -9,50 +9,22 @@ public class CountdownTimer extends Thread{
         Timer timer = new Timer();
         Integer i =0;
         timer.start();
-        System.out.println("Please wait until countdown has passed! Robot may freak out if you dont.\n10 ----------");
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
+        System.out.println("Please wait until countdown has passed! Robot may freak out if you dont.");
+        while(true){
+            System.out.print(10-i+" ");
+            for(int a =10; a >i;a--){
+                System.out.print("-");
+            }
+            System.out.print("\n");
+            if(i>=9){
+                break;
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+            }
+            i++;
         }
-        System.out.println("9 ---------");i++;
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-        }
-        System.out.println("8 --------");i++;
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-        }
-        System.out.println("7 -------");i++;
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-        }
-        System.out.println("6 ------");i++;
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-        }System.out.println("5 -----");i++;
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-        }System.out.println("4 ----");i++;
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-        }System.out.println("3 ---");i++;
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-        }System.out.println("2 --");i++;
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-        }System.out.println("1 -");i++;
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-        }System.out.println("The robot should be fine to use now, so give thumbs up.");
+        System.out.println("The robot should be fine to use now, so give the thumbs up.");
     }
 }
