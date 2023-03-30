@@ -24,7 +24,6 @@ public class CountdownTimer extends Thread{
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
             }
-            i++;
         }
         System.out.println("The robot should be fine to use now, so give the thumbs up.");
     }
