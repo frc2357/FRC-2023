@@ -11,8 +11,8 @@ public class ConeLowScoreCommand extends SequentialCommandGroup {
     public ConeLowScoreCommand() {
         super(
             new IntakeRollerReverseCommand().withTimeout(0.75),
-            new IntakeArmStowCommand(),
-            new SetRobotStateCommand(RobotState.State.ROBOT_STOWED_EMPTY)
+            new SetRobotStateCommand(RobotState.State.ROBOT_STOWED_EMPTY),
+            new IntakeArmStowCommand()
         );
     }
 }

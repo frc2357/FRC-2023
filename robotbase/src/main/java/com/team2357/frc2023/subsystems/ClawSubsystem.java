@@ -16,8 +16,11 @@ public class ClawSubsystem extends SubsystemBase {
 
     public static class Configuration {
         public double m_coneIntakePercentOutput;
+        public double m_coneHoldPercentOutput;
         public double m_coneReleasePercentOutput;
+
         public double m_cubeIntakePercentOutput;
+        public double m_cubeHoldPercentOutput;
         public double m_cubeReleasePercentOutput;
 
         public int m_clawMotorScoreLimitAmps;
@@ -56,6 +59,14 @@ public class ClawSubsystem extends SubsystemBase {
     public void intakeCube() {
         m_rollerMotor.setSmartCurrentLimit(m_config.m_clawMotorIntakeLimitAmps, m_config.m_clawMotorIntakeLimitAmps);
         m_rollerMotor.set(m_config.m_cubeIntakePercentOutput);
+    }
+
+    public void holdCone() {
+        m_rollerMotor.set(m_config.m_coneHoldPercentOutput);
+    }
+
+    public void holdCube() {
+        m_rollerMotor.set(m_config.m_cubeHoldPercentOutput);
     }
 
     public void releaseCone() {

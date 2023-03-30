@@ -21,9 +21,4 @@ public class WristRotateToPositionCommand extends CommandBase {
     public boolean isFinished() {
         return WristSubsystem.getInstance().isAtRotations();
     }
-
-    @Override
-    public void end(boolean interrupted) {
-        WristSubsystem.getInstance().stopMotor();
-    }
 }
