@@ -7,13 +7,14 @@ public class CountdownTimer extends Thread{
     @Override
     public void run() {
         Timer timer = new Timer();
-        Integer i =0;
+        int i =10;
         timer.start();
         System.out.println("Please wait until countdown has passed! Robot may freak out if you dont.");
         while(true){
             System.out.print(10-i+" ");
-            for(int a =10; a >i;a--){
+            while(i > 0){
                 System.out.print("-");
+                i--;
             }
             System.out.print("\n");
             if(i>=9){
