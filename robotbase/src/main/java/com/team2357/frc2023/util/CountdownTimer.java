@@ -17,7 +17,7 @@ public class CountdownTimer extends Thread{
                 i--;
             }
             System.out.print("\n");
-            if(i>=9){
+            if(i<1){
                 break;
             }
             try {
