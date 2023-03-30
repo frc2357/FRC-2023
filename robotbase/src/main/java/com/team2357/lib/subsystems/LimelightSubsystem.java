@@ -16,6 +16,7 @@ import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.DoubleArrayTopic;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.DoubleSubscriber;
+import edu.wpi.first.networktables.IntegerArraySubscriber;
 import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.networktables.IntegerSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
@@ -78,6 +79,9 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
   private DoubleSubscriber m_ThorSub;
   private DoubleSubscriber m_TvertSub;
   private IntegerSubscriber m_Tid;
+  private IntegerArraySubscriber m_BotposeWpiRed;
+  private IntegerArraySubscriber m_BotposeWpiBlue;
+
   private DoubleArraySubscriber m_limelightPoseInfoSub;
 
   /**
@@ -101,6 +105,8 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
     m_ThorSub = m_table.getDoubleTopic("thor").subscribe(m_Configuration.m_DefaultReturnValue);
     m_TvertSub = m_table.getDoubleTopic("tvert").subscribe(m_Configuration.m_DefaultReturnValue);
     m_Tid = m_table.getIntegerTopic("tid").subscribe(-1);
+    m_BotposeWpiRed = m_table.getIntegerArrayTopic("botpose_wpired").subscribe(null, PubSubOption.keepDuplicates(true));
+    m_BotposeWpiBlue = m_table.getIntegerArrayTopic("botpose_wpiblue").subscribe(null, PubSubOption.keepDuplicates(true));
 
     DoubleArrayTopic limelightPoseInfo = m_table.getDoubleArrayTopic("botpose");
     m_limelightPoseInfoSub = limelightPoseInfo.subscribe(null,
@@ -295,6 +301,25 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
     Rotation2d r2d = new Rotation2d(SwerveDriveSubsystem.getInstance().getYaw());
     return new Pose2d(t2d, r2d);
   }
+
+  public Long getLastTargetID(){
+    return m_Tid.get();
+  }
+
+  public Pose2d getLimelightBotPoseWPIRed(){
+    long[] values = m_BotposeWpiRed.get();
+    Translation2d t2d = new Translation2d(values[0], values[1]);
+    Rotation2d r2d = new Rotation2d(SwerveDriveSubsystem.getInstance().getYaw());
+    return new Pose2d(t2d, r2d);
+  }
+
+  public Pose2d getLimelightBotPoseWPIBlue(){
+    long[] values = m_BotposeWpiRed.get();
+    Translation2d t2d = new Translation2d(values[0], values[1]);
+    Rotation2d r2d = new Rotation2d(SwerveDriveSubsystem.getInstance().getYaw());
+    return new Pose2d(t2d, r2d);
+  }
+  
   /*
    * @Override
    * public void periodic() {

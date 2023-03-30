@@ -1,7 +1,10 @@
 package com.team2357.frc2023.subsystems;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.team2357.lib.subsystems.LimelightSubsystem;
 
+import edu.wpi.first.hal.CANData;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -175,5 +178,21 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
 
     public double getSecondaryTX() {
         return m_secondaryLimelight.getTX();
+    }
+
+    @Override
+    public void periodic(){
+        if(m_leftLimelight.validTargetExists()){
+            Logger.getInstance().recordOutput("Left limelight bot pose", m_leftLimelight.getLimelightPose2d());
+            Logger.getInstance().recordOutput("Left limelight TID", m_leftLimelight.getLastTargetID());
+            Logger.getInstance().recordOutput("Left limelight botpose wpi blue", m_leftLimelight.getLimelightBotPoseWPIBlue());
+            Logger.getInstance().recordOutput("Left limelight botpose wpi red", m_leftLimelight.getLimelightBotPoseWPIRed());
+        }
+        if(m_rightLimelight.validTargetExists()){
+            Logger.getInstance().recordOutput("Right limelight bot pose", m_rightLimelight.getLimelightPose2d());
+            Logger.getInstance().recordOutput("Right limelight TID", m_rightLimelight.getLastTargetID());
+            Logger.getInstance().recordOutput("Right limelight botpose wpi blue", m_rightLimelight.getLimelightBotPoseWPIBlue());
+            Logger.getInstance().recordOutput("Right limelight botpose wpi red", m_rightLimelight.getLimelightBotPoseWPIRed());
+        }
     }
 }
