@@ -4,7 +4,6 @@ import com.team2357.frc2023.commands.intake.IntakeArmRotateDumbCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
 import com.team2357.frc2023.commands.intake.IntakeSolenoidExtendCommand;
 import com.team2357.frc2023.commands.intake.IntakeStowConeCommandGroup;
-import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
 import com.team2357.frc2023.trajectoryutil.TrajectoryUtil;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -19,7 +18,7 @@ public class GridOneScoreOneAndBalance extends ParallelCommandGroup {
                 new IntakeSolenoidExtendCommand(),
 
                 // Score cone high
-                new ConeAutoScoreHighCommandGroup(true).withTimeout(6.5),
+                //new ConeAutoScoreHighCommandGroup(true).withTimeout(6.5),
 
                 // Wait until we going over charge station
                 new WaitCommand(1.5),
