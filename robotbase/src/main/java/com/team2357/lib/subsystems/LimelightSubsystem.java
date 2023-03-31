@@ -7,6 +7,10 @@
 
 package com.team2357.lib.subsystems;
 
+import java.util.EnumSet;
+import java.util.function.Consumer;
+
+import com.team2357.frc2023.networktables.Buttonboard;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -16,12 +20,13 @@ import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.DoubleArrayTopic;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.DoubleSubscriber;
-import edu.wpi.first.networktables.IntegerArraySubscriber;
-import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.networktables.IntegerSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.PubSubOption;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /**
  * Controls the limelight camera options.
@@ -68,8 +73,8 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
 
   protected NetworkTable m_table;
 
-  private DoublePublisher m_streamPub; 
-  private DoublePublisher m_pipelinePub; 
+  private DoublePublisher m_streamPub;
+  private DoublePublisher m_pipelinePub;
   private DoubleSubscriber m_pipelineSub;
   private DoubleSubscriber m_TvSub;
   private DoubleSubscriber m_TxSub;
@@ -79,10 +84,12 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
   private DoubleSubscriber m_ThorSub;
   private DoubleSubscriber m_TvertSub;
   private IntegerSubscriber m_Tid;
-  private IntegerArraySubscriber m_BotposeWpiRed;
-  private IntegerArraySubscriber m_BotposeWpiBlue;
+  private DoubleArraySubscriber m_botposeWpiRed;
+  private DoubleArraySubscriber m_botposeWpiBlue;
 
   private DoubleArraySubscriber m_limelightPoseInfoSub;
+
+  private int m_poseListenerHandle;
 
   /**
    * Sets the camera stream.
@@ -105,12 +112,14 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
     m_ThorSub = m_table.getDoubleTopic("thor").subscribe(m_Configuration.m_DefaultReturnValue);
     m_TvertSub = m_table.getDoubleTopic("tvert").subscribe(m_Configuration.m_DefaultReturnValue);
     m_Tid = m_table.getIntegerTopic("tid").subscribe(-1);
-    m_BotposeWpiRed = m_table.getIntegerArrayTopic("botpose_wpired").subscribe(null, PubSubOption.keepDuplicates(true));
-    m_BotposeWpiBlue = m_table.getIntegerArrayTopic("botpose_wpiblue").subscribe(null, PubSubOption.keepDuplicates(true));
+
+    m_botposeWpiRed = m_table.getDoubleArrayTopic("botpose_wpired").subscribe(null, PubSubOption.keepDuplicates(true));
+    m_botposeWpiBlue = m_table.getDoubleArrayTopic("botpose_wpiblue").subscribe(null,
+        PubSubOption.keepDuplicates(true));
 
     DoubleArrayTopic limelightPoseInfo = m_table.getDoubleArrayTopic("botpose");
     m_limelightPoseInfoSub = limelightPoseInfo.subscribe(null,
-    PubSubOption.keepDuplicates(true));
+        PubSubOption.keepDuplicates(true));
 
     instance = this;
   }
@@ -121,6 +130,35 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
     setHumanPipelineActive();
     // setTargetingPipelineActive();
     setStream(configuration.m_isLimelightPrimaryStream);
+  }
+
+  /**
+   * Sets up a consumer to fire when the botpose changes
+   * Will automatically determine if red or blue botpose should be used
+   * 
+   * @param consumer A consumer with prototype consumer(double[] botpose)
+   */
+  public void addBotposeEvent(Consumer<double[]> consumer) {
+
+    Consumer<NetworkTableEvent> botposeConsumer = (NetworkTableEvent event) -> {
+      double[] botpose = event.valueData.value.getDoubleArray();
+
+      consumer.accept(botpose);
+    };
+
+    NetworkTableInstance inst = NetworkTableInstance.getDefault();
+
+    if (Buttonboard.getInstance().getAlliance() == Alliance.Blue) {
+      m_poseListenerHandle = inst.addListener(
+          m_botposeWpiBlue,
+          EnumSet.of(NetworkTableEvent.Kind.kValueAll),
+          botposeConsumer);
+    } else if (Buttonboard.getInstance().getAlliance() == Alliance.Red) {
+      m_poseListenerHandle = inst.addListener(
+          m_botposeWpiRed,
+          EnumSet.of(NetworkTableEvent.Kind.kValueAll),
+          botposeConsumer);
+    }
   }
 
   public boolean validTargetExists() {
@@ -296,30 +334,55 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
   }
 
   public Pose2d getLimelightPose2d() {
-    double[] values = m_limelightPoseInfoSub.get();
-    Translation2d t2d = new Translation2d(values[0], values[1]);
-    Rotation2d r2d = new Rotation2d(SwerveDriveSubsystem.getInstance().getYaw());
-    return new Pose2d(t2d, r2d);
+    return botposeToPose2d(m_limelightPoseInfoSub.get());
   }
 
-  public Long getLastTargetID(){
+  public Long getLastTargetID() {
     return m_Tid.get();
   }
 
-  public Pose2d getLimelightBotPoseWPIRed(){
-    long[] values = m_BotposeWpiRed.get();
-    Translation2d t2d = new Translation2d(values[0], values[1]);
+  public Pose2d getRedPose() {
+    return botposeToPose2d(m_botposeWpiRed.get());
+  }
+
+  public Pose2d getBluePose() {
+    return botposeToPose2d(m_botposeWpiBlue.get());
+  }
+
+  public Pose2d getCurrentAllianceLimelightPose() {
+    if (Buttonboard.getInstance().getAlliance() == Alliance.Blue) {
+      return getBluePose();
+    } else if (Buttonboard.getInstance().getAlliance() == Alliance.Red) {
+      return getRedPose();
+    } else {
+      return null;
+    }
+  }
+
+  public double getBlueBotposeTimestamp() {
+    return Timer.getFPGATimestamp() - (m_botposeWpiBlue.get()[6]);
+  }
+
+  public double getRedBotposeTimestamp() {
+    return Timer.getFPGATimestamp() - (m_botposeWpiRed.get()[6]);
+  }
+
+  public double getCurrentAllianceBotposeTimestamp() {
+    if (Buttonboard.getInstance().getAlliance() == Alliance.Blue) {
+      return getBlueBotposeTimestamp();
+    } else if (Buttonboard.getInstance().getAlliance() == Alliance.Red) {
+      return getRedBotposeTimestamp();
+    } else {
+      return Double.NaN;
+    }
+  }
+
+  public static Pose2d botposeToPose2d(double[] botpose) {
+    Translation2d t2d = new Translation2d(botpose[0], botpose[1]);
     Rotation2d r2d = new Rotation2d(SwerveDriveSubsystem.getInstance().getYaw());
     return new Pose2d(t2d, r2d);
   }
 
-  public Pose2d getLimelightBotPoseWPIBlue(){
-    long[] values = m_BotposeWpiRed.get();
-    Translation2d t2d = new Translation2d(values[0], values[1]);
-    Rotation2d r2d = new Rotation2d(SwerveDriveSubsystem.getInstance().getYaw());
-    return new Pose2d(t2d, r2d);
-  }
-  
   /*
    * @Override
    * public void periodic() {
