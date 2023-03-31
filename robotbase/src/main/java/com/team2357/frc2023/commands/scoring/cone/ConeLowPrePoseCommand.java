@@ -2,7 +2,9 @@ package com.team2357.frc2023.commands.scoring.cone;
 
 import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.state.RobotState;
+import com.team2357.frc2023.commands.armrotation.ArmRotateToPositionCommand;
 import com.team2357.frc2023.commands.everybot.ClawReleaseConeCommand;
+import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
 import com.team2357.frc2023.commands.intake.WinchRotateToPositionCommand;
 import com.team2357.frc2023.commands.state.SetRobotStateCommand;
 
@@ -17,11 +19,14 @@ public class ConeLowPrePoseCommand extends SequentialCommandGroup {
             new ParallelCommandGroup(
                 new SetRobotStateCommand(RobotState.State.ROBOT_PRE_SCORE_CONE_LOW),
                 new WinchRotateToPositionCommand(Constants.INTAKE_ARM.AUTO_SCORE_LOW_ROTATIONS),
+                new ArmRotateToPositionCommand(Constants.ARM_ROTATION.SCORE_CONE_LOW_ROTATIONS),
                 new ParallelDeadlineGroup(
-                    new WaitCommand(0.25),
-                    new ClawReleaseConeCommand()
+                    new WaitCommand(1),
+                    new ClawReleaseConeCommand(),
+                    new IntakeRollerRunCommand()
                 )
-            )
+            ),
+            new ArmRotateToPositionCommand(Constants.ARM_ROTATION.RETRACTED_ROTATIONS)
         );
     }
 }

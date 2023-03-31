@@ -16,10 +16,10 @@ public class ArmExtendToPositionCommand extends CommandBase {
         ArmExtensionSubsystem.getInstance().setExtensionRotations(m_rotations);
     }
 
-    @Override
-    public void end(boolean interrupted) {
-        ArmExtensionSubsystem.getInstance().stopMotor();
-    }
+    // @Override
+    // public void end(boolean interrupted) {
+    //     ArmExtensionSubsystem.getInstance().stopMotor();
+    // }
 
     @Override
     public boolean isFinished() {

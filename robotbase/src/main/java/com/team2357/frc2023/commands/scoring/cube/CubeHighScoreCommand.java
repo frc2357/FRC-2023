@@ -2,6 +2,7 @@ package com.team2357.frc2023.commands.scoring.cube;
 
 import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.commands.armextension.ArmExtendToPositionCommand;
+import com.team2357.frc2023.commands.armextension.ArmExtensionMotorStopCommand;
 import com.team2357.frc2023.commands.armrotation.ArmRotateToPositionCommand;
 import com.team2357.frc2023.commands.everybot.ClawReleaseCubeCommand;
 import com.team2357.frc2023.commands.everybot.WristRotateToPositionCommand;
@@ -23,11 +24,12 @@ public class CubeHighScoreCommand extends SequentialCommandGroup {
                 new ArmExtendToPositionCommand(Constants.ARM_EXTENSION.RETRACTED_ROTATIONS),
 
                 new SequentialCommandGroup(
-                    new WaitCommand(1.0),
+                    new WaitCommand(1.1),
                     new ArmRotateToPositionCommand(Constants.ARM_ROTATION.RETRACTED_ROTATIONS)
                 )
             ),
-
+            
+            new ArmExtensionMotorStopCommand(),
             new WristRotateToPositionCommand(Constants.WRIST.WRIST_RETRACT_ROTATIONS)
         );
     }
