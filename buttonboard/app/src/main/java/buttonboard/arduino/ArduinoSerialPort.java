@@ -33,6 +33,12 @@ public class ArduinoSerialPort implements Runnable {
     for (SerialPort port : serialPorts) {
       if (!m_serialPorts.containsKey(port.getSystemPortPath()) &&
           SUPPORTED_PORT_NAMES.contains(port.getDescriptivePortName())) {
+        System.out.println(
+          "Found compatible device '" +
+          port.getDescriptivePortName() +
+          "' on serial port " +
+          port.getSystemPortPath()
+        );
         ArduinoSerialPort p = new ArduinoSerialPort(port);
         m_serialPorts.put(port.getSystemPortPath(), p);
         p.setListener((listener));
