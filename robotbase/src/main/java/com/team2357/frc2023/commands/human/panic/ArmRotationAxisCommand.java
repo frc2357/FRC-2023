@@ -31,6 +31,6 @@ public class ArmRotationAxisCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        ArmRotationSubsystem.getInstance().endAxisCommand();
+        ArmRotationSubsystem.getInstance().endManualControl();
     }
 }

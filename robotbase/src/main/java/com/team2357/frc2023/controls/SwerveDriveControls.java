@@ -5,9 +5,16 @@ import com.team2357.frc2023.arduino.GamepieceLED.SIGNAL_COLOR;
 import com.team2357.frc2023.commands.drive.Test1AutoBalanceCommand;
 import com.team2357.frc2023.commands.drive.Test2AutoBalanceCommand;
 import com.team2357.frc2023.commands.intake.IntakeDeployCommandGroup;
+import com.team2357.frc2023.commands.drive.AutoBalanceCommand;
+import com.team2357.frc2023.commands.intake.IntakeConeCommandGroup;
+import com.team2357.frc2023.commands.intake.IntakeCubeCommandGroup;
+import com.team2357.frc2023.commands.intake.IntakeDeployConeCommandGroup;
+import com.team2357.frc2023.commands.intake.IntakeDeployCubeCommandGroup;
+import com.team2357.frc2023.commands.intake.IntakePreSignalConeCommandGroup;
+import com.team2357.frc2023.commands.intake.IntakePreSignalCubeCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakeRollerReverseCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
-import com.team2357.frc2023.commands.intake.IntakeStowCommandGroup;
+import com.team2357.frc2023.commands.intake.IntakeStowConeCommandGroup;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.lib.triggers.AxisThresholdTrigger;
 import com.team2357.lib.util.XboxRaw;
@@ -29,8 +36,10 @@ public class SwerveDriveControls {
     private JoystickButton m_yButton;
     private JoystickButton m_startButton;
 
-    private AxisThresholdTrigger m_leftTrigger;
-    private AxisThresholdTrigger m_rightTrigger;
+    private AxisThresholdTrigger m_leftTriggerPre;
+    private AxisThresholdTrigger m_leftTriggerFull;
+    private AxisThresholdTrigger m_rightTriggerPre;
+    private AxisThresholdTrigger m_rightTriggerFull;
 
     public static boolean isFlipped;
 
@@ -49,8 +58,11 @@ public class SwerveDriveControls {
         m_rightBumper = new JoystickButton(m_controller, XboxRaw.BumperRight.value);
         m_leftBumper = new JoystickButton(m_controller, XboxRaw.BumperLeft.value);
 
-        m_rightTrigger = new AxisThresholdTrigger(m_controller, Axis.kRightTrigger, 0.05);
-        m_leftTrigger = new AxisThresholdTrigger(m_controller, Axis.kLeftTrigger, 0.05);
+        m_rightTriggerPre = new AxisThresholdTrigger(m_controller, Axis.kRightTrigger, 0.05);
+        m_rightTriggerFull = new AxisThresholdTrigger(m_controller, Axis.kRightTrigger, 0.75);
+
+        m_leftTriggerPre = new AxisThresholdTrigger(m_controller, Axis.kLeftTrigger, 0.05);
+        m_leftTriggerFull = new AxisThresholdTrigger(m_controller, Axis.kLeftTrigger, 0.75);
 
         mapControls();
     }
@@ -59,17 +71,18 @@ public class SwerveDriveControls {
         // Zero swerve drive
         m_backButton.whileTrue(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().zeroGyroscope()));
         m_startButton.whileTrue(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().setGyroScope(180)));
+
         // Intake commands
-        // TODO: Remove these bindings
-        m_rightBumper.whileTrue(new IntakeRollerRunCommand());
-        m_leftBumper.whileTrue(new IntakeRollerReverseCommand());
 
-        // Intake deploy/stow
-        m_leftTrigger.whileTrue(new IntakeDeployCommandGroup().alongWith(new InstantCommand(() -> GamepieceLED.getInstance().setSignalColor(SIGNAL_COLOR.PURPLE))));
-        m_leftTrigger.onFalse(new IntakeStowCommandGroup());
+        // Intake pre-signal (for human player)
+        m_leftTriggerPre.onTrue(new IntakePreSignalConeCommandGroup());
+        m_rightTriggerPre.onTrue(new IntakePreSignalCubeCommandGroup());
 
-        m_rightTrigger.whileTrue(new IntakeDeployCommandGroup().alongWith(new InstantCommand(() -> GamepieceLED.getInstance().setSignalColor(SIGNAL_COLOR.YELLOW))));
-        m_rightTrigger.onFalse(new IntakeStowCommandGroup());
+        // Cone Intake deploy/stow
+        m_leftTriggerFull.whileTrue(new IntakeConeCommandGroup());
+
+        // Cone Intake deploy/stow
+        m_rightTriggerFull.whileTrue(new IntakeCubeCommandGroup());
 
         m_aButton.whileTrue(new Test1AutoBalanceCommand());
         m_bButton.whileTrue(new Test2AutoBalanceCommand());

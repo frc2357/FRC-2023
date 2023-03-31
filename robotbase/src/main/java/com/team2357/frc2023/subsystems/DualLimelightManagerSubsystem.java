@@ -1,9 +1,15 @@
 package com.team2357.frc2023.subsystems;
 
+import java.util.function.Consumer;
+
+import org.littletonrobotics.junction.Logger;
+
 import com.team2357.lib.subsystems.LimelightSubsystem;
 
+import edu.wpi.first.hal.CANData;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 // Manages two limelight subsystems
@@ -32,12 +38,20 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
 
     private int m_targetAprilTag;
 
+    private Consumer<double[]> botposeConsumer = (double[] botpose) -> {
+        Pose2d pose = LimelightSubsystem.botposeToPose2d(botpose);
+        double timeStamp = Timer.getFPGATimestamp() - (botpose[6] / 1000);
+        SwerveDriveSubsystem.getInstance().addVisionPoseEstimate(pose, timeStamp);
+    };
+
     /**
      * 
-     * @param leftLimelightName Name of the left side limelight
-     * @param rightLimelightName Name ofr the right side limelight
-     * @param leftLimelightTXSetpoint Value of the X angle of the right limelight to get the left limelight in view
-     * @param rightLimelightTXSetpoint  Value of the X angle of the left limelight to get the right limelight in view
+     * @param leftLimelightName        Name of the left side limelight
+     * @param rightLimelightName       Name ofr the right side limelight
+     * @param leftLimelightTXSetpoint  Value of the X angle of the right limelight
+     *                                 to get the left limelight in view
+     * @param rightLimelightTXSetpoint Value of the X angle of the left limelight to
+     *                                 get the right limelight in view
      */
     public DualLimelightManagerSubsystem(String leftLimelightName, String rightLimelightName,
             double leftLimelightTXSetpoint, double rightLimelightTXSetpoint) {
@@ -49,6 +63,9 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
 
         m_leftLimelightTXSetpoint = leftLimelightTXSetpoint;
         m_rightLimelightTXSetpoint = rightLimelightTXSetpoint;
+
+        // m_rightLimelight.addBotposeEvent(botposeConsumer);
+        // m_leftLimelight.addBotposeEvent(botposeConsumer);
 
         m_instance = this;
     }
@@ -110,21 +127,23 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
     }
 
     /**
-     * @return The tX angle setpoint on the opposing camera to get the primary camera in view
+     * @return The tX angle setpoint on the opposing camera to get the primary
+     *         camera in view
      */
     public double getPrimaryTXSetpoint() {
         return m_primaryLimelightTXSetpoint;
     }
 
     public boolean validTargetExists() {
-        if(m_targetAprilTag == -1) {
+        if (m_targetAprilTag == -1) {
             return m_leftLimelight.validTargetExists() || m_rightLimelight.validTargetExists();
         }
-        return m_leftLimelight.validAprilTagTargetExists(m_targetAprilTag) || m_rightLimelight.validAprilTagTargetExists(m_targetAprilTag);
+        return m_leftLimelight.validAprilTagTargetExists(m_targetAprilTag)
+                || m_rightLimelight.validAprilTagTargetExists(m_targetAprilTag);
     }
 
     public boolean validTargetExistsOnPrimary() {
-        if(m_targetAprilTag == -1) {
+        if (m_targetAprilTag == -1) {
             return m_primaryLimelight.validTargetExists();
         }
         return m_primaryLimelight.validAprilTagTargetExists(m_targetAprilTag);
@@ -175,5 +194,21 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
 
     public double getSecondaryTX() {
         return m_secondaryLimelight.getTX();
+    }
+
+    @Override
+    public void periodic() {
+        if (m_leftLimelight.validTargetExists()) {
+            Logger.getInstance().recordOutput("Left limelight bot pose", m_leftLimelight.getLimelightPose2d());
+            Logger.getInstance().recordOutput("Left limelight TID", m_leftLimelight.getLastTargetID());
+            Logger.getInstance().recordOutput("Left limelight botpose wpi blue", m_leftLimelight.getBluePose());
+            Logger.getInstance().recordOutput("Left limelight botpose wpi red", m_leftLimelight.getRedPose());
+        }
+        if (m_rightLimelight.validTargetExists()) {
+            Logger.getInstance().recordOutput("Right limelight bot pose", m_rightLimelight.getLimelightPose2d());
+            Logger.getInstance().recordOutput("Right limelight TID", m_rightLimelight.getLastTargetID());
+            Logger.getInstance().recordOutput("Right limelight botpose wpi blue", m_rightLimelight.getBluePose());
+            Logger.getInstance().recordOutput("Right limelight botpose wpi red", m_rightLimelight.getRedPose());
+        }
     }
 }

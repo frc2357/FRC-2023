@@ -1,9 +1,11 @@
 package com.team2357.frc2023.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.SparkMaxAbsoluteEncoder;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import com.revrobotics.SparkMaxPIDController;
 import com.team2357.frc2023.shuffleboard.ShuffleboardPIDTuner;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
@@ -20,6 +22,9 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
     }
 
     public static class Configuration {
+        public boolean m_isEncoderInverted;
+        public double m_encoderOffset;
+        
         public double m_rotationZeroTolerance;
         
         public double m_rotationAxisMaxSpeed;
@@ -89,6 +94,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
     private CANSparkMax m_rotationMotor;
 
     private SparkMaxPIDController m_pidController;
+    private SparkMaxAbsoluteEncoder m_absoluteEncoder;
     private ArmFeedforward m_feedforward;
 
     private double m_targetRotations;
@@ -108,11 +114,16 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
 
         m_pidController = m_rotationMotor.getPIDController();
         configureRotationPID(m_pidController);
+        m_pidController.setFeedbackDevice(m_rotationMotor.getEncoder());
 
         m_rotationMotor.setInverted(m_config.m_isInverted);
 
         m_feedforward = new ArmFeedforward(m_config.m_feedforwardKs, m_config.m_feedforwardKg, m_config.m_feedforwardKv,
                 m_config.m_feedforwardKa);
+
+        m_absoluteEncoder = m_rotationMotor.getAbsoluteEncoder(Type.kDutyCycle);
+        m_absoluteEncoder.setInverted(m_config.m_isEncoderInverted);
+        m_absoluteEncoder.setZeroOffset(m_config.m_encoderOffset);
         
         resetEncoder();
     }
@@ -166,15 +177,15 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
         m_rotationMotor.set(motorSpeed);
     }
 
-    public void endAxisCommand() {
+    public void endManualControl() {
         stopRotationMotors();
         m_targetRotations = getMotorRotations();
         setClosedLoopEnabled(true);
     }
 
     // Method for the panic mode to rotate the arms
-    public void manualRotate(double sensorUnits) {
-        m_rotationMotor.set(sensorUnits);
+    public void manualRotate(double percentSpeed) {
+        m_rotationMotor.set(percentSpeed);
     }
 
     // Method to stop the motors
@@ -210,20 +221,25 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
         return (m_targetRotations >= -m_config.m_rotationZeroTolerance && m_targetRotations <= m_config.m_rotationZeroTolerance) && isAtRotations();
     }
 
+    public double getAbsoluteEncoderPosition() {
+        return m_absoluteEncoder.getPosition();
+    }
+
     @Override
     public void periodic() {
         if (isClosedLoopEnabled()) {
             double feedforwardVolts = m_feedforward.calculate(calculateFeedforwardRadians(m_targetRotations), 0);
             m_pidController.setReference(m_targetRotations, CANSparkMax.ControlType.kSmartMotion,
-                    m_config.m_smartMotionSlot, feedforwardVolts, ArbFFUnits.kVoltage);
+                   m_config.m_smartMotionSlot, feedforwardVolts, ArbFFUnits.kVoltage);
         }
         if (m_shuffleboardPIDTuner.arePIDsUpdated()) {
             updatePID();
         }
 
-        // System.out.println("Speed: " + m_rotationMotor.getAppliedOutput() + "Amp: " + getAmps());
+        //System.out.println("Speed: " + m_rotationMotor.getAppliedOutput() + "Amp: " + getAmps());
 
-        // System.out.println("Current rot: " + getMotorRotations());
-        //SmartDashboard.putNumber("Rotations", getMotorRotations());
+        // System.out.println("Current rot: " + getMotorRotations() + " target: " + m_targetRotations );
+        // System.out.println("Angle: " + m_absoluteEncoder.getPosition());
+        // SmartDashboard.putNumber("Arm Rotations", getMotorRotations());
     }
 }

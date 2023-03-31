@@ -13,6 +13,8 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import com.team2357.frc2023.commands.drive.SyncDriveEncodersCommand;
 import com.team2357.frc2023.commands.drive.ZeroDriveCommand;
 import com.team2357.frc2023.commands.intake.IntakeSolenoidExtendCommand;
+import com.team2357.frc2023.commands.util.ZeroAllCommand;
+import com.team2357.frc2023.state.RobotState;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -78,7 +80,9 @@ public class Robot extends LoggedRobot {
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+      RobotState.disabledInit();
+  }
 
   @Override
   public void disabledPeriodic() {}
@@ -90,6 +94,7 @@ public class Robot extends LoggedRobot {
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
+      RobotState.autonomousInit();
       m_autonomousCommand.schedule();
     }
   }
@@ -100,8 +105,6 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopInit() {
-
-    // CommandScheduler.getInstance().schedule(new ZeroDriveCommand());
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
@@ -109,7 +112,12 @@ public class Robot extends LoggedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    new IntakeSolenoidExtendCommand().schedule();
+
+    // We went from disabled to teleop
+    if (RobotState.getState() == RobotState.State.ROBOT_DISABLED) {
+      // We'll assume the robot is empty
+      RobotState.setState(RobotState.State.ROBOT_STOWED_EMPTY);
+    }
   }
 
   /** This function is called periodically during operator control. */

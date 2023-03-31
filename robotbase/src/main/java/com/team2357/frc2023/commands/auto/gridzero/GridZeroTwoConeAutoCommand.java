@@ -1,12 +1,10 @@
 package com.team2357.frc2023.commands.auto.gridzero;
 
 import com.team2357.frc2023.Constants;
-import com.team2357.frc2023.commands.claw.ClawInstantOpenCommand;
 import com.team2357.frc2023.commands.intake.IntakeArmRotateDumbCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
 import com.team2357.frc2023.commands.intake.IntakeSolenoidExtendCommand;
-import com.team2357.frc2023.commands.intake.IntakeStowCommandGroup;
-import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
+import com.team2357.frc2023.commands.intake.IntakeStowConeCommandGroup;
 import com.team2357.frc2023.trajectoryutil.TrajectoryUtil;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -21,14 +19,14 @@ public class GridZeroTwoConeAutoCommand extends ParallelCommandGroup {
                 new IntakeSolenoidExtendCommand(),
 
                 // Score cone high
-                new ConeAutoScoreHighCommandGroup(true).withTimeout(6.5),
+                //new ConeAutoScoreHighCommandGroup(true).withTimeout(6.5),
 
                 // Wait until we going over charge station
                 new WaitCommand(2),
 
                 // Then deploy intake after we're back on the floor
                 new ParallelCommandGroup(
-                  new ClawInstantOpenCommand(),
+                //   new ClawInstantOpenCommand(),
                   new IntakeArmRotateDumbCommand(0.6).withTimeout(2.0),
                   new SequentialCommandGroup(
                     new IntakeRollerRunCommand().withTimeout(2)
@@ -36,7 +34,7 @@ public class GridZeroTwoConeAutoCommand extends ParallelCommandGroup {
                 ),
 
                 // Then stow intake
-                new IntakeStowCommandGroup()
+                new IntakeStowConeCommandGroup()
             ),
             // Path movement
             new SequentialCommandGroup(

@@ -76,15 +76,19 @@ public class IntakeRollerSubsystem extends SubsystemBase {
         double motorSpeed = (-axisSpeed) * m_config.m_rollerAxisMaxSpeed;
 
         m_masterIntakeMotor.set(ControlMode.PercentOutput, motorSpeed);
-        manualRunIntake(axisSpeed);
     }
 
     public void manualRunIntake(double percentOutput) {
         m_masterIntakeMotor.set(ControlMode.PercentOutput, percentOutput);
     }
 
-    public double getCurrent(){
+    public double getCurrent() {
         return m_masterIntakeMotor.getStatorCurrent();
+    }
+
+    public boolean isStalled(double stallCurrent) {
+        return (m_masterIntakeMotor.getStatorCurrent() >= stallCurrent) ||
+            (m_followerIntakeMotor.getStatorCurrent() >= stallCurrent);
     }
 
     public void stopIntake() {
