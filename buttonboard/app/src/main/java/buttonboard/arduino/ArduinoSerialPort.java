@@ -31,18 +31,27 @@ public class ArduinoSerialPort implements Runnable {
   public static void scan(Listener listener) {
     SerialPort[] serialPorts = SerialPort.getCommPorts();
     for (SerialPort port : serialPorts) {
-      if (!m_serialPorts.containsKey(port.getSystemPortPath()) &&
-          SUPPORTED_PORT_NAMES.contains(port.getDescriptivePortName())) {
-        System.out.println(
-          "Found compatible device '" +
-          port.getDescriptivePortName() +
-          "' on serial port " +
-          port.getSystemPortPath()
-        );
-        ArduinoSerialPort p = new ArduinoSerialPort(port);
-        m_serialPorts.put(port.getSystemPortPath(), p);
-        p.setListener((listener));
-        p.start();
+      if (!m_serialPorts.containsKey(port.getSystemPortPath())) {
+        if (SUPPORTED_PORT_NAMES.contains(port.getDescriptivePortName())) {
+          System.out.println(
+            "Found compatible device '" +
+            port.getDescriptivePortName() +
+            "' on serial port " +
+            port.getSystemPortPath()
+          );
+          ArduinoSerialPort p = new ArduinoSerialPort(port);
+          m_serialPorts.put(port.getSystemPortPath(), p);
+          p.setListener((listener));
+          p.start();
+        } else {
+          System.out.println(
+            "Found non-compatible device '" +
+            port.getDescriptivePortName() +
+            "' on serial port " +
+            port.getSystemPortPath()
+          );
+          m_serialPorts.put(port.getSystemPortPath(), null);
+        }
       }
     }
   }
