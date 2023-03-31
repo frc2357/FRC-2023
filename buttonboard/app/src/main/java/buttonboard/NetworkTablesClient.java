@@ -28,6 +28,7 @@ public class NetworkTablesClient {
     private StringPublisher m_alliancePub;
     private IntegerPublisher m_targetRowPub;
     private IntegerPublisher m_targetColPub;
+    private IntegerPublisher m_targetTypePub;
     private GridListener m_gridListener;
 
     public NetworkTablesClient() {
@@ -104,6 +105,9 @@ public class NetworkTablesClient {
         m_targetColPub = m_buttonboardTable.getIntegerTopic(Constants.NT_TARGET_COL_TOPIC).publish();
         m_targetColPub.setDefault(-1);
 
+        m_targetTypePub = m_buttonboardTable.getIntegerTopic(Constants.NT_TARGET_TYPE_TOPIC).publish();
+        m_targetTypePub.setDefault(-1);
+
         m_alliancePub = m_buttonboardTable.getStringTopic(Constants.NT_ALLIANCE_TOPIC).publish();
         m_alliancePub.setDefault(Constants.ALLIANCE_UNSET);
     }
@@ -112,15 +116,18 @@ public class NetworkTablesClient {
         System.out.println("NetworkTablesClient.close");
         NetworkTableInstance inst = NetworkTableInstance.getDefault();
         m_gridSub.close();
+        m_alliancePub.close();
         m_targetRowPub.close();
         m_targetColPub.close();
+        m_targetTypePub.close();
         inst.removeListener(m_connListenerHandle);
     }
 
-    public void setGridTarget(int row, int col) {
-        System.out.println("Set grid target to (row=" + row + ", col=" + col + ")");
+    public void setGridTarget(int row, int col, int type) {
+        System.out.println("Set grid target to (row=" + row + ", col=" + col + ", type=" + type + ")");
         m_targetRowPub.set(row);
         m_targetColPub.set(col);
+        m_targetTypePub.set(type);
     }
 
     public void setAlliance(String alliance) {

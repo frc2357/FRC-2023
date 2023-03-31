@@ -8,7 +8,7 @@ import com.google.common.collect.HashBiMap;
 public class ArduinoSerialPortProvider implements ArduinoSerialPort.Listener, Runnable {
   private static final String HEADER = "||v1||";
   public static final int SLEEP_MS = 500;
-  public static final int TIMEOUT_MS = 60 * 1000; // Set timeout to 1 minute
+  public static final int TIMEOUT_MS = 60 * 60 * 1000; // Set timeout to 1 hour
   public static final String MSG_HEADER = "||v1||";
   public static final String MSG_QUERY_DEVICE = MSG_HEADER + "{}";
   public static final String NAME_UNNAMED = "(unnamed)";
