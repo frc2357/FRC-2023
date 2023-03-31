@@ -487,33 +487,38 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		}
 	}
 
-	public void balance() {
-		double yaw, direction, angle, error, power;
-		angle = 0;
-		direction = 0;
+	// public double balance(double prevAngle) {
+	// 	double yaw, direction, angle, error, power;
+	// 	angle = 0;
+	// 	direction = 0;
 
-		yaw = Math.abs(getYaw() % 360);
+	// 	yaw = Math.abs(getYaw() % 360);
 
-		angle = getTilt(yaw);
-		direction = getDirection(yaw);
+	// 	angle = getTilt(yaw);
+	// 	direction = getDirection(yaw);
 
-		if (angle > Constants.DRIVE.BALANCE_FULL_TILT_DEGREES) {
-			return;
-		}
+	// 	if (angle <= Constants.DRIVE.BALANCE_FULL_TILT_DEGREES) {
+	// 		// System.out.println("angle: " + angle);
+	// 		// System.out.println("direction: " + direction);
 
-		error = Math.copySign(Constants.DRIVE.BALANCE_LEVEL_DEGREES + Math.abs(angle), angle);
-		power = Math.min(Math.abs(Constants.DRIVE.BALANCE_KP * error), Constants.DRIVE.BALANCE_MAX_POWER);
-		power = Math.copySign(power, error);
+	// 		error = Math.copySign(Constants.DRIVE.BALANCE_LEVEL_DEGREES + Math.abs(angle), angle);
+	// 		power = Math.min(Math.abs(Constants.DRIVE.BALANCE_KP * error), Constants.DRIVE.BALANCE_MAX_POWER);
+	// 		power = Math.copySign(power, error);
 
-		power *= direction;
+	// 		power *= direction;
 
-		drive(power, 0, 0);
-	}
+	// 		if (Math.abs(prevAngle - angle) < Constants.DRIVE.STOP_DRIVING_TILT_DIFFERENCE) {
+	// 			drive(power, 0, 0);
+	// 		}
+	// 	}
 
-	public boolean isBalanced() {
-		double yaw = Math.abs(getYaw() % 360);
-		return getTilt(yaw) < Constants.DRIVE.BALANCE_LEVEL_DEGREES;
-	}
+	// 	return angle;
+	// }
+
+	// public boolean isBalanced() {
+	// 	double yaw = Math.abs(getYaw() % 360);
+	// 	return getTilt(yaw) < Constants.DRIVE.BALANCE_LEVEL_DEGREES;
+	// }
 
 	public double getTilt(double yaw) {
 		double angle = 0;
@@ -531,8 +536,10 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	public int getDirection(double yaw) {
-		int direction;
+		int direction = 0;
+		System.out.println("yaw: " + yaw);
 		if ((0 <= yaw && yaw < 45) || (315 <= yaw && yaw <= 360)) {
+			System.out.println("correct");
 			direction = 1;
 		} else if (45 <= yaw && yaw < 135) {
 			direction = 1;
@@ -541,7 +548,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		} else if (225 <= yaw && yaw < 315) {
 			direction = -1;
 		}
-		return direction = 0;
+		return direction;
 	}
 
 	public void enableOpenLoopRamp() {
