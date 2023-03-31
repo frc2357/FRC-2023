@@ -4,7 +4,6 @@ import com.team2357.frc2023.arduino.GamepieceLED;
 import com.team2357.frc2023.arduino.GamepieceLED.SIGNAL_COLOR;
 import com.team2357.frc2023.commands.drive.Test1AutoBalanceCommand;
 import com.team2357.frc2023.commands.drive.Test2AutoBalanceCommand;
-import com.team2357.frc2023.commands.drive.Test3AutoBalanceCommand;
 import com.team2357.frc2023.commands.intake.IntakeDeployCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakeRollerReverseCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
@@ -74,7 +73,6 @@ public class SwerveDriveControls {
 
         m_aButton.whileTrue(new Test1AutoBalanceCommand());
         m_bButton.whileTrue(new Test2AutoBalanceCommand());
-        m_yButton.whileTrue(new Test3AutoBalanceCommand());
 
         //Teleop auto
         //m_rightBumper.whileTrue(new HeartlandAutoTranslateCommand(m_controller));
