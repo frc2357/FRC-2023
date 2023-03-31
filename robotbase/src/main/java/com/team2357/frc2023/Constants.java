@@ -144,13 +144,13 @@ public final class Constants {
              * State measurement standard deviations. Left encoder, right encoder, gyro
              * Increase these numbers to trust them less
              */
-            config.m_stateStdDevs = VecBuilder.fill(0.1, 0.1, 0.0);
+            config.m_stateStdDevs = VecBuilder.fill(0.9, 0.9, 0.0);
 
             /**
              * Local measurement standard deviations. Vision X, Y, theta.
              * Increase these numbers to trust them less
              */
-            config.m_visionMeasurementStdDevs = VecBuilder.fill(0.9, 0.9, 1);
+            config.m_visionMeasurementStdDevs = VecBuilder.fill(0.1, 0.1, 1);
 
             config.m_visionToleranceMeters = 0.1524;
 

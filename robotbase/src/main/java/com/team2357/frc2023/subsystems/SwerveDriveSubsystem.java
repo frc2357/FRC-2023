@@ -34,6 +34,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -89,6 +90,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	private Configuration m_config;
 
 	private SwerveDrivePoseEstimator m_poseEstimator;
+	private SwerveDrivePoseEstimator m_visionPoseEstimator;
 
 	// Controller for robot movement along the y-axis
 	private PIDController m_translateXController;
@@ -280,6 +282,13 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 				new Pose2d(0.0, 0.0, getGyroscopeRotation()), m_config.m_stateStdDevs,
 				m_config.m_visionMeasurementStdDevs);
 
+		m_visionPoseEstimator = new SwerveDrivePoseEstimator(m_kinematics, getGyroscopeRotation(),
+				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
+						m_frontRightModule.getPosition(),
+						m_backLeftModule.getPosition(), m_backRightModule.getPosition() },
+				new Pose2d(0.0, 0.0, getGyroscopeRotation()), m_config.m_stateStdDevs,
+				m_config.m_visionMeasurementStdDevs);
+
 		m_translateXController = m_config.m_translateXController;
 		m_translateYController = m_config.m_translateYController;
 	}
@@ -399,6 +408,14 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 						m_frontRightModule.getPosition(),
 						m_backLeftModule.getPosition(), m_backRightModule.getPosition() },
 				pose);
+
+		m_visionPoseEstimator.resetPosition(
+				pose.getRotation(),
+				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
+						m_frontRightModule.getPosition(),
+						m_backLeftModule.getPosition(), m_backRightModule.getPosition() },
+				pose);
+
 	}
 
 	public void drive(double x, double y, double rotation) {
@@ -434,17 +451,23 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		double rightTime = rightLL.getCurrentAllianceBotposeTimestamp();
 
 		if (leftPose != null) {
-			addVisionPoseEstimate(leftPose, leftTime);
+		//	addVisionPoseEstimate(leftPose, leftTime);
 		}
 
 		if (rightPose != null) {
-			addVisionPoseEstimate(rightPose, rightTime);
+		//	addVisionPoseEstimate(rightPose, rightTime);
 		}
 
 		m_poseEstimator.update(getGyroscopeRotation(),
 				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
 						m_frontRightModule.getPosition(),
 						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
+
+		m_visionPoseEstimator.update(getGyroscopeRotation(),
+				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
+						m_frontRightModule.getPosition(),
+						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
+
 	}
 
 	public void addVisionPoseEstimate(AprilTagEstimate estimate) {
@@ -468,56 +491,73 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 			return;
 		}
 
-		System.out.println(
-				"Vision x: " + pose.getX() + ", Y: " + pose.getY() + ", Rot: " + pose.getRotation().getDegrees());
+		// System.out.println(
+		// "Vision x: " + pose.getX() + ", Y: " + pose.getY() + ", Rot: " +
+		// pose.getRotation().getDegrees());
 
 		Pose2d robotPose = getPose();
-		System.out.println(
-				"robot x: " + robotPose.getX() + ", Y: " + robotPose.getY() + ", Rot: "
-						+ robotPose.getRotation().getDegrees());
+		//Pose2d robotPose = m_visionPoseEstimator.getEstimatedPosition();
+		// System.out.println(
+		// "robot x: " + robotPose.getX() + ", Y: " + robotPose.getY() + ", Rot: "
+		// + robotPose.getRotation().getDegrees());
 
 		double xError = robotPose.getX() - pose.getX();
 		double yError = robotPose.getY() - pose.getY();
 
-		System.out.println("Error X: " + xError + " Y: " + yError);
+		// System.out.println("Error X: " + xError + " Y: " + yError);
 
-		if (Utility.isWithinTolerance(pose.getX(), robotPose.getX(), m_config.m_visionToleranceMeters) &&
-				Utility.isWithinTolerance(robotPose.getY(), pose.getY(), m_config.m_visionToleranceMeters)) {
-			// m_poseEstimator.addVisionMeasurement(pose, timestamp);
+		// if (Utility.isWithinTolerance(pose.getX(), robotPose.getX(),
+		// m_config.m_visionToleranceMeters) &&
+		// Utility.isWithinTolerance(robotPose.getY(), pose.getY(),
+		// m_config.m_visionToleranceMeters)) {
+
+
+			Logger.getInstance().recordOutput("Vision timestamp error", Timer.getFPGATimestamp() - timestamp);
+		if (Utility.isWithinTolerance(pose.getRotation().getDegrees(), getYaw(), 15)) {
+			Logger.getInstance().recordOutput("Left limelight botpose filtered", pose);
+		
+			m_poseEstimator.addVisionMeasurement(pose, timestamp);
+			m_visionPoseEstimator.addVisionMeasurement(pose, timestamp);
+		 Logger.getInstance().recordOutput("Vision Pose", "Added");
+		} else {
+			Logger.getInstance().recordOutput("Vision Pose", "Thrown");
 		}
 	}
 
 	// public double balance(double prevAngle) {
-	// 	double yaw, direction, angle, error, power;
-	// 	angle = 0;
-	// 	direction = 0;
+	// double yaw, direction, angle, error, power;
+	// angle = 0;
+	// direction = 0;
 
-	// 	yaw = Math.abs(getYaw() % 360);
+	// yaw = Math.abs(getYaw() % 360);
 
-	// 	angle = getTilt(yaw);
-	// 	direction = getDirection(yaw);
+	// angle = getTilt(yaw);
+	// direction = getDirection(yaw);
 
-	// 	if (angle <= Constants.DRIVE.BALANCE_FULL_TILT_DEGREES) {
-	// 		// System.out.println("angle: " + angle);
-	// 		// System.out.println("direction: " + direction);
+	// if (angle <= Constants.DRIVE.BALANCE_FULL_TILT_DEGREES) {
+	// // System.out.println("angle: " + angle);
+	// // System.out.println("direction: " + direction);
 
-	// 		error = Math.copySign(Constants.DRIVE.BALANCE_LEVEL_DEGREES + Math.abs(angle), angle);
-	// 		power = Math.min(Math.abs(Constants.DRIVE.BALANCE_KP * error), Constants.DRIVE.BALANCE_MAX_POWER);
-	// 		power = Math.copySign(power, error);
+	// error = Math.copySign(Constants.DRIVE.BALANCE_LEVEL_DEGREES +
+	// Math.abs(angle), angle);
+	// power = Math.min(Math.abs(Constants.DRIVE.BALANCE_KP * error),
+	// Constants.DRIVE.BALANCE_MAX_POWER);
+	// power = Math.copySign(power, error);
 
-	// 		power *= direction;
+	// power *= direction;
 
-	// 		if (Math.abs(prevAngle - angle) < Constants.DRIVE.STOP_DRIVING_TILT_DIFFERENCE) {
-	// 			drive(power, 0, 0);
-	// 		}
-	// 	}
+	// if (Math.abs(prevAngle - angle) <
+	// Constants.DRIVE.STOP_DRIVING_TILT_DIFFERENCE) {
+	// drive(power, 0, 0);
+	// }
+	// }
 
-	// 	return angle;
+	// return angle;
 	// }
 
 	// public boolean isBalanced() {
-	// 	double yaw = Math.abs(getYaw() % 360);
-	// 	return getTilt(yaw) < Constants.DRIVE.BALANCE_LEVEL_DEGREES;
+	// double yaw = Math.abs(getYaw() % 360);
+	// return getTilt(yaw) < Constants.DRIVE.BALANCE_LEVEL_DEGREES;
 	// }
 
 	public double getTilt(double yaw) {
@@ -750,6 +790,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		loggingSwerveStates[3] = m_backRightModule.getState();
 		Logger.getInstance().recordOutput("Swerve Speed", loggingSwerveStates);
 		Logger.getInstance().recordOutput("Robot Pose", getPose());
+		Logger.getInstance().recordOutput("Robot Vision Pose", m_visionPoseEstimator.getEstimatedPosition());
 
 		// System.out.println("Is closed loop: "+isClosedLoopEnabled() + ", tracking: "
 		// + isTracking());
