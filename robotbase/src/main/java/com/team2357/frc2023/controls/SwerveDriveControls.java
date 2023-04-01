@@ -82,7 +82,7 @@ public class SwerveDriveControls {
         m_rightTriggerFull.whileTrue(new IntakeCubeCommandGroup());
 
         m_aButton.whileTrue(new DriveToPoseWithAngleCommand(
-         0, 0));// 10, 2.5
+         -12.5, 2.5));// 10, 2.5
 
         //Teleop auto
         //m_rightBumper.whileTrue(new HeartlandAutoTranslateCommand(m_controller));

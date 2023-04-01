@@ -12,14 +12,15 @@ import com.team2357.lib.subsystems.LimelightSubsystem;
 
 /**
  * Command to auto align the robot to a target x, and y from a limelight
- * The units used are in degrees relative to the limelight. Ex: target is x degrees and velocity is x degrees per second
+ * The units used are in degrees relative to the limelight. Ex: target is x
+ * degrees and velocity is x degrees per second
  *
  */
 public class DriveToPoseWithAngleCommand extends CommandBase {
     private final SwerveDriveSubsystem m_swerve;
     private final double m_tXTarget;
     private final double m_tYTarget;
-    
+
     private boolean m_running = false;
 
     private final ProfiledPIDController m_xDriveController;
@@ -48,15 +49,15 @@ public class DriveToPoseWithAngleCommand extends CommandBase {
         // m_thetaController = m_swerve.getAutoAlignThetaController();
 
         m_xDriveController = new ProfiledPIDController(
-                0.0001, 0.0, 0.0, new TrapezoidProfile.Constraints(1, 0.5));
-        m_xDriveController.setTolerance(0.5);
+                0.2, 0.0, 0.015, new TrapezoidProfile.Constraints(7.5, 7.5));
+        m_xDriveController.setTolerance(0.05);
 
         m_yDriveController = new ProfiledPIDController(
-                0.0, 0.0, 0.0, new TrapezoidProfile.Constraints(1, 0.5));
-        m_yDriveController.setTolerance(0.5);
+                0.1, 0.0, 0, new TrapezoidProfile.Constraints(7.5, 7.5));
+        m_yDriveController.setTolerance(0.05);
 
         m_thetaController = new ProfiledPIDController(
-                0.0, 0.0, 0.0, new TrapezoidProfile.Constraints(1, 0.5));
+                0.0, 0.0, 0.0, new TrapezoidProfile.Constraints(12, 8));
         m_thetaController.setTolerance(0.5);
 
         m_limelight = DualLimelightManagerSubsystem.getInstance().getLimelight(LIMELIGHT.RIGHT);
@@ -70,14 +71,10 @@ public class DriveToPoseWithAngleCommand extends CommandBase {
         DualLimelightManagerSubsystem.getInstance().setAprilTagPipelineActive();
         m_xDriveController.reset(m_limelight.getTY());
         m_yDriveController.reset(m_limelight.getTX());
-       
+
         m_thetaController.reset(m_swerve.getYaw());
 
-        double currentAngle = m_swerve.getYaw() % 360;
-
-        while (currentAngle < 0) {
-            currentAngle += 360;
-        }
+        double currentAngle = m_swerve.getYaw0To360();
 
         double distance = 180 - currentAngle; // target - current
         while (distance < -180) {
@@ -87,7 +84,7 @@ public class DriveToPoseWithAngleCommand extends CommandBase {
             distance -= 360;
         }
 
-        m_thetaController.setGoal(m_swerve.getGyroscopeRotation().getDegrees() + distance);    
+        m_thetaController.setGoal(m_swerve.getGyroscopeRotation().getDegrees() + distance);
     }
 
     @Override
@@ -105,26 +102,31 @@ public class DriveToPoseWithAngleCommand extends CommandBase {
             xDegreesPerSecond = 0.0;
 
         double tXError = tXCurrent - m_tXTarget;
-        double yDegreesPerSecond = m_yDriveController.calculate(tXError, 0.0);
+        double yDegreesPerSecond = -m_yDriveController.calculate(tXCurrent, m_tXTarget);
         if (m_yDriveController.atGoal())
             yDegreesPerSecond = 0.0;
-        
+
         // Calculate theta speed
         double thetaDegreesPerSecond = m_thetaController.calculate(m_swerve.getYaw());
         if (m_thetaController.atGoal())
             thetaDegreesPerSecond = 0.0;
 
-        System.out.println("X degrees per second: " + xDegreesPerSecond);
+        System.out.println("Error: " + tXError);
+        System.out.println("Y degrees per second: " + yDegreesPerSecond);
 
-        double xMetersPerSecond = xDegreesPerSecond * 0; // Factor to go from degrees per second to meters per second
-        double yMetersPerSecond = yDegreesPerSecond * 0; // Factor to go from degrees per second to meters per second
-        double thetaRadiansPerSecond =  Math.toRadians(thetaDegreesPerSecond); // Factor to go from degrees per second to radians per second
-        // m_swerve.drive(
-        // ChassisSpeeds.fromFieldRelativeSpeeds(
-        //     xMetersPerSecond, yMetersPerSecond, thetaVelocity,
-        // m_swerve.getGyroscopeRotation()));
+        double xMetersPerSecond = xDegreesPerSecond * (4/7.5) + Math.copySign(0.2, xDegreesPerSecond); // Factor to go from degrees per second to meters per second
+        double yMetersPerSecond = yDegreesPerSecond * (4/7.5) + Math.copySign(0.244, yDegreesPerSecond); // Factor to go from degrees per second to meters per second
+        double thetaRadiansPerSecond = Math.toRadians(thetaDegreesPerSecond); // Factor to go from degrees per second to
+                                                                              // radians per second
+
+        System.out.println("Y meters per second: " + yMetersPerSecond);
+                                                                              
+        m_swerve.drive(
+                ChassisSpeeds.fromFieldRelativeSpeeds(
+                        0, yMetersPerSecond, 0,
+                        m_swerve.getGyroscopeRotation()));
     }
-
+    // -2.3, 18.7
     @Override
     public void end(boolean interrupted) {
         m_running = false;

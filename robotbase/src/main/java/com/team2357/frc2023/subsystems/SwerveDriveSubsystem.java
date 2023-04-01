@@ -384,7 +384,9 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	public double getYaw0To360() {
 		double yaw = getYaw() % 360;
-		yaw += yaw < 0 ? 360 : 0;
+		while (yaw < 0) {
+			yaw += 360;
+		}
 		return yaw;
 	}
 
@@ -733,6 +735,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		// m_poseEstimator.getEstimatedPosition().getRotation().getDegrees());
 
 		SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
+		// System.out.println(m_chassisSpeeds.vxMetersPerSecond);
 		SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxVelocityMetersPerSecond);
 
 		m_frontLeftModule.set(
