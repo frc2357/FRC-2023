@@ -30,8 +30,9 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 public class ConeHighPrePoseCommand extends SequentialCommandGroup {
     public ConeHighPrePoseCommand() {
         super(
-                new SetRobotStateCommand(RobotState.State.ROBOT_PRE_SCORE_CONE_HIGH),
+                
                 new ParallelCommandGroup(
+                        new SetRobotStateCommand(RobotState.State.ROBOT_PRE_SCORE_CONE_HIGH),
                         // Claw Rollers
                         new SequentialCommandGroup(
                                 new ClawIntakeConeCommand(),
