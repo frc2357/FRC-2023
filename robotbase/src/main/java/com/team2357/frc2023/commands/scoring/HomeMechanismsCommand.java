@@ -19,7 +19,7 @@ public class HomeMechanismsCommand extends SequentialCommandGroup {
                         new ArmExtendToPositionCommand(Constants.ARM_EXTENSION.RETRACTED_ROTATIONS),
                         new WaitCommand(1.5)));
 
-        addCommands(new ArmRotateToPositionCommand(Constants.ARM_ROTATION.AUTO_SCORE_MID_ROTATIONS));
+        addCommands(new ArmRotateToPositionCommand(Constants.ARM_ROTATION.SCORE_CONE_MID_ROTATIONS));
 
         addCommands(new IntakeArmStowCommand());
 

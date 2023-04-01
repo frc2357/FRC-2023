@@ -15,11 +15,16 @@ public class ClawSubsystem extends SubsystemBase {
     }
 
     public static class Configuration {
-        public double m_conePercentOutput;
-        public double m_cubePercentOutput;
+        public double m_coneIntakePercentOutput;
+        public double m_coneHoldPercentOutput;
+        public double m_coneReleasePercentOutput;
 
-        public int m_clawMotorFreeLimitAmps;
-        public int m_clawMotorStallLimitAmps;
+        public double m_cubeIntakePercentOutput;
+        public double m_cubeHoldPercentOutput;
+        public double m_cubeReleasePercentOutput;
+
+        public int m_clawMotorScoreLimitAmps;
+        public int m_clawMotorIntakeLimitAmps;
 
         public double m_rollerAxisMaxSpeed;
 
@@ -39,7 +44,7 @@ public class ClawSubsystem extends SubsystemBase {
     public void configure(Configuration config) {
         m_config = config;
 
-        m_rollerMotor.setSmartCurrentLimit(m_config.m_clawMotorStallLimitAmps, m_config.m_clawMotorFreeLimitAmps);
+        m_rollerMotor.setSmartCurrentLimit(m_config.m_clawMotorScoreLimitAmps, m_config.m_clawMotorScoreLimitAmps);
 
         m_rollerMotor.setInverted(m_config.m_isInverted);
 
@@ -47,11 +52,29 @@ public class ClawSubsystem extends SubsystemBase {
     }
 
     public void intakeCone() {
-        m_rollerMotor.set(m_config.m_conePercentOutput);
+        m_rollerMotor.setSmartCurrentLimit(m_config.m_clawMotorIntakeLimitAmps, m_config.m_clawMotorIntakeLimitAmps);
+        m_rollerMotor.set(m_config.m_coneIntakePercentOutput);
     }
 
     public void intakeCube() {
-        m_rollerMotor.set(m_config.m_cubePercentOutput);
+        m_rollerMotor.setSmartCurrentLimit(m_config.m_clawMotorIntakeLimitAmps, m_config.m_clawMotorIntakeLimitAmps);
+        m_rollerMotor.set(m_config.m_cubeIntakePercentOutput);
+    }
+
+    public void holdCone() {
+        m_rollerMotor.set(m_config.m_coneHoldPercentOutput);
+    }
+
+    public void holdCube() {
+        m_rollerMotor.set(m_config.m_cubeHoldPercentOutput);
+    }
+
+    public void releaseCone() {
+        m_rollerMotor.set(m_config.m_coneReleasePercentOutput);
+    }
+
+    public void releaseCube() {
+        m_rollerMotor.set(m_config.m_cubeReleasePercentOutput);
     }
 
     public void setAxisRollerSpeed(double axisSpeed) {
@@ -65,6 +88,7 @@ public class ClawSubsystem extends SubsystemBase {
 
     public void stopRollers() {
         m_rollerMotor.set(0.0);
+        m_rollerMotor.setSmartCurrentLimit(m_config.m_clawMotorScoreLimitAmps, m_config.m_clawMotorScoreLimitAmps);
     }
 
     public double getAmps() {

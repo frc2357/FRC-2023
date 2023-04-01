@@ -3,8 +3,7 @@ package com.team2357.frc2023.commands.auto.gridone;
 import com.team2357.frc2023.commands.intake.IntakeArmRotateDumbCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
 import com.team2357.frc2023.commands.intake.IntakeSolenoidExtendCommand;
-import com.team2357.frc2023.commands.intake.IntakeStowCommandGroup;
-import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
+import com.team2357.frc2023.commands.intake.IntakeStowConeCommandGroup;
 import com.team2357.frc2023.trajectoryutil.TrajectoryUtil;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -19,7 +18,7 @@ public class GridOneScoreOneAndMobility extends ParallelCommandGroup {
                 new IntakeSolenoidExtendCommand(),
 
                 // Score cone high
-                new ConeAutoScoreHighCommandGroup(true).withTimeout(6.5),
+                //new ConeAutoScoreHighCommandGroup(true).withTimeout(6.5),
 
                 // Wait until we going over charge station
                 new WaitCommand(1.5),
@@ -34,7 +33,7 @@ public class GridOneScoreOneAndMobility extends ParallelCommandGroup {
                 ),
 
                 // Then stow intake
-                new IntakeStowCommandGroup()
+                new IntakeStowConeCommandGroup()
             ),
             // Path movement
             new SequentialCommandGroup(

@@ -2,7 +2,6 @@ package com.team2357.frc2023.controls;
 
 import com.team2357.frc2023.Constants.CONTROLLER;
 import com.team2357.frc2023.commands.armextension.ArmExtendAmpZeroCommand;
-import com.team2357.frc2023.commands.auto.RotateToDegreeCommand;
 import com.team2357.frc2023.commands.auto.TranslateToTargetCommand;
 import com.team2357.frc2023.commands.human.panic.ArmExtensionAxisCommand;
 import com.team2357.frc2023.commands.human.panic.ArmRotationAxisCommand;
@@ -12,10 +11,11 @@ import com.team2357.frc2023.commands.human.panic.IntakeArmToggleCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeRollerAxisCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeWinchAxisCommand;
 import com.team2357.frc2023.commands.intake.WinchAmpZeroCommand;
-import com.team2357.frc2023.commands.scoring.AutoScoreLowCommandGroup;
+import com.team2357.frc2023.commands.scoring.GunnerScoreHighCommand;
+import com.team2357.frc2023.commands.scoring.GunnerScoreLowCommand;
+import com.team2357.frc2023.commands.scoring.GunnerScoreMidCommand;
 import com.team2357.frc2023.commands.scoring.HomeMechanismsCommand;
-import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
-import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreMidCommandGroup;
+import com.team2357.frc2023.commands.util.ZeroAllCommand;
 import com.team2357.frc2023.subsystems.ArmRotationSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.lib.triggers.AxisThresholdTrigger;
@@ -25,8 +25,6 @@ import com.team2357.lib.util.XboxRaw;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -200,20 +198,12 @@ public class GunnerControls {
         downDPadAndB.whileTrue(new TranslateToTargetCommand(SwerveDriveSubsystem.COLUMN_TARGET.RIGHT));
 
         // Auto score
-        yButton.whileTrue(new ConeAutoScoreHighCommandGroup());
-        xButton.whileTrue(new ConeAutoScoreMidCommandGroup());
-        aButton.whileTrue(new AutoScoreLowCommandGroup());
+        yButton.whileTrue(new GunnerScoreHighCommand());
+        xButton.whileTrue(new GunnerScoreMidCommand());
+        aButton.whileTrue(new GunnerScoreLowCommand());
 
         // Zero all
-        m_backButton.onTrue(new ParallelCommandGroup(
-            new SequentialCommandGroup(
-                new InstantCommand(() -> {
-                    ArmRotationSubsystem.getInstance().resetEncoder();
-                }),
-                new ArmExtendAmpZeroCommand()
-            ),
-            new WinchAmpZeroCommand()
-        ));
+        m_backButton.whileTrue(new ZeroAllCommand());
 
         m_startButton.whileTrue(new HomeMechanismsCommand());
     }

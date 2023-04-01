@@ -14,10 +14,30 @@
 
 // --- Pin Definitions ---
 #define NEOPIXEL_PIN             16
+#define ARM_ROTATE_ENC_1         10
+#define ARM_ROTATE_ENC_2         11
+#define ARM_EXTEND_ENC_1         12
+#define ARM_EXTEND_ENC_2         13
+#define INTAKE_ROTATE_ENC_1      0
+#define INTAKE_ROTATE_ENC_2      1
+#define INTAKE_SPEED_ENC_1       22
+#define INTAKE_SPEED_ENC_2       23
+
+// MCP Pins
 #define ALLIANCE_RED_LED         0
 #define ALLIANCE_RED_BUTTON      1
 #define ALLIANCE_BLUE_LED        2
 #define ALLIANCE_BLUE_BUTTON     3
+#define ARM_ROTATE_SW            4
+#define ARM_EXTEND_SW            5
+#define INTAKE_ROTATE_SW         6  
+#define INTAKE_SPEED_SW          7
+#define WRIST_LED                8
+#define WRIST_BUTTON             9
+#define CLAMP_LED               10
+#define CLAMP_BUTTON            11 
+#define INTAKE_EXTEND_LED       12
+#define INTAKE_EXTEND_BUTTON    13 
 
 uint8_t rowPins[GRID_ROWS] = {5, 6, 9};
 uint8_t colPins[GRID_COLS] = {26, 27, 28, 29, 24, 25, 14, 15, 8};

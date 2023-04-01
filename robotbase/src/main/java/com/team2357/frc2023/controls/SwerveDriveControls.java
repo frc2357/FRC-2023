@@ -1,13 +1,12 @@
 package com.team2357.frc2023.controls;
 
 import com.team2357.frc2023.commands.auto.DriveToPoseWithAngleCommand;
-import com.team2357.frc2023.commands.drive.AutoBalanceCommand;
-import com.team2357.frc2023.commands.intake.IntakeDeployCommandGroup;
-import com.team2357.frc2023.commands.intake.IntakeRollerReverseCommand;
-import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
-import com.team2357.frc2023.commands.intake.IntakeStowCommandGroup;
-import com.team2357.frc2023.led.GamepieceLED;
-import com.team2357.frc2023.led.GamepieceLED.SIGNAL_COLOR;
+import com.team2357.frc2023.commands.drive.Test1AutoBalanceCommand;
+import com.team2357.frc2023.commands.drive.Test2AutoBalanceCommand;
+import com.team2357.frc2023.commands.intake.IntakeConeCommandGroup;
+import com.team2357.frc2023.commands.intake.IntakeCubeCommandGroup;
+import com.team2357.frc2023.commands.intake.IntakePreSignalConeCommandGroup;
+import com.team2357.frc2023.commands.intake.IntakePreSignalCubeCommandGroup;
 import com.team2357.frc2023.commands.scoring.HeartlandAutoScoreCommand;
 import com.team2357.frc2023.commands.scoring.HeartlandAutoTranslateCommand;
 import com.team2357.frc2023.commands.scoring.TeleopAutoScoreCommandGroup;
@@ -30,11 +29,14 @@ public class SwerveDriveControls {
     private JoystickButton m_rightBumper;
     private JoystickButton m_leftBumper;
     private JoystickButton m_aButton;
-    private JoystickButton m_xButton;
+    private JoystickButton m_bButton;
+    private JoystickButton m_yButton;
     private JoystickButton m_startButton;
 
-    private AxisThresholdTrigger m_leftTrigger;
-    private AxisThresholdTrigger m_rightTrigger;
+    private AxisThresholdTrigger m_leftTriggerPre;
+    private AxisThresholdTrigger m_leftTriggerFull;
+    private AxisThresholdTrigger m_rightTriggerPre;
+    private AxisThresholdTrigger m_rightTriggerFull;
 
     public static boolean isFlipped;
 
@@ -43,7 +45,8 @@ public class SwerveDriveControls {
         m_deadband = deadband;
 
         m_aButton = new JoystickButton(m_controller, XboxRaw.A.value);
-        m_xButton = new JoystickButton(m_controller, XboxRaw.X.value);
+        m_bButton = new JoystickButton(m_controller, XboxRaw.B.value);
+        m_yButton = new JoystickButton(m_controller, XboxRaw.Y.value);
         
         m_backButton = new JoystickButton(m_controller, XboxRaw.Back.value);
         m_startButton = new JoystickButton(m_controller, XboxRaw.Start.value);
@@ -52,8 +55,11 @@ public class SwerveDriveControls {
         m_rightBumper = new JoystickButton(m_controller, XboxRaw.BumperRight.value);
         m_leftBumper = new JoystickButton(m_controller, XboxRaw.BumperLeft.value);
 
-        m_rightTrigger = new AxisThresholdTrigger(m_controller, Axis.kRightTrigger, 0.05);
-        m_leftTrigger = new AxisThresholdTrigger(m_controller, Axis.kLeftTrigger, 0.05);
+        m_rightTriggerPre = new AxisThresholdTrigger(m_controller, Axis.kRightTrigger, 0.05);
+        m_rightTriggerFull = new AxisThresholdTrigger(m_controller, Axis.kRightTrigger, 0.75);
+
+        m_leftTriggerPre = new AxisThresholdTrigger(m_controller, Axis.kLeftTrigger, 0.05);
+        m_leftTriggerFull = new AxisThresholdTrigger(m_controller, Axis.kLeftTrigger, 0.75);
 
         mapControls();
     }
@@ -62,17 +68,18 @@ public class SwerveDriveControls {
         // Zero swerve drive
         m_backButton.whileTrue(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().zeroGyroscope()));
         m_startButton.whileTrue(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().setGyroScope(180)));
+
         // Intake commands
-        // TODO: Remove these bindings
-        m_rightBumper.whileTrue(new IntakeRollerRunCommand());
-        m_leftBumper.whileTrue(new IntakeRollerReverseCommand());
 
-        // Intake deploy/stow
-        m_leftTrigger.whileTrue(new IntakeDeployCommandGroup().alongWith(new InstantCommand(() -> GamepieceLED.getInstance().setSignalColor(SIGNAL_COLOR.PURPLE))));
-        m_leftTrigger.onFalse(new IntakeStowCommandGroup());
+        // Intake pre-signal (for human player)
+        m_leftTriggerPre.onTrue(new IntakePreSignalConeCommandGroup());
+        m_rightTriggerPre.onTrue(new IntakePreSignalCubeCommandGroup());
 
-        m_rightTrigger.whileTrue(new IntakeDeployCommandGroup().alongWith(new InstantCommand(() -> GamepieceLED.getInstance().setSignalColor(SIGNAL_COLOR.YELLOW))));
-        m_rightTrigger.onFalse(new IntakeStowCommandGroup());
+        // Cone Intake deploy/stow
+        m_leftTriggerFull.whileTrue(new IntakeConeCommandGroup());
+
+        // Cone Intake deploy/stow
+        m_rightTriggerFull.whileTrue(new IntakeCubeCommandGroup());
 
         m_aButton.whileTrue(new DriveToPoseWithAngleCommand(
          0.0, 0.0));

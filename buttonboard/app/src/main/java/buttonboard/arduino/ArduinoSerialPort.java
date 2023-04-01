@@ -3,6 +3,7 @@ package buttonboard.arduino;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -22,21 +23,49 @@ public class ArduinoSerialPort implements Runnable {
   private static int BUFFER_SIZE = 1024;
 
   private static List<String> SUPPORTED_PORT_NAMES = Arrays.asList(
-    "PicoArduino (Dial-In)"
+    "PicoArduino (Dial-In)",
+    "Feather RP2040 SCORPIO (Dial-In)",
+    "USB Serial Device"
   );
 
   private static Map<String, ArduinoSerialPort> m_serialPorts = new HashMap<String, ArduinoSerialPort>();
 
+  public static boolean isValidDevice(String descriptivePortName) {
+    Iterator<String> itr = SUPPORTED_PORT_NAMES.iterator();
+    while (itr.hasNext()) {
+      String supportedName = itr.next();
+      // If the serial port comes in with extra text, like (COM3) at the end, it's ok.
+      if (descriptivePortName.startsWith(supportedName)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public static void scan(Listener listener) {
     SerialPort[] serialPorts = SerialPort.getCommPorts();
     for (SerialPort port : serialPorts) {
-      if (!m_serialPorts.containsKey(port.getSystemPortPath()) &&
-          SUPPORTED_PORT_NAMES.contains(port.getDescriptivePortName())) {
-        System.out.println("Initializing port " + port.getSystemPortPath());
-        ArduinoSerialPort p = new ArduinoSerialPort(port);
-        m_serialPorts.put(port.getSystemPortPath(), p);
-        p.setListener((listener));
-        p.start();
+      if (!m_serialPorts.containsKey(port.getSystemPortPath())) {
+        if (isValidDevice(port.getDescriptivePortName())) {
+          System.out.println(
+            "Found compatible device '" +
+            port.getDescriptivePortName() +
+            "' on serial port " +
+            port.getSystemPortPath()
+          );
+          ArduinoSerialPort p = new ArduinoSerialPort(port);
+          m_serialPorts.put(port.getSystemPortPath(), p);
+          p.setListener((listener));
+          p.start();
+        } else {
+          System.out.println(
+            "Found non-compatible device '" +
+            port.getDescriptivePortName() +
+            "' on serial port " +
+            port.getSystemPortPath()
+          );
+          m_serialPorts.put(port.getSystemPortPath(), null);
+        }
       }
     }
   }
@@ -48,7 +77,6 @@ public class ArduinoSerialPort implements Runnable {
   private StringBuffer m_stringBuffer;
 
   private ArduinoSerialPort(SerialPort port) {
-    System.out.println("Setting up serial port");
     m_thread = null;
     m_readBuffer = new byte[BUFFER_SIZE];
     m_stringBuffer = new StringBuffer();
@@ -68,9 +96,8 @@ public class ArduinoSerialPort implements Runnable {
   }
 
   private void start() {
-    System.out.println("start");
     if (isRunning()) {
-      System.out.println("already running");
+      System.err.println("already running");
       stop();
     }
 
@@ -94,7 +121,6 @@ public class ArduinoSerialPort implements Runnable {
   }
 
   private void stop() {
-    System.out.println("stop");
     m_stringBuffer.delete(0, m_stringBuffer.length());
     m_thread = null;
     m_port.closePort();
@@ -110,16 +136,16 @@ public class ArduinoSerialPort implements Runnable {
         }
 
         if (m_port.bytesAvailable() == -1) {
-          System.out.println("disconnected");
           stop();
           if (m_listener != null) {
             m_listener.onDisconnect(this);
           }
+          return;
         }
 
-        m_port.readBytes(m_readBuffer, m_port.bytesAvailable());
+        int bytesRead = m_port.readBytes(m_readBuffer, m_port.bytesAvailable());
 
-        addBytesToBuffer(m_readBuffer, m_stringBuffer);
+        addBytesToBuffer(m_readBuffer, m_stringBuffer, bytesRead);
         int newlineIndex = m_stringBuffer.indexOf("\n");
 
         if (newlineIndex >= 0) {
@@ -134,11 +160,10 @@ public class ArduinoSerialPort implements Runnable {
         e.printStackTrace(System.err);
       }
     }
-    System.out.println("thread = " + m_thread);
   }
 
-  private void addBytesToBuffer(byte[] bytes, StringBuffer buffer) {
-    String s = new String(bytes, StandardCharsets.UTF_8);
+  private void addBytesToBuffer(byte[] bytes, StringBuffer buffer, int bytesRead) {
+    String s = new String(bytes, 0, bytesRead);
 
     for (int i = 0; i < s.length(); i++) {
       char ch = s.charAt(i);

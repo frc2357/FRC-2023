@@ -14,14 +14,9 @@ import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.apriltag.AprilTagEstimate;
-import com.team2357.frc2023.apriltag.GridCamEstimator;
-import com.team2357.frc2023.commands.scoring.AutoScoreLowCommandGroup;
-import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
-import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreMidCommandGroup;
-import com.team2357.frc2023.commands.scoring.cube.CubeAutoScoreHighCommandGroup;
-import com.team2357.frc2023.commands.scoring.cube.CubeAutoScoreMidCommandGroup;
-import com.team2357.frc2023.networktables.GridCam;
+import com.team2357.frc2023.subsystems.DualLimelightManagerSubsystem.LIMELIGHT;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
+import com.team2357.lib.subsystems.LimelightSubsystem;
 import com.team2357.lib.util.Utility;
 
 import edu.wpi.first.math.MathUtil;
@@ -44,7 +39,6 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 
 public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	private static SwerveDriveSubsystem instance = null;
@@ -80,38 +74,6 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 			}
 		}
 		return COLUMN_TARGET.NONE;
-	}
-
-	/**
-	 * @param row row to score on (low: 2, mid: 1, high: 0)
-	 * @return Auto score command to run
-	 */
-	public static Command getAutoScoreCommands(int row, int col) {
-		switch (row) {
-			case 0:
-				switch (col % 3) {
-					case 0:
-					case 2:
-						return new ConeAutoScoreHighCommandGroup();
-					case 1:
-						return new CubeAutoScoreHighCommandGroup();
-					default:
-						return new AutoScoreLowCommandGroup(); // Potentially default to ConeAutoScoreHighCommandGroup
-				}
-			case 1:
-				switch (col % 3) {
-					case 0:
-					case 2:
-						return new ConeAutoScoreMidCommandGroup();
-					case 1:
-						return new CubeAutoScoreMidCommandGroup();
-					default:
-						return new AutoScoreLowCommandGroup(); // Potentially default to ConeAutoScoreHighCommandGroup
-				}
-			default:
-				return new AutoScoreLowCommandGroup();
-		}
-
 	}
 
 	private SwerveDriveKinematics m_kinematics;
@@ -329,7 +291,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 				new Pose2d(0.0, 0.0, getGyroscopeRotation()), m_config.m_stateStdDevs,
 				m_config.m_visionMeasurementStdDevs);
 
-		m_translateXController=m_config.m_translateXController;m_translateYController=m_config.m_translateYController;
+		m_translateXController = m_config.m_translateXController;
+		m_translateYController = m_config.m_translateYController;
 	}
 
 	public PIDController getXController() {
@@ -479,7 +442,23 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	public void updatePoseEstimator() {
-		//addVisionPoseEstimate(GridCamEstimator.getInstance().estimateRobotPose(GridCam.getInstance().getCamRelativePoses()));
+
+		LimelightSubsystem leftLL = DualLimelightManagerSubsystem.getInstance().getLimelight(LIMELIGHT.LEFT);
+		LimelightSubsystem rightLL = DualLimelightManagerSubsystem.getInstance().getLimelight(LIMELIGHT.RIGHT);
+
+		Pose2d leftPose = leftLL.getCurrentAllianceLimelightPose();
+		Pose2d rightPose = rightLL.getCurrentAllianceLimelightPose();
+
+		double leftTime = leftLL.getCurrentAllianceBotposeTimestamp();
+		double rightTime = rightLL.getCurrentAllianceBotposeTimestamp();
+
+		if (leftPose != null) {
+			addVisionPoseEstimate(leftPose, leftTime);
+		}
+
+		if (rightPose != null) {
+			addVisionPoseEstimate(rightPose, rightTime);
+		}
 
 		m_poseEstimator.update(getGyroscopeRotation(),
 				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
@@ -489,11 +468,25 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	public void addVisionPoseEstimate(AprilTagEstimate estimate) {
 
-		if(estimate == null) {
+		if (estimate == null) {
 			return;
 		}
 
 		Pose2d pose = estimate.getPose();
+		addVisionPoseEstimate(pose, estimate.getTimeStamp());
+	}
+
+	/**
+	 * 
+	 * @param pose      The estimated pose from vision
+	 * @param timestamp Timestamp of the vision pose
+	 */
+	public void addVisionPoseEstimate(Pose2d pose, double timestamp) {
+
+		if (pose == null) {
+			return;
+		}
+
 		System.out.println(
 				"Vision x: " + pose.getX() + ", Y: " + pose.getY() + ", Rot: " + pose.getRotation().getDegrees());
 
@@ -507,40 +500,44 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 		System.out.println("Error X: " + xError + " Y: " + yError);
 
-		if (estimate != null && Utility.isWithinTolerance(pose.getX(), robotPose.getX(), m_config.m_visionToleranceMeters) &&
-		 Utility.isWithinTolerance(robotPose.getY(), pose.getY(), m_config.m_visionToleranceMeters)) {
-			// m_poseEstimator.addVisionMeasurement(estimate.getPose(),
-					// estimate.getTimeStamp());
+		if (Utility.isWithinTolerance(pose.getX(), robotPose.getX(), m_config.m_visionToleranceMeters) &&
+				Utility.isWithinTolerance(robotPose.getY(), pose.getY(), m_config.m_visionToleranceMeters)) {
+			// m_poseEstimator.addVisionMeasurement(pose, timestamp);
 		}
 	}
 
-	public void balance() {
-		double yaw, direction, angle, error, power;
-		angle = 0;
-		direction = 0;
+	// public double balance(double prevAngle) {
+	// 	double yaw, direction, angle, error, power;
+	// 	angle = 0;
+	// 	direction = 0;
 
-		yaw = Math.abs(getYaw() % 360);
+	// 	yaw = Math.abs(getYaw() % 360);
 
-		angle = getTilt(yaw);
-		direction = getDirection(yaw);
+	// 	angle = getTilt(yaw);
+	// 	direction = getDirection(yaw);
 
-		if (angle > Constants.DRIVE.BALANCE_FULL_TILT_DEGREES) {
-			return;
-		}
+	// 	if (angle <= Constants.DRIVE.BALANCE_FULL_TILT_DEGREES) {
+	// 		// System.out.println("angle: " + angle);
+	// 		// System.out.println("direction: " + direction);
 
-		error = Math.copySign(Constants.DRIVE.BALANCE_LEVEL_DEGREES + Math.abs(angle), angle);
-		power = Math.min(Math.abs(Constants.DRIVE.BALANCE_KP * error), Constants.DRIVE.BALANCE_MAX_POWER);
-		power = Math.copySign(power, error);
+	// 		error = Math.copySign(Constants.DRIVE.BALANCE_LEVEL_DEGREES + Math.abs(angle), angle);
+	// 		power = Math.min(Math.abs(Constants.DRIVE.BALANCE_KP * error), Constants.DRIVE.BALANCE_MAX_POWER);
+	// 		power = Math.copySign(power, error);
 
-		power *= direction;
+	// 		power *= direction;
 
-		drive(power, 0, 0);
-	}
+	// 		if (Math.abs(prevAngle - angle) < Constants.DRIVE.STOP_DRIVING_TILT_DIFFERENCE) {
+	// 			drive(power, 0, 0);
+	// 		}
+	// 	}
 
-	public boolean isBalanced() {
-		double yaw = Math.abs(getYaw() % 360);
-		return getTilt(yaw) < Constants.DRIVE.BALANCE_LEVEL_DEGREES;
-	}
+	// 	return angle;
+	// }
+
+	// public boolean isBalanced() {
+	// 	double yaw = Math.abs(getYaw() % 360);
+	// 	return getTilt(yaw) < Constants.DRIVE.BALANCE_LEVEL_DEGREES;
+	// }
 
 	public double getTilt(double yaw) {
 		double angle = 0;
@@ -558,8 +555,10 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	public int getDirection(double yaw) {
-		int direction;
+		int direction = 0;
+		System.out.println("yaw: " + yaw);
 		if ((0 <= yaw && yaw < 45) || (315 <= yaw && yaw <= 360)) {
+			System.out.println("correct");
 			direction = 1;
 		} else if (45 <= yaw && yaw < 135) {
 			direction = 1;
@@ -568,7 +567,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		} else if (225 <= yaw && yaw < 315) {
 			direction = -1;
 		}
-		return direction = 0;
+		return direction;
 	}
 
 	public void enableOpenLoopRamp() {
@@ -739,10 +738,12 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		// SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
 
 		// SmartDashboard.putNumber("Yaw", m_pigeon.getYaw());
-		// SmartDashboard.putNumber("Pose X", m_poseEstimator.getEstimatedPosition().getX());
-		// SmartDashboard.putNumber("Pose Y", m_poseEstimator.getEstimatedPosition().getY());
+		// SmartDashboard.putNumber("Pose X",
+		// m_poseEstimator.getEstimatedPosition().getX());
+		// SmartDashboard.putNumber("Pose Y",
+		// m_poseEstimator.getEstimatedPosition().getY());
 		// SmartDashboard.putNumber("Pose Angle",
-		//		m_poseEstimator.getEstimatedPosition().getRotation().getDegrees());
+		// m_poseEstimator.getEstimatedPosition().getRotation().getDegrees());
 
 		SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
 		SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxVelocityMetersPerSecond);

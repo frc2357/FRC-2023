@@ -3,8 +3,7 @@ package com.team2357.frc2023.commands.auto.gridtwo;
 import com.team2357.frc2023.commands.intake.IntakeArmRotateDumbCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
 import com.team2357.frc2023.commands.intake.IntakeSolenoidExtendCommand;
-import com.team2357.frc2023.commands.intake.IntakeStowCommandGroup;
-import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
+import com.team2357.frc2023.commands.intake.IntakeStowConeCommandGroup;
 import com.team2357.frc2023.trajectoryutil.TrajectoryUtil;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -19,7 +18,7 @@ public class GridTwoTwoConeAutoCommand extends ParallelCommandGroup {
                 new IntakeSolenoidExtendCommand(),
 
                 // Score cone high
-                new ConeAutoScoreHighCommandGroup(false).withTimeout(6.5),
+                //new ConeAutoScoreHighCommandGroup(false).withTimeout(6.5),
 
                 // Then deploy intake
                 new ParallelCommandGroup(
@@ -32,11 +31,11 @@ public class GridTwoTwoConeAutoCommand extends ParallelCommandGroup {
                 ),
 
                 // Then stow intake
-                new IntakeStowCommandGroup(),
+                new IntakeStowConeCommandGroup(),
 
                 // Score cone high
-                new WaitCommand(1),
-                new ConeAutoScoreHighCommandGroup(true)
+                new WaitCommand(1)
+                //new ConeAutoScoreHighCommandGroup(true)
             ),
             // Path movement
             new SequentialCommandGroup(
