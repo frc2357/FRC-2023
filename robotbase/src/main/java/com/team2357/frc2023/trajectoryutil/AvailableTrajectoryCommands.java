@@ -1,10 +1,10 @@
 package com.team2357.frc2023.trajectoryutil;
 
-import com.team2357.frc2023.commands.auto.gridtwo.GridTwoTwoConeAutoCommand;
-import com.team2357.frc2023.commands.auto.gridzero.GridZeroTwoConeAutoCommand;
 import com.team2357.frc2023.commands.auto.ScoreHighAutoCommand;
 import com.team2357.frc2023.commands.auto.gridone.GridOneScoreOneAndBalance;
 import com.team2357.frc2023.commands.auto.gridone.GridOneScoreOneAndMobility;
+import com.team2357.frc2023.commands.auto.gridtwo.GridTwoTwoConeAutoCommand;
+import com.team2357.frc2023.commands.auto.gridzero.GridZeroTwoConeAutoCommand;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
