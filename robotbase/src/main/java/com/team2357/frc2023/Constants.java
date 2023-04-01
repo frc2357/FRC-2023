@@ -171,11 +171,15 @@ public final class Constants {
         public static final PIDController CHARGE_STATION_BALANCE_ANGLE_CONTROLLER = new PIDController(0.5, 0, 0);
         public static final PIDController CHARGE_STATION_DISTANCE_CONTROLLER = new PIDController(0.5, 0, 0);
 
-        public static final double BALANCE_LEVEL_DEGREES = 2.5;
+        public static final double BALANCE_LEVEL_DEGREES = 1;
         public static final double BALANCE_FULL_TILT_DEGREES = 15;
         public static final double BACKWARDS_BALANCING_EXTRA_POWER_MULTIPLIER = 1.35;
         public static final double BALANCE_KP = 0.01;
-        public static final double BALANCE_MAX_POWER = 0.2;
+        public static final double BALANCE_KI = 0.0;
+        public static final double BALANCE_KD = 0.000001;
+        public static final double BALANCE_MAX_POWER = 0.3;
+        public static final double STOP_DRIVING_TILT_DIFFERENCE = .05;
+        public static final PIDController BALANCE_PID_CONTROLLER = new PIDController(BALANCE_KP, BALANCE_KI, BALANCE_KD);
 
         public static final double TICKS_PER_ROTATION = 2048.0;
 
@@ -383,8 +387,8 @@ public final class Constants {
     public static final class ARM_EXTENSION {
         public static final double RETRACTED_ROTATIONS = 0;
 
-        public static final double AUTO_SCORE_MID_ROTATIONS = 12;
-        public static final double SCORE_CONE_HIGH_ROTATIONS = 65;
+        // public static final double AUTO_SCORE_MID_ROTATIONS = 10;
+        public static final double SCORE_CONE_HIGH_ROTATIONS = 39;
         public static final double SCORE_CUBE_HIGH_ROTATIONS = 33;
 
         public static final double ARM_EXTENSION_AMP_ZERO_PERCENT_OUTPUT = -0.2;
@@ -396,8 +400,8 @@ public final class Constants {
 
             config.m_extendMotorIdleMode = IdleMode.kBrake;
 
-            config.m_extendMotorStallLimitAmps = 60;
-            config.m_extendMotorFreeLimitAmps = 60;
+            config.m_extendMotorStallLimitAmps = 80;
+            config.m_extendMotorFreeLimitAmps = 80;
 
             config.m_isInverted = true;
 
@@ -437,10 +441,11 @@ public final class Constants {
 
         public static final double WRIST_CLEAR_INTAKE_ROTATIONS = 30;
         public static final double EXTENSION_HIGH_START_ROTATIONS = 45;
-        public static final double SCORE_CONE_MID_ROTATIONS = 57;
+        public static final double SCORE_CONE_MID_ROTATIONS = 52;
         public static final double SCORE_CONE_HIGH_ROTATIONS = 70;
         public static final double SCORE_CUBE_MID_ROTATIONS = 50;
         public static final double SCORE_CUBE_HIGH_ROTATIONS = 65;
+        public static final double SCORE_CONE_LOW_ROTATIONS = 25;
 
         public static final double ARM_ROTATION_GEAR_RATIO = 190.91;
         public static final double ARM_HANDOFF_ROTATIONS = ARM_ROTATION_GEAR_RATIO / 8;
@@ -555,8 +560,8 @@ public final class Constants {
     }
 
     public static final class COMPRESSOR {
-        public static final int MIN_PRESSURE_PSI = 90;
-        public static final int MAX_PRESSURE_PSI = 120;
+        public static final int MIN_PRESSURE_PSI = 100;
+        public static final int MAX_PRESSURE_PSI = 115;
     }
 
     public static final class ZEROING {
