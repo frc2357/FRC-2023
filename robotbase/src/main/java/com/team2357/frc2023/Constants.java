@@ -389,6 +389,7 @@ public final class Constants {
 
         // public static final double AUTO_SCORE_MID_ROTATIONS = 10;
         public static final double SCORE_CONE_HIGH_ROTATIONS = 39;
+        public static final double AUTO_SCORE_CONE_HIGH_ROTATIONS = 36;
         public static final double SCORE_CUBE_HIGH_ROTATIONS = 33;
 
         public static final double ARM_EXTENSION_AMP_ZERO_PERCENT_OUTPUT = -0.2;
