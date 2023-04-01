@@ -21,7 +21,6 @@ public class Test1AutoBalanceCommand extends CommandLoggerBase {
 
     @Override
     public void initialize() {
-        m_swerve.zero();
         prevAngle = m_swerve.getYaw0To360(); 
     }
 

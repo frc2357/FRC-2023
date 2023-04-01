@@ -23,7 +23,6 @@ public class Test2AutoBalanceCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        m_swerve.zero();
         prevAngle = m_swerve.getYaw0To360(); 
     }
 
