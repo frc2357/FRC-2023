@@ -33,7 +33,7 @@ public class LogTimerCommand extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         if (!interrupted) {
-            Logger.getInstance().recordMetadata(m_key, m_message);
+            Logger.getInstance().recordOutput(m_key, m_message);
         }
     }
 }
