@@ -25,12 +25,12 @@ public class GridOneScoreOneAndBalance extends ParallelCommandGroup {
                 new ConeHighScoreCommand(),
 
                 // Wait until we are over charge station
-                new WaitCommand(1),
+                new WaitCommand(1.5),
 
                 // Then deploy intake after we're back on the floor
                 new ParallelCommandGroup(
-                  new IntakeArmRotateDumbCommand(0.5).withTimeout(1.5),
-                    new IntakeRollerRunCommand().withTimeout(4)
+                  new IntakeArmRotateDumbCommand(0.4).withTimeout(1.875),
+                    new IntakeRollerRunCommand().withTimeout(3)
                 ),
 
                 // Then stow intake
@@ -39,7 +39,7 @@ public class GridOneScoreOneAndBalance extends ParallelCommandGroup {
             // Path movement
             new SequentialCommandGroup(
                 new WaitCommand(3),
-                TrajectoryUtil.createTrajectoryPathCommand("grid1 1 cone balance", new PathConstraints(1, 1), true),
+                TrajectoryUtil.createTrajectoryPathCommand("grid1 1 cone balance", new PathConstraints(1.25, 1), true),
                 new Test1AutoBalanceCommand()
                 )
         );

@@ -11,6 +11,7 @@ import com.team2357.frc2023.commands.intake.IntakeArmStowCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerReverseCommand;
 import com.team2357.frc2023.commands.intake.WinchRotateToPositionCommand;
 import com.team2357.frc2023.commands.state.SetRobotStateCommand;
+import com.team2357.frc2023.commands.util.AlertCommand;
 import com.team2357.frc2023.state.RobotState;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -29,33 +30,38 @@ public class ConeHighPrePoseCommand extends ParallelCommandGroup {
             // Claw Rollers
             new SequentialCommandGroup(
                 new ClawIntakeConeCommand(),
-                new ClawHoldConeCommand()
+                new AlertCommand("ClawIntakeConeCommand finished"),
+                new ClawHoldConeCommand(),
+                new AlertCommand("Claw roller finished")
             ),
 
             // Intake Rollers
-            new IntakeRollerReverseCommand().withTimeout(1),
+            new IntakeRollerReverseCommand().withTimeout(1).andThen(new AlertCommand("Intake roller finished")),
 
             // Intake Arm
             new SequentialCommandGroup(
                 new WaitCommand(0.5),
                 new WinchRotateToPositionCommand(Constants.INTAKE_ARM.INTAKE_HANDOFF_WINCH_ROTATIONS),
                 new WaitCommand(0.25),
-                new IntakeArmStowCommand()
+                new IntakeArmStowCommand(),
+                new AlertCommand("Intake arm finished")
             ),
 
             // Arm
-            new ArmRotateToPositionCommand(Constants.ARM_ROTATION.SCORE_CONE_HIGH_ROTATIONS),
+            new ArmRotateToPositionCommand(Constants.ARM_ROTATION.SCORE_CONE_HIGH_ROTATIONS).andThen(new AlertCommand("Arm rotation finished")),
 
             // Wrist
             new SequentialCommandGroup(
                 new ArmWaitForGreaterThanPositionCommand(Constants.ARM_ROTATION.WRIST_CLEAR_INTAKE_ROTATIONS),
-                new WristRotateToPositionCommand(Constants.WRIST.SCORE_CONE_HIGH_ROTATIONS)
+                new WristRotateToPositionCommand(Constants.WRIST.SCORE_CONE_HIGH_ROTATIONS),
+                new AlertCommand("Wrist rotation finished")
             ),
 
             // Extension
             new SequentialCommandGroup(
                 new ArmWaitForGreaterThanPositionCommand(Constants.ARM_ROTATION.EXTENSION_HIGH_START_ROTATIONS),
-                new ArmExtendToPositionCommand(isAuto ? Constants.ARM_EXTENSION.AUTO_SCORE_CONE_HIGH_ROTATIONS : Constants.ARM_EXTENSION.SCORE_CONE_HIGH_ROTATIONS)
+                new ArmExtendToPositionCommand(isAuto ? Constants.ARM_EXTENSION.AUTO_SCORE_CONE_HIGH_ROTATIONS : Constants.ARM_EXTENSION.SCORE_CONE_HIGH_ROTATIONS),
+                new AlertCommand("Arm extension finished")
             )
         );
     }

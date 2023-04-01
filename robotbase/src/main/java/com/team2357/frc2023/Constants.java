@@ -489,7 +489,7 @@ public final class Constants {
             config.m_rotationMotorMaxVel = 4600;
             config.m_rotationMotorMinVel = 0;
             config.m_rotationMotorMaxAcc = 4600;
-            config.m_rotationMotorAllowedError = 0.5;
+            config.m_rotationMotorAllowedError = 1.0;
 
             config.m_smartMotionSlot = 0;
 
