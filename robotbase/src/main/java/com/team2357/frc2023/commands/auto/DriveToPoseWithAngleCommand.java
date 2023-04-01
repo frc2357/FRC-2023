@@ -48,7 +48,7 @@ public class DriveToPoseWithAngleCommand extends CommandBase {
         // m_thetaController = m_swerve.getAutoAlignThetaController();
 
         m_xDriveController = new ProfiledPIDController(
-                0.0, 0.0, 0.0, new TrapezoidProfile.Constraints(1, 0.5));
+                0.0001, 0.0, 0.0, new TrapezoidProfile.Constraints(1, 0.5));
         m_xDriveController.setTolerance(0.5);
 
         m_yDriveController = new ProfiledPIDController(
