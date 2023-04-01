@@ -9,6 +9,8 @@ import org.littletonrobotics.junction.Logger;
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 import com.swervedrivespecialties.swervelib.AbsoluteEncoder;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
@@ -33,6 +35,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
@@ -101,6 +104,11 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	// Whether or not the robot is seeking to get the primary limelight camera in
 	// view
 	private boolean m_isSeeking;
+
+	// The current path the robot is running
+	private PathPlannerTrajectory m_currentTrajectory;
+	// Time when trajectory starts
+	private double m_trajectoryStartSeconds;
 
 	public static class Configuration {
 		/**
@@ -423,6 +431,16 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		m_chassisSpeeds = chassisSpeeds;
 	}
 
+	public void setCurrentTrajectory(PathPlannerTrajectory trajectory) {
+		m_currentTrajectory = trajectory;
+		m_trajectoryStartSeconds = Timer.getFPGATimestamp();
+	}
+
+	public void endTrajectory() {
+		m_currentTrajectory = null;
+		m_trajectoryStartSeconds = 0;
+	}
+
 	public void updatePoseEstimator() {
 
 		LimelightSubsystem leftLL = DualLimelightManagerSubsystem.getInstance().getLimelight(LIMELIGHT.LEFT);
@@ -435,11 +453,11 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		double rightTime = rightLL.getCurrentAllianceBotposeTimestamp();
 
 		if (leftPose != null) {
-		//	addVisionPoseEstimate(leftPose, leftTime);
+			addVisionPoseEstimate(leftPose, leftTime);
 		}
 
 		if (rightPose != null) {
-		//	addVisionPoseEstimate(rightPose, rightTime);
+			addVisionPoseEstimate(rightPose, rightTime);
 		}
 
 		m_poseEstimator.update(getGyroscopeRotation(),
@@ -483,18 +501,24 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 		// System.out.println("Error X: " + xError + " Y: " + yError);
 
-		// if (Utility.isWithinTolerance(pose.getX(), robotPose.getX(),
-		// m_config.m_visionToleranceMeters) &&
-		// Utility.isWithinTolerance(robotPose.getY(), pose.getY(),
-		// m_config.m_visionToleranceMeters)) {
-
-
-			Logger.getInstance().recordOutput("Vision timestamp error", Timer.getFPGATimestamp() - timestamp);
+		Logger.getInstance().recordOutput("Vision timestamp error", Timer.getFPGATimestamp() - timestamp);
 		if (Utility.isWithinTolerance(pose.getRotation().getDegrees(), getYaw(), 15)) {
+
+			if (m_currentTrajectory != null) {
+				Pose2d trajPose = m_currentTrajectory.sample(timestamp - m_trajectoryStartSeconds).poseMeters;
+				if (!Utility.isWithinTolerance(pose.getX(), trajPose.getX(),
+						m_config.m_visionToleranceMeters) ||
+						!Utility.isWithinTolerance(pose.getY(), trajPose.getY(),
+								m_config.m_visionToleranceMeters)) {
+					Logger.getInstance().recordOutput("Vision Pose", "Thrown");
+					return;
+				}
+			}
+
 			Logger.getInstance().recordOutput("Left limelight botpose filtered", pose);
-		
 			m_poseEstimator.addVisionMeasurement(pose, timestamp);
-		 	Logger.getInstance().recordOutput("Vision Pose", "Added");
+			Logger.getInstance().recordOutput("Vision Pose", "Added");
+
 		} else {
 			Logger.getInstance().recordOutput("Vision Pose", "Thrown");
 		}

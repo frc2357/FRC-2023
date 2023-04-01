@@ -1,5 +1,6 @@
 package com.team2357.frc2023.commands.auto.gridone;
 
+import com.pathplanner.lib.PathConstraints;
 import com.team2357.frc2023.commands.drive.Test1AutoBalanceCommand;
 import com.team2357.frc2023.commands.intake.IntakeArmRotateDumbCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
@@ -41,7 +42,7 @@ public class GridOneScoreOneAndBalance extends ParallelCommandGroup {
             // Path movement
             new SequentialCommandGroup(
                 new WaitCommand(0),
-                TrajectoryUtil.createTrajectoryPathCommand("grid1 1 cone balance", true),
+                TrajectoryUtil.createTrajectoryPathCommand("grid1 1 cone balance", new PathConstraints(1, 1), true),
                 new Test1AutoBalanceCommand()
                 )
         );

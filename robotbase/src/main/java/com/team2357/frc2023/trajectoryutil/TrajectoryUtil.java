@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 public class TrajectoryUtil {
 
 	public static SequentialCommandGroup createTrajectoryPathCommand(String trajectoryFileName,
-			final boolean resetOdometry) {		
+			final boolean resetOdometry) {
 		return createDrivePathCommand(createPathPlannerTrajectory(trajectoryFileName), resetOdometry);
 	}
 
@@ -30,12 +30,14 @@ public class TrajectoryUtil {
 				Constants.DRIVE.DEFAULT_PATH_CONSTRAINTS);
 	}
 
-	public static SequentialCommandGroup createTrajectoryPathCommand(String trajectoryFileName, PathConstraints constraints,
-			final boolean resetOdometry) {		
+	public static SequentialCommandGroup createTrajectoryPathCommand(String trajectoryFileName,
+			PathConstraints constraints,
+			final boolean resetOdometry) {
 		return createDrivePathCommand(createPathPlannerTrajectory(trajectoryFileName, constraints), resetOdometry);
 	}
 
-	public static PathPlannerTrajectory createPathPlannerTrajectory(String trajectoryFileName, PathConstraints constraints) {
+	public static PathPlannerTrajectory createPathPlannerTrajectory(String trajectoryFileName,
+			PathConstraints constraints) {
 		return PathPlanner.loadPath(trajectoryFileName, constraints);
 	}
 
@@ -68,13 +70,15 @@ public class TrajectoryUtil {
 		pathCommand.addCommands(new InstantCommand(() -> {
 			if (resetOdometry) {
 				PathPlannerState initialState = trajectory.getInitialState();
-				initialState = PathPlannerTrajectory.transformStateForAlliance(initialState, DriverStation.getAlliance());
+				initialState = PathPlannerTrajectory.transformStateForAlliance(initialState,
+						DriverStation.getAlliance());
 				Pose2d initialPose = new Pose2d(initialState.poseMeters.getTranslation(),
-				initialState.holonomicRotation);
+						initialState.holonomicRotation);
 				swerveDrive.resetPoseEstimator(initialPose);
 			}
 			swerveDrive.getXController().reset();
 			swerveDrive.getYController().reset();
+			swerveDrive.setCurrentTrajectory(trajectory);
 		}));
 
 		pathCommand.addCommands(new PPSwerveControllerCommand(
@@ -88,7 +92,10 @@ public class TrajectoryUtil {
 					swerveDrive.drive(SwerveDriveSubsystem.getInstance().getKinematics().toChassisSpeeds(moduleStates));
 				}, true));
 
-		pathCommand.addCommands(new InstantCommand(() -> swerveDrive.drive(new ChassisSpeeds())));
+		pathCommand.addCommands(new InstantCommand(() -> {
+			swerveDrive.drive(new ChassisSpeeds());
+			swerveDrive.endTrajectory();
+		}));
 
 		return pathCommand;
 	}

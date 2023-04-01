@@ -199,7 +199,6 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         if (m_leftLimelight.validTargetExists()) {
-            SwerveDriveSubsystem.getInstance().addVisionPoseEstimate(m_rightLimelight.getBluePose(), m_rightLimelight.getBlueBotposeTimestamp());
             Logger.getInstance().recordOutput("Left limelight botpose wpi blue", m_leftLimelight.getBluePose());
             Logger.getInstance().recordOutput("Left limelight botpose wpi red", m_leftLimelight.getRedPose());
         }
