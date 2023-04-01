@@ -16,7 +16,13 @@ public class ClawHoldConeCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return true;
-    }    
+        return false;
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        ClawSubsystem.getInstance().stopRollers();
+    }
+    
 }
  

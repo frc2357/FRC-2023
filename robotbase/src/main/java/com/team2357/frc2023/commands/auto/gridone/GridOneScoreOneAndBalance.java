@@ -17,28 +17,31 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 public class GridOneScoreOneAndBalance extends ParallelCommandGroup {
     public GridOneScoreOneAndBalance() {
         addCommands(
-            new SequentialCommandGroup(
-                // Initialize
-                new AutonomousZeroCommand(),
-                // Score cone high
-                new ConeHighPrePoseCommand(true),
-                new ConeHighScoreCommand(),
+            // new SequentialCommandGroup(
+            //     // Initialize
+            //     new AutonomousZeroCommand(),
+            //     // Score cone high
+            //     new ConeHighPrePoseCommand(),
+            //     new ConeHighScoreCommand(),
 
-                // Wait until we are over charge station
-                new WaitCommand(1),
+            //     // Wait until we going over charge station
+            //     new WaitCommand(1.5),
 
-                // Then deploy intake after we're back on the floor
-                new ParallelCommandGroup(
-                  new IntakeArmRotateDumbCommand(0.5).withTimeout(1.5),
-                    new IntakeRollerRunCommand().withTimeout(4)
-                ),
+            //     // Then deploy intake after we're back on the floor
+            //     new ParallelCommandGroup(
+            //       // new ClawInstantOpenCommand(),
+            //       new IntakeArmRotateDumbCommand(0.6).withTimeout(2.0),
+            //       new SequentialCommandGroup(
+            //         new IntakeRollerRunCommand().withTimeout(2)
+            //       )
+            //     ),
 
-                // Then stow intake
-                new IntakeStowConeCommandGroup()
-            ),
+            //     // Then stow intake
+            //     new IntakeStowConeCommandGroup()
+            // ),
             // Path movement
             new SequentialCommandGroup(
-                new WaitCommand(3),
+                new WaitCommand(0),
                 TrajectoryUtil.createTrajectoryPathCommand("grid1 1 cone balance", new PathConstraints(1, 1), true),
                 new Test1AutoBalanceCommand()
                 )

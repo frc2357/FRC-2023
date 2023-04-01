@@ -7,7 +7,6 @@ import com.team2357.frc2023.commands.armrotation.ArmRotateToPositionCommand;
 import com.team2357.frc2023.commands.everybot.ClawReleaseConeCommand;
 import com.team2357.frc2023.commands.everybot.WristRotateToPositionCommand;
 import com.team2357.frc2023.commands.state.SetRobotStateCommand;
-import com.team2357.frc2023.commands.util.AlertCommand;
 import com.team2357.frc2023.state.RobotState;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -30,8 +29,7 @@ public class ConeHighScoreCommand extends SequentialCommandGroup  {
                 )
             ),
             new ArmExtensionMotorStopCommand(),
-            new WristRotateToPositionCommand(Constants.WRIST.WRIST_RETRACT_ROTATIONS, true),
-            new AlertCommand("HIGH SCORE ENDED")
+            new WristRotateToPositionCommand(Constants.WRIST.WRIST_RETRACT_ROTATIONS)
         );
     }
 }

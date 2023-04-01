@@ -384,6 +384,12 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		return m_pigeon.getYaw();
 	}
 
+	public double getYaw0To360() {
+		double yaw = getYaw() % 360;
+		yaw += yaw < 0 ? 360 : 0;
+		return yaw;
+	}
+
 	public double getPitch() {
 		return m_pigeon.getPitch();
 	}
@@ -577,16 +583,14 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	public int getDirection(double yaw) {
 		int direction = 0;
-		System.out.println("yaw: " + yaw);
 		if ((0 <= yaw && yaw < 45) || (315 <= yaw && yaw <= 360)) {
-			System.out.println("correct");
 			direction = 1;
 		} else if (45 <= yaw && yaw < 135) {
-			direction = 1;
+			direction = -1;
 		} else if (135 <= yaw && yaw < 225) {
 			direction = -1;
 		} else if (225 <= yaw && yaw < 315) {
-			direction = -1;
+			direction = 1;
 		}
 		return direction;
 	}

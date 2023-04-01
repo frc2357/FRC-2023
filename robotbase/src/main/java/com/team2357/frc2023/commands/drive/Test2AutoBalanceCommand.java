@@ -12,6 +12,7 @@ public class Test2AutoBalanceCommand extends CommandBase {
     
     private SwerveDriveSubsystem m_swerve;
      
+    private double balanceStart = -1;
     private double prevAngle = Double.NaN;
     private double yaw, direction, angle, error, power;
     
@@ -23,12 +24,12 @@ public class Test2AutoBalanceCommand extends CommandBase {
     @Override
     public void initialize() {
         m_swerve.zero();
-        prevAngle = m_swerve.getYaw(); 
+        prevAngle = m_swerve.getYaw0To360(); 
     }
 
     @Override
     public void execute() {
-        yaw = Math.abs(m_swerve.getYaw() % 360);
+        yaw = m_swerve.getYaw0To360();
         
         angle = m_swerve.getTilt(yaw);
         direction = m_swerve.getDirection(yaw);
@@ -51,7 +52,15 @@ public class Test2AutoBalanceCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return Math.abs(m_swerve.getTilt(m_swerve.getYaw())) < Constants.DRIVE.BALANCE_LEVEL_DEGREES;
+        double elapsedBalanceTime = System.currentTimeMillis() - balanceStart;
+        boolean isBalanced = Math.abs(m_swerve.getTilt(m_swerve.getYaw0To360())) < Constants.DRIVE.BALANCE_LEVEL_DEGREES;
+        if (!isBalanced) {
+            balanceStart = -1;
+        } else if (isBalanced && balanceStart == -1) {
+            balanceStart = System.currentTimeMillis();
+        }
+
+        return isBalanced && elapsedBalanceTime >= Constants.DRIVE.BALANCE_WAIT_MILLIS;
     }
     
     @Override
