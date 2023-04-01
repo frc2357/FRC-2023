@@ -14,6 +14,7 @@ import com.team2357.frc2023.commands.drive.SyncDriveEncodersCommand;
 import com.team2357.frc2023.commands.drive.ZeroDriveCommand;
 import com.team2357.frc2023.commands.intake.IntakeSolenoidExtendCommand;
 import com.team2357.frc2023.commands.util.ZeroAllCommand;
+import com.team2357.frc2023.networktables.Buttonboard;
 import com.team2357.frc2023.state.RobotState;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.frc2023.util.CountdownTimer;
@@ -92,6 +93,7 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    Buttonboard.getInstance().setAlliance();
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -107,6 +109,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopInit() {
+    Buttonboard.getInstance().setAlliance();
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
