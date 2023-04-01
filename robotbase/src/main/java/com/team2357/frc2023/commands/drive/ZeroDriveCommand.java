@@ -15,7 +15,6 @@ public class ZeroDriveCommand extends CommandLoggerBase {
 
     @Override
     public void initialize() {
-        SwerveDriveSubsystem.getInstance().zero();
         m_startMillis = System.currentTimeMillis();
     }
 

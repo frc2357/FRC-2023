@@ -9,6 +9,8 @@ import org.littletonrobotics.junction.Logger;
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 import com.swervedrivespecialties.swervelib.AbsoluteEncoder;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
@@ -34,7 +36,9 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -101,6 +105,11 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	// Whether or not the robot is seeking to get the primary limelight camera in
 	// view
 	private boolean m_isSeeking;
+
+	// The current path the robot is running
+	private PathPlannerTrajectory m_currentTrajectory;
+	// Time when trajectory starts
+	private double m_trajectoryStartSeconds;
 
 	public static class Configuration {
 		/**
@@ -361,27 +370,6 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		return m_areEncodersSynced;
 	}
 
-	public void zero() {
-		SwerveModuleState state = new SwerveModuleState(0.0, Rotation2d.fromDegrees(0.0));
-
-		// m_frontLeftModule.set(
-		// state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond *
-		// m_config.m_maxVoltage,
-		// state.angle.getRadians());
-		// m_frontRightModule.set(
-		// state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond *
-		// m_config.m_maxVoltage,
-		// state.angle.getRadians());
-		// m_backLeftModule.set(
-		// state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond *
-		// m_config.m_maxVoltage,
-		// state.angle.getRadians());
-		// m_backRightModule.set(
-		// state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond *
-		// m_config.m_maxVoltage,
-		// state.angle.getRadians());
-	}
-
 	public void zeroGyroscope() {
 		m_pigeon.reset();
 	}
@@ -392,6 +380,12 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	public double getYaw() {
 		return m_pigeon.getYaw();
+	}
+
+	public double getYaw0To360() {
+		double yaw = getYaw() % 360;
+		yaw += yaw < 0 ? 360 : 0;
+		return yaw;
 	}
 
 	public double getPitch() {
@@ -441,6 +435,16 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		m_chassisSpeeds = chassisSpeeds;
 	}
 
+	public void setCurrentTrajectory(PathPlannerTrajectory trajectory) {
+		m_currentTrajectory = trajectory;
+		m_trajectoryStartSeconds = Timer.getFPGATimestamp();
+	}
+
+	public void endTrajectory() {
+		m_currentTrajectory = null;
+		m_trajectoryStartSeconds = 0;
+	}
+
 	public void updatePoseEstimator() {
 
 		LimelightSubsystem leftLL = DualLimelightManagerSubsystem.getInstance().getLimelight(LIMELIGHT.LEFT);
@@ -487,58 +491,43 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 			return;
 		}
 
-		System.out.println(
-				"Vision x: " + pose.getX() + ", Y: " + pose.getY() + ", Rot: " + pose.getRotation().getDegrees());
+		// System.out.println(
+		// "Vision x: " + pose.getX() + ", Y: " + pose.getY() + ", Rot: " +
+		// pose.getRotation().getDegrees());
 
 		Pose2d robotPose = getPose();
-		System.out.println(
-				"robot x: " + robotPose.getX() + ", Y: " + robotPose.getY() + ", Rot: "
-						+ robotPose.getRotation().getDegrees());
+		// System.out.println(
+		// "robot x: " + robotPose.getX() + ", Y: " + robotPose.getY() + ", Rot: "
+		// + robotPose.getRotation().getDegrees());
 
 		double xError = robotPose.getX() - pose.getX();
 		double yError = robotPose.getY() - pose.getY();
 
-		System.out.println("Error X: " + xError + " Y: " + yError);
+		// System.out.println("Error X: " + xError + " Y: " + yError);
 
-		if (Utility.isWithinTolerance(pose.getX(), robotPose.getX(), m_config.m_visionToleranceMeters) &&
-				Utility.isWithinTolerance(robotPose.getY(), pose.getY(), m_config.m_visionToleranceMeters)) {
-			// m_poseEstimator.addVisionMeasurement(pose, timestamp);
+		Logger.getInstance().recordOutput("Vision timestamp error", Timer.getFPGATimestamp() - timestamp);
+		if (Utility.isWithinTolerance(pose.getRotation().getDegrees(), getYaw(), 15)) {
+
+			if (m_currentTrajectory != null) {
+				Pose2d trajPose = m_currentTrajectory.sample(timestamp - m_trajectoryStartSeconds).poseMeters;
+				if (!Utility.isWithinTolerance(pose.getX(), trajPose.getX(),
+						m_config.m_visionToleranceMeters) ||
+						!Utility.isWithinTolerance(pose.getY(), trajPose.getY(),
+								m_config.m_visionToleranceMeters)) {
+					Logger.getInstance().recordOutput("Vision Pose", "Thrown");
+					return;
+				}
+			}
+
+			Logger.getInstance().recordOutput("Left limelight botpose filtered", pose);
+			m_poseEstimator.addVisionMeasurement(pose, timestamp);
+			Logger.getInstance().recordOutput("Vision Pose", "Added");
+
+		} else {
+			Logger.getInstance().recordOutput("Vision Pose", "Thrown");
 		}
 	}
-
-	// public double balance(double prevAngle) {
-	// 	double yaw, direction, angle, error, power;
-	// 	angle = 0;
-	// 	direction = 0;
-
-	// 	yaw = Math.abs(getYaw() % 360);
-
-	// 	angle = getTilt(yaw);
-	// 	direction = getDirection(yaw);
-
-	// 	if (angle <= Constants.DRIVE.BALANCE_FULL_TILT_DEGREES) {
-	// 		// System.out.println("angle: " + angle);
-	// 		// System.out.println("direction: " + direction);
-
-	// 		error = Math.copySign(Constants.DRIVE.BALANCE_LEVEL_DEGREES + Math.abs(angle), angle);
-	// 		power = Math.min(Math.abs(Constants.DRIVE.BALANCE_KP * error), Constants.DRIVE.BALANCE_MAX_POWER);
-	// 		power = Math.copySign(power, error);
-
-	// 		power *= direction;
-
-	// 		if (Math.abs(prevAngle - angle) < Constants.DRIVE.STOP_DRIVING_TILT_DIFFERENCE) {
-	// 			drive(power, 0, 0);
-	// 		}
-	// 	}
-
-	// 	return angle;
-	// }
-
-	// public boolean isBalanced() {
-	// 	double yaw = Math.abs(getYaw() % 360);
-	// 	return getTilt(yaw) < Constants.DRIVE.BALANCE_LEVEL_DEGREES;
-	// }
-
+	
 	public double getTilt(double yaw) {
 		double angle = 0;
 		if ((0 <= yaw && yaw < 45) || (315 <= yaw && yaw <= 360)) {
@@ -556,16 +545,14 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	public int getDirection(double yaw) {
 		int direction = 0;
-		System.out.println("yaw: " + yaw);
 		if ((0 <= yaw && yaw < 45) || (315 <= yaw && yaw <= 360)) {
-			System.out.println("correct");
 			direction = 1;
 		} else if (45 <= yaw && yaw < 135) {
-			direction = 1;
+			direction = -1;
 		} else if (135 <= yaw && yaw < 225) {
 			direction = -1;
 		} else if (225 <= yaw && yaw < 315) {
-			direction = -1;
+			direction = 1;
 		}
 		return direction;
 	}

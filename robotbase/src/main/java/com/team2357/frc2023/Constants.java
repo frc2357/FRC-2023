@@ -142,13 +142,13 @@ public final class Constants {
              * State measurement standard deviations. Left encoder, right encoder, gyro
              * Increase these numbers to trust them less
              */
-            config.m_stateStdDevs = VecBuilder.fill(0.1, 0.1, 0.0);
+            config.m_stateStdDevs = VecBuilder.fill(0.9, 0.9, 0.0);
 
             /**
              * Local measurement standard deviations. Vision X, Y, theta.
              * Increase these numbers to trust them less
              */
-            config.m_visionMeasurementStdDevs = VecBuilder.fill(0.9, 0.9, 1);
+            config.m_visionMeasurementStdDevs = VecBuilder.fill(0.1, 0.1, 1);
 
             config.m_visionToleranceMeters = 0.1524;
 
@@ -178,11 +178,13 @@ public final class Constants {
         public static final double BALANCE_LEVEL_DEGREES = 1;
         public static final double BALANCE_FULL_TILT_DEGREES = 15;
         public static final double BACKWARDS_BALANCING_EXTRA_POWER_MULTIPLIER = 1.35;
-        public static final double BALANCE_KP = 0.01;
+        public static final double BALANCE_KP = 0.015;
         public static final double BALANCE_KI = 0.0;
         public static final double BALANCE_KD = 0.000001;
         public static final double BALANCE_MAX_POWER = 0.3;
-        public static final double STOP_DRIVING_TILT_DIFFERENCE = .05;
+        public static final double BALANCE_WAIT_MILLIS = 250;
+        public static final double STOP_DRIVING_TILT_DIFFERENCE = .0000005;
+        public static final double BALANCE_DENOMINATOR_MULTIPLIER = 2.5;
         public static final PIDController BALANCE_PID_CONTROLLER = new PIDController(BALANCE_KP, BALANCE_KI, BALANCE_KD);
 
         public static final double TICKS_PER_ROTATION = 2048.0;
@@ -393,6 +395,7 @@ public final class Constants {
 
         // public static final double AUTO_SCORE_MID_ROTATIONS = 10;
         public static final double SCORE_CONE_HIGH_ROTATIONS = 39;
+        public static final double AUTO_SCORE_CONE_HIGH_ROTATIONS = 36;
         public static final double SCORE_CUBE_HIGH_ROTATIONS = 33;
 
         public static final double ARM_EXTENSION_AMP_ZERO_PERCENT_OUTPUT = -0.2;
@@ -490,7 +493,7 @@ public final class Constants {
             config.m_rotationMotorMaxVel = 4600;
             config.m_rotationMotorMinVel = 0;
             config.m_rotationMotorMaxAcc = 4600;
-            config.m_rotationMotorAllowedError = 0.5;
+            config.m_rotationMotorAllowedError = 1.0;
 
             config.m_smartMotionSlot = 0;
 

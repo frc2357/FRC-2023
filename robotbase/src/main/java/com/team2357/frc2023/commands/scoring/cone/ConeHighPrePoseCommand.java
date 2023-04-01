@@ -11,6 +11,7 @@ import com.team2357.frc2023.commands.intake.IntakeArmStowCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerReverseCommand;
 import com.team2357.frc2023.commands.intake.WinchRotateToPositionCommand;
 import com.team2357.frc2023.commands.state.SetRobotStateCommand;
+import com.team2357.frc2023.commands.util.AlertCommand;
 import com.team2357.frc2023.state.RobotState;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -19,6 +20,10 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 public class ConeHighPrePoseCommand extends ParallelCommandGroup {
     public ConeHighPrePoseCommand() {
+        this(false);
+    }
+
+    public ConeHighPrePoseCommand(boolean isAuto) {
         super(
             new SetRobotStateCommand(RobotState.State.ROBOT_PRE_SCORE_CONE_HIGH),
 
@@ -51,7 +56,7 @@ public class ConeHighPrePoseCommand extends ParallelCommandGroup {
             // Extension
             new SequentialCommandGroup(
                 new ArmWaitForGreaterThanPositionCommand(Constants.ARM_ROTATION.EXTENSION_HIGH_START_ROTATIONS),
-                new ArmExtendToPositionCommand(Constants.ARM_EXTENSION.SCORE_CONE_HIGH_ROTATIONS)
+                new ArmExtendToPositionCommand(isAuto ? Constants.ARM_EXTENSION.AUTO_SCORE_CONE_HIGH_ROTATIONS : Constants.ARM_EXTENSION.SCORE_CONE_HIGH_ROTATIONS)
             )
         );
     }
