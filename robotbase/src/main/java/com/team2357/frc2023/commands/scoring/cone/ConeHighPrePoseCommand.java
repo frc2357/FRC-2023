@@ -30,38 +30,33 @@ public class ConeHighPrePoseCommand extends ParallelCommandGroup {
             // Claw Rollers
             new SequentialCommandGroup(
                 new ClawIntakeConeCommand(),
-                new AlertCommand("ClawIntakeConeCommand finished"),
-                new ClawHoldConeCommand(),
-                new AlertCommand("Claw roller finished")
+                new ClawHoldConeCommand()
             ),
 
             // Intake Rollers
-            new IntakeRollerReverseCommand().withTimeout(1).andThen(new AlertCommand("Intake roller finished")),
+            new IntakeRollerReverseCommand().withTimeout(1),
 
             // Intake Arm
             new SequentialCommandGroup(
                 new WaitCommand(0.5),
                 new WinchRotateToPositionCommand(Constants.INTAKE_ARM.INTAKE_HANDOFF_WINCH_ROTATIONS),
                 new WaitCommand(0.25),
-                new IntakeArmStowCommand(),
-                new AlertCommand("Intake arm finished")
+                new IntakeArmStowCommand()
             ),
 
             // Arm
-            new ArmRotateToPositionCommand(Constants.ARM_ROTATION.SCORE_CONE_HIGH_ROTATIONS).andThen(new AlertCommand("Arm rotation finished")),
+            new ArmRotateToPositionCommand(Constants.ARM_ROTATION.SCORE_CONE_HIGH_ROTATIONS),
 
             // Wrist
             new SequentialCommandGroup(
                 new ArmWaitForGreaterThanPositionCommand(Constants.ARM_ROTATION.WRIST_CLEAR_INTAKE_ROTATIONS),
-                new WristRotateToPositionCommand(Constants.WRIST.SCORE_CONE_HIGH_ROTATIONS),
-                new AlertCommand("Wrist rotation finished")
+                new WristRotateToPositionCommand(Constants.WRIST.SCORE_CONE_HIGH_ROTATIONS)
             ),
 
             // Extension
             new SequentialCommandGroup(
                 new ArmWaitForGreaterThanPositionCommand(Constants.ARM_ROTATION.EXTENSION_HIGH_START_ROTATIONS),
-                new ArmExtendToPositionCommand(isAuto ? Constants.ARM_EXTENSION.AUTO_SCORE_CONE_HIGH_ROTATIONS : Constants.ARM_EXTENSION.SCORE_CONE_HIGH_ROTATIONS),
-                new AlertCommand("Arm extension finished")
+                new ArmExtendToPositionCommand(isAuto ? Constants.ARM_EXTENSION.AUTO_SCORE_CONE_HIGH_ROTATIONS : Constants.ARM_EXTENSION.SCORE_CONE_HIGH_ROTATIONS)
             )
         );
     }
