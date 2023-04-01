@@ -90,7 +90,6 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	private Configuration m_config;
 
 	private SwerveDrivePoseEstimator m_poseEstimator;
-	private SwerveDrivePoseEstimator m_visionPoseEstimator;
 
 	// Controller for robot movement along the y-axis
 	private PIDController m_translateXController;
@@ -282,13 +281,6 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 				new Pose2d(0.0, 0.0, getGyroscopeRotation()), m_config.m_stateStdDevs,
 				m_config.m_visionMeasurementStdDevs);
 
-		m_visionPoseEstimator = new SwerveDrivePoseEstimator(m_kinematics, getGyroscopeRotation(),
-				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
-						m_frontRightModule.getPosition(),
-						m_backLeftModule.getPosition(), m_backRightModule.getPosition() },
-				new Pose2d(0.0, 0.0, getGyroscopeRotation()), m_config.m_stateStdDevs,
-				m_config.m_visionMeasurementStdDevs);
-
 		m_translateXController = m_config.m_translateXController;
 		m_translateYController = m_config.m_translateYController;
 	}
@@ -408,14 +400,6 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 						m_frontRightModule.getPosition(),
 						m_backLeftModule.getPosition(), m_backRightModule.getPosition() },
 				pose);
-
-		m_visionPoseEstimator.resetPosition(
-				pose.getRotation(),
-				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
-						m_frontRightModule.getPosition(),
-						m_backLeftModule.getPosition(), m_backRightModule.getPosition() },
-				pose);
-
 	}
 
 	public void drive(double x, double y, double rotation) {
@@ -462,12 +446,6 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
 						m_frontRightModule.getPosition(),
 						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
-
-		m_visionPoseEstimator.update(getGyroscopeRotation(),
-				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
-						m_frontRightModule.getPosition(),
-						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
-
 	}
 
 	public void addVisionPoseEstimate(AprilTagEstimate estimate) {
@@ -496,7 +474,6 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		// pose.getRotation().getDegrees());
 
 		Pose2d robotPose = getPose();
-		//Pose2d robotPose = m_visionPoseEstimator.getEstimatedPosition();
 		// System.out.println(
 		// "robot x: " + robotPose.getX() + ", Y: " + robotPose.getY() + ", Rot: "
 		// + robotPose.getRotation().getDegrees());
@@ -517,8 +494,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 			Logger.getInstance().recordOutput("Left limelight botpose filtered", pose);
 		
 			m_poseEstimator.addVisionMeasurement(pose, timestamp);
-			m_visionPoseEstimator.addVisionMeasurement(pose, timestamp);
-		 Logger.getInstance().recordOutput("Vision Pose", "Added");
+		 	Logger.getInstance().recordOutput("Vision Pose", "Added");
 		} else {
 			Logger.getInstance().recordOutput("Vision Pose", "Thrown");
 		}
@@ -790,7 +766,6 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		loggingSwerveStates[3] = m_backRightModule.getState();
 		Logger.getInstance().recordOutput("Swerve Speed", loggingSwerveStates);
 		Logger.getInstance().recordOutput("Robot Pose", getPose());
-		Logger.getInstance().recordOutput("Robot Vision Pose", m_visionPoseEstimator.getEstimatedPosition());
 
 		// System.out.println("Is closed loop: "+isClosedLoopEnabled() + ", tracking: "
 		// + isTracking());
