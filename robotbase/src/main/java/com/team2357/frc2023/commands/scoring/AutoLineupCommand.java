@@ -2,12 +2,13 @@ package com.team2357.frc2023.commands.scoring;
 
 import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.commands.auto.DriveToPoseCommand;
-import com.team2357.frc2023.commands.controller.RumbleCommand;
+import com.team2357.frc2023.networktables.Buttonboard;
 import com.team2357.frc2023.subsystems.DualLimelightManagerSubsystem;
+import com.team2357.frc2023.util.Utility;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class AutoLineupCommand extends CommandBase {
@@ -22,7 +23,8 @@ public class AutoLineupCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        m_targetPose = new Pose2d(1.77, 3.3, Rotation2d.fromDegrees(180));
+        int targetCol = Buttonboard.getInstance().getColValue();
+        m_targetPose = Utility.gridColumnToTargetPose(targetCol);
         m_driveToPose = null;
     }
 
@@ -37,7 +39,7 @@ public class AutoLineupCommand extends CommandBase {
                     m_driveToPose.schedule();
                 }
             } else {
-                RumbleCommand.createRumbleCommand(m_controller, Constants.CONTROLLER.RUMBLE_TIMEOUT_SECONDS_ON_TELEOP_AUTO).schedule();
+               m_controller.setRumble(RumbleType.kBothRumble, Constants.CONTROLLER.RUMBLE_INTENSITY);
             }
         }
     }
@@ -53,5 +55,6 @@ public class AutoLineupCommand extends CommandBase {
         if (m_driveToPose != null) {
             m_driveToPose.cancel();
         }
+        m_controller.setRumble(RumbleType.kBothRumble, 0.0);
     }
 }

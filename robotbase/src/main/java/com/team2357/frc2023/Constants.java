@@ -596,4 +596,13 @@ public final class Constants {
     public static final class GAMEPIECE_LED {
         public static final int PWM_PORT = 0;
     }
+
+    public static final class FIELD {
+        public static final double FIELD_WIDTH_METERS = 8.02;
+        public static final double COLUMN_ZERO_SCORE_Y_METERS = 0.51;
+        public static final double GRID_SCORE_X_METERS = 1.77;
+        public static final double GRID_DISTANCE_METERS_BETWEEN_COLUMN = 0.5588;
+        public static final double GRID_SCORE_Y_TRIM = -0.1;
+        public static final double GRID_SCORE_ROTATION_DEGREES = 180;
+    }
 }
