@@ -14,7 +14,6 @@ import com.swervedrivespecialties.swervelib.AbsoluteEncoder;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
-import com.team2357.frc2023.apriltag.AprilTagEstimate;
 import com.team2357.frc2023.subsystems.DualLimelightManagerSubsystem.LIMELIGHT;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 import com.team2357.lib.subsystems.LimelightSubsystem;
@@ -393,16 +392,6 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
 						m_frontRightModule.getPosition(),
 						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
-	}
-
-	public void addVisionPoseEstimate(AprilTagEstimate estimate) {
-
-		if (estimate == null) {
-			return;
-		}
-
-		Pose2d pose = estimate.getPose();
-		addVisionPoseEstimate(pose, estimate.getTimeStamp());
 	}
 
 	/**
