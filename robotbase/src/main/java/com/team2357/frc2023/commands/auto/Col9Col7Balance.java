@@ -6,7 +6,7 @@ import com.team2357.frc2023.commands.auto.support.ConeHighPrePoseClaw;
 import com.team2357.frc2023.commands.auto.support.ConeHighPrePoseIntake;
 import com.team2357.frc2023.commands.auto.support.ConeHighScoreArmReturn;
 import com.team2357.frc2023.commands.auto.support.ConeHighScoreClaw;
-import com.team2357.frc2023.commands.drive.Test1AutoBalanceCommand;
+import com.team2357.frc2023.commands.drive.AutoBalanceCommand;
 import com.team2357.frc2023.commands.intake.IntakeArmRotateDumbCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
 import com.team2357.frc2023.commands.intake.IntakeStowConeCommandGroup;
@@ -89,7 +89,7 @@ public class Col9Col7Balance extends ParallelCommandGroup {
             new SequentialCommandGroup(
                 new WaitCommand(2.25),
                 TrajectoryUtil.createTrajectoryPathCommand(getClass().getSimpleName(), new PathConstraints(3.0, 1.5), true),
-                new Test1AutoBalanceCommand()
+                new AutoBalanceCommand()
             )
         );
     }
