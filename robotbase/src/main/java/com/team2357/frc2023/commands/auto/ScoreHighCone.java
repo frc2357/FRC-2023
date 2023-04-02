@@ -16,4 +16,9 @@ public class ScoreHighCone extends SequentialCommandGroup {
             new ConeHighScoreCommand()
         );
     }
+
+    @Override
+    public String toString() {
+        return "High Cone";
+    }
 }
