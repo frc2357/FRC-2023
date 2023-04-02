@@ -1,7 +1,7 @@
 package com.team2357.frc2023.commands.auto;
 
 import com.pathplanner.lib.PathConstraints;
-import com.team2357.frc2023.commands.drive.Test1AutoBalanceCommand;
+import com.team2357.frc2023.commands.drive.AutoBalanceCommand;
 import com.team2357.frc2023.commands.intake.IntakeArmRotateDumbCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
 import com.team2357.frc2023.commands.intake.IntakeStowConeCommandGroup;
@@ -40,7 +40,7 @@ public class Col4StowBalance extends ParallelCommandGroup {
             new SequentialCommandGroup(
                 new WaitCommand(3),
                 TrajectoryUtil.createTrajectoryPathCommand(getClass().getSimpleName(), new PathConstraints(1.25, 1), true),
-                new Test1AutoBalanceCommand()
+                new AutoBalanceCommand()
                 )
         );
     }

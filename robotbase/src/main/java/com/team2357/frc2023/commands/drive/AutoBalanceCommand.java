@@ -2,21 +2,17 @@ package com.team2357.frc2023.commands.drive;
 
 import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
+import com.team2357.lib.commands.CommandLoggerBase;
 
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+public class AutoBalanceCommand extends CommandLoggerBase {
 
-public class Test2AutoBalanceCommand extends CommandBase {
-
-    // Stop driving if angle is changing too quickly
-    
     private SwerveDriveSubsystem m_swerve;
      
     private double balanceStart = -1;
     private double prevAngle = Double.NaN;
     private double yaw, direction, angle, error, power;
     
-    public Test2AutoBalanceCommand() {
+    public AutoBalanceCommand() {
         m_swerve = SwerveDriveSubsystem.getInstance();
         addRequirements(m_swerve);
     }
@@ -40,9 +36,9 @@ public class Test2AutoBalanceCommand extends CommandBase {
             power = Math.min(Math.abs(Constants.DRIVE.BALANCE_KP * error), Constants.DRIVE.BALANCE_MAX_POWER);
             power = Math.copySign(power, error) * direction;
 
-            if (Math.abs(prevAngle - angle) > Constants.DRIVE.STOP_DRIVING_TILT_DIFFERENCE) {
-                m_swerve.drive(power, 0, 0);
-            }
+            power /= (1 + (Math.abs(prevAngle - angle) * Constants.DRIVE.BALANCE_DENOMINATOR_MULTIPLIER));
+
+            m_swerve.drive(power, 0, 0);
 
         }
 
@@ -66,4 +62,5 @@ public class Test2AutoBalanceCommand extends CommandBase {
     public void end(boolean interrupted) {
         SwerveDriveSubsystem.getInstance().drive(0, 0, 0);
     }
+
 }
