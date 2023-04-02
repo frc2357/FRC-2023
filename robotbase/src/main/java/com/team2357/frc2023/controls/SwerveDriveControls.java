@@ -1,19 +1,11 @@
 package com.team2357.frc2023.controls;
 
-import com.team2357.frc2023.commands.auto.AutoLineupCommand;
-import com.team2357.frc2023.commands.auto.DriveToPoseWithAngleCommand;
-import com.team2357.frc2023.commands.drive.Test1AutoBalanceCommand;
-import com.team2357.frc2023.commands.drive.Test2AutoBalanceCommand;
 import com.team2357.frc2023.commands.intake.IntakeConeCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakeCubeCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakePreSignalConeCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakePreSignalCubeCommandGroup;
-import com.team2357.frc2023.commands.scoring.HeartlandAutoScoreCommand;
-import com.team2357.frc2023.commands.scoring.HeartlandAutoTranslateCommand;
-import com.team2357.frc2023.commands.scoring.TeleopAutoScoreCommandGroup;
-import com.team2357.frc2023.subsystems.DualLimelightManagerSubsystem;
+import com.team2357.frc2023.commands.scoring.AutoLineupCommand;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
-import com.team2357.frc2023.subsystems.DualLimelightManagerSubsystem.LIMELIGHT;
 import com.team2357.lib.triggers.AxisThresholdTrigger;
 import com.team2357.lib.util.XboxRaw;
 
@@ -82,12 +74,8 @@ public class SwerveDriveControls {
         // Cone Intake deploy/stow
         m_rightTriggerFull.whileTrue(new IntakeCubeCommandGroup());
 
-        m_rightBumper.whileTrue(new AutoLineupCommand(m_controller));// 10, 2.5
-
-        //Teleop auto
-        //m_rightBumper.whileTrue(new HeartlandAutoTranslateCommand(m_controller));
-        //m_leftBumper.whileTrue(new HeartlandAutoScoreCommand());
-
+        // Auto score
+        m_aButton.whileTrue(new AutoLineupCommand(m_controller));
     }
 
     public double getX() {

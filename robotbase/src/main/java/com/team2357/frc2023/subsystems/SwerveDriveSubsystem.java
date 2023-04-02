@@ -328,6 +328,10 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		return m_config.m_autoAlignThetaController;
 	}
 
+	public Twist2d getFieldVelocity() {
+		return m_fieldVelocity;
+	}
+
 	public SwerveDriveKinematics getKinematics() {
 		return m_kinematics;
 	}
@@ -496,20 +500,6 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		if (pose == null) {
 			return;
 		}
-
-		// System.out.println(
-		// "Vision x: " + pose.getX() + ", Y: " + pose.getY() + ", Rot: " +
-		// pose.getRotation().getDegrees());
-
-		Pose2d robotPose = getPose();
-		// System.out.println(
-		// "robot x: " + robotPose.getX() + ", Y: " + robotPose.getY() + ", Rot: "
-		// + robotPose.getRotation().getDegrees());
-
-		double xError = robotPose.getX() - pose.getX();
-		double yError = robotPose.getY() - pose.getY();
-
-		// System.out.println("Error X: " + xError + " Y: " + yError);
 
 		Logger.getInstance().recordOutput("Vision timestamp error", Timer.getFPGATimestamp() - timestamp);
 		if (Utility.isWithinTolerance(pose.getRotation().getDegrees(), getYaw(), 15)) {
@@ -739,7 +729,6 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		// m_poseEstimator.getEstimatedPosition().getRotation().getDegrees());
 
 		SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
-		// System.out.println(m_chassisSpeeds.vxMetersPerSecond);
 		SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxVelocityMetersPerSecond);
 
 		m_frontLeftModule.set(
@@ -791,9 +780,5 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		SmartDashboard.putNumber("back right module encoder count",
 				((TalonFX) (m_backRightModule.getDriveMotor())).getSelectedSensorPosition(0));
 
-	}
-
-	public Twist2d getFieldVelocity() {
-		return new Twist2d();
 	}
 }

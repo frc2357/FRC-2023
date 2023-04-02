@@ -1,5 +1,6 @@
-package com.team2357.frc2023.commands.auto;
+package com.team2357.frc2023.commands.scoring;
 
+import com.team2357.frc2023.commands.auto.DriveToPoseCommand;
 import com.team2357.frc2023.commands.controller.RumbleCommand;
 import com.team2357.frc2023.subsystems.DualLimelightManagerSubsystem;
 
