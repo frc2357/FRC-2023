@@ -188,6 +188,8 @@ public final class Constants {
         public static final PathConstraints DEFAULT_PATH_CONSTRAINTS = new PathConstraints(2.5,
                 1.5);
         public static final PathConstraints GRID_ZERO_PATH_CONSTRAINTS = new PathConstraints(2, 1);
+   
+        public static final double TIME_TO_COAST_SECONDS = 5;
     }
 
     public static final class INTAKE_ROLLER {
