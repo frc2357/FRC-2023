@@ -123,6 +123,10 @@ public class Utility {
                 }
         }
 
+        String message = "No target selected";
+        DriverStation.reportWarning(message, false);
+        Logger.getInstance().recordOutput("Scoring", message);
+
         return new WaitCommand(0);
     }
 
@@ -160,6 +164,10 @@ public class Utility {
                         return new CubeHighScoreCommand();
                 }
         }
+
+        String message = "No target selected";
+        DriverStation.reportWarning(message, false);
+        Logger.getInstance().recordOutput("Scoring", message);
 
         return new WaitCommand(0);
     }
