@@ -3,6 +3,7 @@ package com.team2357.frc2023.shuffleboard;
 import com.team2357.frc2023.commands.auto.ScoreHighCone;
 import com.team2357.frc2023.commands.auto.Col4StowBalance;
 import com.team2357.frc2023.commands.auto.Col6StowBalance;
+import com.team2357.frc2023.commands.auto.Col9Col7;
 import com.team2357.frc2023.commands.auto.Col9Col7Balance;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -19,6 +20,7 @@ public class AutoCommandChooser {
             new ScoreHighCone(),
             new Col4StowBalance(),
             new Col6StowBalance(),
+            new Col9Col7(),
             new Col9Col7Balance()
         };
 
