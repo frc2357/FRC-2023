@@ -37,11 +37,13 @@ fiducial_decoder_strictness:strict
 fiducial_denoise:0.000000
 fiducial_idfilters:
 fiducial_locfilters:
+fiducial_qualitythreshold:0.000000
 fiducial_resdiv:2
 fiducial_size:203.2
 fiducial_skip3d:1
 fiducial_type:aprilClassic16h5
 fiducial_vis_mode:3dtargposebotspace
+flicker_correction:0
 force_convex:1
 hue_max:85
 hue_min:60
@@ -54,7 +56,7 @@ lcgain:6.000000
 multigroup_max:7
 multigroup_min:1
 multigroup_rejector:0
-pipeline_led_enabled:1
+pipeline_led_enabled:0
 pipeline_led_power:100
 pipeline_res:1
 pipeline_type:3

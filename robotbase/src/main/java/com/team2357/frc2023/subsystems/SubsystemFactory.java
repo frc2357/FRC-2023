@@ -1,99 +1,81 @@
 package com.team2357.frc2023.subsystems;
 
-import com.ctre.phoenix.sensors.WPI_Pigeon2;
-import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
-import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
 
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-
 public class SubsystemFactory {
-    public SwerveDriveSubsystem CreateSwerveDriveSubsystem() {
-        ShuffleboardTab tab = Shuffleboard.getTab("Drivetrain");
+        public SwerveDriveSubsystem CreateSwerveDriveSubsystem() {
 
-        WPI_Pigeon2 pigeon = new WPI_Pigeon2(Constants.CAN_ID.PIGEON_ID, Constants.CAN_ID.DRIVE_CANBUS);
+                SwerveDriveSubsystem subsystem = new SwerveDriveSubsystem(
+                        Constants.CAN_ID.PIGEON_ID,
+                        new int[] {
+                                Constants.CAN_ID.FRONT_LEFT_MODULE_DRIVE_MOTOR_ID,
+                                Constants.CAN_ID.FRONT_LEFT_MODULE_STEER_MOTOR_ID,
+                                Constants.CAN_ID.FRONT_LEFT_MODULE_STEER_ENCODER_ID
+                        },new int[] {
+                                Constants.CAN_ID.FRONT_RIGHT_MODULE_DRIVE_MOTOR_ID,
+                                Constants.CAN_ID.FRONT_RIGHT_MODULE_STEER_MOTOR_ID,
+                                Constants.CAN_ID.FRONT_RIGHT_MODULE_STEER_ENCODER_ID
+                        },
+                        new int[] {
+                                Constants.CAN_ID.BACK_LEFT_MODULE_DRIVE_MOTOR_ID,
+                                Constants.CAN_ID.BACK_LEFT_MODULE_STEER_MOTOR_ID,
+                                Constants.CAN_ID.BACK_LEFT_MODULE_STEER_ENCODER_ID
+                        },
+                        new int[] {
+                                Constants.CAN_ID.BACK_RIGHT_MODULE_DRIVE_MOTOR_ID,
+                                Constants.CAN_ID.BACK_RIGHT_MODULE_STEER_MOTOR_ID,
+                                Constants.CAN_ID.BACK_RIGHT_MODULE_STEER_ENCODER_ID
+                        },
+                        Constants.CAN_ID.DRIVE_CANBUS,
+                        Constants.DRIVE.SWERVE_MODULE_SHUFFLEBOARD_TAB_NAME
+                );
+                subsystem.configure(Constants.DRIVE.GET_SWERVE_DRIVE_CONFIG());
 
-        SwerveModule frontLeft = Mk4iSwerveModuleHelper.createFalcon500(
-                tab.getLayout("Front Left Module", BuiltInLayouts.kList)
-                        .withSize(2, 4)
-                        .withPosition(0, 0),
-                Mk4iSwerveModuleHelper.GearRatio.L2,
-                Constants.CAN_ID.FRONT_LEFT_MODULE_DRIVE_MOTOR_ID,
-                Constants.CAN_ID.FRONT_LEFT_MODULE_STEER_MOTOR_ID,
-                Constants.CAN_ID.FRONT_LEFT_MODULE_STEER_ENCODER_ID,
-                // the canbus the module is on
-                Constants.CAN_ID.DRIVE_CANBUS,
-                Constants.DRIVE.FRONT_LEFT_MODULE_STEER_OFFSET);
+                return subsystem;
+        }
 
-        SwerveModule frontRight = Mk4iSwerveModuleHelper.createFalcon500(
-                tab.getLayout("Front Right Module", BuiltInLayouts.kList)
-                        .withSize(2, 4)
-                        .withPosition(2, 0),
-                Mk4iSwerveModuleHelper.GearRatio.L2,
-                Constants.CAN_ID.FRONT_RIGHT_MODULE_DRIVE_MOTOR_ID,
-                Constants.CAN_ID.FRONT_RIGHT_MODULE_STEER_MOTOR_ID,
-                Constants.CAN_ID.FRONT_RIGHT_MODULE_STEER_ENCODER_ID,
-                // the canbus the module is on
-                Constants.CAN_ID.DRIVE_CANBUS,
-                Constants.DRIVE.FRONT_RIGHT_MODULE_STEER_OFFSET);
+        public IntakeRollerSubsystem CreateIntakeRollerSubsystem() {
+                IntakeRollerSubsystem subsystem = new IntakeRollerSubsystem(Constants.CAN_ID.MASTER_INTAKE_MOTOR_ID,
+                                Constants.CAN_ID.FOLLOWER_INTAKE_MOTOR_ID);
+                subsystem.configure(Constants.INTAKE_ROLLER.GET_INTAKE_CONFIG());
+                return subsystem;
+        }
 
-        SwerveModule backLeft = Mk4iSwerveModuleHelper.createFalcon500(
-                tab.getLayout("Back Left Module", BuiltInLayouts.kList)
-                        .withSize(2, 4)
-                        .withPosition(4, 0),
-                Mk4iSwerveModuleHelper.GearRatio.L2,
-                Constants.CAN_ID.BACK_LEFT_MODULE_DRIVE_MOTOR_ID,
-                Constants.CAN_ID.BACK_LEFT_MODULE_STEER_MOTOR_ID,
-                Constants.CAN_ID.BACK_LEFT_MODULE_STEER_ENCODER_ID,
-                // the canbus the module is on
-                Constants.CAN_ID.DRIVE_CANBUS,
-                Constants.DRIVE.BACK_LEFT_MODULE_STEER_OFFSET);
+        public ClawSubsystem CreateEverybotClawSubsystem() {
+                ClawSubsystem subsystem = new ClawSubsystem(Constants.CAN_ID.WRIST_ROTATION_MOTOR_ID);
+                subsystem.configure(Constants.CLAW.GET_CLAW_CONFIG());
+                return subsystem;
+        }
 
-        SwerveModule backRight = Mk4iSwerveModuleHelper.createFalcon500(
-                tab.getLayout("Back Right Module", BuiltInLayouts.kList)
-                        .withSize(2, 4)
-                        .withPosition(6, 0),
-                Mk4iSwerveModuleHelper.GearRatio.L2,
-                Constants.CAN_ID.BACK_RIGHT_MODULE_DRIVE_MOTOR_ID,
-                Constants.CAN_ID.BACK_RIGHT_MODULE_STEER_MOTOR_ID,
-                Constants.CAN_ID.BACK_RIGHT_MODULE_STEER_ENCODER_ID,
-                // the canbus the module is on
-                Constants.CAN_ID.DRIVE_CANBUS,
-                Constants.DRIVE.BACK_RIGHT_MODULE_STEER_OFFSET);
+        public WristSubsystem CreateEverybotWristSubsystem() {
+                WristSubsystem subsystem = new WristSubsystem(Constants.CAN_ID.CLAW_ROLLER_MOTOR_ID);
+                subsystem.configure(Constants.WRIST.GET_WRIST_CONFIG());
+                return subsystem;
+        }
 
-        SwerveDriveSubsystem subsystem = new SwerveDriveSubsystem(pigeon, frontLeft, frontRight, backLeft,
-                backRight);
-        subsystem.configure(Constants.DRIVE.GET_SWERVE_DRIVE_CONFIG());
+        public IntakeArmSubsystem CreateIntakeArmSubsystem() {
+                IntakeArmSubsystem subsystem = new IntakeArmSubsystem(Constants.PH_ID.INTAKE_SOLENOID_FORWARD_CHANNEL,
+                                Constants.PH_ID.INTAKE_SOLENOID_REVERSE_CHANNEL, Constants.CAN_ID.INTAKE_WINCH_MOTOR_ID);
+                subsystem.configure(Constants.INTAKE_ARM.GET_INTAKE_ARM_CONFIG());
+                return subsystem;
+        }
 
-        return subsystem;
-    }
+        public ArmRotationSubsystem CreateArmRotationSubsystem() {
+                ArmRotationSubsystem subsystem = new ArmRotationSubsystem(Constants.CAN_ID.ARM_ROTATION_MOTOR_ID);
+                subsystem.configure(Constants.ARM_ROTATION.GET_ROTATION_CONFIG());
+                return subsystem;
+        }
 
-    public IntakeSubsystem CreateIntakeSubsystem() {
-        IntakeSubsystem subsystem = new IntakeSubsystem();
-        subsystem.configure(Constants.INTAKE.GET_INTAKE_CONFIG());
-        return subsystem;
-    }
-
-    public WristSubsystem CreateWristSubsystem() {
-        DoubleSolenoid wristSolenoid = new DoubleSolenoid(Constants.CAN_ID.PNEUMATICS_HUB_ID,
-                PneumaticsModuleType.REVPH, Constants.PH_ID.WRIST_SOLENOID_FORWARD_CHANNEL,
-                Constants.PH_ID.WRIST_SOLENOID_REVERSE_CHANNEL);
-        WristSubsystem subsystem = new WristSubsystem(wristSolenoid);
-        subsystem.configure(Constants.WRIST.GET_WRIST_CONFIG());
-        return subsystem;
-    }
-
-    public ClawSubsystem CreateClawSubsystem() {
-        DoubleSolenoid clawSolenoid = new DoubleSolenoid(Constants.CAN_ID.PNEUMATICS_HUB_ID,
-                PneumaticsModuleType.REVPH, Constants.PH_ID.CLAW_SOLENOID_FORWARD_CHANNEL,
-                Constants.PH_ID.CLAW_SOLENOID_REVERSE_CHANNEL);
-
-        ClawSubsystem subsystem = new ClawSubsystem(clawSolenoid);
-        subsystem.configure(Constants.CLAW.GET_CLAW_CONFIG());
-        return subsystem;
-    }
+        public ArmExtensionSubsystem CreateArmExtensionSubsystem() {
+                ArmExtensionSubsystem subsystem = new ArmExtensionSubsystem(Constants.CAN_ID.ARM_EXTENSION_MOTOR_ID);
+                subsystem.configure(Constants.ARM_EXTENSION.GET_EXTENSION_CONFIG());
+                return subsystem;
+        }
+        
+        public DualLimelightManagerSubsystem CreateDualLimelightManagerSubsystem(){
+                DualLimelightManagerSubsystem manager = new DualLimelightManagerSubsystem(
+                        Constants.LIMELIGHT.LEFT_LIMELIGHT_NAME, Constants.LIMELIGHT.RIGHT_LIMELIGHT_NAME,
+                        Constants.LIMELIGHT.LEFT_LIMELIGHT_TX_SETPOINT, Constants.LIMELIGHT.RIGHT_LIMELIGHT_TX_SETPOINT);
+                return manager;
+        }
 }

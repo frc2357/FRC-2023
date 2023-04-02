@@ -1,8 +1,8 @@
 #include <XInput.h>
 #include "Adafruit_Keypad.h"
 
-const byte ROWS = 4; // rows
-const byte COLS = 4; // columns
+const byte ROWS = 3; // rows
+const byte COLS = 9; // columns
 //define the symbols on the buttons of the keypads
 char keys[ROWS][COLS] = {
   {'1','2','3','4','5','6','7','8','9'},

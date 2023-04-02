@@ -6,35 +6,45 @@ package com.team2357.frc2023.subsystems;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.ErrorCode;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
-import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlannerTrajectory;
 import com.swervedrivespecialties.swervelib.AbsoluteEncoder;
+import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
+import com.team2357.frc2023.apriltag.AprilTagEstimate;
+import com.team2357.frc2023.subsystems.DualLimelightManagerSubsystem.LIMELIGHT;
+import com.team2357.lib.subsystems.ClosedLoopSubsystem;
+import com.team2357.lib.subsystems.LimelightSubsystem;
+import com.team2357.lib.util.Utility;
 
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.networktables.DoubleArraySubscriber;
-import edu.wpi.first.networktables.DoubleArrayTopic;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.PubSubOption;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class SwerveDriveSubsystem extends SubsystemBase {
+public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	private static SwerveDriveSubsystem instance = null;
 
-	private boolean m_isZeroed;
+	private boolean m_areEncodersSynced;
 
 	public static SwerveDriveSubsystem getInstance() {
 		return instance;
@@ -53,13 +63,14 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
 	private Configuration m_config;
 
-	private SwerveDriveOdometry m_odometry;
+	private SwerveDrivePoseEstimator m_poseEstimator;
 
-	private PathConstraints m_pathConstraints;
+	// The current path the robot is running
+	private PathPlannerTrajectory m_currentTrajectory;
+	// Time when trajectory starts
+	private double m_trajectoryStartSeconds;
 
-	public NetworkTable m_limelightTable;
-	public DoubleArrayTopic m_limelightInfo;
-	private DoubleArraySubscriber m_limelightSubscriber;
+	private Twist2d m_fieldVelocity;
 
 	public static class Configuration {
 		/**
@@ -98,10 +109,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
 		public double m_maxAngularAccelerationRadiansPerSecondSquared;
 
-		public double m_trajectoryMaxVelocityMetersPerSecond;
-
-		public double m_trajectoryMaxAccelerationMetersPerSecond;
-
+		// Trajectory PID controllers
 		public PIDController m_xController;
 		public PIDController m_yController;
 		public PIDController m_thetaController;
@@ -113,26 +121,89 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		 * moduleConfiguration.getSteerReduction()
 		 */
 		public double m_sensorPositionCoefficient;
+
+		// Standard deviations for pose estimation
+		public Matrix<N3, N1> m_stateStdDevs;
+		public Matrix<N3, N1> m_visionMeasurementStdDevs;
+
+		/**
+		 * Error tolerance in meters for vision estimate from encoder estimate in meters
+		 */
+		public double m_visionToleranceMeters;
+
+		/**
+		 * Profiled PID controller for translation for autoAlign
+		 */
+		public ProfiledPIDController m_autoAlignDriveController;
+
+		/**
+		 * Profiled PID controller for rotation for autoAlign
+		 */
+		public ProfiledPIDController m_autoAlignThetaController;
 	}
 
-	public SwerveDriveSubsystem(WPI_Pigeon2 pigeon, SwerveModule frontLeft, SwerveModule frontRight,
-			SwerveModule backLeft, SwerveModule backRight) {
-		m_pigeon = pigeon;
+	public SwerveDriveSubsystem(int pigeonId, int[] frontLeftIds, int[] frontRightIds,
+			int[] backLeftIds, int[] backRightIds, String canbus, String shuffleboardTab) {
+		ShuffleboardTab tab = Shuffleboard.getTab(shuffleboardTab);
 
-		m_frontLeftModule = frontLeft;
-		m_frontRightModule = frontRight;
-		m_backLeftModule = backLeft;
-		m_backRightModule = backRight;
+		m_pigeon = new WPI_Pigeon2(pigeonId, canbus);
 
-		m_limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
-		m_limelightInfo = m_limelightTable.getDoubleArrayTopic("botpose");
-		m_limelightSubscriber = m_limelightInfo.subscribe(null, PubSubOption.keepDuplicates(true));
+		m_frontLeftModule = Mk4iSwerveModuleHelper.createFalcon500(
+				tab.getLayout("Front Left Module", BuiltInLayouts.kList)
+						.withSize(2, 4)
+						.withPosition(0, 0),
+				Mk4iSwerveModuleHelper.GearRatio.L2,
+				frontLeftIds[0],
+				frontLeftIds[1],
+				frontLeftIds[2],
+				canbus,
+				0 // Offsets are set manually so this parameter is unnecessary
+		);
 
+		m_frontRightModule = Mk4iSwerveModuleHelper.createFalcon500(
+				tab.getLayout("Front Right Module", BuiltInLayouts.kList)
+						.withSize(2, 4)
+						.withPosition(2, 0),
+				Mk4iSwerveModuleHelper.GearRatio.L2,
+				frontRightIds[0],
+				frontRightIds[1],
+				frontRightIds[2],
+				canbus,
+				0 // Offsets are set manually so this parameter is unnecessary
+		);
+
+		m_backLeftModule = Mk4iSwerveModuleHelper.createFalcon500(
+				tab.getLayout("Back Left Module", BuiltInLayouts.kList)
+						.withSize(2, 4)
+						.withPosition(4, 0),
+				Mk4iSwerveModuleHelper.GearRatio.L2,
+				backLeftIds[0],
+				backLeftIds[1],
+				backLeftIds[2],
+				canbus,
+				0 // Offsets are set manually so this parameter is unnecessary
+		);
+
+		m_backRightModule = Mk4iSwerveModuleHelper.createFalcon500(
+				tab.getLayout("Back Right Module", BuiltInLayouts.kList)
+						.withSize(2, 4)
+						.withPosition(6, 0),
+				Mk4iSwerveModuleHelper.GearRatio.L2,
+				backRightIds[0],
+				backRightIds[1],
+				backRightIds[2],
+				canbus,
+				0 // Offsets are set manually so this parameter is unnecessary
+		);
+
+		m_fieldVelocity = new Twist2d();
 		instance = this;
 	}
 
 	public void configure(Configuration config) {
 		m_config = config;
+
+		m_pigeon.configFactoryDefault();
 
 		m_kinematics = new SwerveDriveKinematics(
 				new Translation2d(m_config.m_trackwidthMeters / 2.0,
@@ -144,13 +215,12 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 				new Translation2d(-m_config.m_trackwidthMeters / 2.0,
 						-m_config.m_wheelbaseMeters / 2.0));
 
-		m_odometry = new SwerveDriveOdometry(m_kinematics, getGyroscopeRotation(),
+		m_poseEstimator = new SwerveDrivePoseEstimator(m_kinematics, getGyroscopeRotation(),
 				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
 						m_frontRightModule.getPosition(),
-						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
-
-		m_pathConstraints = new PathConstraints(m_config.m_trajectoryMaxVelocityMetersPerSecond,
-				m_config.m_trajectoryMaxAccelerationMetersPerSecond);
+						m_backLeftModule.getPosition(), m_backRightModule.getPosition() },
+				new Pose2d(0.0, 0.0, getGyroscopeRotation()), m_config.m_stateStdDevs,
+				m_config.m_visionMeasurementStdDevs);
 	}
 
 	public PIDController getXController() {
@@ -165,76 +235,82 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 		return m_config.m_thetaController;
 	}
 
+	public ProfiledPIDController getAutoAlignDriveController() {
+		return m_config.m_autoAlignDriveController;
+	}
+
+	public ProfiledPIDController getAutoAlignThetaController() {
+		return m_config.m_autoAlignThetaController;
+	}
+
+	public Twist2d getFieldVelocity() {
+		return m_fieldVelocity;
+	}
+
 	public SwerveDriveKinematics getKinematics() {
 		return m_kinematics;
 	}
 
-	public PathConstraints getPathConstraints() {
-		return m_pathConstraints;
+	public void syncEncoders() {
+		syncEncoder(m_frontLeftModule);
+		syncEncoder(m_frontRightModule);
+		syncEncoder(m_backLeftModule);
+		syncEncoder(m_backRightModule);
 	}
 
-	public boolean isReadyToZero() {
-		if (isReadyToZero(m_frontLeftModule) && isReadyToZero(m_frontRightModule) && isReadyToZero(m_backLeftModule)
-				&& isReadyToZero(m_backRightModule)) {
-			return true;
-		}
-		return false;
-	}
-
-	private boolean isReadyToZero(SwerveModule module) {
-		WPI_TalonFX steerMotor;
-		steerMotor = (WPI_TalonFX) (module.getSteerMotor());
+	private void syncEncoder(SwerveModule module) {
+		TalonFX steerMotor = (TalonFX) (module.getSteerMotor());
 
 		double absoluteAngle = module.getSteerEncoder().getAbsoluteAngle();
-		((WPI_TalonFX) (module.getSteerMotor()))
-				.setSelectedSensorPosition(absoluteAngle / m_config.m_sensorPositionCoefficient);
-
-		return isEncoderSynced(steerMotor, module.getSteerEncoder());
+		ErrorCode error = steerMotor.setSelectedSensorPosition(absoluteAngle / m_config.m_sensorPositionCoefficient);
+		if (error != ErrorCode.OK)
+			System.out
+					.println("Sensor position unsuccessfully set on motor " + steerMotor.getDeviceID() + ": " + error);
 	}
 
-	private boolean isEncoderSynced(WPI_TalonFX steerMotor, AbsoluteEncoder steerEncoder) {
+	private boolean isEncoderSynced(SwerveModule module) {
+		TalonFX steerMotor = (TalonFX) (module.getSteerMotor());
+		AbsoluteEncoder steerEncoder = module.getSteerEncoder();
+
 		double difference = Math.abs(steerMotor.getSelectedSensorPosition() * m_config.m_sensorPositionCoefficient
 				- steerEncoder.getAbsoluteAngle());
 		difference %= Math.PI;
-		System.out.println(difference);
+		// System.out.println(difference);
 		return difference < Constants.DRIVE.ENCODER_SYNC_ACCURACY_RADIANS
 				|| Math.abs(difference - Math.PI) < Constants.DRIVE.ENCODER_SYNC_ACCURACY_RADIANS;
 	}
 
-	public void zero() {
-		SwerveModuleState state = new SwerveModuleState(0.0, Rotation2d.fromDegrees(0.0));
+	public boolean checkEncodersSynced() {
+		m_areEncodersSynced = ((isEncoderSynced(m_frontLeftModule)) &&
+				(isEncoderSynced(m_frontRightModule)) &&
+				(isEncoderSynced(m_backLeftModule)) &&
+				(isEncoderSynced(m_backRightModule)));
 
-		m_frontLeftModule.set(
-				state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
-				state.angle.getRadians());
-		m_frontRightModule.set(
-				state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
-				state.angle.getRadians());
-		m_backLeftModule.set(
-				state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
-				state.angle.getRadians());
-		m_backRightModule.set(
-				state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
-				state.angle.getRadians());
+		return m_areEncodersSynced;
 	}
 
-	public void checkEncodersSynced() {
-		m_isZeroed = ((isEncoderSynced((WPI_TalonFX) m_frontLeftModule.getSteerMotor(),
-				m_frontLeftModule.getSteerEncoder())) &&
-				(isEncoderSynced((WPI_TalonFX) m_frontRightModule.getSteerMotor(),
-						m_frontRightModule.getSteerEncoder()))
-				&&
-				(isEncoderSynced((WPI_TalonFX) m_backLeftModule.getSteerMotor(), m_backLeftModule.getSteerEncoder())) &&
-				(isEncoderSynced((WPI_TalonFX) m_backRightModule.getSteerMotor(),
-						m_backRightModule.getSteerEncoder())));
+	public boolean getIsEncodersSynced() {
+		return m_areEncodersSynced;
 	}
 
 	public void zeroGyroscope() {
 		m_pigeon.reset();
 	}
 
+	public void setGyroScope(double degrees) {
+		m_pigeon.setYaw(degrees);
+	}
+
 	public double getYaw() {
 		return m_pigeon.getYaw();
+	}
+
+	public double getYaw0To360() {
+		double yaw = getYaw() % 360;
+		while (yaw < 0) {
+			yaw += 360;
+		}
+		return yaw;
 	}
 
 	public double getPitch() {
@@ -246,16 +322,17 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	}
 
 	public Rotation2d getGyroscopeRotation() {
-		return Rotation2d.fromDegrees(m_pigeon.getYaw());
+		return Rotation2d.fromDegrees(getYaw());
 	}
 
 	public Pose2d getPose() {
-		return m_odometry.getPoseMeters();
+		return m_poseEstimator.getEstimatedPosition();
 	}
 
-	public void resetOdometry(Pose2d pose) {
-		m_odometry.resetPosition(
-				getGyroscopeRotation(),
+	public void resetPoseEstimator(Pose2d pose) {
+		setGyroScope(pose.getRotation().getDegrees());
+		m_poseEstimator.resetPosition(
+				pose.getRotation(),
 				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
 						m_frontRightModule.getPosition(),
 						m_backLeftModule.getPosition(), m_backRightModule.getPosition() },
@@ -273,11 +350,149 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 	}
 
 	public void drive(ChassisSpeeds chassisSpeeds) {
-		if (!m_isZeroed) {
-			DriverStation.reportError("Swerve is not zeroed", false);
+		if (!m_areEncodersSynced) {
+			DriverStation.reportError("Swerve is not synced", false);
+			syncEncoders();
+			checkEncodersSynced();
 			return;
 		}
+
 		m_chassisSpeeds = chassisSpeeds;
+	}
+
+	public void setCurrentTrajectory(PathPlannerTrajectory trajectory) {
+		m_currentTrajectory = trajectory;
+		m_trajectoryStartSeconds = Timer.getFPGATimestamp();
+	}
+
+	public void endTrajectory() {
+		m_currentTrajectory = null;
+		m_trajectoryStartSeconds = 0;
+	}
+
+	public void updatePoseEstimator() {
+
+		LimelightSubsystem leftLL = DualLimelightManagerSubsystem.getInstance().getLimelight(LIMELIGHT.LEFT);
+		LimelightSubsystem rightLL = DualLimelightManagerSubsystem.getInstance().getLimelight(LIMELIGHT.RIGHT);
+
+		Pose2d leftPose = leftLL.getCurrentAllianceLimelightPose();
+		Pose2d rightPose = rightLL.getCurrentAllianceLimelightPose();
+
+		double leftTime = leftLL.getCurrentAllianceBotposeTimestamp();
+		double rightTime = rightLL.getCurrentAllianceBotposeTimestamp();
+
+		if (leftPose != null) {
+			addVisionPoseEstimate(leftPose, leftTime);
+		}
+
+		if (rightPose != null) {
+			addVisionPoseEstimate(rightPose, rightTime);
+		}
+
+		m_poseEstimator.update(getGyroscopeRotation(),
+				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
+						m_frontRightModule.getPosition(),
+						m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
+	}
+
+	public void addVisionPoseEstimate(AprilTagEstimate estimate) {
+
+		if (estimate == null) {
+			return;
+		}
+
+		Pose2d pose = estimate.getPose();
+		addVisionPoseEstimate(pose, estimate.getTimeStamp());
+	}
+
+	/**
+	 * 
+	 * @param pose      The estimated pose from vision
+	 * @param timestamp Timestamp of the vision pose
+	 */
+	public void addVisionPoseEstimate(Pose2d pose, double timestamp) {
+
+		if (pose == null) {
+			return;
+		}
+
+		Logger.getInstance().recordOutput("Vision timestamp error", Timer.getFPGATimestamp() - timestamp);
+		if (Utility.isWithinTolerance(pose.getRotation().getDegrees(), getYaw(), 15)) {
+
+			if (m_currentTrajectory != null) {
+				Pose2d trajPose = m_currentTrajectory.sample(timestamp - m_trajectoryStartSeconds).poseMeters;
+				if (!Utility.isWithinTolerance(pose.getX(), trajPose.getX(),
+						m_config.m_visionToleranceMeters) ||
+						!Utility.isWithinTolerance(pose.getY(), trajPose.getY(),
+								m_config.m_visionToleranceMeters)) {
+					Logger.getInstance().recordOutput("Vision Pose", "Thrown");
+					return;
+				}
+			}
+
+			Logger.getInstance().recordOutput("Left limelight botpose filtered", pose);
+			m_poseEstimator.addVisionMeasurement(pose, timestamp);
+			Logger.getInstance().recordOutput("Vision Pose", "Added");
+
+		} else {
+			Logger.getInstance().recordOutput("Vision Pose", "Thrown");
+		}
+	}
+
+	public double getTilt(double yaw) {
+		double angle = 0;
+		if ((0 <= yaw && yaw < 45) || (315 <= yaw && yaw <= 360)) {
+			angle = getRoll();
+		} else if (45 <= yaw && yaw < 135) {
+			angle = getPitch();
+		} else if (135 <= yaw && yaw < 225) {
+			angle = getRoll();
+		} else if (225 <= yaw && yaw < 315) {
+			angle = getPitch();
+		}
+
+		return angle;
+	}
+
+	public int getDirection(double yaw) {
+		int direction = 0;
+		if ((0 <= yaw && yaw < 45) || (315 <= yaw && yaw <= 360)) {
+			direction = 1;
+		} else if (45 <= yaw && yaw < 135) {
+			direction = -1;
+		} else if (135 <= yaw && yaw < 225) {
+			direction = -1;
+		} else if (225 <= yaw && yaw < 315) {
+			direction = 1;
+		}
+		return direction;
+	}
+
+	private void updateFieldVelocity() {
+		Translation2d linearFieldVelocity = new Translation2d(m_chassisSpeeds.vxMetersPerSecond,
+				m_chassisSpeeds.vyMetersPerSecond)
+				.rotateBy(getPose().getRotation());
+
+		m_fieldVelocity = new Twist2d(
+				linearFieldVelocity.getX(),
+				linearFieldVelocity.getY(),
+				Math.toRadians(m_pigeon.getRate()));
+	}
+	
+	@Override
+	public void periodic() {
+		updatePoseEstimator();
+
+		// SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
+
+		// SmartDashboard.putNumber("Yaw", m_pigeon.getYaw());
+		// SmartDashboard.putNumber("Pose X",
+		// m_poseEstimator.getEstimatedPosition().getX());
+		// SmartDashboard.putNumber("Pose Y",
+		// m_poseEstimator.getEstimatedPosition().getY());
+		// SmartDashboard.putNumber("Pose Angle",
+		// m_poseEstimator.getEstimatedPosition().getRotation().getDegrees());
+
 		SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
 		SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxVelocityMetersPerSecond);
 
@@ -294,70 +509,28 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 				states[3].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
 				states[3].angle.getRadians());
 
-		Logger.getInstance().recordOutput("Swerve States", states);
+		Logger.getInstance().recordOutput("Swerve Setpoints", states);
+		SwerveModuleState[] loggingSwerveStates = states;
+		loggingSwerveStates[0] = m_frontLeftModule.getState();
+		loggingSwerveStates[1] = m_frontRightModule.getState();
+		loggingSwerveStates[2] = m_backLeftModule.getState();
+		loggingSwerveStates[3] = m_backRightModule.getState();
+		Logger.getInstance().recordOutput("Swerve Speed", loggingSwerveStates);
+		Logger.getInstance().recordOutput("Robot Pose", getPose());
+
+		updateFieldVelocity();
 	}
 
-	public void setOdemetryFromApriltag() {
-		double[] vals = m_limelightSubscriber.get();
-		if (vals.length >= 2) {
-			Translation2d t2d = new Translation2d(vals[0], vals[1]);
-			Rotation2d r2d = new Rotation2d(getYaw());
-			Pose2d p2d = new Pose2d(t2d, r2d);
-			resetOdometry(p2d);
-		} else {
-			DriverStation.reportError("No AprilTag target", false);
-		}
-	}
+	public void printEncoderVals() {
+		SmartDashboard.putNumber("front left encoder count",
+				((TalonFX) (m_frontLeftModule.getDriveMotor())).getSelectedSensorPosition(0));
 
-	public void balance() {
-		double yaw, direction, angle, error, power;
-		angle = 0;
-		direction = 0;
+		SmartDashboard.putNumber("front right encoder count",
+				((TalonFX) (m_frontRightModule.getDriveMotor())).getSelectedSensorPosition(0));
+		SmartDashboard.putNumber("back left module encoder count",
+				((TalonFX) (m_backLeftModule.getDriveMotor())).getSelectedSensorPosition(0));
+		SmartDashboard.putNumber("back right module encoder count",
+				((TalonFX) (m_backRightModule.getDriveMotor())).getSelectedSensorPosition(0));
 
-		yaw = Math.abs(getYaw() % 360);
-
-		if ((0 <= yaw && yaw < 45) || (315 <= yaw && yaw <= 360)) {
-			direction = 1;
-			angle = getRoll();
-		} else if (45 <= yaw && yaw < 135) {
-			direction = 1;
-			angle = getPitch();
-		} else if (135 <= yaw && yaw < 225) {
-			direction = -1;
-			angle = getRoll();
-		} else if (225 <= yaw && yaw < 315) {
-			direction = -1;
-			angle = getPitch();
-		}
-
-		if (angle > Constants.DRIVE.BALANCE_FULL_TILT_DEGREES) {
-			return;
-		}
-
-		error = Math.copySign(Constants.DRIVE.BALANCE_LEVEL_DEGREES + Math.abs(angle), angle);
-		power = Math.min(Math.abs(Constants.DRIVE.BALANCE_KP * error), Constants.DRIVE.BALANCE_MAX_POWER);
-		power = Math.copySign(power, error);
-
-		power *= direction;
-
-		drive(power, 0, 0);
-	}
-
-	@Override
-	public void periodic() {
-		// m_odometry.update(getGyroscopeRotation(),
-		// new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
-		// m_frontRightModule.getPosition(),
-		// m_backLeftModule.getPosition(), m_backRightModule.getPosition() });
-		setOdemetryFromApriltag();
-
-		SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
-
-		SmartDashboard.putNumber("Yaw", m_pigeon.getYaw());
-		SmartDashboard.putNumber("Pose X", m_odometry.getPoseMeters().getX());
-		SmartDashboard.putNumber("Pose Y", m_odometry.getPoseMeters().getY());
-		SmartDashboard.putNumber("Pose Angle", m_odometry.getPoseMeters().getRotation().getDegrees());
-
-		Logger.getInstance().recordOutput("Robot Pose", m_odometry.getPoseMeters());
 	}
 }

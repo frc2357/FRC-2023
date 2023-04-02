@@ -1,0 +1,24 @@
+
+
+# Set timeout, clear error
+
+||v1||{"timeoutMs":9999999,"error":""}
+
+
+# Red Alliance
+
+||v1||{"sensors":{"alliance":{"value":"red"}}}
+
+# Blue Alliance
+
+||v1||{"sensors":{"alliance":{"value":"blue"}}}
+
+# Clear grid
+
+||v1||{"sensors":{"grid":{"value":"---------------------------"}}}
+
+
+# Link opportunities
+
+||v1||{"sensors":{"grid":{"value":"---AO-A--------------OO----"}}}
+
