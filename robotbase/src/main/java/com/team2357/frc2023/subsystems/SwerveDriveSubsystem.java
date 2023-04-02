@@ -24,11 +24,13 @@ import com.team2357.lib.util.Utility;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -109,6 +111,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	private PathPlannerTrajectory m_currentTrajectory;
 	// Time when trajectory starts
 	private double m_trajectoryStartSeconds;
+
+	private Twist2d m_fieldVelocity;
 
 	public static class Configuration {
 		/**
@@ -207,6 +211,16 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		 * Error tolerance in meters for vision estimate from encoder estimate in meters
 		 */
 		public double m_visionToleranceMeters;
+
+		/**
+		 * Profiled PID controller for translation for autoAlign
+		 */
+		public ProfiledPIDController m_autoAlignDriveController;
+
+		/**
+		 * Profiled PID controller for rotation for autoAlign
+		 */
+		public ProfiledPIDController m_autoAlignThetaController;
 	}
 
 	public SwerveDriveSubsystem(int pigeonId, int[] frontLeftIds, int[] frontRightIds,
@@ -264,6 +278,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		);
 
 		m_targetColumn = COLUMN_TARGET.NONE;
+		m_fieldVelocity = new Twist2d();
 		instance = this;
 	}
 
@@ -303,6 +318,18 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	public PIDController getThetaController() {
 		return m_config.m_thetaController;
+	}
+
+	public ProfiledPIDController getAutoAlignDriveController() {
+		return m_config.m_autoAlignDriveController;
+	}
+
+	public ProfiledPIDController getAutoAlignThetaController() {
+		return m_config.m_autoAlignThetaController;
+	}
+
+	public Twist2d getFieldVelocity() {
+		return m_fieldVelocity;
 	}
 
 	public SwerveDriveKinematics getKinematics() {
@@ -365,7 +392,9 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	public double getYaw0To360() {
 		double yaw = getYaw() % 360;
-		yaw += yaw < 0 ? 360 : 0;
+		while (yaw < 0) {
+			yaw += 360;
+		}
 		return yaw;
 	}
 
@@ -472,20 +501,6 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 			return;
 		}
 
-		// System.out.println(
-		// "Vision x: " + pose.getX() + ", Y: " + pose.getY() + ", Rot: " +
-		// pose.getRotation().getDegrees());
-
-		Pose2d robotPose = getPose();
-		// System.out.println(
-		// "robot x: " + robotPose.getX() + ", Y: " + robotPose.getY() + ", Rot: "
-		// + robotPose.getRotation().getDegrees());
-
-		double xError = robotPose.getX() - pose.getX();
-		double yError = robotPose.getY() - pose.getY();
-
-		// System.out.println("Error X: " + xError + " Y: " + yError);
-
 		Logger.getInstance().recordOutput("Vision timestamp error", Timer.getFPGATimestamp() - timestamp);
 		if (Utility.isWithinTolerance(pose.getRotation().getDegrees(), getYaw(), 15)) {
 
@@ -508,7 +523,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 			Logger.getInstance().recordOutput("Vision Pose", "Thrown");
 		}
 	}
-	
+
 	public double getTilt(double yaw) {
 		double angle = 0;
 		if ((0 <= yaw && yaw < 45) || (315 <= yaw && yaw <= 360)) {
@@ -699,6 +714,17 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		drive(0, 0, 0);
 	}
 
+	private void updateFieldVelocity() {
+		Translation2d linearFieldVelocity = new Translation2d(m_chassisSpeeds.vxMetersPerSecond,
+				m_chassisSpeeds.vyMetersPerSecond)
+				.rotateBy(getPose().getRotation());
+
+		m_fieldVelocity = new Twist2d(
+				linearFieldVelocity.getX(),
+				linearFieldVelocity.getY(),
+				Math.toRadians(m_pigeon.getRate()));
+	}
+
 	@Override
 	public void periodic() {
 		updatePoseEstimator();
@@ -743,6 +769,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		if (isClosedLoopEnabled() && isTracking()) {
 			trackingPeriodic();
 		}
+
+		updateFieldVelocity();
 	}
 
 	public void printEncoderVals() {
