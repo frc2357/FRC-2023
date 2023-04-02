@@ -5,6 +5,7 @@ import com.team2357.frc2023.commands.intake.IntakeCubeCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakePreSignalConeCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakePreSignalCubeCommandGroup;
 import com.team2357.frc2023.commands.scoring.AutoLineupCommand;
+import com.team2357.frc2023.commands.scoring.DriverAutoScoreCommand;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.lib.triggers.AxisThresholdTrigger;
 import com.team2357.lib.util.XboxRaw;
@@ -76,6 +77,7 @@ public class SwerveDriveControls {
 
         // Auto score
         m_aButton.whileTrue(new AutoLineupCommand(m_controller));
+        m_bButton.whileTrue(new DriverAutoScoreCommand());
     }
 
     public double getX() {

@@ -7,13 +7,15 @@ import com.team2357.frc2023.subsystems.DualLimelightManagerSubsystem;
 import com.team2357.frc2023.util.Utility;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class AutoLineupCommand extends CommandBase {
 
     DriveToPoseCommand m_driveToPose;
+    Command m_preposeCommand;
     Pose2d m_targetPose;
     XboxController m_controller;
 
@@ -24,8 +26,12 @@ public class AutoLineupCommand extends CommandBase {
     @Override
     public void initialize() {
         int targetCol = Buttonboard.getInstance().getColValue();
+        int targetRow = Buttonboard.getInstance().getRowValue();
         m_targetPose = Utility.gridColumnToTargetPose(targetCol);
         m_driveToPose = null;
+        m_preposeCommand = Utility.getPreposeCommand(targetRow, targetCol);
+        
+        m_preposeCommand.schedule();
     }
 
     @Override
@@ -42,6 +48,7 @@ public class AutoLineupCommand extends CommandBase {
                m_controller.setRumble(RumbleType.kBothRumble, Constants.CONTROLLER.RUMBLE_INTENSITY);
             }
         }
+
     }
 
     @Override
