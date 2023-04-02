@@ -153,10 +153,10 @@ public final class Constants {
             config.m_visionToleranceMeters = 0.1524;
 
             config.m_autoAlignDriveController = new ProfiledPIDController(
-                2.0, 0.0, 0.0, new TrapezoidProfile.Constraints(2.5, 1.5));
+                8.0, 0.0, 0.0, new TrapezoidProfile.Constraints(2, 1));
 
             config.m_autoAlignThetaController = new ProfiledPIDController(
-                5.0, 0.0, 0.0, new TrapezoidProfile.Constraints(2, 1));  
+                6.0, 0.0, 0.0, new TrapezoidProfile.Constraints(2, 1));  
                     
             return config;
         }

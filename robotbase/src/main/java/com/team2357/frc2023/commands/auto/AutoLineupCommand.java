@@ -29,7 +29,7 @@ public class AutoLineupCommand extends CommandBase {
         if (m_driveToPose == null) {
             Pose2d visionPose = DualLimelightManagerSubsystem.getInstance().getLimelightPose2d();
             if (visionPose != null) {
-                if (visionPose.getTranslation().getDistance(m_targetPose.getTranslation()) <= 1) {
+                if (visionPose.getTranslation().getDistance(m_targetPose.getTranslation()) <= 3) {
 
                     m_driveToPose = new DriveToPoseCommand(visionPose, m_targetPose);
                     m_driveToPose.schedule();
