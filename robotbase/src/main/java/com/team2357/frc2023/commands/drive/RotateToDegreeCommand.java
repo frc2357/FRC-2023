@@ -1,4 +1,4 @@
-package com.team2357.frc2023.commands.auto;
+package com.team2357.frc2023.commands.drive;
 
 import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
