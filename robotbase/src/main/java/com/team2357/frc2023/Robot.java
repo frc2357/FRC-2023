@@ -10,10 +10,8 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import com.team2357.frc2023.commands.drive.SetCoastOnDisableCommand;
 import com.team2357.frc2023.commands.drive.SyncDriveEncodersCommand;
-import com.team2357.frc2023.commands.drive.ZeroDriveCommand;
-import com.team2357.frc2023.commands.intake.IntakeSolenoidExtendCommand;
-import com.team2357.frc2023.commands.util.ZeroAllCommand;
 import com.team2357.frc2023.networktables.Buttonboard;
 import com.team2357.frc2023.state.RobotState;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
@@ -34,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
  */
 public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
+  private Command m_setCoastCommand;
 
   private RobotContainer m_robotContainer;
 
@@ -63,6 +62,8 @@ public class Robot extends LoggedRobot {
 
     (new WaitCommand(3).andThen(new SyncDriveEncodersCommand())).schedule();
     new CountdownTimer().start();
+
+    m_setCoastCommand = new SetCoastOnDisableCommand();
   }
 
   /**
@@ -84,7 +85,8 @@ public class Robot extends LoggedRobot {
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
-      RobotState.disabledInit();
+    RobotState.disabledInit();
+    m_setCoastCommand.schedule();
   }
 
   @Override
@@ -93,6 +95,9 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    m_setCoastCommand.cancel();
+    SwerveDriveSubsystem.getInstance().setBrakeMode();
+
     Buttonboard.getInstance().setAlliance();
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
@@ -109,6 +114,8 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopInit() {
+    m_setCoastCommand.cancel();
+    SwerveDriveSubsystem.getInstance().setBrakeMode();
     Buttonboard.getInstance().setAlliance();
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
