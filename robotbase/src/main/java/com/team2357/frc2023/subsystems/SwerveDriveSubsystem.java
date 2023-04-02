@@ -714,6 +714,17 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		drive(0, 0, 0);
 	}
 
+	private void updateFieldVelocity() {
+		Translation2d linearFieldVelocity = new Translation2d(m_chassisSpeeds.vxMetersPerSecond,
+				m_chassisSpeeds.vyMetersPerSecond)
+				.rotateBy(getPose().getRotation());
+
+		m_fieldVelocity = new Twist2d(
+				linearFieldVelocity.getX(),
+				linearFieldVelocity.getY(),
+				Math.toRadians(m_pigeon.getRate()));
+	}
+
 	@Override
 	public void periodic() {
 		updatePoseEstimator();
@@ -759,14 +770,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 			trackingPeriodic();
 		}
 
-		Translation2d linearFieldVelocity = new Translation2d(m_chassisSpeeds.vxMetersPerSecond,
-				m_chassisSpeeds.vyMetersPerSecond)
-				.rotateBy(getPose().getRotation());
-
-		m_fieldVelocity = new Twist2d(
-				linearFieldVelocity.getX(),
-				linearFieldVelocity.getY(),
-				Math.toRadians(m_pigeon.getRate()));
+		updateFieldVelocity();
 	}
 
 	public void printEncoderVals() {
