@@ -22,7 +22,7 @@ public class LogCommand extends CommandBase {
     public void initialize() {
         //record output records things that we pass into it, like a number or really anything.
         //expect for inputs, thats a different method, called proccesInputs
-        Logger.getInstance().recordOutput(m_key, m_message);
+        Logger.getInstance().recordOutput("Log Command Logged/"+m_key, m_message);
         if (m_logToConsole) {
             System.out.println("LOG [" + m_key + "]:" + m_message);
         }
