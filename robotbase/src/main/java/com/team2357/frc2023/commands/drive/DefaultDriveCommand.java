@@ -1,6 +1,7 @@
 package com.team2357.frc2023.commands.drive;
 
 import com.team2357.frc2023.controls.SwerveDriveControls;
+import com.team2357.frc2023.state.RobotState;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -23,7 +24,8 @@ public class DefaultDriveCommand extends CommandBase {
         m_drivetrainSubsystem.drive(
             m_controls.getY(),
             m_controls.getX(),
-            m_controls.getRotation());
+            m_controls.getRotation(), 
+            RobotState.isFieldRelative());
     }
 
     @Override

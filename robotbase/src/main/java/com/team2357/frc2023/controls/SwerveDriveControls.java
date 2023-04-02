@@ -1,5 +1,6 @@
 package com.team2357.frc2023.controls;
 
+import com.team2357.frc2023.commands.drive.ToggleRobotCentricDriveCommand;
 import com.team2357.frc2023.commands.intake.IntakeConeCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakeCubeCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakePreSignalConeCommandGroup;
@@ -75,7 +76,7 @@ public class SwerveDriveControls {
         m_rightTriggerFull.whileTrue(new IntakeCubeCommandGroup());
 
         // Auto score
-        m_aButton.whileTrue(new AutoLineupCommand(m_controller));
+        m_aButton.onTrue(new ToggleRobotCentricDriveCommand());
     }
 
     public double getX() {
