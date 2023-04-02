@@ -1,14 +1,10 @@
 package com.team2357.frc2023.util;
 
-import edu.wpi.first.wpilibj.Timer;
-
 public class CountdownTimer extends Thread{
 
     @Override
     public void run() {
-        Timer timer = new Timer();
         int i =10;
-        timer.start();
         System.err.println("Please wait until countdown has passed! Robot may freak out if you dont.");
         while(i>0){
             System.err.print(i+" ");
