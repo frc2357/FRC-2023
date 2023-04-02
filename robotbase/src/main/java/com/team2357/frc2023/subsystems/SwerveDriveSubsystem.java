@@ -7,6 +7,7 @@ package com.team2357.frc2023.subsystems;
 import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix.ErrorCode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.pathplanner.lib.PathPlannerTrajectory;
@@ -195,6 +196,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 				0 // Offsets are set manually so this parameter is unnecessary
 		);
 
+		setCoastMode();
+		
 		m_fieldVelocity = new Twist2d();
 		instance = this;
 	}
@@ -220,6 +223,20 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 						m_backLeftModule.getPosition(), m_backRightModule.getPosition() },
 				new Pose2d(0.0, 0.0, getGyroscopeRotation()), m_config.m_stateStdDevs,
 				m_config.m_visionMeasurementStdDevs);
+	}
+
+	public void setBrakeMode() {
+		((TalonFX) m_frontLeftModule.getDriveMotor()).setNeutralMode(NeutralMode.Brake);
+		((TalonFX) m_frontRightModule.getDriveMotor()).setNeutralMode(NeutralMode.Brake);
+		((TalonFX) m_backLeftModule.getDriveMotor()).setNeutralMode(NeutralMode.Brake);
+		((TalonFX) m_backRightModule.getDriveMotor()).setNeutralMode(NeutralMode.Brake);
+	}
+
+	public void setCoastMode() {
+		((TalonFX) m_frontLeftModule.getDriveMotor()).setNeutralMode(NeutralMode.Coast);
+		((TalonFX) m_frontRightModule.getDriveMotor()).setNeutralMode(NeutralMode.Coast);
+		((TalonFX) m_backLeftModule.getDriveMotor()).setNeutralMode(NeutralMode.Coast);
+		((TalonFX) m_backRightModule.getDriveMotor()).setNeutralMode(NeutralMode.Coast);
 	}
 
 	public PIDController getXController() {
