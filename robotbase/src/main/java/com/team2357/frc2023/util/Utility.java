@@ -141,7 +141,7 @@ public class Utility {
                         checkGamepieceSelections(gamepiece, Gamepiece.CUBE);
                         return new CubeLowScoreCommand();
                     default:
-                        return new WaitCommand(0);
+                        break;
                 }
             case 1:
                 switch (col % 3) {
