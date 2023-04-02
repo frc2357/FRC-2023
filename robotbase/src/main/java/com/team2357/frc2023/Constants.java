@@ -493,6 +493,7 @@ public final class Constants {
         public static final String BUTTONBOARD_TABLE_NAME = "buttonboard";
         public static final String ROW_TOPIC_NAME = "targetRow";
         public static final String COLUMN_TOPIC_NAME = "targetCol";
+        public static final String GAMEPIECE_TOPIC_NAME = "";
         public static final String ALLIANCE_TOPIC_NAME = "alliance";
 
         public static final String INTAKE_WINCH_TOPIC_NAME = "intakeWinch";

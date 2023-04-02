@@ -17,6 +17,7 @@ public class DriverAutoScoreCommand extends CommandBase {
     public void initialize() {
         int targetCol = Buttonboard.getInstance().getColValue();
         int targetRow = Buttonboard.getInstance().getRowValue();
+        // int gamepiece = Buttonboard.getInstance().get
 
         m_scoreCommand = Utility.getScoreCommand(targetRow, targetCol);
         m_scoreCommand.schedule();

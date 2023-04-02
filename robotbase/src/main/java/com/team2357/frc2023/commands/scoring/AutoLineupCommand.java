@@ -27,9 +27,10 @@ public class AutoLineupCommand extends CommandBase {
     public void initialize() {
         int targetCol = Buttonboard.getInstance().getColValue();
         int targetRow = Buttonboard.getInstance().getRowValue();
+        Buttonboard.Gamepiece targetGamepiece = Buttonboard.getInstance().getGamepieceValue();
         m_targetPose = Utility.gridColumnToTargetPose(targetCol);
         m_driveToPose = null;
-        m_preposeCommand = Utility.getPreposeCommand(targetRow, targetCol);
+        m_preposeCommand = Utility.getPreposeCommand(targetRow, targetCol, targetGamepiece);
 
     }
 

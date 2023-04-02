@@ -1,5 +1,7 @@
 package com.team2357.frc2023.util;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.commands.scoring.cone.ConeHighPrePoseCommand;
 import com.team2357.frc2023.commands.scoring.cone.ConeHighScoreCommand;
@@ -14,12 +16,14 @@ import com.team2357.frc2023.commands.scoring.cube.CubeLowScoreCommand;
 import com.team2357.frc2023.commands.scoring.cube.CubeMidPrePoseCommand;
 import com.team2357.frc2023.commands.scoring.cube.CubeMidScoreCommand;
 import com.team2357.frc2023.networktables.Buttonboard;
+import com.team2357.frc2023.networktables.Buttonboard.Gamepiece;
 import com.team2357.frc2023.state.RobotState;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -83,13 +87,15 @@ public class Utility {
         return new Transform2d(new Translation2d(x, y), new Rotation2d());
     }
 
-    public static Command getPreposeCommand(int row, int col) {
+    public static Command getPreposeCommand(int row, int col, Gamepiece gamepiece) {
         switch (row) {
             case 2:
                 switch (RobotState.getState()) {
                     case ROBOT_STOWED_CONE:
+                        checkGamepieceSelections(gamepiece, Gamepiece.CONE);
                         return new ConeLowPrePoseCommand();
                     case ROBOT_STOWED_CUBE:
+                        checkGamepieceSelections(gamepiece, Gamepiece.CUBE);
                         return new CubeLowPrePoseCommand();
                     default:
                         return new WaitCommand(0);
@@ -98,16 +104,20 @@ public class Utility {
                 switch (col % 3) {
                     case 0:
                     case 2:
+                        checkGamepieceSelections(gamepiece, Gamepiece.CONE);
                         return new ConeMidPrePoseCommand();
                     case 1:
+                        checkGamepieceSelections(gamepiece, Gamepiece.CUBE);
                         return new CubeMidPrePoseCommand();
                 }
             case 0:
                 switch (col % 3) {
                     case 0:
                     case 2:
+                        checkGamepieceSelections(gamepiece, Gamepiece.CONE);
                         return new ConeHighPrePoseCommand();
                     case 1:
+                        checkGamepieceSelections(gamepiece, Gamepiece.CUBE);
                         return new CubeHighPrePoseCommand();
                 }
         }
@@ -115,13 +125,15 @@ public class Utility {
         return new WaitCommand(0);
     }
 
-    public static Command getScoreCommand(int row, int col) {
+    public static Command getScoreCommand(int row, int col, Gamepiece gamepiece) {
         switch (row) {
             case 2:
                 switch (RobotState.getState()) {
                     case ROBOT_STOWED_CONE:
+                        checkGamepieceSelections(gamepiece, Gamepiece.CONE);
                         return new ConeLowScoreCommand();
                     case ROBOT_STOWED_CUBE:
+                        checkGamepieceSelections(gamepiece, Gamepiece.CUBE);
                         return new CubeLowScoreCommand();
                     default:
                         return new WaitCommand(0);
@@ -130,20 +142,32 @@ public class Utility {
                 switch (col % 3) {
                     case 0:
                     case 2:
+                        checkGamepieceSelections(gamepiece, Gamepiece.CONE);
                         return new ConeMidScoreCommand();
                     case 1:
+                        checkGamepieceSelections(gamepiece, Gamepiece.CUBE);
                         return new CubeMidScoreCommand();
                 }
             case 0:
                 switch (col % 3) {
                     case 0:
                     case 2:
+                        checkGamepieceSelections(gamepiece, Gamepiece.CONE);
                         return new ConeHighScoreCommand();
                     case 1:
+                        checkGamepieceSelections(gamepiece, Gamepiece.CUBE);
                         return new CubeHighScoreCommand();
                 }
         }
 
         return new WaitCommand(0);
+    }
+
+    public static void checkGamepieceSelections(Gamepiece buttonboardSelection, Gamepiece stateSelection) {
+        if (buttonboardSelection != stateSelection) {
+            String message = "Tried to score " + buttonboardSelection.toString().toLowerCase() + " while holding " + stateSelection.toString().toLowerCase();
+            DriverStation.reportError(message, false);
+            Logger.getInstance().recordOutput("Scoring", message);
+        }
     }
 }
