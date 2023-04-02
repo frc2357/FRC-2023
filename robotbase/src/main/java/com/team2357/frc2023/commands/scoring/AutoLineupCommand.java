@@ -31,7 +31,7 @@ public class AutoLineupCommand extends CommandBase {
     @Override
     public void execute() {
         if (m_driveToPose == null) {
-            Pose2d visionPose = DualLimelightManagerSubsystem.getInstance().getLimelightPose2d();
+            Pose2d visionPose = DualLimelightManagerSubsystem.getInstance().getAveragePose();
             if (visionPose != null) {
                 if (visionPose.getTranslation().getDistance(m_targetPose.getTranslation()) <= Constants.DRIVE.AUTO_LINEUP_RANGE_METERS) {
 

@@ -10,8 +10,6 @@ import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.team2357.frc2023.subsystems.ArmExtensionSubsystem;
 import com.team2357.frc2023.subsystems.ArmRotationSubsystem;
 import com.team2357.frc2023.subsystems.ClawSubsystem;
-import com.team2357.frc2023.subsystems.ClawSubsystem;
-import com.team2357.frc2023.subsystems.WristSubsystem;
 import com.team2357.frc2023.subsystems.IntakeArmSubsystem;
 import com.team2357.frc2023.subsystems.IntakeRollerSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
@@ -20,7 +18,6 @@ import com.team2357.frc2023.subsystems.WristSubsystem;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -117,27 +114,6 @@ public final class Constants {
             config.m_sensorPositionCoefficient = 2.0 * Math.PI / Constants.DRIVE.TICKS_PER_ROTATION
                     * SdsModuleConfigurations.MK4I_L2.getSteerReduction();
 
-            config.m_translateXMaxSpeedMeters = 3;
-            config.m_translateYMaxSpeedMeters = 3;
-
-            config.m_translateYAngleTolerance = 1;
-            config.m_translateXAngleTolerance = 1;
-
-            config.m_defaultXAngleSetpoint = DRIVE.DEFAULT_X_ANGLE_SETPOINT;
-            config.m_defaultYAngleSetpoint = DRIVE.DEFAULT_Y_ANGLE_SETPOINT;
-
-            config.m_leftColXAngleSetpoint = DRIVE.LEFT_COL_X_ANGLE_SETPOINT;
-            config.m_midColXAngleSetpoint = DRIVE.MID_COL_X_ANGLE_SETPOINT;
-            config.m_rightColXAngleSetpoint = DRIVE.RIGHT_COL_X_ANGLE_SETPOINT;
-
-            config.m_translateXController = new PIDController(0.3, 0, 0.015);
-            config.m_translateYController = new PIDController(0.1, 0, 0.025);
-
-            config.m_translationXFeedForward = new SimpleMotorFeedforward(0.244, 0);
-            config.m_translationYFeedForward = new SimpleMotorFeedforward(0.244, 0.00);
-
-            config.m_openLoopRampRateSeconds = 1;
-
             /**
              * State measurement standard deviations. Left encoder, right encoder, gyro
              * Increase these numbers to trust them less
@@ -197,13 +173,6 @@ public final class Constants {
 
         public static final double ROTATE_MAXSPEED_RADIANS_PER_SECOND = 0.91;
         public static final double SYNC_ENCODER_LIMIT_MS = 10000;
-
-        public static final double DEFAULT_Y_ANGLE_SETPOINT = 20;
-        public static final double DEFAULT_X_ANGLE_SETPOINT = -9;
-
-        public static final double LEFT_COL_X_ANGLE_SETPOINT = -10;
-        public static final double MID_COL_X_ANGLE_SETPOINT = -9;
-        public static final double RIGHT_COL_X_ANGLE_SETPOINT = -8;
 
         public static final double DEAD_RECKONING_TRANSLATION_METERS_PER_SECOND = 1;
         public static final double DEAD_RECKONING_ROTATION_RADIANS_PER_SECOND = 0.1;
