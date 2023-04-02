@@ -17,16 +17,14 @@ import com.team2357.frc2023.subsystems.IntakeRollerSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.frc2023.subsystems.WristSubsystem;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -154,6 +152,12 @@ public final class Constants {
 
             config.m_visionToleranceMeters = 0.1524;
 
+            config.m_autoAlignDriveController = new ProfiledPIDController(
+                8.0, 0.0, 0.0, new TrapezoidProfile.Constraints(2, 1));
+
+            config.m_autoAlignThetaController = new ProfiledPIDController(
+                6.0, 0.0, 0.0, new TrapezoidProfile.Constraints(2, 1));  
+                    
             return config;
         }
 
@@ -213,14 +217,12 @@ public final class Constants {
 
         public static final String SWERVE_MODULE_SHUFFLEBOARD_TAB_NAME = "Drivetrain";
 
-        // Tolerance for out-of-range poses on auto-mapping
-        public static final double TRAJECTORY_MAP_TOLERANCE_METERS = 0.1;
+        public static final double AUTO_LINEUP_RANGE_METERS = 3;
 
         // Path constraints
         public static final PathConstraints DEFAULT_PATH_CONSTRAINTS = new PathConstraints(2.5,
                 1.5);
         public static final PathConstraints GRID_ZERO_PATH_CONSTRAINTS = new PathConstraints(2, 1);
-
     }
 
     public static final class INTAKE_ROLLER {
@@ -593,5 +595,14 @@ public final class Constants {
 
     public static final class GAMEPIECE_LED {
         public static final int PWM_PORT = 0;
+    }
+
+    public static final class FIELD {
+        public static final double FIELD_WIDTH_METERS = 8.02;
+        public static final double COLUMN_ZERO_SCORE_Y_METERS = 0.51;
+        public static final double GRID_SCORE_X_METERS = 1.77;
+        public static final double GRID_DISTANCE_METERS_BETWEEN_COLUMN = 0.5588;
+        public static final double GRID_SCORE_Y_TRIM = -0.1;
+        public static final double GRID_SCORE_ROTATION_DEGREES = 180;
     }
 }
