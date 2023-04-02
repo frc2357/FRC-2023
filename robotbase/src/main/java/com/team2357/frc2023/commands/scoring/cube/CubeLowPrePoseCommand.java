@@ -26,7 +26,7 @@ public class CubeLowPrePoseCommand extends SequentialCommandGroup {
                         new ParallelDeadlineGroup(
                                 new WaitCommand(0.25),
                                 new ClawReleaseCubeCommand())),
-                new InstantCommand(() -> Logger.getInstance().recordOutput("Cube Low prePose",
+                new InstantCommand(() -> Logger.getInstance().recordOutput("Pre Pose/Cube Low prePose",
                         new double[] { ArmRotationSubsystem.getInstance().getMotorRotations(),
                                 ArmExtensionSubsystem.getInstance().getMotorRotations(),
                                 WristSubsystem.getInstance().getRotations() })));

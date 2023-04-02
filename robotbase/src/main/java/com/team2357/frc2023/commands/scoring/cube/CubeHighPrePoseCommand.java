@@ -58,7 +58,7 @@ public class CubeHighPrePoseCommand extends SequentialCommandGroup {
                                 new ArmWaitForGreaterThanPositionCommand(
                                         Constants.ARM_ROTATION.EXTENSION_HIGH_START_ROTATIONS),
                                 new ArmExtendToPositionCommand(Constants.ARM_EXTENSION.SCORE_CUBE_HIGH_ROTATIONS))),
-                new InstantCommand(() -> Logger.getInstance().recordOutput("Cube High prePose",
+                new InstantCommand(() -> Logger.getInstance().recordOutput("Pre Pose/Cube High prePose",
                         new double[] { ArmRotationSubsystem.getInstance().getMotorRotations(),
                                 ArmExtensionSubsystem.getInstance().getMotorRotations(),
                                 WristSubsystem.getInstance().getRotations() })));

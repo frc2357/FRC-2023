@@ -51,7 +51,7 @@ public class CubeMidPrePoseCommand extends SequentialCommandGroup {
                                 new ArmWaitForGreaterThanPositionCommand(
                                         Constants.ARM_ROTATION.WRIST_CLEAR_INTAKE_ROTATIONS),
                                 new WristRotateToPositionCommand(Constants.WRIST.SCORE_CUBE_MID_ROTATIONS))),
-                new InstantCommand(() -> Logger.getInstance().recordOutput("Cube Mid prePose",
+                new InstantCommand(() -> Logger.getInstance().recordOutput("Pre Pose/Cube Mid prePose",
                         new double[] { ArmRotationSubsystem.getInstance().getMotorRotations(),
                                 ArmExtensionSubsystem.getInstance().getMotorRotations(),
                                 WristSubsystem.getInstance().getRotations() })));

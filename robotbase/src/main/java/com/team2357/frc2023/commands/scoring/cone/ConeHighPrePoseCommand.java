@@ -67,7 +67,7 @@ public class ConeHighPrePoseCommand extends SequentialCommandGroup {
                                 new ArmWaitForGreaterThanPositionCommand(
                                         Constants.ARM_ROTATION.EXTENSION_HIGH_START_ROTATIONS),
                                 new ArmExtendToPositionCommand(isAuto ? Constants.ARM_EXTENSION.AUTO_SCORE_CONE_HIGH_ROTATIONS : Constants.ARM_EXTENSION.SCORE_CONE_HIGH_ROTATIONS))),
-                new InstantCommand(() -> Logger.getInstance().recordOutput("Cone High prePose",
+                new InstantCommand(() -> Logger.getInstance().recordOutput("Pre Pose/Cone High prePose",
                         new double[] { ArmRotationSubsystem.getInstance().getMotorRotations(),
                                 ArmExtensionSubsystem.getInstance().getMotorRotations(),
                                 WristSubsystem.getInstance().getRotations() })));

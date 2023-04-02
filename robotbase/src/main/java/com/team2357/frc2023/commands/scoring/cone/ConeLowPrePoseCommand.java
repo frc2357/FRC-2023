@@ -31,7 +31,7 @@ public class ConeLowPrePoseCommand extends SequentialCommandGroup {
                                 new ClawReleaseConeCommand(),
                                 new IntakeRollerRunCommand())),
                 new ArmRotateToPositionCommand(Constants.ARM_ROTATION.RETRACTED_ROTATIONS),
-                new InstantCommand(() -> Logger.getInstance().recordOutput("Cone Low prePose",
+                new InstantCommand(() -> Logger.getInstance().recordOutput("Pre Pose/Cone Low prePose",
                         new double[] { ArmRotationSubsystem.getInstance().getMotorRotations(),
                                 ArmExtensionSubsystem.getInstance().getMotorRotations(),
                                 WristSubsystem.getInstance().getRotations() })));
