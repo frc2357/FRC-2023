@@ -1,5 +1,6 @@
 package com.team2357.frc2023.commands.scoring;
 
+import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.commands.auto.DriveToPoseCommand;
 import com.team2357.frc2023.commands.controller.RumbleCommand;
 import com.team2357.frc2023.subsystems.DualLimelightManagerSubsystem;
@@ -30,13 +31,13 @@ public class AutoLineupCommand extends CommandBase {
         if (m_driveToPose == null) {
             Pose2d visionPose = DualLimelightManagerSubsystem.getInstance().getLimelightPose2d();
             if (visionPose != null) {
-                if (visionPose.getTranslation().getDistance(m_targetPose.getTranslation()) <= 3) {
+                if (visionPose.getTranslation().getDistance(m_targetPose.getTranslation()) <= Constants.DRIVE.AUTO_LINEUP_RANGE_METERS) {
 
                     m_driveToPose = new DriveToPoseCommand(visionPose, m_targetPose);
                     m_driveToPose.schedule();
                 }
             } else {
-                RumbleCommand.createRumbleCommand(m_controller, 0.25).schedule();;
+                RumbleCommand.createRumbleCommand(m_controller, Constants.CONTROLLER.RUMBLE_TIMEOUT_SECONDS_ON_TELEOP_AUTO).schedule();
             }
         }
     }

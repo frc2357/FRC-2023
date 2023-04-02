@@ -217,14 +217,12 @@ public final class Constants {
 
         public static final String SWERVE_MODULE_SHUFFLEBOARD_TAB_NAME = "Drivetrain";
 
-        // Tolerance for out-of-range poses on auto-mapping
-        public static final double TRAJECTORY_MAP_TOLERANCE_METERS = 0.1;
+        public static final double AUTO_LINEUP_RANGE_METERS = 3;
 
         // Path constraints
         public static final PathConstraints DEFAULT_PATH_CONSTRAINTS = new PathConstraints(2.5,
                 1.5);
         public static final PathConstraints GRID_ZERO_PATH_CONSTRAINTS = new PathConstraints(2, 1);
-
     }
 
     public static final class INTAKE_ROLLER {

@@ -6,9 +6,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import java.util.function.Supplier;
-
-import com.team2357.frc2023.subsystems.DualLimelightManagerSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.frc2023.util.Utility;
 
@@ -17,22 +14,21 @@ import com.team2357.frc2023.util.Utility;
  * between the target pose and the robot.
  * Uses odometry to determine target velocities for the robot to move to.
  * 
- * Heavily based on: https://github.com/Mechanical-Advantage/RobotCode2023/blob/main/src/main/java/org/littletonrobotics/frc2023/commands/DriveToPose.java
+ * Heavily based on:
+ * https://github.com/Mechanical-Advantage/RobotCode2023/blob/main/src/main/java/org/littletonrobotics/frc2023/commands/DriveToPose.java
  */
 public class DriveToPoseCommand extends CommandBase {
     private final SwerveDriveSubsystem m_swerve;
     private final Pose2d m_targetPose;
     private final Pose2d m_initialPose;
 
-    private boolean m_running = false;
-
     private final ProfiledPIDController m_driveController;
     private final ProfiledPIDController m_thetaController;
 
     /**
-     * @param targetPose          The pose to reach relative to the target ex: The
-     *                            pose to be at to score on the middle row relative
-     *                            to the april-tag in fron of it
+     * @param initialPose The initial field-relative pose to set the robot to
+     * @param targetPose  Field-relative pose for the robot to reach
+     * 
      */
     public DriveToPoseCommand(Pose2d initialPose, Pose2d targetPose) {
         m_swerve = SwerveDriveSubsystem.getInstance();
@@ -49,28 +45,27 @@ public class DriveToPoseCommand extends CommandBase {
     @Override
     public void initialize() {
         // Reset all controllers
+        m_swerve.resetPoseEstimator(
+                new Pose2d(m_initialPose.getX(), m_initialPose.getY(), m_swerve.getGyroscopeRotation()));
 
-        m_swerve.resetPoseEstimator(new Pose2d(m_initialPose.getX(), m_initialPose.getY(), m_swerve.getGyroscopeRotation()));
-
-        var currentPose = m_swerve.getPose();
+        Pose2d currentPose = m_swerve.getPose();
         m_driveController.reset(
                 new TrapezoidProfile.State(
-                    currentPose.getTranslation().getDistance(m_targetPose.getTranslation()),
-                    -new Translation2d(m_swerve.getFieldVelocity().dx, m_swerve.getFieldVelocity().dy)
-                        .rotateBy(
-                            m_targetPose
-                                .getTranslation()
-                                .minus(m_swerve.getPose().getTranslation())
-                                .getAngle()
-                                .unaryMinus())
-                        .getX()));
-            
+                        currentPose.getTranslation().getDistance(m_targetPose.getTranslation()),
+                        -new Translation2d(m_swerve.getFieldVelocity().dx, m_swerve.getFieldVelocity().dy)
+                                .rotateBy(
+                                        m_targetPose
+                                                .getTranslation()
+                                                .minus(m_swerve.getPose().getTranslation())
+                                                .getAngle()
+                                                .unaryMinus())
+                                .getX()));
+
         m_thetaController.reset(currentPose.getRotation().getRadians());
     }
 
     @Override
     public void execute() {
-        m_running = true;
 
         // Get current and target pose
         Pose2d currentPose = m_swerve.getPose();
@@ -95,16 +90,14 @@ public class DriveToPoseCommand extends CommandBase {
                 .transformBy(Utility.translationToTransform(driveVelocityScalar, 0.0))
                 .getTranslation();
 
-        System.out.println(" X: " + driveVelocity.getX() + " Y: " + driveVelocity.getY() + " rot: " + thetaVelocity);
         m_swerve.drive(
-        ChassisSpeeds.fromFieldRelativeSpeeds(
-        driveVelocity.getX(), driveVelocity.getY(), thetaVelocity,
-        m_swerve.getGyroscopeRotation()));
+                ChassisSpeeds.fromFieldRelativeSpeeds(
+                        driveVelocity.getX(), driveVelocity.getY(), thetaVelocity,
+                        m_swerve.getGyroscopeRotation()));
     }
 
     @Override
     public void end(boolean interrupted) {
-        m_running = false;
         m_swerve.drive(new ChassisSpeeds());
     }
 
@@ -115,11 +108,6 @@ public class DriveToPoseCommand extends CommandBase {
 
     /** Checks if the robot is stopped at the final pose. */
     public boolean atGoal() {
-        return m_running && m_driveController.atGoal() && m_thetaController.atGoal();
-    }
-
-    /** Returns whether the command is actively running. */
-    public boolean isRunning() {
-        return m_running;
+        return m_driveController.atGoal() && m_thetaController.atGoal();
     }
 }
