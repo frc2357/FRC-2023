@@ -1,14 +1,14 @@
 package com.team2357.frc2023.util;
 
-public class CountdownTimer extends Thread{
+public class CountdownTimer extends Thread {
 
     @Override
     public void run() {
-        int i =10;
+
         System.err.println("Please wait until countdown has passed! Robot may freak out if you dont.");
-        while(i>0){
-            System.err.print(i+" ");
-            for(int a = i;a > 0;a--){
+        for (int i = 10; i > 0; i--) {
+            System.err.print(i + " ");
+            for (int a = i; a > 0; a--) {
                 System.err.print("-");
             }
             System.err.print("\n");
@@ -16,7 +16,7 @@ public class CountdownTimer extends Thread{
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
             }
-            i--;
+
         }
         System.err.println("The robot should be fine to use now, so give the thumbs up.");
     }
