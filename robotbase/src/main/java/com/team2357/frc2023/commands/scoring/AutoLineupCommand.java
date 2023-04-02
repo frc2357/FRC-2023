@@ -30,8 +30,7 @@ public class AutoLineupCommand extends CommandBase {
         m_targetPose = Utility.gridColumnToTargetPose(targetCol);
         m_driveToPose = null;
         m_preposeCommand = Utility.getPreposeCommand(targetRow, targetCol);
-        
-        m_preposeCommand.schedule();
+
     }
 
     @Override
@@ -43,6 +42,7 @@ public class AutoLineupCommand extends CommandBase {
 
                     m_driveToPose = new DriveToPoseCommand(visionPose, m_targetPose);
                     m_driveToPose.schedule();
+                    m_preposeCommand.schedule();
                 }
             } else {
                m_controller.setRumble(RumbleType.kBothRumble, Constants.CONTROLLER.RUMBLE_INTENSITY);
@@ -53,7 +53,7 @@ public class AutoLineupCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return m_driveToPose != null && m_driveToPose.atGoal();
+        return m_driveToPose != null && m_driveToPose.atGoal() && m_preposeCommand.isFinished();
     }
 
     @Override
@@ -62,6 +62,10 @@ public class AutoLineupCommand extends CommandBase {
         if (m_driveToPose != null) {
             m_driveToPose.cancel();
         }
+        if (m_preposeCommand != null) {
+            m_preposeCommand.cancel();
+        }
+
         m_controller.setRumble(RumbleType.kBothRumble, 0.0);
     }
 }
