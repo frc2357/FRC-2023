@@ -97,6 +97,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		 * Formula: 6380 / 60 * <gear ratio> * <wheel diameter> * Math.PI
 		 */
 		public double m_maxVelocityMetersPerSecond;
+		public double m_robotCentricMaxVelocityPerSecond;
 
 		/**
 		 * The maximum angular velocity of the robot in radians per second
@@ -106,6 +107,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		 * m_wheelbaseMeters / 2)
 		 */
 		public double m_maxAngularVelocityRadiansPerSecond;
+		public double m_robotCentricMaxAngularVelocityRadiansPerSecond;
 
 		public double m_maxAngularAccelerationRadiansPerSecondSquared;
 
@@ -356,12 +358,24 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	public void drive(double x, double y, double rotation) {
-		ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-				x * m_config.m_maxVelocityMetersPerSecond,
-				y * m_config.m_maxVelocityMetersPerSecond,
-				rotation * m_config.m_maxAngularVelocityRadiansPerSecond,
-				getGyroscopeRotation());
+		drive(x, y, rotation, true);
+	}
 
+	public void drive(double x, double y, double rotation, boolean fieldOriented) {
+		ChassisSpeeds chassisSpeeds;
+
+		if (fieldOriented) {
+			chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+					x * m_config.m_maxVelocityMetersPerSecond,
+					y * m_config.m_maxVelocityMetersPerSecond,
+					rotation * m_config.m_maxAngularVelocityRadiansPerSecond,
+					getGyroscopeRotation());
+		} else {
+			chassisSpeeds = new ChassisSpeeds(
+					x * m_config.m_robotCentricMaxVelocityPerSecond,
+					y * m_config.m_robotCentricMaxVelocityPerSecond,
+					rotation * m_config.m_robotCentricMaxAngularVelocityRadiansPerSecond);
+		}
 		drive(chassisSpeeds);
 	}
 
@@ -484,7 +498,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 				linearFieldVelocity.getY(),
 				Math.toRadians(m_pigeon.getRate()));
 	}
-	
+
 	@Override
 	public void periodic() {
 		updatePoseEstimator();
