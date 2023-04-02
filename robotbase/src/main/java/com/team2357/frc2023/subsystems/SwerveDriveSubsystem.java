@@ -468,6 +468,189 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		return direction;
 	}
 
+	private void updateFieldVelocity() {
+		Translation2d linearFieldVelocity = new Translation2d(m_chassisSpeeds.vxMetersPerSecond,
+				m_chassisSpeeds.vyMetersPerSecond)
+				.rotateBy(getPose().getRotation());
+
+		m_fieldVelocity = new Twist2d(
+				linearFieldVelocity.getX(),
+				linearFieldVelocity.getY(),
+				Math.toRadians(m_pigeon.getRate()));
+	}
+	
+	public void enableOpenLoopRamp() {
+		TalonFX motor = (TalonFX) m_backRightModule.getDriveMotor();
+		motor.configOpenloopRamp(m_config.m_openLoopRampRateSeconds);
+		motor = (TalonFX) m_backLeftModule.getDriveMotor();
+		motor.configOpenloopRamp(m_config.m_openLoopRampRateSeconds);
+		motor = (TalonFX) m_frontLeftModule.getDriveMotor();
+		motor.configOpenloopRamp(m_config.m_openLoopRampRateSeconds);
+		motor = (TalonFX) m_frontRightModule.getDriveMotor();
+		motor.configOpenloopRamp(m_config.m_openLoopRampRateSeconds);
+	}
+
+	public void disableOpenLoopRamp() {
+		TalonFX motor = (TalonFX) m_backRightModule.getDriveMotor();
+		motor.configOpenloopRamp(0);
+		motor = (TalonFX) m_backLeftModule.getDriveMotor();
+		motor.configOpenloopRamp(0);
+		motor = (TalonFX) m_frontLeftModule.getDriveMotor();
+		motor.configOpenloopRamp(0);
+		motor = (TalonFX) m_frontRightModule.getDriveMotor();
+		motor.configOpenloopRamp(0);
+	}
+
+	public boolean isTracking() {
+		return m_targetColumn != COLUMN_TARGET.NONE;
+	}
+
+	public boolean isAtXTarget() {
+		if (isTracking()) {
+			return m_translateXController.atSetpoint();
+		}
+		return true;
+	}
+
+	public boolean isAtYTarget() {
+		if (isTracking()) {
+			return m_translateYController.atSetpoint();
+		}
+		return true;
+	}
+
+	public boolean hasTarget() {
+		return DualLimelightManagerSubsystem.getInstance().validTargetExists();
+	}
+
+	public boolean isAtTarget() {
+		// System.out.println(isAtXTarget() && isAtYTarget());
+		// return isAtXTarget();
+		// return isAtYTarget();
+		return isAtXTarget() && isAtYTarget() && !m_isSeeking;
+	}
+
+	/**
+	 * 
+	 * @param column         The target column relative to the selected april tag
+	 *                       (RIGHT, MIDDLE, LEFT)
+	 * @param targetAprilTag The target AprilTag for the limelight to track,
+	 *                       -1 will cause the limelight to track the primary in
+	 *                       view AprilTag
+	 */
+	public void trackTarget(SwerveDriveSubsystem.COLUMN_TARGET column, int targetAprilTag) {
+		// System.out.println("track target");
+		setClosedLoopEnabled(true);
+
+		DualLimelightManagerSubsystem limelightManager = DualLimelightManagerSubsystem.getInstance();
+		m_targetColumn = column;
+
+		limelightManager.setPrimary(m_targetColumn.primaryLimelight);
+		limelightManager.setTargetAprilTag(targetAprilTag);
+		limelightManager.setAprilTagPipelineActive();
+
+		trackXTarget();
+		trackYTarget(column.setpoint);
+		enableOpenLoopRamp();
+	}
+
+	public void trackXTarget() {
+		m_translateXController.reset();
+		m_translateXController.setSetpoint(m_config.m_defaultYAngleSetpoint);
+		m_translateXController.setTolerance(m_config.m_translateYAngleTolerance);
+	}
+
+	public void trackYTarget(double setpoint) {
+		m_translateYController.reset();
+		m_translateYController.setSetpoint(setpoint);
+		m_translateYController.setTolerance(m_config.m_translateXAngleTolerance);
+	}
+
+	private void configureSeeking() {
+		m_isSeeking = true;
+		DualLimelightManagerSubsystem limelightManager = DualLimelightManagerSubsystem.getInstance();
+		trackYTarget(limelightManager.getPrimaryTXSetpoint());
+	}
+
+	private void stopSeeking() {
+		m_isSeeking = false;
+		trackYTarget(m_targetColumn.setpoint);
+	}
+
+	public double calculateXMetersPerSecond() {
+		double tY = DualLimelightManagerSubsystem.getInstance().getTY();
+
+		double outputMetersPerSecond = m_translateXController
+				.calculate(tY);
+		outputMetersPerSecond *= -1; // Invert output
+		outputMetersPerSecond += m_config.m_translationYFeedForward.calculate(tY);
+
+		outputMetersPerSecond = MathUtil.clamp(outputMetersPerSecond, -m_config.m_translateXMaxSpeedMeters,
+				m_config.m_translateXMaxSpeedMeters);
+		return outputMetersPerSecond;
+	}
+
+	public double calculateYMetersPerSecond() {
+		DualLimelightManagerSubsystem limelightManager = DualLimelightManagerSubsystem.getInstance();
+		double errorAngle = m_isSeeking ? limelightManager.getSecondaryTX() : limelightManager.getPrimaryTX();
+
+		double outputMetersPerSecond = m_translateYController.calculate(errorAngle);
+		outputMetersPerSecond += -m_config.m_translationYFeedForward.calculate(errorAngle);
+		outputMetersPerSecond = MathUtil.clamp(outputMetersPerSecond, -m_config.m_translateYMaxSpeedMeters,
+				m_config.m_translateYMaxSpeedMeters);
+		return outputMetersPerSecond;
+	}
+
+	public void trackingPeriodic() {
+		DualLimelightManagerSubsystem limelightManager = DualLimelightManagerSubsystem.getInstance();
+		// System.out.println(m_translateXController.getSetpoint());
+		// System.out.println("TY "+limelight.getTY());
+		if (!limelightManager.validTargetExists()) {
+			DriverStation.reportWarning("NOT IN RANGE OF APRILTAG", null);
+			return;
+		}
+
+		// System.out.println(isTracking());
+
+		if (!limelightManager.validTargetExistsOnPrimary() && !m_isSeeking) { // If the primary limelight has no target,
+																				// and has not been set to seek
+			configureSeeking();
+		} else if (limelightManager.validTargetExistsOnPrimary() && m_isSeeking) {
+			stopSeeking();
+		}
+
+		double speed = calculateXMetersPerSecond();
+		// System.out.println("speed: " + speed);
+		// System.out.println("error: " +
+		// (DualLimelightManagerSubsystem.getInstance().getTY() -
+		// m_translateXController.getSetpoint()));
+		// drive(new ChassisSpeeds(0, speed, 0));
+		// drive(new ChassisSpeeds(speed, 0, 0));
+		drive(new ChassisSpeeds(calculateXMetersPerSecond(), calculateYMetersPerSecond(), 0));
+	}
+
+	public void stopTracking() {
+		setClosedLoopEnabled(false);
+		DualLimelightManagerSubsystem.getInstance().setTargetAprilTag(-1);
+		m_targetColumn = COLUMN_TARGET.NONE;
+		m_isSeeking = false;
+
+		// System.out.println("Ending Tracking -----------------");
+		disableOpenLoopRamp();
+		drive(0, 0, 0);
+	}
+
+	private void updateFieldVelocity() {
+		Translation2d linearFieldVelocity = new Translation2d(m_chassisSpeeds.vxMetersPerSecond,
+				m_chassisSpeeds.vyMetersPerSecond)
+				.rotateBy(getPose().getRotation());
+
+		m_fieldVelocity = new Twist2d(
+				linearFieldVelocity.getX(),
+				linearFieldVelocity.getY(),
+				Math.toRadians(m_pigeon.getRate()));
+	}
+
 	@Override
 	public void periodic() {
 		updatePoseEstimator();
@@ -507,14 +690,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		Logger.getInstance().recordOutput("Swerve Speed", loggingSwerveStates);
 		Logger.getInstance().recordOutput("Robot Pose", getPose());
 
-		Translation2d linearFieldVelocity = new Translation2d(m_chassisSpeeds.vxMetersPerSecond,
-				m_chassisSpeeds.vyMetersPerSecond)
-				.rotateBy(getPose().getRotation());
-
-		m_fieldVelocity = new Twist2d(
-				linearFieldVelocity.getX(),
-				linearFieldVelocity.getY(),
-				Math.toRadians(m_pigeon.getRate()));
+		updateFieldVelocity();
 	}
 
 	public void printEncoderVals() {

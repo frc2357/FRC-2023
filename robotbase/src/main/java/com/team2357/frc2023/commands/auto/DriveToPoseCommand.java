@@ -84,7 +84,7 @@ public class DriveToPoseCommand extends CommandBase {
             thetaVelocity = 0.0;
 
         // Command speeds
-        var driveVelocity = new Pose2d(
+        Translation2d driveVelocity = new Pose2d(
                 new Translation2d(),
                 currentPose.getTranslation().minus(m_targetPose.getTranslation()).getAngle())
                 .transformBy(Utility.translationToTransform(driveVelocityScalar, 0.0))
