@@ -151,8 +151,8 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
 
     public Pose2d getLimelightPose2d() {
         if (m_leftLimelight.validTargetExists() && m_rightLimelight.validTargetExists()) {
-            Pose2d leftPose = m_leftLimelight.getLimelightPose2d();
-            Pose2d rightPose = m_rightLimelight.getLimelightPose2d();
+            Pose2d leftPose = m_leftLimelight.getCurrentAllianceLimelightPose();
+            Pose2d rightPose = m_rightLimelight.getCurrentAllianceLimelightPose();
 
             double xLocation = (leftPose.getX() + rightPose.getX()) / 2;
             double yLocation = (leftPose.getY() + rightPose.getY()) / 2;
@@ -160,9 +160,9 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
 
             return new Pose2d(xLocation, yLocation, Rotation2d.fromDegrees(rotationDegrees));
         } else if (m_leftLimelight.validTargetExists()) {
-            return m_leftLimelight.getLimelightPose2d();
+            return m_leftLimelight.getCurrentAllianceLimelightPose();
         } else if (m_rightLimelight.validTargetExists()) {
-            return m_rightLimelight.getLimelightPose2d();
+            return m_rightLimelight.getCurrentAllianceLimelightPose();
         } else {
             return null;
         }
