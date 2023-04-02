@@ -85,7 +85,7 @@ public class Utility {
 
     public static Command getPreposeCommand(int row, int col) {
         switch (row) {
-            case 0:
+            case 2:
                 switch (RobotState.getState()) {
                     case ROBOT_STOWED_CONE:
                         return new ConeLowPrePoseCommand();
@@ -102,7 +102,7 @@ public class Utility {
                     case 1:
                         return new CubeMidPrePoseCommand();
                 }
-            case 2:
+            case 0:
                 switch (col % 3) {
                     case 0:
                     case 2:
@@ -117,7 +117,7 @@ public class Utility {
 
     public static Command getScoreCommand(int row, int col) {
         switch (row) {
-            case 0:
+            case 2:
                 switch (RobotState.getState()) {
                     case ROBOT_STOWED_CONE:
                         return new ConeLowScoreCommand();
@@ -134,7 +134,7 @@ public class Utility {
                     case 1:
                         return new CubeMidScoreCommand();
                 }
-            case 2:
+            case 0:
                 switch (col % 3) {
                     case 0:
                     case 2:
