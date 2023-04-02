@@ -77,8 +77,9 @@ public class SwerveDriveControls {
         m_rightTriggerFull.whileTrue(new IntakeCubeCommandGroup());
 
         // Auto score
-        m_aButton.whileTrue(new AutoLineupCommand(m_controller));
-        m_bButton.whileTrue(new DriverAutoScoreCommand());
+        m_leftBumper.whileTrue(new AutoLineupCommand(m_controller));
+        m_rightBumper.whileTrue(new DriverAutoScoreCommand());
+        
         m_aButton.onTrue(new ToggleRobotCentricDriveCommand());
     }
 
