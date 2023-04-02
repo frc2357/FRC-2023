@@ -148,20 +148,12 @@ public final class Constants {
         public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(306.3 - 180);
         public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(163.04 + 180);
 
-        public static final PIDController CHARGE_STATION_BALANCE_ANGLE_CONTROLLER = new PIDController(0.5, 0, 0);
-        public static final PIDController CHARGE_STATION_DISTANCE_CONTROLLER = new PIDController(0.5, 0, 0);
-
         public static final double BALANCE_LEVEL_DEGREES = 1;
         public static final double BALANCE_FULL_TILT_DEGREES = 15;
-        public static final double BACKWARDS_BALANCING_EXTRA_POWER_MULTIPLIER = 1.35;
         public static final double BALANCE_KP = 0.015;
-        public static final double BALANCE_KI = 0.0;
-        public static final double BALANCE_KD = 0.000001;
         public static final double BALANCE_MAX_POWER = 0.3;
         public static final double BALANCE_WAIT_MILLIS = 250;
-        public static final double STOP_DRIVING_TILT_DIFFERENCE = .0000005;
         public static final double BALANCE_DENOMINATOR_MULTIPLIER = 2.5;
-        public static final PIDController BALANCE_PID_CONTROLLER = new PIDController(BALANCE_KP, BALANCE_KI, BALANCE_KD);
 
         public static final double TICKS_PER_ROTATION = 2048.0;
 
