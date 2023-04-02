@@ -9,22 +9,19 @@ public class CountdownTimer extends Thread{
         Timer timer = new Timer();
         int i =10;
         timer.start();
-        System.out.println("Please wait until countdown has passed! Robot may freak out if you dont.");
-        while(true){
-            System.out.print(10-i+" ");
-            while(i > 0){
-                System.out.print("-");
-                i--;
+        System.err.println("Please wait until countdown has passed! Robot may freak out if you dont.");
+        while(i>0){
+            System.err.print(i+" ");
+            for(int a = i;a > 0;a--){
+                System.err.print("-");
             }
-            System.out.print("\n");
-            if(i<1){
-                break;
-            }
+            System.err.print("\n");
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
             }
+            i--;
         }
-        System.out.println("The robot should be fine to use now, so give the thumbs up.");
+        System.err.println("The robot should be fine to use now, so give the thumbs up.");
     }
 }
