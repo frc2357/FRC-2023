@@ -1,4 +1,4 @@
-package com.team2357.frc2023.commands.auto.gridone;
+package com.team2357.frc2023.commands.auto;
 
 import com.pathplanner.lib.PathConstraints;
 import com.team2357.frc2023.commands.drive.Test1AutoBalanceCommand;
@@ -14,8 +14,8 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
-public class GridOneScoreOneAndBalance extends ParallelCommandGroup {
-    public GridOneScoreOneAndBalance() {
+public class Col4StowBalance extends ParallelCommandGroup {
+    public Col4StowBalance() {
         addCommands(
             new SequentialCommandGroup(
                 // Initialize
@@ -39,7 +39,7 @@ public class GridOneScoreOneAndBalance extends ParallelCommandGroup {
             // Path movement
             new SequentialCommandGroup(
                 new WaitCommand(3),
-                TrajectoryUtil.createTrajectoryPathCommand("grid1 1 cone balance", new PathConstraints(1.25, 1), true),
+                TrajectoryUtil.createTrajectoryPathCommand(getClass().getSimpleName(), new PathConstraints(1.25, 1), true),
                 new Test1AutoBalanceCommand()
                 )
         );
