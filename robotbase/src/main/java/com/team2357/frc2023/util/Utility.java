@@ -18,6 +18,7 @@ import com.team2357.frc2023.commands.scoring.cube.CubeMidScoreCommand;
 import com.team2357.frc2023.networktables.Buttonboard;
 import com.team2357.frc2023.networktables.Buttonboard.Gamepiece;
 import com.team2357.frc2023.state.RobotState;
+import com.team2357.frc2023.state.RobotState.State;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -93,10 +94,10 @@ public class Utility {
                 switch (RobotState.getState()) {
                     case ROBOT_STOWED_CONE:
                         checkGamepieceSelections(gamepiece, Gamepiece.CONE);
-                        return new ConeLowPrePoseCommand();
+                        return verifyNotInPrepose(State.ROBOT_PRE_SCORE_CONE_LOW, new ConeLowPrePoseCommand());
                     case ROBOT_STOWED_CUBE:
                         checkGamepieceSelections(gamepiece, Gamepiece.CUBE);
-                        return new CubeLowPrePoseCommand();
+                        return verifyNotInPrepose(State.ROBOT_PRE_SCORE_CUBE_LOW, new CubeLowPrePoseCommand());
                     default:
                         return new WaitCommand(0);
                 }
@@ -105,20 +106,20 @@ public class Utility {
                     case 0:
                     case 2:
                         checkGamepieceSelections(gamepiece, Gamepiece.CONE);
-                        return new ConeMidPrePoseCommand();
+                        return verifyNotInPrepose(State.ROBOT_PRE_SCORE_CONE_MID, new ConeMidPrePoseCommand());
                     case 1:
                         checkGamepieceSelections(gamepiece, Gamepiece.CUBE);
-                        return new CubeMidPrePoseCommand();
+                        return verifyNotInPrepose(State.ROBOT_PRE_SCORE_CUBE_MID, new CubeMidPrePoseCommand());
                 }
             case 0:
                 switch (col % 3) {
                     case 0:
                     case 2:
                         checkGamepieceSelections(gamepiece, Gamepiece.CONE);
-                        return new ConeHighPrePoseCommand();
+                        return verifyNotInPrepose(State.ROBOT_PRE_SCORE_CONE_HIGH, new ConeHighPrePoseCommand());
                     case 1:
                         checkGamepieceSelections(gamepiece, Gamepiece.CUBE);
-                        return new CubeHighPrePoseCommand();
+                        return verifyNotInPrepose(State.ROBOT_PRE_SCORE_CUBE_HIGH, new CubeHighPrePoseCommand());
                 }
         }
 
@@ -161,6 +162,14 @@ public class Utility {
         }
 
         return new WaitCommand(0);
+    }
+
+    public static Command verifyNotInPrepose(State preposeState, Command preposeCommand) {
+        if (preposeState == RobotState.getState()) {
+            return new WaitCommand(0);
+        }
+        return preposeCommand;
+
     }
 
     public static void checkGamepieceSelections(Gamepiece buttonboardSelection, Gamepiece stateSelection) {
