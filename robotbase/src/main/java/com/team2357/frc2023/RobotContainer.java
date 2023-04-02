@@ -13,7 +13,6 @@ import com.team2357.frc2023.state.RobotState;
 import com.team2357.frc2023.subsystems.DualLimelightManagerSubsystem;
 import com.team2357.frc2023.subsystems.SubsystemFactory;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
-import com.team2357.frc2023.trajectoryutil.AvailableTrajectoryCommands;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -76,9 +75,6 @@ public class RobotContainer {
         Constants.COMPRESSOR.MAX_PRESSURE_PSI);
     // m_compressor.disable();
 
-    // Build trajectory paths
-    AvailableTrajectoryCommands.generateTrajectories();
-
     // Configure Shuffleboard
     configureShuffleboard();
 
@@ -99,6 +95,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return m_autoCommandChooser.generateCommand();
+    return m_autoCommandChooser.getSelectedAutoCommand();
   }
 }
