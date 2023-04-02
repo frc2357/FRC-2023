@@ -498,13 +498,13 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 				states[3].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
 				states[3].angle.getRadians());
 
-		Logger.getInstance().recordOutput("Swerve measurments/Swerve Setpoints", states);
+		Logger.getInstance().recordOutput("Swerve/Swerve Setpoints", states);
 		SwerveModuleState[] loggingSwerveStates = states;
 		loggingSwerveStates[0] = m_frontLeftModule.getState();
 		loggingSwerveStates[1] = m_frontRightModule.getState();
 		loggingSwerveStates[2] = m_backLeftModule.getState();
 		loggingSwerveStates[3] = m_backRightModule.getState();
-		Logger.getInstance().recordOutput("Swerve measurments/Swerve Speed", loggingSwerveStates);
+		Logger.getInstance().recordOutput("Swerve/Swerve Speed", loggingSwerveStates);
 		Logger.getInstance().recordOutput("Robot Pose", getPose());
 
 		updateFieldVelocity();
