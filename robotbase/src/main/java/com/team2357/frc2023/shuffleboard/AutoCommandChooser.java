@@ -14,18 +14,10 @@ public class AutoCommandChooser {
     private AutoActionChooser autoChooser;
 
     private enum automodes {
-        NONE,
-        // GRID_0_TWO_CONE,
-        // GRID_0_TWO_CONE_BALANCE,
-        // GRID_1_TWO_CONE,
-        // GRID_1_TWO_CONE_BALANCE,
-        // GRID_2_TWO_CONE,
-        // GRID_2_TWO_CONE_BALANCE
-        GRID_ZERO,
-        GRID_ONE,
-        GRID_TWO,
-        GRID_ONE_MOBILITY,
-        SCORE
+        NONE { public String toString() { return "None"; } },
+        SCORE_HIGH_CONE { public String toString() { return "High Cone"; } },
+        COL_4_STOW_BALANCE { public String toString() { return "Col 4,Stow,Balance"; } },
+        COL_9_COL_7_BALANCE { public String toString() { return "Col 9,Col 7,Balance"; } },
     }
 
     private class AutoActionChooser {
@@ -37,7 +29,7 @@ public class AutoCommandChooser {
             m_chooser.setDefaultOption("None", automodes.NONE);
             for (automodes automode : automodes.values()) {
                 if (automode != automodes.NONE) {
-                    m_chooser.addOption(automode.toString().toLowerCase(), automode);
+                    m_chooser.addOption(automode.toString(), automode);
                 }
             }
 
@@ -46,28 +38,13 @@ public class AutoCommandChooser {
 
         public Command getActionCommand() {
             switch (m_chooser.getSelected()) {
-                // case GRID_0_TWO_CONE:
-                //     return new GridZeroTwoConeAutoCommand();
-                // case GRID_0_TWO_CONE_BALANCE:
-                //     return new GridZeroTwoConeBalanceAutoCommand();
-                // case GRID_1_TWO_CONE:
-                //     return new GridOneTwoConeAutoCommand();
-                // case GRID_1_TWO_CONE_BALANCE:
-                //     return new GridOneTwoConeBalanceAutoCommand();
-                // case GRID_2_TWO_CONE:
-                //     return new GridTwoTwoConeAutoCommand();
-                // case GRID_2_TWO_CONE_BALANCE:
-                //     return new GridTwoTwoConeBalanceAutoCommand();
-                case GRID_ZERO:
-                    return AvailableTrajectoryCommands.GridZeroTwoConeAuto;
-                case GRID_ONE:
-                    return AvailableTrajectoryCommands.GridOneScoreOneAndBalance;
-                case GRID_TWO:
-                    return AvailableTrajectoryCommands.GridTwoTwoConeAuto;
-                case SCORE:
-                    return AvailableTrajectoryCommands.Score;
-                case GRID_ONE_MOBILITY:
-                    return AvailableTrajectoryCommands.GridOneMobility;
+                case SCORE_HIGH_CONE:
+                    return AvailableTrajectoryCommands.scoreHighCone;
+                case COL_4_STOW_BALANCE:
+                    return AvailableTrajectoryCommands.col4StowBalance;
+                case COL_9_COL_7_BALANCE:
+                    return AvailableTrajectoryCommands.col9Col7Balance;
+                case NONE:
                 default:
                     return new WaitCommand(0);
             }

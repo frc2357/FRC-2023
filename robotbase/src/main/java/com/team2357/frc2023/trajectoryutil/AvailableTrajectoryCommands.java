@@ -1,33 +1,19 @@
 package com.team2357.frc2023.trajectoryutil;
 
-import com.team2357.frc2023.commands.auto.ScoreHighAutoCommand;
-import com.team2357.frc2023.commands.auto.gridone.GridOneScoreOneAndBalance;
-import com.team2357.frc2023.commands.auto.gridone.GridOneScoreOneAndMobility;
-import com.team2357.frc2023.commands.auto.gridtwo.GridTwoTwoConeAutoCommand;
-import com.team2357.frc2023.commands.auto.gridzero.GridZeroTwoConeAutoCommand;
+import com.team2357.frc2023.commands.auto.Col4StowBalance;
+import com.team2357.frc2023.commands.auto.Col9Col7Balance;
+import com.team2357.frc2023.commands.auto.ScoreHighCone;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class AvailableTrajectoryCommands {
-    public static Command GridZeroTwoConeAuto;
-
-    public static Command GridTwoTwoConeAuto;
-
-    public static Command GridOneScoreOneAndBalance;
-
-    public static Command Score;
-
-    public static Command GridOneMobility;
+    public static Command scoreHighCone;
+    public static Command col4StowBalance;
+    public static Command col9Col7Balance;
 
     public static void generateTrajectories() {
-        GridZeroTwoConeAuto = new GridZeroTwoConeAutoCommand();
-  
-        GridTwoTwoConeAuto = new GridTwoTwoConeAutoCommand();
-
-        GridOneScoreOneAndBalance = new GridOneScoreOneAndBalance();
-
-        Score = new ScoreHighAutoCommand();
-
-        GridOneMobility = new GridOneScoreOneAndMobility();
+        scoreHighCone = new ScoreHighCone();
+        col4StowBalance = new Col4StowBalance();
+        col9Col7Balance = new Col9Col7Balance();
     }
 }
