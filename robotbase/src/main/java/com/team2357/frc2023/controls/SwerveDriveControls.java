@@ -1,13 +1,10 @@
 package com.team2357.frc2023.controls;
 
-import com.team2357.frc2023.commands.drive.AutoBalanceCommand;
-import com.team2357.frc2023.commands.intake.IntakeDeployConeCommandGroup;
-import com.team2357.frc2023.commands.intake.IntakeDeployCubeCommandGroup;
+import com.team2357.frc2023.commands.intake.IntakeConeCommandGroup;
+import com.team2357.frc2023.commands.intake.IntakeCubeCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakePreSignalConeCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakePreSignalCubeCommandGroup;
-import com.team2357.frc2023.commands.intake.IntakeRollerReverseCommand;
-import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
-import com.team2357.frc2023.commands.intake.IntakeStowCommandGroup;
+import com.team2357.frc2023.commands.scoring.AutoLineupCommand;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.lib.triggers.AxisThresholdTrigger;
 import com.team2357.lib.util.XboxRaw;
@@ -25,7 +22,8 @@ public class SwerveDriveControls {
     private JoystickButton m_rightBumper;
     private JoystickButton m_leftBumper;
     private JoystickButton m_aButton;
-    private JoystickButton m_xButton;
+    private JoystickButton m_bButton;
+    private JoystickButton m_yButton;
     private JoystickButton m_startButton;
 
     private AxisThresholdTrigger m_leftTriggerPre;
@@ -40,7 +38,8 @@ public class SwerveDriveControls {
         m_deadband = deadband;
 
         m_aButton = new JoystickButton(m_controller, XboxRaw.A.value);
-        m_xButton = new JoystickButton(m_controller, XboxRaw.X.value);
+        m_bButton = new JoystickButton(m_controller, XboxRaw.B.value);
+        m_yButton = new JoystickButton(m_controller, XboxRaw.Y.value);
         
         m_backButton = new JoystickButton(m_controller, XboxRaw.Back.value);
         m_startButton = new JoystickButton(m_controller, XboxRaw.Start.value);
@@ -69,19 +68,14 @@ public class SwerveDriveControls {
         m_leftTriggerPre.onTrue(new IntakePreSignalConeCommandGroup());
         m_rightTriggerPre.onTrue(new IntakePreSignalCubeCommandGroup());
 
-        // Intake deploy/stow
-        m_leftTriggerFull.whileTrue(new IntakeDeployConeCommandGroup());
-        m_leftTriggerFull.onFalse(new IntakeStowCommandGroup());
+        // Cone Intake deploy/stow
+        m_leftTriggerFull.whileTrue(new IntakeConeCommandGroup());
 
-        m_rightTriggerFull.whileTrue(new IntakeDeployCubeCommandGroup());
-        m_rightTriggerFull.onFalse(new IntakeStowCommandGroup());
+        // Cone Intake deploy/stow
+        m_rightTriggerFull.whileTrue(new IntakeCubeCommandGroup());
 
-        m_aButton.whileTrue(new AutoBalanceCommand());
-
-        //Teleop auto
-        //m_rightBumper.whileTrue(new HeartlandAutoTranslateCommand(m_controller));
-        //m_leftBumper.whileTrue(new HeartlandAutoScoreCommand());
-
+        // Auto score
+        m_aButton.whileTrue(new AutoLineupCommand(m_controller));
     }
 
     public double getX() {

@@ -38,13 +38,13 @@ public class Buttonboard {
             case Constants.BUTTONBOARD.ALLIANCE_TOPIC_NAME:
                 switch (event.valueData.value.getString()) {
                     case "red":
-                        m_allianceValue.set(DriverStation.Alliance.Red);
+                        //m_allianceValue.set(DriverStation.Alliance.Red);
                         break;
                     case "blue":
-                        m_allianceValue.set(DriverStation.Alliance.Blue);
+                        //m_allianceValue.set(DriverStation.Alliance.Blue);
                         break;
                     default:
-                        m_allianceValue.set(DriverStation.Alliance.Invalid);
+                        //m_allianceValue.set(DriverStation.Alliance.Invalid);
                         break;
                 }
                 new ConfigureAllianceCommand(getAlliance()).schedule();
@@ -102,6 +102,10 @@ public class Buttonboard {
 
     public DriverStation.Alliance getAlliance() {
         return m_allianceValue.get();
+    }
+
+    public void setAlliance() {
+        m_allianceValue.set(DriverStation.getAlliance());
     }
 
     public void close() {

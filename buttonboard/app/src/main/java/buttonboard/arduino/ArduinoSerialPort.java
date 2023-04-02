@@ -3,6 +3,7 @@ package buttonboard.arduino;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -23,20 +24,48 @@ public class ArduinoSerialPort implements Runnable {
 
   private static List<String> SUPPORTED_PORT_NAMES = Arrays.asList(
     "PicoArduino (Dial-In)",
-    "Feather RP2040 SCORPIO (Dial-In)"
+    "Feather RP2040 SCORPIO (Dial-In)",
+    "USB Serial Device"
   );
 
   private static Map<String, ArduinoSerialPort> m_serialPorts = new HashMap<String, ArduinoSerialPort>();
 
+  public static boolean isValidDevice(String descriptivePortName) {
+    Iterator<String> itr = SUPPORTED_PORT_NAMES.iterator();
+    while (itr.hasNext()) {
+      String supportedName = itr.next();
+      // If the serial port comes in with extra text, like (COM3) at the end, it's ok.
+      if (descriptivePortName.startsWith(supportedName)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public static void scan(Listener listener) {
     SerialPort[] serialPorts = SerialPort.getCommPorts();
     for (SerialPort port : serialPorts) {
-      if (!m_serialPorts.containsKey(port.getSystemPortPath()) &&
-          SUPPORTED_PORT_NAMES.contains(port.getDescriptivePortName())) {
-        ArduinoSerialPort p = new ArduinoSerialPort(port);
-        m_serialPorts.put(port.getSystemPortPath(), p);
-        p.setListener((listener));
-        p.start();
+      if (!m_serialPorts.containsKey(port.getSystemPortPath())) {
+        if (isValidDevice(port.getDescriptivePortName())) {
+          System.out.println(
+            "Found compatible device '" +
+            port.getDescriptivePortName() +
+            "' on serial port " +
+            port.getSystemPortPath()
+          );
+          ArduinoSerialPort p = new ArduinoSerialPort(port);
+          m_serialPorts.put(port.getSystemPortPath(), p);
+          p.setListener((listener));
+          p.start();
+        } else {
+          System.out.println(
+            "Found non-compatible device '" +
+            port.getDescriptivePortName() +
+            "' on serial port " +
+            port.getSystemPortPath()
+          );
+          m_serialPorts.put(port.getSystemPortPath(), null);
+        }
       }
     }
   }

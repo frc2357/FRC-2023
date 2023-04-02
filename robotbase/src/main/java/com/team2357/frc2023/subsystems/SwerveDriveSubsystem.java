@@ -9,41 +9,41 @@ import org.littletonrobotics.junction.Logger;
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 import com.swervedrivespecialties.swervelib.AbsoluteEncoder;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.apriltag.AprilTagEstimate;
-import com.team2357.frc2023.apriltag.GridCamEstimator;
-import com.team2357.frc2023.commands.scoring.AutoScoreLowCommandGroup;
-import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreHighCommandGroup;
-import com.team2357.frc2023.commands.scoring.cone.ConeAutoScoreMidCommandGroup;
-import com.team2357.frc2023.commands.scoring.cube.CubeAutoScoreHighCommandGroup;
-import com.team2357.frc2023.commands.scoring.cube.CubeAutoScoreMidCommandGroup;
-import com.team2357.frc2023.networktables.GridCam;
+import com.team2357.frc2023.subsystems.DualLimelightManagerSubsystem.LIMELIGHT;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
+import com.team2357.lib.subsystems.LimelightSubsystem;
 import com.team2357.lib.util.Utility;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 
 public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	private static SwerveDriveSubsystem instance = null;
@@ -81,38 +81,6 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		return COLUMN_TARGET.NONE;
 	}
 
-	/**
-	 * @param row row to score on (low: 2, mid: 1, high: 0)
-	 * @return Auto score command to run
-	 */
-	public static Command getAutoScoreCommands(int row, int col) {
-		switch (row) {
-			case 0:
-				switch (col % 3) {
-					case 0:
-					case 2:
-						return new ConeAutoScoreHighCommandGroup();
-					case 1:
-						return new CubeAutoScoreHighCommandGroup();
-					default:
-						return new AutoScoreLowCommandGroup(); // Potentially default to ConeAutoScoreHighCommandGroup
-				}
-			case 1:
-				switch (col % 3) {
-					case 0:
-					case 2:
-						return new ConeAutoScoreMidCommandGroup();
-					case 1:
-						return new CubeAutoScoreMidCommandGroup();
-					default:
-						return new AutoScoreLowCommandGroup(); // Potentially default to ConeAutoScoreHighCommandGroup
-				}
-			default:
-				return new AutoScoreLowCommandGroup();
-		}
-
-	}
-
 	private SwerveDriveKinematics m_kinematics;
 
 	private WPI_Pigeon2 m_pigeon;
@@ -138,6 +106,13 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	// Whether or not the robot is seeking to get the primary limelight camera in
 	// view
 	private boolean m_isSeeking;
+
+	// The current path the robot is running
+	private PathPlannerTrajectory m_currentTrajectory;
+	// Time when trajectory starts
+	private double m_trajectoryStartSeconds;
+
+	private Twist2d m_fieldVelocity;
 
 	public static class Configuration {
 		/**
@@ -236,6 +211,16 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		 * Error tolerance in meters for vision estimate from encoder estimate in meters
 		 */
 		public double m_visionToleranceMeters;
+
+		/**
+		 * Profiled PID controller for translation for autoAlign
+		 */
+		public ProfiledPIDController m_autoAlignDriveController;
+
+		/**
+		 * Profiled PID controller for rotation for autoAlign
+		 */
+		public ProfiledPIDController m_autoAlignThetaController;
 	}
 
 	public SwerveDriveSubsystem(int pigeonId, int[] frontLeftIds, int[] frontRightIds,
@@ -293,6 +278,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		);
 
 		m_targetColumn = COLUMN_TARGET.NONE;
+		m_fieldVelocity = new Twist2d();
 		instance = this;
 	}
 
@@ -318,7 +304,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 				new Pose2d(0.0, 0.0, getGyroscopeRotation()), m_config.m_stateStdDevs,
 				m_config.m_visionMeasurementStdDevs);
 
-		m_translateXController=m_config.m_translateXController;m_translateYController=m_config.m_translateYController;
+		m_translateXController = m_config.m_translateXController;
+		m_translateYController = m_config.m_translateYController;
 	}
 
 	public PIDController getXController() {
@@ -331,6 +318,18 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	public PIDController getThetaController() {
 		return m_config.m_thetaController;
+	}
+
+	public ProfiledPIDController getAutoAlignDriveController() {
+		return m_config.m_autoAlignDriveController;
+	}
+
+	public ProfiledPIDController getAutoAlignThetaController() {
+		return m_config.m_autoAlignThetaController;
+	}
+
+	public Twist2d getFieldVelocity() {
+		return m_fieldVelocity;
 	}
 
 	public SwerveDriveKinematics getKinematics() {
@@ -379,27 +378,6 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		return m_areEncodersSynced;
 	}
 
-	public void zero() {
-		SwerveModuleState state = new SwerveModuleState(0.0, Rotation2d.fromDegrees(0.0));
-
-		// m_frontLeftModule.set(
-		// state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond *
-		// m_config.m_maxVoltage,
-		// state.angle.getRadians());
-		// m_frontRightModule.set(
-		// state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond *
-		// m_config.m_maxVoltage,
-		// state.angle.getRadians());
-		// m_backLeftModule.set(
-		// state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond *
-		// m_config.m_maxVoltage,
-		// state.angle.getRadians());
-		// m_backRightModule.set(
-		// state.speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond *
-		// m_config.m_maxVoltage,
-		// state.angle.getRadians());
-	}
-
 	public void zeroGyroscope() {
 		m_pigeon.reset();
 	}
@@ -410,6 +388,14 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	public double getYaw() {
 		return m_pigeon.getYaw();
+	}
+
+	public double getYaw0To360() {
+		double yaw = getYaw() % 360;
+		while (yaw < 0) {
+			yaw += 360;
+		}
+		return yaw;
 	}
 
 	public double getPitch() {
@@ -459,8 +445,34 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		m_chassisSpeeds = chassisSpeeds;
 	}
 
+	public void setCurrentTrajectory(PathPlannerTrajectory trajectory) {
+		m_currentTrajectory = trajectory;
+		m_trajectoryStartSeconds = Timer.getFPGATimestamp();
+	}
+
+	public void endTrajectory() {
+		m_currentTrajectory = null;
+		m_trajectoryStartSeconds = 0;
+	}
+
 	public void updatePoseEstimator() {
-		//addVisionPoseEstimate(GridCamEstimator.getInstance().estimateRobotPose(GridCam.getInstance().getCamRelativePoses()));
+
+		LimelightSubsystem leftLL = DualLimelightManagerSubsystem.getInstance().getLimelight(LIMELIGHT.LEFT);
+		LimelightSubsystem rightLL = DualLimelightManagerSubsystem.getInstance().getLimelight(LIMELIGHT.RIGHT);
+
+		Pose2d leftPose = leftLL.getCurrentAllianceLimelightPose();
+		Pose2d rightPose = rightLL.getCurrentAllianceLimelightPose();
+
+		double leftTime = leftLL.getCurrentAllianceBotposeTimestamp();
+		double rightTime = rightLL.getCurrentAllianceBotposeTimestamp();
+
+		if (leftPose != null) {
+			addVisionPoseEstimate(leftPose, leftTime);
+		}
+
+		if (rightPose != null) {
+			addVisionPoseEstimate(rightPose, rightTime);
+		}
 
 		m_poseEstimator.update(getGyroscopeRotation(),
 				new SwerveModulePosition[] { m_frontLeftModule.getPosition(),
@@ -470,57 +482,46 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	public void addVisionPoseEstimate(AprilTagEstimate estimate) {
 
-		if(estimate == null) {
+		if (estimate == null) {
 			return;
 		}
 
 		Pose2d pose = estimate.getPose();
-		System.out.println(
-				"Vision x: " + pose.getX() + ", Y: " + pose.getY() + ", Rot: " + pose.getRotation().getDegrees());
-
-		Pose2d robotPose = getPose();
-		System.out.println(
-				"robot x: " + robotPose.getX() + ", Y: " + robotPose.getY() + ", Rot: "
-						+ robotPose.getRotation().getDegrees());
-
-		double xError = robotPose.getX() - pose.getX();
-		double yError = robotPose.getY() - pose.getY();
-
-		System.out.println("Error X: " + xError + " Y: " + yError);
-
-		if (estimate != null && Utility.isWithinTolerance(pose.getX(), robotPose.getX(), m_config.m_visionToleranceMeters) &&
-		 Utility.isWithinTolerance(robotPose.getY(), pose.getY(), m_config.m_visionToleranceMeters)) {
-			// m_poseEstimator.addVisionMeasurement(estimate.getPose(),
-					// estimate.getTimeStamp());
-		}
+		addVisionPoseEstimate(pose, estimate.getTimeStamp());
 	}
 
-	public void balance() {
-		double yaw, direction, angle, error, power;
-		angle = 0;
-		direction = 0;
+	/**
+	 * 
+	 * @param pose      The estimated pose from vision
+	 * @param timestamp Timestamp of the vision pose
+	 */
+	public void addVisionPoseEstimate(Pose2d pose, double timestamp) {
 
-		yaw = Math.abs(getYaw() % 360);
-
-		angle = getTilt(yaw);
-		direction = getDirection(yaw);
-
-		if (angle > Constants.DRIVE.BALANCE_FULL_TILT_DEGREES) {
+		if (pose == null) {
 			return;
 		}
 
-		error = Math.copySign(Constants.DRIVE.BALANCE_LEVEL_DEGREES + Math.abs(angle), angle);
-		power = Math.min(Math.abs(Constants.DRIVE.BALANCE_KP * error), Constants.DRIVE.BALANCE_MAX_POWER);
-		power = Math.copySign(power, error);
+		Logger.getInstance().recordOutput("Vision timestamp error", Timer.getFPGATimestamp() - timestamp);
+		if (Utility.isWithinTolerance(pose.getRotation().getDegrees(), getYaw(), 15)) {
 
-		power *= direction;
+			if (m_currentTrajectory != null) {
+				Pose2d trajPose = m_currentTrajectory.sample(timestamp - m_trajectoryStartSeconds).poseMeters;
+				if (!Utility.isWithinTolerance(pose.getX(), trajPose.getX(),
+						m_config.m_visionToleranceMeters) ||
+						!Utility.isWithinTolerance(pose.getY(), trajPose.getY(),
+								m_config.m_visionToleranceMeters)) {
+					Logger.getInstance().recordOutput("Vision Pose", "Thrown");
+					return;
+				}
+			}
 
-		drive(power, 0, 0);
-	}
+			Logger.getInstance().recordOutput("Left limelight botpose filtered", pose);
+			m_poseEstimator.addVisionMeasurement(pose, timestamp);
+			Logger.getInstance().recordOutput("Vision Pose", "Added");
 
-	public boolean isBalanced() {
-		double yaw = Math.abs(getYaw() % 360);
-		return getTilt(yaw) < Constants.DRIVE.BALANCE_LEVEL_DEGREES;
+		} else {
+			Logger.getInstance().recordOutput("Vision Pose", "Thrown");
+		}
 	}
 
 	public double getTilt(double yaw) {
@@ -539,17 +540,17 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	public int getDirection(double yaw) {
-		int direction;
+		int direction = 0;
 		if ((0 <= yaw && yaw < 45) || (315 <= yaw && yaw <= 360)) {
 			direction = 1;
 		} else if (45 <= yaw && yaw < 135) {
-			direction = 1;
+			direction = -1;
 		} else if (135 <= yaw && yaw < 225) {
 			direction = -1;
 		} else if (225 <= yaw && yaw < 315) {
-			direction = -1;
+			direction = 1;
 		}
-		return direction = 0;
+		return direction;
 	}
 
 	public void enableOpenLoopRamp() {
@@ -713,6 +714,17 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		drive(0, 0, 0);
 	}
 
+	private void updateFieldVelocity() {
+		Translation2d linearFieldVelocity = new Translation2d(m_chassisSpeeds.vxMetersPerSecond,
+				m_chassisSpeeds.vyMetersPerSecond)
+				.rotateBy(getPose().getRotation());
+
+		m_fieldVelocity = new Twist2d(
+				linearFieldVelocity.getX(),
+				linearFieldVelocity.getY(),
+				Math.toRadians(m_pigeon.getRate()));
+	}
+
 	@Override
 	public void periodic() {
 		updatePoseEstimator();
@@ -720,10 +732,12 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		// SmartDashboard.putNumber("Angle", m_pigeon.getYaw());
 
 		// SmartDashboard.putNumber("Yaw", m_pigeon.getYaw());
-		// SmartDashboard.putNumber("Pose X", m_poseEstimator.getEstimatedPosition().getX());
-		// SmartDashboard.putNumber("Pose Y", m_poseEstimator.getEstimatedPosition().getY());
+		// SmartDashboard.putNumber("Pose X",
+		// m_poseEstimator.getEstimatedPosition().getX());
+		// SmartDashboard.putNumber("Pose Y",
+		// m_poseEstimator.getEstimatedPosition().getY());
 		// SmartDashboard.putNumber("Pose Angle",
-		//		m_poseEstimator.getEstimatedPosition().getRotation().getDegrees());
+		// m_poseEstimator.getEstimatedPosition().getRotation().getDegrees());
 
 		SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
 		SwerveDriveKinematics.desaturateWheelSpeeds(states, m_config.m_maxVelocityMetersPerSecond);
@@ -755,6 +769,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		if (isClosedLoopEnabled() && isTracking()) {
 			trackingPeriodic();
 		}
+
+		updateFieldVelocity();
 	}
 
 	public void printEncoderVals() {
