@@ -53,7 +53,7 @@ public class DriveToPoseWithAngleCommand extends CommandBase {
         m_xDriveController.setTolerance(0.05);
 
         m_yDriveController = new ProfiledPIDController(
-                0.1, 0.0, 0, new TrapezoidProfile.Constraints(7.5, 7.5));
+                0.2, 0.0, 0.00, new TrapezoidProfile.Constraints(30, 100));
         m_yDriveController.setTolerance(0.05);
 
         m_thetaController = new ProfiledPIDController(
@@ -96,34 +96,32 @@ public class DriveToPoseWithAngleCommand extends CommandBase {
         double tYCurrent = m_limelight.getTY();
 
         // Calculate drive speed
-        double tYError = tYCurrent - m_tYTarget;
-        double xDegreesPerSecond = m_xDriveController.calculate(tYError, 0.0);
+        double xDegreesPerSecond = m_xDriveController.calculate(tYCurrent, m_tYTarget);
         if (m_xDriveController.atGoal())
             xDegreesPerSecond = 0.0;
 
-        double tXError = tXCurrent - m_tXTarget;
         double yDegreesPerSecond = -m_yDriveController.calculate(tXCurrent, m_tXTarget);
-        if (m_yDriveController.atGoal())
+        if (m_yDriveController.atGoal()){
+            System.out.println("At goal");
             yDegreesPerSecond = 0.0;
+        }
 
         // Calculate theta speed
         double thetaDegreesPerSecond = m_thetaController.calculate(m_swerve.getYaw());
         if (m_thetaController.atGoal())
             thetaDegreesPerSecond = 0.0;
 
-        System.out.println("Error: " + tXError);
         System.out.println("Y degrees per second: " + yDegreesPerSecond);
 
-        double xMetersPerSecond = xDegreesPerSecond * (4/7.5) + Math.copySign(0.2, xDegreesPerSecond); // Factor to go from degrees per second to meters per second
-        double yMetersPerSecond = yDegreesPerSecond * (4/7.5) + Math.copySign(0.244, yDegreesPerSecond); // Factor to go from degrees per second to meters per second
+        double xMetersPerSecond = (xDegreesPerSecond * (4/7.5)) + Math.copySign(0.2, xDegreesPerSecond); // Factor to go from degrees per second to meters per second
+        double yMetersPerSecond = (yDegreesPerSecond * (4.0/30.0)) + Math.copySign(0.2, yDegreesPerSecond); // Factor to go from degrees per second to meters per second
         double thetaRadiansPerSecond = Math.toRadians(thetaDegreesPerSecond); // Factor to go from degrees per second to
                                                                               // radians per second
-
         System.out.println("Y meters per second: " + yMetersPerSecond);
                                                                               
         m_swerve.drive(
                 ChassisSpeeds.fromFieldRelativeSpeeds(
-                        0, yMetersPerSecond, 0,
+                        xMetersPerSecond, yMetersPerSecond, 0,
                         m_swerve.getGyroscopeRotation()));
     }
     // -2.3, 18.7

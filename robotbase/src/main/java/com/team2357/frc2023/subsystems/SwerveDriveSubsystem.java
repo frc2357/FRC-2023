@@ -30,6 +30,7 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -110,6 +111,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	private PathPlannerTrajectory m_currentTrajectory;
 	// Time when trajectory starts
 	private double m_trajectoryStartSeconds;
+
+	private Twist2d m_fieldVelocity;
 
 	public static class Configuration {
 		/**
@@ -210,13 +213,13 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		public double m_visionToleranceMeters;
 
 		/**
-		 * Profiled PID controller for translation for autoAlign 
+		 * Profiled PID controller for translation for autoAlign
 		 */
 		public ProfiledPIDController m_autoAlignDriveController;
 
-		 /**
-		  * Profiled PID controller for rotation for autoAlign
-		  */
+		/**
+		 * Profiled PID controller for rotation for autoAlign
+		 */
 		public ProfiledPIDController m_autoAlignThetaController;
 	}
 
@@ -275,6 +278,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		);
 
 		m_targetColumn = COLUMN_TARGET.NONE;
+		m_fieldVelocity = new Twist2d();
 		instance = this;
 	}
 
@@ -529,7 +533,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 			Logger.getInstance().recordOutput("Vision Pose", "Thrown");
 		}
 	}
-	
+
 	public double getTilt(double yaw) {
 		double angle = 0;
 		if ((0 <= yaw && yaw < 45) || (315 <= yaw && yaw <= 360)) {
@@ -765,6 +769,15 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		if (isClosedLoopEnabled() && isTracking()) {
 			trackingPeriodic();
 		}
+
+		Translation2d linearFieldVelocity = new Translation2d(m_chassisSpeeds.vxMetersPerSecond,
+				m_chassisSpeeds.vyMetersPerSecond)
+				.rotateBy(getPose().getRotation());
+
+		m_fieldVelocity = new Twist2d(
+				linearFieldVelocity.getX(),
+				linearFieldVelocity.getY(),
+				Math.toRadians(m_pigeon.getRate()));
 	}
 
 	public void printEncoderVals() {
@@ -778,5 +791,9 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		SmartDashboard.putNumber("back right module encoder count",
 				((TalonFX) (m_backRightModule.getDriveMotor())).getSelectedSensorPosition(0));
 
+	}
+
+	public Twist2d getFieldVelocity() {
+		return new Twist2d();
 	}
 }

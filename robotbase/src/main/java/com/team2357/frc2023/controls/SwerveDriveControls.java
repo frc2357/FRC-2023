@@ -1,5 +1,6 @@
 package com.team2357.frc2023.controls;
 
+import com.team2357.frc2023.commands.auto.AutoLineupCommand;
 import com.team2357.frc2023.commands.auto.DriveToPoseWithAngleCommand;
 import com.team2357.frc2023.commands.drive.Test1AutoBalanceCommand;
 import com.team2357.frc2023.commands.drive.Test2AutoBalanceCommand;
@@ -81,8 +82,7 @@ public class SwerveDriveControls {
         // Cone Intake deploy/stow
         m_rightTriggerFull.whileTrue(new IntakeCubeCommandGroup());
 
-        m_aButton.whileTrue(new DriveToPoseWithAngleCommand(
-         -12.5, 2.5));// 10, 2.5
+        m_rightBumper.whileTrue(new AutoLineupCommand(m_controller));// 10, 2.5
 
         //Teleop auto
         //m_rightBumper.whileTrue(new HeartlandAutoTranslateCommand(m_controller));
