@@ -102,9 +102,13 @@ public final class Constants {
             config.m_maxVelocityMetersPerSecond = 6380.0 / 60.0 *
                     SdsModuleConfigurations.MK4I_L2.getDriveReduction() *
                     SdsModuleConfigurations.MK4I_L2.getWheelDiameter() * Math.PI;
+            config.m_robotCentricMaxVelocityPerSecond = config.m_maxVelocityMetersPerSecond / 2;
+
 
             config.m_maxAngularVelocityRadiansPerSecond = config.m_maxVelocityMetersPerSecond /
                     Math.hypot(config.m_trackwidthMeters / 2.0, config.m_wheelbaseMeters / 2.0);
+            config.m_robotCentricMaxAngularVelocityRadiansPerSecond = config.m_maxAngularVelocityRadiansPerSecond / 2;
+
             config.m_maxAngularAccelerationRadiansPerSecondSquared = config.m_maxAngularVelocityRadiansPerSecond / 3.0;
 
             config.m_xController = new PIDController(8.0, 0, 0); // .56122 2.2
@@ -184,6 +188,8 @@ public final class Constants {
         public static final PathConstraints DEFAULT_PATH_CONSTRAINTS = new PathConstraints(2.5,
                 1.5);
         public static final PathConstraints GRID_ZERO_PATH_CONSTRAINTS = new PathConstraints(2, 1);
+   
+        public static final double TIME_TO_COAST_SECONDS = 5;
     }
 
     public static final class INTAKE_ROLLER {

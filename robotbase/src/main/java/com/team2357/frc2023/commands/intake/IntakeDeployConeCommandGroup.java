@@ -13,7 +13,6 @@ public class IntakeDeployConeCommandGroup extends ParallelCommandGroup {
     public IntakeDeployConeCommandGroup() {
         addCommands(
             new SetRobotStateCommand(RobotState.State.ROBOT_INTAKING_CONE),
-            new InstantCommand(() -> DualLimelightManagerSubsystem.getInstance().setHumanPipelineActive()),
             new SequentialCommandGroup(
                 new IntakeHalfDeployCommand(),
                 new IntakeArmDeployCommand()

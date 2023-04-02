@@ -26,6 +26,11 @@ public class RobotState {
         ROBOT_PRE_SCORE_CUBE_LOW,      // Robot is in the "pre-score" pose to score a cube in a low node
     };
 
+    public static enum DriveControlState {
+        FIELD_RELATIVE, // Manual control of the robot is field relative
+        ROBOT_CENTRIC // Manual control of the robot is robot centric
+    }
+
     public static Alliance getAlliance() {
         return s_instance.m_alliance;
     }
@@ -82,13 +87,27 @@ public class RobotState {
         s_instance.setCurrentState(newState);
     }
 
+    public static boolean isFieldRelative() {
+        return s_instance.m_currentDriveControlState == DriveControlState.FIELD_RELATIVE;
+    }
+
+    public static DriveControlState getDriveControlState() {
+        return s_instance.m_currentDriveControlState;
+    }
+
+    public static void setDriveControlState(DriveControlState driveControlState) {
+        s_instance.setCurrentDriveControlState(driveControlState);
+    }
+
     private Alliance m_alliance;
     private State m_currentState;
+    private DriveControlState m_currentDriveControlState;
     private boolean m_zeroed;
 
     private RobotState() {
         m_alliance = Alliance.Invalid;
         m_currentState = State.ROBOT_INIT;
+        m_currentDriveControlState = DriveControlState.FIELD_RELATIVE;
         m_zeroed = false;
     }
 
@@ -107,5 +126,10 @@ public class RobotState {
         Logger.getInstance().recordOutput("Robot State", newState.name());
         m_currentState = newState;
         LEDState.getInstance().updateLEDs(m_currentState, m_alliance);
+    }
+
+    private void setCurrentDriveControlState(DriveControlState driveControlState) {
+        Logger.getInstance().recordOutput("Robot Drive Control State", driveControlState.name());
+        m_currentDriveControlState = driveControlState;
     }
 }
