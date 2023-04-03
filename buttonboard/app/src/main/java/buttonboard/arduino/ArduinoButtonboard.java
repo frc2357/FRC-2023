@@ -27,6 +27,7 @@ public class ArduinoButtonboard implements ArduinoJSONDevice.DeviceListener, Net
   @Override
   public void onConnect() {
     System.out.println("--- Buttonboard Connected ---");
+    m_device.setSensorField(SENSOR_GRID, "value", m_gridString);
   }
 
   @Override
@@ -38,6 +39,12 @@ public class ArduinoButtonboard implements ArduinoJSONDevice.DeviceListener, Net
   public void onStateReceived() {
     updateAlliance(m_device.getSensor(SENSOR_ALLIANCE).getStringValue());
     updateTarget(m_device.getSensor(SENSOR_TARGET).getIntArray());
+
+    if (m_gridString != null && !m_device.getSensor(SENSOR_GRID).getStringValue().equals(m_gridString)) {
+      if (m_device.isConnected()) {
+        m_device.setSensorField(SENSOR_GRID, "value", m_gridString);
+      }
+    }
   }
 
   private void updateAlliance(String alliance) {
@@ -49,34 +56,28 @@ public class ArduinoButtonboard implements ArduinoJSONDevice.DeviceListener, Net
   }
 
   private void updateTarget(int[] target) {
-    int targetRow = target[0];
-    int targetCol = target[1];
+    int targetCol = target[0];
+    int targetRow = target[1];
     int targetType = target[2];
 
-    if (m_targetRow != targetRow) {
+    if (m_targetRow != targetRow || m_targetCol != targetCol || m_targetType != targetType) {
       m_targetRow = targetRow;
-      System.out.println("targetRow set: '" + m_targetRow + "'");
-    }
-
-    if (m_targetCol != targetCol) {
       m_targetCol = targetCol;
-      System.out.println("targetCol set: '" + m_targetCol + "'");
-    }
-
-    if (m_targetType != targetType) {
       m_targetType = targetType;
-      System.out.println("targetType set: '" + m_targetType + "'");
+      m_ntClient.setGridTarget(m_targetRow, m_targetCol, m_targetType);
+      System.out.println("target row/col/type set: " + m_targetRow + ", " + m_targetCol + ", " + m_targetType);
     }
   }
 
   @Override
   public void gridUpdated(String high, String mid, String low) {
+    System.out.println("GridUpdated: " + high + "/" + mid + "/" + low);
     String gridString = high + mid + low;
     if (gridString != m_gridString) {
       if (m_device.isConnected()) {
         m_device.setSensorField(SENSOR_GRID, "value", gridString);
-        m_gridString = gridString;
       }
+      m_gridString = gridString;
     }
   }
 }

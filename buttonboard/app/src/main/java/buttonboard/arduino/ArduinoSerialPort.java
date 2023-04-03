@@ -22,6 +22,7 @@ public class ArduinoSerialPort implements Runnable {
   private static int READ_SLEEP = 20;
   private static int BUFFER_SIZE = 1024;
 
+
   private static List<String> SUPPORTED_PORT_NAMES = Arrays.asList(
     "PicoArduino (Dial-In)",
     "Feather RP2040 SCORPIO (Dial-In)",
@@ -150,11 +151,13 @@ public class ArduinoSerialPort implements Runnable {
 
         if (newlineIndex >= 0) {
           String message = m_stringBuffer.substring(0, newlineIndex);
+          System.out.println("read: " + message);
           m_stringBuffer.delete(0, newlineIndex + 1);
           if (m_listener != null) {
             m_listener.onMessage(this, message);
           }
         }
+
       } catch (Exception e) {
         System.err.println("Exception while reading from " + m_port.getSystemPortPath());
         e.printStackTrace(System.err);
@@ -185,6 +188,7 @@ public class ArduinoSerialPort implements Runnable {
     while (bytesRemaining > 0) {
       int offset = bytes.length - bytesRemaining;
       int bytesWritten = m_port.writeBytes(bytes, bytesRemaining, offset);
+      System.out.println("write: " + message);
 
       if (bytesWritten == -1) {
         System.err.println("Write to serial port failed.");
