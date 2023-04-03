@@ -10,6 +10,8 @@ import com.team2357.frc2023.commands.human.panic.IntakeArmToggleCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeRollerAxisCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeWinchAxisCommand;
 import com.team2357.frc2023.commands.intake.WinchAmpZeroCommand;
+import com.team2357.frc2023.commands.scoring.AutoLineupCommand;
+import com.team2357.frc2023.commands.scoring.DriverAutoScoreCommand;
 import com.team2357.frc2023.commands.scoring.GunnerScoreHighCommand;
 import com.team2357.frc2023.commands.scoring.GunnerScoreLowCommand;
 import com.team2357.frc2023.commands.scoring.GunnerScoreMidCommand;
@@ -21,6 +23,7 @@ import com.team2357.lib.util.Utility;
 import com.team2357.lib.util.XboxRaw;
 
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -32,7 +35,14 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * 
  * @category Drive
  */
-public class GunnerControls {
+public class GunnerControls implements RumbleInterface {
+
+    private static GunnerControls s_instance;
+
+    public static GunnerControls getInstance() {
+        return s_instance;
+    }
+
     XboxController m_controller;
 
     // Triggers
@@ -60,6 +70,8 @@ public class GunnerControls {
      * @param builder The GunnerControlsBuilder object
      */
     public GunnerControls(XboxController controller) {
+        s_instance = this;
+
         m_controller = controller;
 
         // Triggers
@@ -195,9 +207,16 @@ public class GunnerControls {
         xButton.whileTrue(new GunnerScoreMidCommand());
         aButton.whileTrue(new GunnerScoreLowCommand());
 
+        m_leftBumper.whileTrue(new AutoLineupCommand());
+        m_rightBumper.whileTrue(new DriverAutoScoreCommand());
+
         // Zero all
         m_backButton.whileTrue(new ZeroAllCommand());
 
         m_startButton.whileTrue(new HomeMechanismsCommand());
+    }
+
+    public void setRumble(RumbleType type, double intensity) {
+        m_controller.setRumble(type, intensity);
     }
 }

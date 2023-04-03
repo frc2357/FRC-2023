@@ -2,6 +2,7 @@ package com.team2357.frc2023.commands.scoring;
 
 import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.commands.auto.DriveToPoseCommand;
+import com.team2357.frc2023.controls.GunnerControls;
 import com.team2357.frc2023.networktables.Buttonboard;
 import com.team2357.frc2023.subsystems.DualLimelightManagerSubsystem;
 import com.team2357.frc2023.util.Utility;
@@ -17,11 +18,6 @@ public class AutoLineupCommand extends CommandBase {
     DriveToPoseCommand m_driveToPose;
     Command m_preposeCommand;
     Pose2d m_targetPose;
-    XboxController m_controller;
-
-    public AutoLineupCommand(XboxController controller) {
-        m_controller = controller;
-    }
 
     @Override
     public void initialize() {
@@ -46,7 +42,7 @@ public class AutoLineupCommand extends CommandBase {
                     m_preposeCommand.schedule();
                 }
             } else {
-               m_controller.setRumble(RumbleType.kBothRumble, Constants.CONTROLLER.RUMBLE_INTENSITY);
+               GunnerControls.getInstance().setRumble(RumbleType.kBothRumble, Constants.CONTROLLER.RUMBLE_INTENSITY);
             }
         }
 
@@ -67,6 +63,6 @@ public class AutoLineupCommand extends CommandBase {
             m_preposeCommand.cancel();
         }
 
-        m_controller.setRumble(RumbleType.kBothRumble, 0.0);
+        GunnerControls.getInstance().setRumble(RumbleType.kBothRumble, 0.0);
     }
 }

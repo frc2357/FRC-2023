@@ -526,6 +526,7 @@ public final class Constants {
 
         public static final double RUMBLE_INTENSITY = 0.5;
         public static final double RUMBLE_TIMEOUT_SECONDS_ON_TELEOP_AUTO = 0.5;
+        public static final double RUMBLE_TIME_TO_START_AFTER_SCORE = 0.5;
 
         public static final int BUTTON_BOARD_NUM_ROWS = 3;
         public static final int BUTTON_BOARD_NUM_COLS = 9;
