@@ -90,49 +90,4 @@ public class Utility {
     public static Transform2d translationToTransform(double x, double y) {
         return new Transform2d(new Translation2d(x, y), new Rotation2d());
     }
-
-    public static Command getScoreCommand(int row, int col) {
-        switch (row) {
-            case 2:
-                switch (RobotState.getState()) {
-                    case ROBOT_PRE_SCORE_CONE_LOW:
-                        return new ConeLowScoreCommand();
-                    case ROBOT_PRE_SCORE_CUBE_LOW:
-                        return new CubeLowScoreCommand();
-                    default:
-                        break;
-                }
-            case 1:
-                switch (col % 3) {
-                    case 0:
-                    case 2:
-                        return verifyPreposeToScore(State.ROBOT_PRE_SCORE_CONE_MID, new ConeMidScoreCommand());
-                    case 1:
-                        return verifyPreposeToScore(State.ROBOT_PRE_SCORE_CUBE_MID, new CubeMidScoreCommand());
-                }
-            case 0:
-                switch (col % 3) {
-                    case 0:
-                    case 2:
-                        return verifyPreposeToScore(State.ROBOT_PRE_SCORE_CONE_HIGH, new ConeHighScoreCommand());
-                    case 1:
-                        return verifyPreposeToScore(State.ROBOT_PRE_SCORE_CUBE_HIGH, new CubeHighScoreCommand());
-                }
-        }
-
-        String message = "No target selected";
-        DriverStation.reportWarning(message, false);
-        Logger.getInstance().recordOutput("Auto Score", message);
-
-        return new WaitCommand(0);
-    }
-
-    public static Command verifyPreposeToScore(State preposeState, Command scoreCommand) {
-        if (!RobotState.isInState(preposeState)) {
-            DriverStation.reportWarning(
-                    "Tried to score " + preposeState.name() + " from " + RobotState.getState().name(), null);
-            return new WaitCommand(0);
-        }
-        return scoreCommand;
-    }
 }
