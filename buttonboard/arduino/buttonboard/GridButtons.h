@@ -126,15 +126,11 @@ private:
   void scanKeypad(Adafruit_Keypad &keypad) {
     while (keypad.available()) {
       keypadEvent e = keypad.read();
-      uint8_t row = e.bit.ROW;
-      uint8_t col = e.bit.COL;
+      uint8_t buttonRow = e.bit.ROW;
+      uint8_t buttonCol = e.bit.COL;
+      uint8_t row = buttonRow;
+      uint8_t col = GRID_COLS - 1 - buttonCol;
       if (e.bit.EVENT == KEY_JUST_PRESSED) {
-        uint16_t keynum;
-        if (row % 2 == 0) { // even row
-          keynum = row * GRID_COLS + col;
-        } else { // odd row the neopixels go BACKWARDS!
-          keynum = row * GRID_COLS + (5 - col);
-        }
         onKeyPress(row, col);
       }
       else if(e.bit.EVENT == KEY_JUST_RELEASED) {
@@ -260,11 +256,13 @@ private:
 
   size_t getLEDIndex(uint8_t row, uint8_t col) {
     size_t index; 
+    uint8_t buttonRow = row;
+    uint8_t buttonCol = GRID_COLS - 1 - col;
 
-    if (row % 2 == 0) { // even row
-      index = row * GRID_COLS + col;
+    if (buttonRow % 2 == 0) { // even row
+      index = buttonRow * GRID_COLS + buttonCol;
     } else { // odd row the neopixels go BACKWARDS!
-      index = row * GRID_COLS + ((GRID_COLS - 1) - col);
+      index = buttonRow * GRID_COLS + ((GRID_COLS - 1) - buttonCol);
     }
 
     return index;

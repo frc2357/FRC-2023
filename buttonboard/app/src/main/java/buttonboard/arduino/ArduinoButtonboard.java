@@ -56,8 +56,8 @@ public class ArduinoButtonboard implements ArduinoJSONDevice.DeviceListener, Net
   }
 
   private void updateTarget(int[] target) {
-    int targetRow = target[0];
-    int targetCol = target[1];
+    int targetCol = target[0];
+    int targetRow = target[1];
     int targetType = target[2];
 
     if (m_targetRow != targetRow || m_targetCol != targetCol || m_targetType != targetType) {
