@@ -92,16 +92,4 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
             return null;
         }
     }
-
-    @Override
-    public void periodic() {
-        if (m_leftLimelight.validTargetExists()) {
-            Logger.getInstance().recordOutput("limelight poses/Left limelight botpose wpi blue", m_leftLimelight.getBluePose());
-            Logger.getInstance().recordOutput("limelight poses/Left limelight botpose wpi red", m_leftLimelight.getRedPose());
-        }
-        if (m_rightLimelight.validTargetExists()) {
-            Logger.getInstance().recordOutput("limelight poses/Right limelight botpose wpi blue", m_rightLimelight.getBluePose());
-            Logger.getInstance().recordOutput("limelight poses/Right limelight botpose wpi red", m_rightLimelight.getRedPose());
-        }
-    }
 }
