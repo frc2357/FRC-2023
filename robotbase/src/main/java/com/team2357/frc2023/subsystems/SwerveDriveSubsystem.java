@@ -436,7 +436,6 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 			return;
 		}
 
-		Logger.getInstance().recordOutput("limelight poses/Vision timestamp error", Timer.getFPGATimestamp() - timestamp);
 		if (Utility.isWithinTolerance(pose.getRotation().getDegrees(), getYaw(), 15)) {
 
 			if (m_currentTrajectory != null) {
@@ -445,17 +444,12 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 						m_config.m_visionToleranceMeters) ||
 						!Utility.isWithinTolerance(pose.getY(), trajPose.getY(),
 								m_config.m_visionToleranceMeters)) {
-					Logger.getInstance().recordOutput("limelight poses/Vision Pose", "Thrown");
 					return;
 				}
 			}
 
-			Logger.getInstance().recordOutput("limelight poses/Left limelight botpose filtered", pose);
+			Logger.getInstance().recordOutput("filtered vision pose", pose);
 			m_poseEstimator.addVisionMeasurement(pose, timestamp);
-			Logger.getInstance().recordOutput("limelight poses/Vision Pose", "Added");
-
-		} else {
-			Logger.getInstance().recordOutput("limelight poses/Vision Pose", "Thrown");
 		}
 	}
 
@@ -529,13 +523,11 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 				states[3].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
 				states[3].angle.getRadians());
 
-		Logger.getInstance().recordOutput("Swerve/Swerve Setpoints", states);
 		SwerveModuleState[] loggingSwerveStates = states;
 		loggingSwerveStates[0] = m_frontLeftModule.getState();
 		loggingSwerveStates[1] = m_frontRightModule.getState();
 		loggingSwerveStates[2] = m_backLeftModule.getState();
 		loggingSwerveStates[3] = m_backRightModule.getState();
-		Logger.getInstance().recordOutput("Swerve/Swerve Speed", loggingSwerveStates);
 		Logger.getInstance().recordOutput("Robot Pose", getPose());
 
 		updateFieldVelocity();
