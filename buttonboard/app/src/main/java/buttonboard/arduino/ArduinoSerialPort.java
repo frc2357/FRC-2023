@@ -25,6 +25,7 @@ public class ArduinoSerialPort implements Runnable {
 
   private static List<String> SUPPORTED_PORT_NAMES = Arrays.asList(
     "PicoArduino (Dial-In)",
+    "XIAO RP2040 (Dial-In)",
     "Feather RP2040 SCORPIO (Dial-In)",
     "USB Serial Device"
   );
