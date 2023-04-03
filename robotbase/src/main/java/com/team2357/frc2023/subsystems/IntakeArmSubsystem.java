@@ -6,7 +6,6 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.team2357.frc2023.shuffleboard.ShuffleboardPIDTuner;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 import com.team2357.lib.util.Utility;
 
@@ -88,8 +87,6 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
     private ArmState m_currentState;
     private ArmState m_desiredState;
 
-    private ShuffleboardPIDTuner m_shuffleboardPIDTuner;
-
     public IntakeArmSubsystem(int forwardChannel, int reverseChannel, int winchMotorId) {
         m_intakeSolenoid = new DoubleSolenoid(PneumaticsModuleType.REVPH, forwardChannel, reverseChannel);
         m_winchMotor = new CANSparkMax(winchMotorId, MotorType.kBrushless);
@@ -99,10 +96,6 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
 
     public void configure(Configuration config) {
         m_config = config;
-
-        m_shuffleboardPIDTuner = new ShuffleboardPIDTuner("Intake Arm", config.m_shuffleboardTunerPRange,
-                config.m_shuffleboardTunerIRange, config.m_shuffleboardTunerDRange, config.m_winchDeployP,
-                config.m_winchDeployI, config.m_winchDeployD);
 
         configureWinchMotor(m_winchMotor);
 
@@ -183,12 +176,6 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
 
     public double getWinchRotations() {
         return m_winchMotor.getEncoder().getPosition();
-    }
-
-    public void updatePID() {
-        m_winchPIDController.setP(m_shuffleboardPIDTuner.getPValue());
-        m_winchPIDController.setI(m_shuffleboardPIDTuner.getIValue());
-        m_winchPIDController.setD(m_shuffleboardPIDTuner.getDValue());
     }
 
     public boolean isWinchAtRotations() {
@@ -273,9 +260,6 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
 
         if (isClosedLoopEnabled() && isWinchAtRotations()) {
             setClosedLoopEnabled(false);
-        }
-        if (m_shuffleboardPIDTuner.arePIDsUpdated()) {
-            updatePID();
         }
 
         SmartDashboard.putNumber("Winch speed", m_winchMotor.getAppliedOutput());
