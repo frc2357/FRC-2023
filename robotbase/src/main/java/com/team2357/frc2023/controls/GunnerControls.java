@@ -2,7 +2,6 @@ package com.team2357.frc2023.controls;
 
 import com.team2357.frc2023.Constants.CONTROLLER;
 import com.team2357.frc2023.commands.armextension.ArmExtendAmpZeroCommand;
-import com.team2357.frc2023.commands.auto.TranslateToTargetCommand;
 import com.team2357.frc2023.commands.human.panic.ArmExtensionAxisCommand;
 import com.team2357.frc2023.commands.human.panic.ArmRotationAxisCommand;
 import com.team2357.frc2023.commands.human.panic.EverybotClawRollerAxisCommand;
@@ -11,18 +10,20 @@ import com.team2357.frc2023.commands.human.panic.IntakeArmToggleCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeRollerAxisCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeWinchAxisCommand;
 import com.team2357.frc2023.commands.intake.WinchAmpZeroCommand;
+import com.team2357.frc2023.commands.scoring.AutoLineupCommand;
+import com.team2357.frc2023.commands.scoring.GunnerAutoScoreCommand;
 import com.team2357.frc2023.commands.scoring.GunnerScoreHighCommand;
 import com.team2357.frc2023.commands.scoring.GunnerScoreLowCommand;
 import com.team2357.frc2023.commands.scoring.GunnerScoreMidCommand;
 import com.team2357.frc2023.commands.scoring.HomeMechanismsCommand;
 import com.team2357.frc2023.commands.util.ZeroAllCommand;
 import com.team2357.frc2023.subsystems.ArmRotationSubsystem;
-import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.lib.triggers.AxisThresholdTrigger;
 import com.team2357.lib.util.Utility;
 import com.team2357.lib.util.XboxRaw;
 
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -34,7 +35,14 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * 
  * @category Drive
  */
-public class GunnerControls {
+public class GunnerControls implements RumbleInterface {
+
+    private static GunnerControls s_instance;
+
+    public static GunnerControls getInstance() {
+        return s_instance;
+    }
+
     XboxController m_controller;
 
     // Triggers
@@ -62,6 +70,8 @@ public class GunnerControls {
      * @param builder The GunnerControlsBuilder object
      */
     public GunnerControls(XboxController controller) {
+        s_instance = this;
+
         m_controller = controller;
 
         // Triggers
@@ -192,19 +202,21 @@ public class GunnerControls {
         rightDPadAndA.onTrue(new IntakeArmToggleCommand());
         rightDPadAndY.onTrue(new WinchAmpZeroCommand());
 
-        // Teleop trajectory
-        downDPadAndX.whileTrue(new TranslateToTargetCommand(SwerveDriveSubsystem.COLUMN_TARGET.LEFT));
-        downDPadAndA.whileTrue(new TranslateToTargetCommand(SwerveDriveSubsystem.COLUMN_TARGET.MIDDLE));
-        downDPadAndB.whileTrue(new TranslateToTargetCommand(SwerveDriveSubsystem.COLUMN_TARGET.RIGHT));
-
         // Auto score
         yButton.whileTrue(new GunnerScoreHighCommand());
         xButton.whileTrue(new GunnerScoreMidCommand());
         aButton.whileTrue(new GunnerScoreLowCommand());
 
+        m_leftBumper.whileTrue(new AutoLineupCommand());
+        m_rightBumper.whileTrue(new GunnerAutoScoreCommand());
+
         // Zero all
         m_backButton.whileTrue(new ZeroAllCommand());
 
         m_startButton.whileTrue(new HomeMechanismsCommand());
+    }
+
+    public void setRumble(RumbleType type, double intensity) {
+        m_controller.setRumble(type, intensity);
     }
 }

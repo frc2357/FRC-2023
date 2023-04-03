@@ -1,7 +1,6 @@
 package com.team2357.frc2023.controls;
 
-import com.team2357.frc2023.commands.drive.Test1AutoBalanceCommand;
-import com.team2357.frc2023.commands.drive.Test2AutoBalanceCommand;
+import com.team2357.frc2023.commands.drive.ToggleRobotCentricDriveCommand;
 import com.team2357.frc2023.commands.intake.IntakeConeCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakeCubeCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakePreSignalConeCommandGroup;
@@ -11,11 +10,18 @@ import com.team2357.lib.triggers.AxisThresholdTrigger;
 import com.team2357.lib.util.XboxRaw;
 
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
-public class SwerveDriveControls {
+public class SwerveDriveControls implements RumbleInterface {
+    private static SwerveDriveControls s_instance;
+
+    public static SwerveDriveControls getInstance() {
+        return s_instance;
+    }
+
     private XboxController m_controller;
     private double m_deadband;
 
@@ -35,6 +41,8 @@ public class SwerveDriveControls {
     public static boolean isFlipped;
 
     public SwerveDriveControls(XboxController controller, double deadband) {
+        s_instance = this;
+
         m_controller = controller;
         m_deadband = deadband;
 
@@ -75,13 +83,7 @@ public class SwerveDriveControls {
         // Cone Intake deploy/stow
         m_rightTriggerFull.whileTrue(new IntakeCubeCommandGroup());
 
-        m_aButton.whileTrue(new Test1AutoBalanceCommand());
-        m_bButton.whileTrue(new Test2AutoBalanceCommand());
-
-        //Teleop auto
-        //m_rightBumper.whileTrue(new HeartlandAutoTranslateCommand(m_controller));
-        //m_leftBumper.whileTrue(new HeartlandAutoScoreCommand());
-
+        m_aButton.onTrue(new ToggleRobotCentricDriveCommand());
     }
 
     public double getX() {
@@ -118,5 +120,9 @@ public class SwerveDriveControls {
         value = deadband(value, m_deadband);
         value = Math.copySign(value * value, value);
         return value;
+    }
+
+    public void setRumble(RumbleType type, double intensity) {
+        m_controller.setRumble(type, intensity);
     }
 }

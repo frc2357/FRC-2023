@@ -1,15 +1,11 @@
 package com.team2357.frc2023.subsystems;
 
-import java.util.function.Consumer;
-
 import org.littletonrobotics.junction.Logger;
 
 import com.team2357.lib.subsystems.LimelightSubsystem;
 
-import edu.wpi.first.hal.CANData;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 // Manages two limelight subsystems
@@ -29,21 +25,6 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
     private LimelightSubsystem m_leftLimelight;
     private LimelightSubsystem m_rightLimelight;
 
-    private LimelightSubsystem m_primaryLimelight;
-    private LimelightSubsystem m_secondaryLimelight;
-
-    private double m_leftLimelightTXSetpoint;
-    private double m_rightLimelightTXSetpoint;
-    private double m_primaryLimelightTXSetpoint;
-
-    private int m_targetAprilTag;
-
-    private Consumer<double[]> botposeConsumer = (double[] botpose) -> {
-        Pose2d pose = LimelightSubsystem.botposeToPose2d(botpose);
-        double timeStamp = Timer.getFPGATimestamp() - (botpose[6] / 1000);
-        SwerveDriveSubsystem.getInstance().addVisionPoseEstimate(pose, timeStamp);
-    };
-
     /**
      * 
      * @param leftLimelightName        Name of the left side limelight
@@ -58,15 +39,6 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
         m_leftLimelight = new LimelightSubsystem(leftLimelightName);
         m_rightLimelight = new LimelightSubsystem(rightLimelightName);
 
-        m_primaryLimelight = m_leftLimelight;
-        m_secondaryLimelight = m_rightLimelight;
-
-        m_leftLimelightTXSetpoint = leftLimelightTXSetpoint;
-        m_rightLimelightTXSetpoint = rightLimelightTXSetpoint;
-
-        // m_rightLimelight.addBotposeEvent(botposeConsumer);
-        // m_leftLimelight.addBotposeEvent(botposeConsumer);
-
         m_instance = this;
     }
 
@@ -78,34 +50,6 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
                 return m_rightLimelight;
         }
         return null;
-    }
-
-    public void setPrimary(LIMELIGHT limelight) {
-        switch (limelight) {
-            case LEFT:
-                m_primaryLimelight = m_leftLimelight;
-                m_secondaryLimelight = m_rightLimelight;
-                m_primaryLimelightTXSetpoint = m_leftLimelightTXSetpoint;
-                break;
-            case RIGHT:
-                m_primaryLimelight = m_rightLimelight;
-                m_secondaryLimelight = m_leftLimelight;
-                m_primaryLimelightTXSetpoint = m_rightLimelightTXSetpoint;
-                break;
-        }
-    }
-
-    public LIMELIGHT getPrimaryLimelight() {
-        if (m_primaryLimelight == m_rightLimelight) {
-            return LIMELIGHT.RIGHT;
-        } else if (m_primaryLimelight == m_leftLimelight) {
-            return LIMELIGHT.LEFT;
-        }
-        return null;
-    }
-
-    public void setTargetAprilTag(int id) {
-        m_targetAprilTag = id;
     }
 
     public void setAprilTagPipelineActive() {
@@ -126,33 +70,14 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
         return m_leftLimelight.isHumanPipelineActive() && m_rightLimelight.isHumanPipelineActive();
     }
 
-    /**
-     * @return The tX angle setpoint on the opposing camera to get the primary
-     *         camera in view
-     */
-    public double getPrimaryTXSetpoint() {
-        return m_primaryLimelightTXSetpoint;
-    }
-
     public boolean validTargetExists() {
-        if (m_targetAprilTag == -1) {
-            return m_leftLimelight.validTargetExists() || m_rightLimelight.validTargetExists();
-        }
-        return m_leftLimelight.validAprilTagTargetExists(m_targetAprilTag)
-                || m_rightLimelight.validAprilTagTargetExists(m_targetAprilTag);
+        return m_leftLimelight.validTargetExists() || m_rightLimelight.validTargetExists();
     }
 
-    public boolean validTargetExistsOnPrimary() {
-        if (m_targetAprilTag == -1) {
-            return m_primaryLimelight.validTargetExists();
-        }
-        return m_primaryLimelight.validAprilTagTargetExists(m_targetAprilTag);
-    }
-
-    public Pose2d getLimelightPose2d() {
+    public Pose2d getAveragePose() {
         if (m_leftLimelight.validTargetExists() && m_rightLimelight.validTargetExists()) {
-            Pose2d leftPose = m_leftLimelight.getLimelightPose2d();
-            Pose2d rightPose = m_rightLimelight.getLimelightPose2d();
+            Pose2d leftPose = m_leftLimelight.getCurrentAllianceLimelightPose();
+            Pose2d rightPose = m_rightLimelight.getCurrentAllianceLimelightPose();
 
             double xLocation = (leftPose.getX() + rightPose.getX()) / 2;
             double yLocation = (leftPose.getY() + rightPose.getY()) / 2;
@@ -160,51 +85,11 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
 
             return new Pose2d(xLocation, yLocation, Rotation2d.fromDegrees(rotationDegrees));
         } else if (m_leftLimelight.validTargetExists()) {
-            return m_leftLimelight.getLimelightPose2d();
+            return m_leftLimelight.getCurrentAllianceLimelightPose();
         } else if (m_rightLimelight.validTargetExists()) {
-            return m_rightLimelight.getLimelightPose2d();
+            return m_rightLimelight.getCurrentAllianceLimelightPose();
         } else {
             return null;
-        }
-    }
-
-    public double getTY() {
-        if (m_primaryLimelight.validTargetExists()) {
-            return m_primaryLimelight.getTY();
-        } else if (m_secondaryLimelight.validTargetExists()) {
-            return m_secondaryLimelight.getTY();
-        } else {
-            return Double.NaN;
-        }
-    }
-
-    public double getTX() {
-        if (m_primaryLimelight.validTargetExists()) {
-            return m_primaryLimelight.getTX();
-        } else if (m_secondaryLimelight.validTargetExists()) {
-            return m_secondaryLimelight.getTX();
-        } else {
-            return Double.NaN;
-        }
-    }
-
-    public double getPrimaryTX() {
-        return m_primaryLimelight.getTX();
-    }
-
-    public double getSecondaryTX() {
-        return m_secondaryLimelight.getTX();
-    }
-
-    @Override
-    public void periodic() {
-        if (m_leftLimelight.validTargetExists()) {
-            Logger.getInstance().recordOutput("Left limelight botpose wpi blue", m_leftLimelight.getBluePose());
-            Logger.getInstance().recordOutput("Left limelight botpose wpi red", m_leftLimelight.getRedPose());
-        }
-        if (m_rightLimelight.validTargetExists()) {
-            Logger.getInstance().recordOutput("Right limelight botpose wpi blue", m_rightLimelight.getBluePose());
-            Logger.getInstance().recordOutput("Right limelight botpose wpi red", m_rightLimelight.getRedPose());
         }
     }
 }
