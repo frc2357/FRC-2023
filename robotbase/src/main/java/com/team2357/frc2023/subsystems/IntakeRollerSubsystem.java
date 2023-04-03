@@ -66,10 +66,14 @@ public class IntakeRollerSubsystem extends SubsystemBase {
 
     public void runIntake(boolean reverse) {
         if (reverse) {
-            m_masterIntakeMotor.set(ControlMode.PercentOutput, m_config.m_reversePercentOutput);
+            runIntake(m_config.m_reversePercentOutput);
         } else {
-            m_masterIntakeMotor.set(ControlMode.PercentOutput, m_config.m_runPercentOutput);
+            runIntake(m_config.m_runPercentOutput);
         }
+    }
+
+    public void runIntake(double percentOutput) {
+        m_masterIntakeMotor.set(ControlMode.PercentOutput, percentOutput);
     }
 
     public void setAxisRollerSpeed(double axisSpeed) {

@@ -1,11 +1,11 @@
 package com.team2357.frc2023.controls;
 
-import com.team2357.frc2023.commands.drive.Test1AutoBalanceCommand;
-import com.team2357.frc2023.commands.drive.Test2AutoBalanceCommand;
+import com.team2357.frc2023.commands.drive.ToggleRobotCentricDriveCommand;
 import com.team2357.frc2023.commands.intake.IntakeConeCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakeCubeCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakePreSignalConeCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakePreSignalCubeCommandGroup;
+import com.team2357.frc2023.commands.scoring.AutoLineupCommand;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.lib.triggers.AxisThresholdTrigger;
 import com.team2357.lib.util.XboxRaw;
@@ -75,13 +75,8 @@ public class SwerveDriveControls {
         // Cone Intake deploy/stow
         m_rightTriggerFull.whileTrue(new IntakeCubeCommandGroup());
 
-        m_aButton.whileTrue(new Test1AutoBalanceCommand());
-        m_bButton.whileTrue(new Test2AutoBalanceCommand());
-
-        //Teleop auto
-        //m_rightBumper.whileTrue(new HeartlandAutoTranslateCommand(m_controller));
-        //m_leftBumper.whileTrue(new HeartlandAutoScoreCommand());
-
+        // Auto score
+        m_aButton.onTrue(new ToggleRobotCentricDriveCommand());
     }
 
     public double getX() {

@@ -10,23 +10,18 @@ import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.team2357.frc2023.subsystems.ArmExtensionSubsystem;
 import com.team2357.frc2023.subsystems.ArmRotationSubsystem;
 import com.team2357.frc2023.subsystems.ClawSubsystem;
-import com.team2357.frc2023.subsystems.ClawSubsystem;
-import com.team2357.frc2023.subsystems.WristSubsystem;
 import com.team2357.frc2023.subsystems.IntakeArmSubsystem;
 import com.team2357.frc2023.subsystems.IntakeRollerSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.frc2023.subsystems.WristSubsystem;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -107,9 +102,13 @@ public final class Constants {
             config.m_maxVelocityMetersPerSecond = 6380.0 / 60.0 *
                     SdsModuleConfigurations.MK4I_L2.getDriveReduction() *
                     SdsModuleConfigurations.MK4I_L2.getWheelDiameter() * Math.PI;
+            config.m_robotCentricMaxVelocityPerSecond = config.m_maxVelocityMetersPerSecond / 2;
+
 
             config.m_maxAngularVelocityRadiansPerSecond = config.m_maxVelocityMetersPerSecond /
                     Math.hypot(config.m_trackwidthMeters / 2.0, config.m_wheelbaseMeters / 2.0);
+            config.m_robotCentricMaxAngularVelocityRadiansPerSecond = config.m_maxAngularVelocityRadiansPerSecond / 2;
+
             config.m_maxAngularAccelerationRadiansPerSecondSquared = config.m_maxAngularVelocityRadiansPerSecond / 3.0;
 
             config.m_xController = new PIDController(8.0, 0, 0); // .56122 2.2
@@ -118,27 +117,6 @@ public final class Constants {
 
             config.m_sensorPositionCoefficient = 2.0 * Math.PI / Constants.DRIVE.TICKS_PER_ROTATION
                     * SdsModuleConfigurations.MK4I_L2.getSteerReduction();
-
-            config.m_translateXMaxSpeedMeters = 3;
-            config.m_translateYMaxSpeedMeters = 3;
-
-            config.m_translateYAngleTolerance = 1;
-            config.m_translateXAngleTolerance = 1;
-
-            config.m_defaultXAngleSetpoint = DRIVE.DEFAULT_X_ANGLE_SETPOINT;
-            config.m_defaultYAngleSetpoint = DRIVE.DEFAULT_Y_ANGLE_SETPOINT;
-
-            config.m_leftColXAngleSetpoint = DRIVE.LEFT_COL_X_ANGLE_SETPOINT;
-            config.m_midColXAngleSetpoint = DRIVE.MID_COL_X_ANGLE_SETPOINT;
-            config.m_rightColXAngleSetpoint = DRIVE.RIGHT_COL_X_ANGLE_SETPOINT;
-
-            config.m_translateXController = new PIDController(0.3, 0, 0.015);
-            config.m_translateYController = new PIDController(0.1, 0, 0.025);
-
-            config.m_translationXFeedForward = new SimpleMotorFeedforward(0.244, 0);
-            config.m_translationYFeedForward = new SimpleMotorFeedforward(0.244, 0.00);
-
-            config.m_openLoopRampRateSeconds = 1;
 
             /**
              * State measurement standard deviations. Left encoder, right encoder, gyro
@@ -154,6 +132,12 @@ public final class Constants {
 
             config.m_visionToleranceMeters = 0.1524;
 
+            config.m_autoAlignDriveController = new ProfiledPIDController(
+                8.0, 0.0, 0.0, new TrapezoidProfile.Constraints(2, 1));
+
+            config.m_autoAlignThetaController = new ProfiledPIDController(
+                6.0, 0.0, 0.0, new TrapezoidProfile.Constraints(2, 1));  
+                    
             return config;
         }
 
@@ -168,20 +152,12 @@ public final class Constants {
         public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(306.3 - 180);
         public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(163.04 + 180);
 
-        public static final PIDController CHARGE_STATION_BALANCE_ANGLE_CONTROLLER = new PIDController(0.5, 0, 0);
-        public static final PIDController CHARGE_STATION_DISTANCE_CONTROLLER = new PIDController(0.5, 0, 0);
-
         public static final double BALANCE_LEVEL_DEGREES = 1;
         public static final double BALANCE_FULL_TILT_DEGREES = 15;
-        public static final double BACKWARDS_BALANCING_EXTRA_POWER_MULTIPLIER = 1.35;
         public static final double BALANCE_KP = 0.015;
-        public static final double BALANCE_KI = 0.0;
-        public static final double BALANCE_KD = 0.000001;
         public static final double BALANCE_MAX_POWER = 0.3;
         public static final double BALANCE_WAIT_MILLIS = 250;
-        public static final double STOP_DRIVING_TILT_DIFFERENCE = .0000005;
         public static final double BALANCE_DENOMINATOR_MULTIPLIER = 2.5;
-        public static final PIDController BALANCE_PID_CONTROLLER = new PIDController(BALANCE_KP, BALANCE_KI, BALANCE_KD);
 
         public static final double TICKS_PER_ROTATION = 2048.0;
 
@@ -193,13 +169,6 @@ public final class Constants {
 
         public static final double ROTATE_MAXSPEED_RADIANS_PER_SECOND = 0.91;
         public static final double SYNC_ENCODER_LIMIT_MS = 10000;
-
-        public static final double DEFAULT_Y_ANGLE_SETPOINT = 20;
-        public static final double DEFAULT_X_ANGLE_SETPOINT = -9;
-
-        public static final double LEFT_COL_X_ANGLE_SETPOINT = -10;
-        public static final double MID_COL_X_ANGLE_SETPOINT = -9;
-        public static final double RIGHT_COL_X_ANGLE_SETPOINT = -8;
 
         public static final double DEAD_RECKONING_TRANSLATION_METERS_PER_SECOND = 1;
         public static final double DEAD_RECKONING_ROTATION_RADIANS_PER_SECOND = 0.1;
@@ -213,14 +182,14 @@ public final class Constants {
 
         public static final String SWERVE_MODULE_SHUFFLEBOARD_TAB_NAME = "Drivetrain";
 
-        // Tolerance for out-of-range poses on auto-mapping
-        public static final double TRAJECTORY_MAP_TOLERANCE_METERS = 0.1;
+        public static final double AUTO_LINEUP_RANGE_METERS = 3;
 
         // Path constraints
         public static final PathConstraints DEFAULT_PATH_CONSTRAINTS = new PathConstraints(2.5,
                 1.5);
         public static final PathConstraints GRID_ZERO_PATH_CONSTRAINTS = new PathConstraints(2, 1);
-
+   
+        public static final double TIME_TO_COAST_SECONDS = 5;
     }
 
     public static final class INTAKE_ROLLER {
@@ -593,5 +562,14 @@ public final class Constants {
 
     public static final class GAMEPIECE_LED {
         public static final int PWM_PORT = 0;
+    }
+
+    public static final class FIELD {
+        public static final double FIELD_WIDTH_METERS = 8.02;
+        public static final double COLUMN_ZERO_SCORE_Y_METERS = 0.51;
+        public static final double GRID_SCORE_X_METERS = 1.77;
+        public static final double GRID_DISTANCE_METERS_BETWEEN_COLUMN = 0.5588;
+        public static final double GRID_SCORE_Y_TRIM = -0.1;
+        public static final double GRID_SCORE_ROTATION_DEGREES = 180;
     }
 }

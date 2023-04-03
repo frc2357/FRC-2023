@@ -2,7 +2,6 @@ package com.team2357.frc2023.controls;
 
 import com.team2357.frc2023.Constants.CONTROLLER;
 import com.team2357.frc2023.commands.armextension.ArmExtendAmpZeroCommand;
-import com.team2357.frc2023.commands.auto.TranslateToTargetCommand;
 import com.team2357.frc2023.commands.human.panic.ArmExtensionAxisCommand;
 import com.team2357.frc2023.commands.human.panic.ArmRotationAxisCommand;
 import com.team2357.frc2023.commands.human.panic.EverybotClawRollerAxisCommand;
@@ -17,7 +16,6 @@ import com.team2357.frc2023.commands.scoring.GunnerScoreMidCommand;
 import com.team2357.frc2023.commands.scoring.HomeMechanismsCommand;
 import com.team2357.frc2023.commands.util.ZeroAllCommand;
 import com.team2357.frc2023.subsystems.ArmRotationSubsystem;
-import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.lib.triggers.AxisThresholdTrigger;
 import com.team2357.lib.util.Utility;
 import com.team2357.lib.util.XboxRaw;
@@ -191,11 +189,6 @@ public class GunnerControls {
 
         rightDPadAndA.onTrue(new IntakeArmToggleCommand());
         rightDPadAndY.onTrue(new WinchAmpZeroCommand());
-
-        // Teleop trajectory
-        downDPadAndX.whileTrue(new TranslateToTargetCommand(SwerveDriveSubsystem.COLUMN_TARGET.LEFT));
-        downDPadAndA.whileTrue(new TranslateToTargetCommand(SwerveDriveSubsystem.COLUMN_TARGET.MIDDLE));
-        downDPadAndB.whileTrue(new TranslateToTargetCommand(SwerveDriveSubsystem.COLUMN_TARGET.RIGHT));
 
         // Auto score
         yButton.whileTrue(new GunnerScoreHighCommand());
