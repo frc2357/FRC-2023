@@ -7,7 +7,6 @@ import com.revrobotics.SparkMaxPIDController.ArbFFUnits;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import com.revrobotics.SparkMaxPIDController;
-import com.team2357.frc2023.shuffleboard.ShuffleboardPIDTuner;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 import com.team2357.lib.util.Utility;
 
@@ -98,7 +97,6 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
     private ArmFeedforward m_feedforward;
 
     private double m_targetRotations;
-    private ShuffleboardPIDTuner m_shuffleboardPIDTuner;
 
     public ArmRotationSubsystem(int motorId) {
         instance = this;
@@ -107,9 +105,6 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
 
     public void configure(Configuration config) {
         m_config = config;
-        m_shuffleboardPIDTuner = new ShuffleboardPIDTuner("Arm Rotation", config.m_shuffleboardTunerPRange,
-                m_config.m_shuffleboardTunerIRange, m_config.m_shuffleboardTunerDRange, m_config.m_rotationMotorP,
-                m_config.m_rotationMotorI, m_config.m_rotationMotorD);
         configureRotationMotor(m_rotationMotor);
 
         m_pidController = m_rotationMotor.getPIDController();
@@ -207,12 +202,6 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
         m_targetRotations = m_rotationMotor.getEncoder().getPosition();
     }
 
-    public void updatePID() {
-        m_pidController.setP(m_shuffleboardPIDTuner.getPValue());
-        m_pidController.setI(m_shuffleboardPIDTuner.getIValue());
-        m_pidController.setD(m_shuffleboardPIDTuner.getDValue());
-    }
-
     public double getAmps() {
         return m_rotationMotor.getOutputCurrent();
     }
@@ -232,10 +221,7 @@ public class ArmRotationSubsystem extends ClosedLoopSubsystem {
             m_pidController.setReference(m_targetRotations, CANSparkMax.ControlType.kSmartMotion,
                    m_config.m_smartMotionSlot, feedforwardVolts, ArbFFUnits.kVoltage);
         }
-        if (m_shuffleboardPIDTuner.arePIDsUpdated()) {
-            updatePID();
-        }
-
+     
         //System.out.println("Speed: " + m_rotationMotor.getAppliedOutput() + "Amp: " + getAmps());
 
         // System.out.println("Current rot: " + getMotorRotations() + " target: " + m_targetRotations );
