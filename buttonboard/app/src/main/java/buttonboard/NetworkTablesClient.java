@@ -20,6 +20,14 @@ public class NetworkTablesClient {
         public void gridUpdated(String high, String mid, String low);
     }
 
+    public static interface AllianceListener {
+        public void allianceUpdated(String alliance);
+    }
+
+    public static interface TargetListener {
+        public void targetUpdated(int row, int col, int type);
+    }
+
     private String m_serverName;
     private int m_connListenerHandle;
     private NetworkTable m_buttonboardTable;
@@ -30,6 +38,8 @@ public class NetworkTablesClient {
     private IntegerPublisher m_targetColPub;
     private IntegerPublisher m_targetTypePub;
     private GridListener m_gridListener;
+    private TargetListener m_targetListener;
+    private AllianceListener m_allianceListener;
 
     public NetworkTablesClient() {
         this(null);
@@ -59,6 +69,14 @@ public class NetworkTablesClient {
 
     public void setGridListener(GridListener l) {
         m_gridListener = l;
+    }
+
+    public void setAllianceListener(AllianceListener l) {
+        m_allianceListener = l;
+    }
+
+    public void setTargetListener(TargetListener l) {
+        m_targetListener = l;
     }
 
     public void open() {
@@ -128,10 +146,16 @@ public class NetworkTablesClient {
         m_targetRowPub.set(row);
         m_targetColPub.set(col);
         m_targetTypePub.set(type);
+        if (m_targetListener != null) {
+            m_targetListener.targetUpdated(row, col, type);
+        }
     }
 
     public void setAlliance(String alliance) {
         System.out.println("Set alliance to " + alliance);
         m_alliancePub.set(alliance);
+        if (m_allianceListener != null) {
+            m_allianceListener.allianceUpdated(alliance);
+        }
     }
 }

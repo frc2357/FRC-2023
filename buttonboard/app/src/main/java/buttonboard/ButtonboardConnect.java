@@ -10,6 +10,7 @@ import java.util.List;
 import buttonboard.test.GridPubClient;
 import buttonboard.test.NTListener;
 import buttonboard.arduino.ArduinoButtonboard;
+import buttonboard.arduino.ArduinoDriverLights;
 
 public class ButtonboardConnect {
     private static final String ARG_TEST_ARDUINO = "test:buttonboard";
@@ -58,6 +59,7 @@ public class ButtonboardConnect {
         System.out.println("----- Buttonboard FRC 2357 -----");
         NetworkTablesClient nt = new NetworkTablesClient();
         ArduinoButtonboard buttonboard = new ArduinoButtonboard(nt);
+        ArduinoDriverLights driverLights = new ArduinoDriverLights(nt);
         nt.open();
         try {
             while (true) {
