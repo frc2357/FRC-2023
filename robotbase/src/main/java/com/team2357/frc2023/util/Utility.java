@@ -16,7 +16,6 @@ import com.team2357.frc2023.commands.scoring.cube.CubeLowScoreCommand;
 import com.team2357.frc2023.commands.scoring.cube.CubeMidPrePoseCommand;
 import com.team2357.frc2023.commands.scoring.cube.CubeMidScoreCommand;
 import com.team2357.frc2023.networktables.Buttonboard;
-import com.team2357.frc2023.networktables.Buttonboard.Gamepiece;
 import com.team2357.frc2023.state.RobotState;
 import com.team2357.frc2023.state.RobotState.State;
 
@@ -50,6 +49,10 @@ public class Utility {
 
     public static Pose2d gridColumnToTargetPose(int col) {
 
+        if (col == -1) {
+            return null;
+        }
+
         double y = Constants.FIELD.COLUMN_ZERO_SCORE_Y_METERS + Constants.FIELD.GRID_SCORE_Y_TRIM;
         y += (col * Constants.FIELD.GRID_DISTANCE_METERS_BETWEEN_COLUMN);
 
@@ -69,7 +72,7 @@ public class Utility {
                     Constants.FIELD.FIELD_WIDTH_METERS - pose.getY());
 
             Rotation2d flippedRotation = pose.getRotation().times(-1);
-            
+
             return new Pose2d(flippedTranslation, flippedRotation);
         }
         return pose;
@@ -88,15 +91,13 @@ public class Utility {
         return new Transform2d(new Translation2d(x, y), new Rotation2d());
     }
 
-    public static Command getPreposeCommand(int row, int col, Gamepiece gamepiece) {
+    public static Command getPreposeCommand(int row, int col, Buttonboard.Gamepiece gamepiece) {
         switch (row) {
             case 2:
-                switch (RobotState.getState()) {
-                    case ROBOT_STOWED_CONE:
-                        checkGamepieceSelections(gamepiece, Gamepiece.CONE);
+                switch (gamepiece) {
+                    case CONE:
                         return verifyNotInPrepose(State.ROBOT_PRE_SCORE_CONE_LOW, new ConeLowPrePoseCommand());
-                    case ROBOT_STOWED_CUBE:
-                        checkGamepieceSelections(gamepiece, Gamepiece.CUBE);
+                    case CUBE:
                         return verifyNotInPrepose(State.ROBOT_PRE_SCORE_CUBE_LOW, new CubeLowPrePoseCommand());
                     default:
                         return new WaitCommand(0);
@@ -105,40 +106,34 @@ public class Utility {
                 switch (col % 3) {
                     case 0:
                     case 2:
-                        checkGamepieceSelections(gamepiece, Gamepiece.CONE);
                         return verifyNotInPrepose(State.ROBOT_PRE_SCORE_CONE_MID, new ConeMidPrePoseCommand());
                     case 1:
-                        checkGamepieceSelections(gamepiece, Gamepiece.CUBE);
                         return verifyNotInPrepose(State.ROBOT_PRE_SCORE_CUBE_MID, new CubeMidPrePoseCommand());
                 }
             case 0:
                 switch (col % 3) {
                     case 0:
                     case 2:
-                        checkGamepieceSelections(gamepiece, Gamepiece.CONE);
                         return verifyNotInPrepose(State.ROBOT_PRE_SCORE_CONE_HIGH, new ConeHighPrePoseCommand());
                     case 1:
-                        checkGamepieceSelections(gamepiece, Gamepiece.CUBE);
                         return verifyNotInPrepose(State.ROBOT_PRE_SCORE_CUBE_HIGH, new CubeHighPrePoseCommand());
                 }
         }
 
         String message = "No target selected";
         DriverStation.reportWarning(message, false);
-        Logger.getInstance().recordOutput("Scoring", message);
+        Logger.getInstance().recordOutput("Auto Prepose", message);
 
         return new WaitCommand(0);
     }
 
-    public static Command getScoreCommand(int row, int col, Gamepiece gamepiece) {
+    public static Command getScoreCommand(int row, int col) {
         switch (row) {
             case 2:
                 switch (RobotState.getState()) {
-                    case ROBOT_STOWED_CONE:
-                        checkGamepieceSelections(gamepiece, Gamepiece.CONE);
+                    case ROBOT_PRE_SCORE_CONE_LOW:
                         return new ConeLowScoreCommand();
-                    case ROBOT_STOWED_CUBE:
-                        checkGamepieceSelections(gamepiece, Gamepiece.CUBE);
+                    case ROBOT_PRE_SCORE_CUBE_LOW:
                         return new CubeLowScoreCommand();
                     default:
                         break;
@@ -147,44 +142,40 @@ public class Utility {
                 switch (col % 3) {
                     case 0:
                     case 2:
-                        checkGamepieceSelections(gamepiece, Gamepiece.CONE);
-                        return new ConeMidScoreCommand();
+                        return verifyPreposeToScore(State.ROBOT_PRE_SCORE_CONE_MID, new ConeMidScoreCommand());
                     case 1:
-                        checkGamepieceSelections(gamepiece, Gamepiece.CUBE);
-                        return new CubeMidScoreCommand();
+                        return verifyPreposeToScore(State.ROBOT_PRE_SCORE_CUBE_MID, new CubeMidScoreCommand());
                 }
             case 0:
                 switch (col % 3) {
                     case 0:
                     case 2:
-                        checkGamepieceSelections(gamepiece, Gamepiece.CONE);
-                        return new ConeHighScoreCommand();
+                        return verifyPreposeToScore(State.ROBOT_PRE_SCORE_CONE_HIGH, new ConeHighScoreCommand());
                     case 1:
-                        checkGamepieceSelections(gamepiece, Gamepiece.CUBE);
-                        return new CubeHighScoreCommand();
+                        return verifyPreposeToScore(State.ROBOT_PRE_SCORE_CUBE_HIGH, new CubeHighScoreCommand());
                 }
         }
 
         String message = "No target selected";
         DriverStation.reportWarning(message, false);
-        Logger.getInstance().recordOutput("Scoring", message);
+        Logger.getInstance().recordOutput("Auto Score", message);
 
         return new WaitCommand(0);
     }
 
     public static Command verifyNotInPrepose(State preposeState, Command preposeCommand) {
-        if (preposeState == RobotState.getState()) {
+        if (RobotState.isInState(preposeState)) {
             return new WaitCommand(0);
         }
         return preposeCommand;
-
     }
 
-    public static void checkGamepieceSelections(Gamepiece buttonboardSelection, Gamepiece stateSelection) {
-        if (buttonboardSelection != stateSelection) {
-            String message = "Tried to score " + buttonboardSelection.toString().toLowerCase() + " while holding " + stateSelection.toString().toLowerCase();
-            DriverStation.reportError(message, false);
-            Logger.getInstance().recordOutput("Scoring", message);
+    public static Command verifyPreposeToScore(State preposeState, Command scoreCommand) {
+        if (!RobotState.isInState(preposeState)) {
+            DriverStation.reportWarning(
+                    "Tried to score " + preposeState.name() + " from " + RobotState.getState().name(), null);
+            return new WaitCommand(0);
         }
+        return scoreCommand;
     }
 }

@@ -63,6 +63,10 @@ public class RobotState {
           state == State.ROBOT_PRE_SCORE_CUBE_LOW;
     }
 
+    public static boolean isInState(State state) {
+        return s_instance.m_currentState == state;
+    }
+
     public static void onDriverAllianceSelect(Alliance alliance) {
         s_instance.setAlliance(alliance);
     }

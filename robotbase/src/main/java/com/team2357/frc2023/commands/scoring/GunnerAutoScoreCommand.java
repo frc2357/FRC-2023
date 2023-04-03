@@ -10,11 +10,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
-public class DriverAutoScoreCommand extends CommandBase {
+public class GunnerAutoScoreCommand extends CommandBase {
     private Command m_scoreCommand;
+    private Command m_rumbleCommand;
 
-    public DriverAutoScoreCommand() {
+    public GunnerAutoScoreCommand() {
         m_scoreCommand = null;
+        m_rumbleCommand = new RumbleCommand(SwerveDriveControls.getInstance(),
+                Constants.CONTROLLER.RUMBLE_TIMEOUT_SECONDS_ON_TELEOP_AUTO);
     }
 
     @Override
@@ -23,12 +26,13 @@ public class DriverAutoScoreCommand extends CommandBase {
         int targetRow = Buttonboard.getInstance().getRowValue();
         Buttonboard.Gamepiece targetGamepiece = Buttonboard.getInstance().getGamepieceValue();
 
-        m_scoreCommand = Utility.getScoreCommand(targetRow, targetCol, targetGamepiece);
+        m_scoreCommand = Utility.getScoreCommand(targetRow, targetCol);
+        m_scoreCommand = new WaitCommand(0);
         m_scoreCommand.schedule();
 
-        new WaitCommand(Constants.CONTROLLER.RUMBLE_TIME_TO_START_AFTER_SCORE)
-                .andThen(RumbleCommand.createRumbleCommand(SwerveDriveControls.getInstance(),
-                        Constants.CONTROLLER.RUMBLE_TIMEOUT_SECONDS_ON_TELEOP_AUTO)).schedule();
+        m_rumbleCommand.schedule();
+
+        System.out.println("Auto line col: " + targetCol + " row: " + targetRow + " game: " + targetGamepiece);
     }
 
     @Override
@@ -39,5 +43,6 @@ public class DriverAutoScoreCommand extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         m_scoreCommand.cancel();
+        m_rumbleCommand.cancel();
     }
 }
