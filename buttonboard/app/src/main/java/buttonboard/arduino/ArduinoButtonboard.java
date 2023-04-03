@@ -40,7 +40,7 @@ public class ArduinoButtonboard implements ArduinoJSONDevice.DeviceListener, Net
     updateAlliance(m_device.getSensor(SENSOR_ALLIANCE).getStringValue());
     updateTarget(m_device.getSensor(SENSOR_TARGET).getIntArray());
 
-    if (!m_device.getSensor(SENSOR_GRID).getStringValue().equals(m_gridString)) {
+    if (m_gridString != null && !m_device.getSensor(SENSOR_GRID).getStringValue().equals(m_gridString)) {
       if (m_device.isConnected()) {
         m_device.setSensorField(SENSOR_GRID, "value", m_gridString);
       }
