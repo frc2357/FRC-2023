@@ -6,6 +6,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+
+import java.util.function.Supplier;
+
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.frc2023.util.Utility;
 
@@ -19,31 +22,44 @@ import com.team2357.frc2023.util.Utility;
  */
 public class DriveToPoseCommand extends CommandBase {
     private final SwerveDriveSubsystem m_swerve;
-    private final Pose2d m_targetPose;
-    private final Pose2d m_initialPose;
+    private Pose2d m_targetPose;
+    private Pose2d m_initialPose;
 
     private final ProfiledPIDController m_driveController;
     private final ProfiledPIDController m_thetaController;
+
+    private final Supplier<Pose2d> m_initialPoseSupplier;
+    private final Supplier<Pose2d> m_targetPoseSupplier;
+
+    private boolean m_isRunning;
 
     /**
      * @param initialPose The initial field-relative pose to set the robot to
      * @param targetPose  Field-relative pose for the robot to reach
      * 
      */
-    public DriveToPoseCommand(Pose2d initialPose, Pose2d targetPose) {
+    public DriveToPoseCommand(Supplier<Pose2d> initialPoseSupplier, Supplier<Pose2d> targetPoseSupplier) {
         m_swerve = SwerveDriveSubsystem.getInstance();
-        m_targetPose = targetPose;
-        m_initialPose = initialPose;
-        addRequirements(m_swerve);
-
+        m_initialPoseSupplier = initialPoseSupplier;
+        m_targetPoseSupplier = targetPoseSupplier;
+        
         m_driveController = m_swerve.getAutoAlignDriveController();
 
         m_thetaController = m_swerve.getAutoAlignThetaController();
         m_thetaController.enableContinuousInput(-Math.PI, Math.PI);
+
+        m_isRunning = false;
+
+        addRequirements(m_swerve);
     }
 
     @Override
     public void initialize() {
+        m_isRunning = true;
+
+        m_initialPose = m_initialPoseSupplier.get();
+        m_targetPose = m_targetPoseSupplier.get();
+
         // Reset all controllers
         m_swerve.resetPoseEstimator(
                 new Pose2d(m_initialPose.getX(), m_initialPose.getY(), m_swerve.getGyroscopeRotation()));
@@ -66,7 +82,6 @@ public class DriveToPoseCommand extends CommandBase {
 
     @Override
     public void execute() {
-
         // Get current and target pose
         Pose2d currentPose = m_swerve.getPose();
 
@@ -98,16 +113,21 @@ public class DriveToPoseCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
+        m_isRunning = false;
         m_swerve.drive(new ChassisSpeeds());
     }
 
     @Override
     public boolean isFinished() {
-        return atGoal();
+        return false;
     }
 
     /** Checks if the robot is stopped at the final pose. */
     public boolean atGoal() {
-        return m_driveController.atGoal() && m_thetaController.atGoal();
+        return m_isRunning && m_driveController.atGoal() && m_thetaController.atGoal();
+    }
+
+    public boolean isRunning() {
+        return m_isRunning;
     }
 }

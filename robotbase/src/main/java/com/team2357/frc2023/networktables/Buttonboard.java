@@ -18,11 +18,18 @@ public class Buttonboard {
 
     private final AtomicReference<Integer> m_rowValue = new AtomicReference<Integer>();
     private final AtomicReference<Integer> m_colValue = new AtomicReference<Integer>();
+    private final AtomicReference<Integer> m_gamepieceValue = new AtomicReference<Integer>();
 
     private final AtomicReference<DriverStation.Alliance> m_allianceValue = new AtomicReference<DriverStation.Alliance>();
 
     private final MultiSubscriber m_buttonboardSub;
     private final int m_buttonboardListenerHandle;
+
+    public enum Gamepiece {
+        CONE,
+        CUBE,
+        NONE
+    }
 
     public final Consumer<NetworkTableEvent> m_updateConsumer = (NetworkTableEvent event) -> {
         String[] split = event.valueData.getTopic().getName().split("/");
@@ -33,6 +40,9 @@ public class Buttonboard {
                 break;
             case Constants.BUTTONBOARD.ROW_TOPIC_NAME:
                 m_rowValue.set((int) event.valueData.value.getInteger());
+                break;
+            case Constants.BUTTONBOARD.GAMEPIECE_TOPIC_NAME:
+                m_gamepieceValue.set((int) event.valueData.value.getInteger());
                 break;
             case Constants.BUTTONBOARD.ALLIANCE_TOPIC_NAME:
                 switch (event.valueData.value.getString()) {
@@ -96,6 +106,20 @@ public class Buttonboard {
             return -1;
         }
         return m_colValue.get();
+    }
+
+    public Gamepiece getGamepieceValue() {
+        if (m_gamepieceValue.get() == null) {
+            return Gamepiece.NONE;
+        }
+        switch (m_gamepieceValue.get()) {
+            case 0:
+                return Gamepiece.CUBE;
+            case 1:
+                return Gamepiece.CONE;
+            default:
+                return Gamepiece.NONE;
+        }
     }
 
     public DriverStation.Alliance getAlliance() {
