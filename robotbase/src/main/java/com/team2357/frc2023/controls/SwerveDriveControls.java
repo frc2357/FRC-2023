@@ -82,8 +82,6 @@ public class SwerveDriveControls implements RumbleInterface {
 
         // Cone Intake deploy/stow
         m_rightTriggerFull.whileTrue(new IntakeCubeCommandGroup());
-
-        m_aButton.onTrue(new ToggleRobotCentricDriveCommand());
     }
 
     public double getX() {

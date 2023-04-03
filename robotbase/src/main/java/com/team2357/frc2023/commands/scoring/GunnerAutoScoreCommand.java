@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 public class GunnerAutoScoreCommand extends CommandBase {
     private Command m_scoreCommand;
     private Command m_rumbleCommand;
-
+    
     public GunnerAutoScoreCommand() {
         m_scoreCommand = null;
         m_rumbleCommand = new RumbleCommand(SwerveDriveControls.getInstance(),

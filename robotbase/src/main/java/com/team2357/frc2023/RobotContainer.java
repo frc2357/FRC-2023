@@ -5,6 +5,7 @@
 package com.team2357.frc2023;
 
 import com.team2357.frc2023.commands.drive.DefaultDriveCommand;
+import com.team2357.frc2023.controls.ControllerManager;
 import com.team2357.frc2023.controls.GunnerControls;
 import com.team2357.frc2023.controls.SwerveDriveControls;
 import com.team2357.frc2023.shuffleboard.AutoCommandChooser;
@@ -58,8 +59,8 @@ public class RobotContainer {
 
     // Create gunner controls and drive controls
     SwerveDriveControls driveControls = new SwerveDriveControls(
-        new XboxController(Constants.CONTROLLER.DRIVE_CONTROLLER_PORT), Constants.CONTROLLER.DRIVE_CONTROLLER_DEADBAND);
-    GunnerControls gunnerControls = new GunnerControls(new XboxController(Constants.CONTROLLER.GUNNER_CONTROLLER_PORT));
+        ControllerManager.getInstance().getDriveController(), Constants.CONTROLLER.DRIVE_CONTROLLER_DEADBAND);
+    GunnerControls gunnerControls = new GunnerControls(ControllerManager.getInstance().getGunnerController());
 
     // Set default commands
     m_drivetrainSubsystem.setDefaultCommand(new DefaultDriveCommand(

@@ -4,9 +4,11 @@ import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.commands.armextension.ArmExtendToPositionCommand;
 import com.team2357.frc2023.commands.armextension.ArmExtensionMotorStopCommand;
 import com.team2357.frc2023.commands.armrotation.ArmRotateToPositionCommand;
+import com.team2357.frc2023.commands.controller.RumbleCommand;
 import com.team2357.frc2023.commands.everybot.ClawReleaseCubeCommand;
 import com.team2357.frc2023.commands.everybot.WristRotateToPositionCommand;
 import com.team2357.frc2023.commands.state.SetRobotStateCommand;
+import com.team2357.frc2023.controls.ControllerManager;
 import com.team2357.frc2023.state.RobotState;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -18,6 +20,7 @@ public class CubeHighScoreCommand extends SequentialCommandGroup {
         super(
             new ClawReleaseCubeCommand().withTimeout(0.5),
             new SetRobotStateCommand(RobotState.State.ROBOT_STOWED_EMPTY),
+            RumbleCommand.createRumbleCommand(ControllerManager.getInstance().getDriveController(), 0.5),
 
             new ParallelCommandGroup(
                 new WristRotateToPositionCommand(Constants.WRIST.WRIST_EXTENSION_RETRACT_ROTATIONS),

@@ -180,12 +180,9 @@ public class GunnerControls implements RumbleInterface {
             ArmRotationSubsystem.getInstance().resetEncoder();
         }));
 
-        // Arm extension / claw / wrist
+        // Arm extension
         leftDPadOnly.whileTrue(new ArmExtensionAxisCommand(axisRightStickY));
         
-        // leftDPadAndA.onTrue(new WristToggleCommand());
-        // leftDPadAndB.onTrue(new ClawToggleCommand());
-
         leftDPadAndY.onTrue(new ArmExtendAmpZeroCommand());
 
         // Intake
@@ -203,9 +200,9 @@ public class GunnerControls implements RumbleInterface {
         rightDPadAndY.onTrue(new WinchAmpZeroCommand());
 
         // Auto score
-        yButton.whileTrue(new GunnerScoreHighCommand());
-        xButton.whileTrue(new GunnerScoreMidCommand());
-        aButton.whileTrue(new GunnerScoreLowCommand());
+        downDPadAndY.whileTrue(new GunnerScoreHighCommand());
+        downDPadAndX.whileTrue(new GunnerScoreMidCommand());
+        downDPadAndA.whileTrue(new GunnerScoreLowCommand());
 
         m_leftBumper.whileTrue(new AutoLineupCommand());
         m_rightBumper.whileTrue(new GunnerAutoScoreCommand());
@@ -214,6 +211,10 @@ public class GunnerControls implements RumbleInterface {
         m_backButton.whileTrue(new ZeroAllCommand());
 
         m_startButton.whileTrue(new HomeMechanismsCommand());
+
+        // Auto score
+        m_aButton.whileTrue(new AutoLineupCommand(m_controller));
+        m_bButton.whileTrue(new GunnerAutoScoreCommand());
     }
 
     public void setRumble(RumbleType type, double intensity) {
