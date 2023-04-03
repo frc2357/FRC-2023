@@ -91,42 +91,6 @@ public class Utility {
         return new Transform2d(new Translation2d(x, y), new Rotation2d());
     }
 
-    public static Command getPreposeCommand(int row, int col, Buttonboard.Gamepiece gamepiece) {
-        switch (row) {
-            case 2:
-                switch (gamepiece) {
-                    case CONE:
-                        return verifyNotInPrepose(State.ROBOT_PRE_SCORE_CONE_LOW, new ConeLowPrePoseCommand());
-                    case CUBE:
-                        return verifyNotInPrepose(State.ROBOT_PRE_SCORE_CUBE_LOW, new CubeLowPrePoseCommand());
-                    default:
-                        return new WaitCommand(0);
-                }
-            case 1:
-                switch (col % 3) {
-                    case 0:
-                    case 2:
-                        return verifyNotInPrepose(State.ROBOT_PRE_SCORE_CONE_MID, new ConeMidPrePoseCommand());
-                    case 1:
-                        return verifyNotInPrepose(State.ROBOT_PRE_SCORE_CUBE_MID, new CubeMidPrePoseCommand());
-                }
-            case 0:
-                switch (col % 3) {
-                    case 0:
-                    case 2:
-                        return verifyNotInPrepose(State.ROBOT_PRE_SCORE_CONE_HIGH, new ConeHighPrePoseCommand());
-                    case 1:
-                        return verifyNotInPrepose(State.ROBOT_PRE_SCORE_CUBE_HIGH, new CubeHighPrePoseCommand());
-                }
-        }
-
-        String message = "No target selected";
-        DriverStation.reportWarning(message, false);
-        Logger.getInstance().recordOutput("Auto Prepose", message);
-
-        return new WaitCommand(0);
-    }
-
     public static Command getScoreCommand(int row, int col) {
         switch (row) {
             case 2:
@@ -161,13 +125,6 @@ public class Utility {
         Logger.getInstance().recordOutput("Auto Score", message);
 
         return new WaitCommand(0);
-    }
-
-    public static Command verifyNotInPrepose(State preposeState, Command preposeCommand) {
-        if (RobotState.isInState(preposeState)) {
-            return new WaitCommand(0);
-        }
-        return preposeCommand;
     }
 
     public static Command verifyPreposeToScore(State preposeState, Command scoreCommand) {
