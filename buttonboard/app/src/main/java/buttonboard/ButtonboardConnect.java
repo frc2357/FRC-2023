@@ -8,13 +8,16 @@ import java.util.Arrays;
 import java.util.List;
 
 import buttonboard.test.GridPubClient;
+import buttonboard.test.NTListener;
 import buttonboard.arduino.ArduinoButtonboard;
+import buttonboard.arduino.ArduinoDriverLights;
 
 public class ButtonboardConnect {
     private static final String ARG_TEST_ARDUINO = "test:buttonboard";
     private static final String ARG_TEST_NTCLIENT = "test:ntclient";
     private static final String ARG_TEST_NTSERVER = "test:ntserver";
     private static final String ARG_TEST_GRIDPUB = "test:gridpub";
+    private static final String ARG_TEST_LISTENER = "test:listener";
 
     public static void main(String[] args) {
         try {
@@ -37,6 +40,9 @@ public class ButtonboardConnect {
                     case ARG_TEST_GRIDPUB:
                         testGridPubClient();
                         System.exit(0);
+                    case ARG_TEST_LISTENER:
+                        testListener();
+                        System.exit(0);
                     default:
                         System.err.println("Unrecognized command: '" + args[0] + "'");
                 }
@@ -53,6 +59,7 @@ public class ButtonboardConnect {
         System.out.println("----- Buttonboard FRC 2357 -----");
         NetworkTablesClient nt = new NetworkTablesClient();
         ArduinoButtonboard buttonboard = new ArduinoButtonboard(nt);
+        ArduinoDriverLights driverLights = new ArduinoDriverLights(nt);
         nt.open();
         try {
             while (true) {
@@ -88,7 +95,8 @@ public class ButtonboardConnect {
             while (true) {
                 int x = (int)(Math.random() * 9);
                 int y = (int)(Math.random() * 3);
-                nt.setGridTarget(x, y);
+                int type = (int)(Math.random() * 3) - 1;
+                nt.setGridTarget(x, y, type);
                 Thread.sleep(1000);
             }
         } catch (InterruptedException ie) {
@@ -143,6 +151,22 @@ public class ButtonboardConnect {
             }
         } catch (InterruptedException ie) {
             System.out.println("Server exiting");
+            nt.close();
+            return;
+        }
+    }
+
+    private static void testListener() {
+        System.out.println("TEST: Network Tables Listener");
+        NTListener nt = new NTListener();
+        nt.open();
+        try {
+            System.out.println("Listener ready");
+            while (true) {
+                Thread.sleep(1000);
+            }
+        } catch (InterruptedException ie) {
+            System.out.println("Listener exiting");
             nt.close();
             return;
         }
