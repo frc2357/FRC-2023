@@ -22,10 +22,12 @@ public class CubeLowPrePoseCommand extends SequentialCommandGroup {
         super(
                 new ParallelCommandGroup(
                         new SetRobotStateCommand(RobotState.State.ROBOT_PRE_SCORE_CUBE_LOW),
-                        new WinchRotateToPositionCommand(Constants.INTAKE_ARM.AUTO_SCORE_LOW_ROTATIONS),
-                        new ParallelDeadlineGroup(
-                                new WaitCommand(0.25),
-                                new ClawReleaseCubeCommand())),
+                new WinchRotateToPositionCommand(Constants.INTAKE_ARM.AUTO_SCORE_LOW_ROTATIONS),
+                new ParallelDeadlineGroup(
+                    new WaitCommand(0.25),
+                    new ClawReleaseCubeCommand()
+                )
+            ),
                 new InstantCommand(() -> Logger.getInstance().recordOutput("Pre Pose/Cube Low prePose",
                         new double[] { ArmRotationSubsystem.getInstance().getMotorRotations(),
                                 ArmExtensionSubsystem.getInstance().getMotorRotations(),

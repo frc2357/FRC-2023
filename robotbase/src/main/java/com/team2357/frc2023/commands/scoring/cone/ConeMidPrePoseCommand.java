@@ -28,29 +28,31 @@ public class ConeMidPrePoseCommand extends SequentialCommandGroup {
                 new ParallelCommandGroup(
                         new SetRobotStateCommand(RobotState.State.ROBOT_PRE_SCORE_CONE_MID),
 
-                        // Claw Rollers
-                        new SequentialCommandGroup(
-                                new ClawIntakeConeCommand(),
-                                new ClawHoldConeCommand()),
+            // Claw Rollers
+            new SequentialCommandGroup(
+                new ClawIntakeConeCommand(),
+                new ClawHoldConeCommand()
+            ),
 
-                        // Intake Rollers
-                        new IntakeRollerReverseCommand().withTimeout(1),
+            // Intake Rollers
+            new IntakeRollerReverseCommand().withTimeout(1),
 
-                        // Intake Arm
-                        new SequentialCommandGroup(
-                                new WaitCommand(0.5),
-                                new WinchRotateToPositionCommand(Constants.INTAKE_ARM.INTAKE_HANDOFF_WINCH_ROTATIONS),
-                                new WaitCommand(0.25),
-                                new IntakeArmStowCommand()),
+            // Intake Arm
+            new SequentialCommandGroup(
+                new WaitCommand(0.5),
+                new WinchRotateToPositionCommand(Constants.INTAKE_ARM.INTAKE_HANDOFF_WINCH_ROTATIONS),
+                new WaitCommand(0.25),
+                new IntakeArmStowCommand()
+            ),
 
-                        // Arm
-                        new ArmRotateToPositionCommand(Constants.ARM_ROTATION.SCORE_CONE_MID_ROTATIONS),
+            // Arm
+            new ArmRotateToPositionCommand(Constants.ARM_ROTATION.SCORE_CONE_MID_ROTATIONS),
 
-                        // Wrist
-                        new SequentialCommandGroup(
-                                new ArmWaitForGreaterThanPositionCommand(
-                                        Constants.ARM_ROTATION.WRIST_CLEAR_INTAKE_ROTATIONS),
-                                new WristRotateToPositionCommand(Constants.WRIST.SCORE_CONE_MID_ROTATIONS))),
+            // Wrist
+            new SequentialCommandGroup(
+                new ArmWaitForGreaterThanPositionCommand(Constants.ARM_ROTATION.WRIST_CLEAR_INTAKE_ROTATIONS),
+                new WristRotateToPositionCommand(Constants.WRIST.SCORE_CONE_MID_ROTATIONS)
+            )),
                 new InstantCommand(() -> Logger.getInstance().recordOutput("Pre Pose/Cone Mid prePose",
                         new double[] { ArmRotationSubsystem.getInstance().getMotorRotations(),
                                 ArmExtensionSubsystem.getInstance().getMotorRotations(),
