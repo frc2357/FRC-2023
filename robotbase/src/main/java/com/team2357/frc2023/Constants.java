@@ -102,9 +102,13 @@ public final class Constants {
             config.m_maxVelocityMetersPerSecond = 6380.0 / 60.0 *
                     SdsModuleConfigurations.MK4I_L2.getDriveReduction() *
                     SdsModuleConfigurations.MK4I_L2.getWheelDiameter() * Math.PI;
+            config.m_robotCentricMaxVelocityPerSecond = config.m_maxVelocityMetersPerSecond / 2;
+
 
             config.m_maxAngularVelocityRadiansPerSecond = config.m_maxVelocityMetersPerSecond /
                     Math.hypot(config.m_trackwidthMeters / 2.0, config.m_wheelbaseMeters / 2.0);
+            config.m_robotCentricMaxAngularVelocityRadiansPerSecond = config.m_maxAngularVelocityRadiansPerSecond / 2;
+
             config.m_maxAngularAccelerationRadiansPerSecondSquared = config.m_maxAngularVelocityRadiansPerSecond / 3.0;
 
             config.m_xController = new PIDController(8.0, 0, 0); // .56122 2.2
@@ -184,6 +188,8 @@ public final class Constants {
         public static final PathConstraints DEFAULT_PATH_CONSTRAINTS = new PathConstraints(2.5,
                 1.5);
         public static final PathConstraints GRID_ZERO_PATH_CONSTRAINTS = new PathConstraints(2, 1);
+   
+        public static final double TIME_TO_COAST_SECONDS = 5;
     }
 
     public static final class INTAKE_ROLLER {
@@ -493,6 +499,7 @@ public final class Constants {
         public static final String BUTTONBOARD_TABLE_NAME = "buttonboard";
         public static final String ROW_TOPIC_NAME = "targetRow";
         public static final String COLUMN_TOPIC_NAME = "targetCol";
+        public static final String GAMEPIECE_TOPIC_NAME = "targetType";
         public static final String ALLIANCE_TOPIC_NAME = "alliance";
 
         public static final String INTAKE_WINCH_TOPIC_NAME = "intakeWinch";
@@ -517,8 +524,8 @@ public final class Constants {
         public static final double DRIVE_CONTROLLER_DEADBAND = 0.05;
         public static final double GUNNER_CONTROLLER_DEADBAND = 0.1;
 
-        public static final double RUMBLE_INTENSITY = 0.5;
-        public static final double RUMBLE_TIMEOUT_SECONDS_ON_TELEOP_AUTO = 0.5;
+        public static final double RUMBLE_INTENSITY = 1;
+        public static final double RUMBLE_TIMEOUT_SECONDS_ON_TELEOP_AUTO = 5;
 
         public static final int BUTTON_BOARD_NUM_ROWS = 3;
         public static final int BUTTON_BOARD_NUM_COLS = 9;

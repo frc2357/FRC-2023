@@ -18,7 +18,6 @@
 #define NODE_CUBE                'O'
 
 enum NodeState {
-  NodeDisconnected,
   NodeEmpty,
   NodeCone,
   NodeCube,
@@ -45,9 +44,7 @@ public:
 
   void update() {
     updatePixelColors();
-    if (isConnected()) {
-      scanKeypad(m_keypad);
-    }
+    scanKeypad(m_keypad);
   }
 
   bool updateLEDs() {
@@ -75,8 +72,6 @@ public:
   }
 
   NodeState calculateGridValue(size_t row, size_t col, char gridValue) {
-    // TODO: Add target status
-    // TODO: Add link status
     if (gridValue == NODE_CONE) {
       return NodeCone;
     } else if (gridValue == NODE_CUBE) {
@@ -89,17 +84,13 @@ public:
   void clearGridData() {
     for (int row = 0; row < GRID_ROWS; row++) {
       for (int col = 0; col < GRID_COLS; col++) {
-        m_nodes[row][col] = NodeDisconnected;
+        m_nodes[row][col] = NodeEmpty;
       }
     }
   }
 
   void setAlliance(const char *alliance) {
     m_alliance = alliance;
-  }
-
-  bool isConnected() {
-    return m_nodes[0][0] != NodeDisconnected;
   }
 
   int8_t getSelectedRow() {
@@ -135,15 +126,11 @@ private:
   void scanKeypad(Adafruit_Keypad &keypad) {
     while (keypad.available()) {
       keypadEvent e = keypad.read();
-      uint8_t row = e.bit.ROW;
-      uint8_t col = e.bit.COL;
+      uint8_t buttonRow = e.bit.ROW;
+      uint8_t buttonCol = e.bit.COL;
+      uint8_t row = buttonRow;
+      uint8_t col = GRID_COLS - 1 - buttonCol;
       if (e.bit.EVENT == KEY_JUST_PRESSED) {
-        uint16_t keynum;
-        if (row % 2 == 0) { // even row
-          keynum = row * GRID_COLS + col;
-        } else { // odd row the neopixels go BACKWARDS!
-          keynum = row * GRID_COLS + (5 - col);
-        }
         onKeyPress(row, col);
       }
       else if(e.bit.EVENT == KEY_JUST_RELEASED) {
@@ -153,10 +140,6 @@ private:
   }
 
   void onKeyPress(uint8_t row, uint8_t col) {
-    if (!isConnected()) {
-      return;
-    }
-
     if (m_selectedCol == col && m_selectedRow == row) {
       // We already selected this key.
       if (row == 2 && m_selectedIsCube) {
@@ -248,7 +231,14 @@ private:
         }
 
         switch (m_nodes[row][col]) {
+          case NodeCone:
+            setPixelColor(ledIndex, getColorCone());
+            break;
+          case NodeCube:
+            setPixelColor(ledIndex, getColorCube());
+            break;
           case NodeEmpty:
+          default:
             if (isNodeLinkOpportunity(row, col)) {
                 setPixelColor(ledIndex, getColorLinkOpportunity());
             } else {
@@ -259,22 +249,6 @@ private:
               }
             }
             break;
-          case NodeCone:
-            setPixelColor(ledIndex, getColorCone());
-            break;
-          case NodeCube:
-            setPixelColor(ledIndex, getColorCube());
-            break;
-          case NodeDisconnected:
-          default:
-            if (strcmp(m_alliance, ALLIANCE_RED) == 0) {
-              setPixelColor(ledIndex, getColorDisconnectedRed());
-            } else if (strcmp(m_alliance, ALLIANCE_BLUE) == 0) {
-              setPixelColor(ledIndex, getColorDisconnectedBlue());
-            } else {
-              setPixelColor(ledIndex, getColorDisconnected());
-            }
-            break;
         }
       }
     }
@@ -282,11 +256,13 @@ private:
 
   size_t getLEDIndex(uint8_t row, uint8_t col) {
     size_t index; 
+    uint8_t buttonRow = row;
+    uint8_t buttonCol = GRID_COLS - 1 - col;
 
-    if (row % 2 == 0) { // even row
-      index = row * GRID_COLS + col;
+    if (buttonRow % 2 == 0) { // even row
+      index = buttonRow * GRID_COLS + buttonCol;
     } else { // odd row the neopixels go BACKWARDS!
-      index = row * GRID_COLS + ((GRID_COLS - 1) - col);
+      index = buttonRow * GRID_COLS + ((GRID_COLS - 1) - buttonCol);
     }
 
     return index;
@@ -302,18 +278,6 @@ private:
       float factor = ((float)2000 - cycleMillis) / 1000.0;
       return m_neoPixels.Color(255 * factor, 255 * factor, 255 * factor);
     }
-  }
-
-  uint32_t getColorDisconnected() {
-    return m_neoPixels.Color(125, 125, 125);
-  }
-
-  uint32_t getColorDisconnectedRed() {
-    return m_neoPixels.Color(125, 0, 0);
-  }
-
-  uint32_t getColorDisconnectedBlue() {
-    return m_neoPixels.Color(0, 0, 125);
   }
 
   uint32_t getColorEmptyRed() {

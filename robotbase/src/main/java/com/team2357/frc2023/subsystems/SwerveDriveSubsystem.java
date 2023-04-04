@@ -7,6 +7,7 @@ package com.team2357.frc2023.subsystems;
 import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix.ErrorCode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.pathplanner.lib.PathPlannerTrajectory;
@@ -96,6 +97,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		 * Formula: 6380 / 60 * <gear ratio> * <wheel diameter> * Math.PI
 		 */
 		public double m_maxVelocityMetersPerSecond;
+		public double m_robotCentricMaxVelocityPerSecond;
 
 		/**
 		 * The maximum angular velocity of the robot in radians per second
@@ -105,6 +107,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		 * m_wheelbaseMeters / 2)
 		 */
 		public double m_maxAngularVelocityRadiansPerSecond;
+		public double m_robotCentricMaxAngularVelocityRadiansPerSecond;
 
 		public double m_maxAngularAccelerationRadiansPerSecondSquared;
 
@@ -195,6 +198,8 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 				0 // Offsets are set manually so this parameter is unnecessary
 		);
 
+		setCoastMode();
+
 		m_fieldVelocity = new Twist2d();
 		instance = this;
 	}
@@ -220,6 +225,20 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 						m_backLeftModule.getPosition(), m_backRightModule.getPosition() },
 				new Pose2d(0.0, 0.0, getGyroscopeRotation()), m_config.m_stateStdDevs,
 				m_config.m_visionMeasurementStdDevs);
+	}
+
+	public void setBrakeMode() {
+		((TalonFX) m_frontLeftModule.getDriveMotor()).setNeutralMode(NeutralMode.Brake);
+		((TalonFX) m_frontRightModule.getDriveMotor()).setNeutralMode(NeutralMode.Brake);
+		((TalonFX) m_backLeftModule.getDriveMotor()).setNeutralMode(NeutralMode.Brake);
+		((TalonFX) m_backRightModule.getDriveMotor()).setNeutralMode(NeutralMode.Brake);
+	}
+
+	public void setCoastMode() {
+		((TalonFX) m_frontLeftModule.getDriveMotor()).setNeutralMode(NeutralMode.Coast);
+		((TalonFX) m_frontRightModule.getDriveMotor()).setNeutralMode(NeutralMode.Coast);
+		((TalonFX) m_backLeftModule.getDriveMotor()).setNeutralMode(NeutralMode.Coast);
+		((TalonFX) m_backRightModule.getDriveMotor()).setNeutralMode(NeutralMode.Coast);
 	}
 
 	public PIDController getXController() {
@@ -339,12 +358,24 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 	}
 
 	public void drive(double x, double y, double rotation) {
-		ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-				x * m_config.m_maxVelocityMetersPerSecond,
-				y * m_config.m_maxVelocityMetersPerSecond,
-				rotation * m_config.m_maxAngularVelocityRadiansPerSecond,
-				getGyroscopeRotation());
+		drive(x, y, rotation, true);
+	}
 
+	public void drive(double x, double y, double rotation, boolean fieldOriented) {
+		ChassisSpeeds chassisSpeeds;
+
+		if (fieldOriented) {
+			chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+					x * m_config.m_maxVelocityMetersPerSecond,
+					y * m_config.m_maxVelocityMetersPerSecond,
+					rotation * m_config.m_maxAngularVelocityRadiansPerSecond,
+					getGyroscopeRotation());
+		} else {
+			chassisSpeeds = new ChassisSpeeds(
+					x * m_config.m_robotCentricMaxVelocityPerSecond,
+					y * m_config.m_robotCentricMaxVelocityPerSecond,
+					rotation * m_config.m_robotCentricMaxAngularVelocityRadiansPerSecond);
+		}
 		drive(chassisSpeeds);
 	}
 
@@ -405,7 +436,6 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 			return;
 		}
 
-		Logger.getInstance().recordOutput("Vision timestamp error", Timer.getFPGATimestamp() - timestamp);
 		if (Utility.isWithinTolerance(pose.getRotation().getDegrees(), getYaw(), 15)) {
 
 			if (m_currentTrajectory != null) {
@@ -414,17 +444,19 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 						m_config.m_visionToleranceMeters) ||
 						!Utility.isWithinTolerance(pose.getY(), trajPose.getY(),
 								m_config.m_visionToleranceMeters)) {
-					Logger.getInstance().recordOutput("Vision Pose", "Thrown");
 					return;
 				}
 			}
 
-			Logger.getInstance().recordOutput("Left limelight botpose filtered", pose);
+			Logger.getInstance().recordOutput("filtered vision pose", pose);
+			Pose2d currentPose = getPose();
 			m_poseEstimator.addVisionMeasurement(pose, timestamp);
-			Logger.getInstance().recordOutput("Vision Pose", "Added");
+			Pose2d updatedPose = getPose();
 
-		} else {
-			Logger.getInstance().recordOutput("Vision Pose", "Thrown");
+			Logger.getInstance().recordOutput("Vision Correction (x, y, degrees)", new double[] {
+					currentPose.getX() - updatedPose.getX(),
+					currentPose.getY() - updatedPose.getY(),
+					currentPose.getRotation().getDegrees() - updatedPose.getRotation().getDegrees() });
 		}
 	}
 
@@ -467,7 +499,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 				linearFieldVelocity.getY(),
 				Math.toRadians(m_pigeon.getRate()));
 	}
-	
+
 	@Override
 	public void periodic() {
 		updatePoseEstimator();
@@ -498,13 +530,11 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 				states[3].speedMetersPerSecond / m_config.m_maxVelocityMetersPerSecond * m_config.m_maxVoltage,
 				states[3].angle.getRadians());
 
-		Logger.getInstance().recordOutput("Swerve Setpoints", states);
 		SwerveModuleState[] loggingSwerveStates = states;
 		loggingSwerveStates[0] = m_frontLeftModule.getState();
 		loggingSwerveStates[1] = m_frontRightModule.getState();
 		loggingSwerveStates[2] = m_backLeftModule.getState();
 		loggingSwerveStates[3] = m_backRightModule.getState();
-		Logger.getInstance().recordOutput("Swerve Speed", loggingSwerveStates);
 		Logger.getInstance().recordOutput("Robot Pose", getPose());
 
 		updateFieldVelocity();
