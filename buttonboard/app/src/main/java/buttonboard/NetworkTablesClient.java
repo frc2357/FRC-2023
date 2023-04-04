@@ -20,6 +20,14 @@ public class NetworkTablesClient {
         public void gridUpdated(String high, String mid, String low);
     }
 
+    public static interface AllianceListener {
+        public void allianceUpdated(String alliance);
+    }
+
+    public static interface TargetListener {
+        public void targetUpdated(int row, int col, int type);
+    }
+
     private String m_serverName;
     private int m_connListenerHandle;
     private NetworkTable m_buttonboardTable;
@@ -28,7 +36,10 @@ public class NetworkTablesClient {
     private StringPublisher m_alliancePub;
     private IntegerPublisher m_targetRowPub;
     private IntegerPublisher m_targetColPub;
+    private IntegerPublisher m_targetTypePub;
     private GridListener m_gridListener;
+    private TargetListener m_targetListener;
+    private AllianceListener m_allianceListener;
 
     public NetworkTablesClient() {
         this(null);
@@ -58,6 +69,14 @@ public class NetworkTablesClient {
 
     public void setGridListener(GridListener l) {
         m_gridListener = l;
+    }
+
+    public void setAllianceListener(AllianceListener l) {
+        m_allianceListener = l;
+    }
+
+    public void setTargetListener(TargetListener l) {
+        m_targetListener = l;
     }
 
     public void open() {
@@ -104,6 +123,9 @@ public class NetworkTablesClient {
         m_targetColPub = m_buttonboardTable.getIntegerTopic(Constants.NT_TARGET_COL_TOPIC).publish();
         m_targetColPub.setDefault(-1);
 
+        m_targetTypePub = m_buttonboardTable.getIntegerTopic(Constants.NT_TARGET_TYPE_TOPIC).publish();
+        m_targetTypePub.setDefault(-1);
+
         m_alliancePub = m_buttonboardTable.getStringTopic(Constants.NT_ALLIANCE_TOPIC).publish();
         m_alliancePub.setDefault(Constants.ALLIANCE_UNSET);
     }
@@ -112,19 +134,28 @@ public class NetworkTablesClient {
         System.out.println("NetworkTablesClient.close");
         NetworkTableInstance inst = NetworkTableInstance.getDefault();
         m_gridSub.close();
+        m_alliancePub.close();
         m_targetRowPub.close();
         m_targetColPub.close();
+        m_targetTypePub.close();
         inst.removeListener(m_connListenerHandle);
     }
 
-    public void setGridTarget(int row, int col) {
-        System.out.println("Set grid target to (row=" + row + ", col=" + col + ")");
+    public void setGridTarget(int row, int col, int type) {
+        System.out.println("Set grid target to (row=" + row + ", col=" + col + ", type=" + type + ")");
         m_targetRowPub.set(row);
         m_targetColPub.set(col);
+        m_targetTypePub.set(type);
+        if (m_targetListener != null) {
+            m_targetListener.targetUpdated(row, col, type);
+        }
     }
 
     public void setAlliance(String alliance) {
         System.out.println("Set alliance to " + alliance);
         m_alliancePub.set(alliance);
+        if (m_allianceListener != null) {
+            m_allianceListener.allianceUpdated(alliance);
+        }
     }
 }

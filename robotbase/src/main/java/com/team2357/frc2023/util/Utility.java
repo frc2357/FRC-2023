@@ -1,13 +1,32 @@
 package com.team2357.frc2023.util;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.team2357.frc2023.Constants;
+import com.team2357.frc2023.commands.scoring.cone.ConeHighPrePoseCommand;
+import com.team2357.frc2023.commands.scoring.cone.ConeHighScoreCommand;
+import com.team2357.frc2023.commands.scoring.cone.ConeLowPrePoseCommand;
+import com.team2357.frc2023.commands.scoring.cone.ConeLowScoreCommand;
+import com.team2357.frc2023.commands.scoring.cone.ConeMidPrePoseCommand;
+import com.team2357.frc2023.commands.scoring.cone.ConeMidScoreCommand;
+import com.team2357.frc2023.commands.scoring.cube.CubeHighPrePoseCommand;
+import com.team2357.frc2023.commands.scoring.cube.CubeHighScoreCommand;
+import com.team2357.frc2023.commands.scoring.cube.CubeLowPrePoseCommand;
+import com.team2357.frc2023.commands.scoring.cube.CubeLowScoreCommand;
+import com.team2357.frc2023.commands.scoring.cube.CubeMidPrePoseCommand;
+import com.team2357.frc2023.commands.scoring.cube.CubeMidScoreCommand;
 import com.team2357.frc2023.networktables.Buttonboard;
+import com.team2357.frc2023.state.RobotState;
+import com.team2357.frc2023.state.RobotState.State;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 public class Utility {
     /**
@@ -30,6 +49,10 @@ public class Utility {
 
     public static Pose2d gridColumnToTargetPose(int col) {
 
+        if (col == -1) {
+            return null;
+        }
+
         double y = Constants.FIELD.COLUMN_ZERO_SCORE_Y_METERS + Constants.FIELD.GRID_SCORE_Y_TRIM;
         y += (col * Constants.FIELD.GRID_DISTANCE_METERS_BETWEEN_COLUMN);
 
@@ -49,7 +72,7 @@ public class Utility {
                     Constants.FIELD.FIELD_WIDTH_METERS - pose.getY());
 
             Rotation2d flippedRotation = pose.getRotation().times(-1);
-            
+
             return new Pose2d(flippedTranslation, flippedRotation);
         }
         return pose;

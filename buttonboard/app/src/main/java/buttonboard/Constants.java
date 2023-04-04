@@ -7,6 +7,7 @@ public class Constants {
     public static final String NT_BUTTONBOARD_TABLE = "buttonboard";
     public static final String NT_TARGET_ROW_TOPIC = "targetRow";
     public static final String NT_TARGET_COL_TOPIC = "targetCol";
+    public static final String NT_TARGET_TYPE_TOPIC = "targetType";
     public static final String NT_ALLIANCE_TOPIC = "alliance";
     public static final String NT_INTAKE_WINCH_TOPIC = "intakeWinch";
     public static final String NT_INTAKE_SPEED_TOPIC = "intakeSpeed";

@@ -360,11 +360,11 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
   }
 
   public double getBlueBotposeTimestamp() {
-    return Timer.getFPGATimestamp() - (m_botposeWpiBlue.get()[6]/1000);
+    return calculateTimestamp(m_botposeWpiBlue.get());
   }
 
   public double getRedBotposeTimestamp() {
-    return Timer.getFPGATimestamp() - (m_botposeWpiRed.get()[6]/1000);
+    return calculateTimestamp(m_botposeWpiRed.get());
   }
 
   public double getCurrentAllianceBotposeTimestamp() {
@@ -377,7 +377,19 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
     }
   }
 
+  public double calculateTimestamp(double[] botpose) {
+    if(botpose == null) {
+      return 0;
+    }
+
+    return Timer.getFPGATimestamp() - (botpose[6]/1000);
+  }
+
   public static Pose2d botposeToPose2d(double[] botpose) {
+    if(botpose == null) {
+      return null;
+    }
+
     Translation2d t2d = new Translation2d(botpose[0], botpose[1]);
     Rotation2d r2d = Rotation2d.fromDegrees(botpose[5]);
     return new Pose2d(t2d, r2d);

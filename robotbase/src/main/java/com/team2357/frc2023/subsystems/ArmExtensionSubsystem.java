@@ -4,7 +4,6 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.team2357.frc2023.shuffleboard.ShuffleboardPIDTuner;
 import com.team2357.lib.subsystems.ClosedLoopSubsystem;
 import com.team2357.lib.util.Utility;
 
@@ -59,7 +58,6 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
     private CANSparkMax m_extendMotor;
     private SparkMaxPIDController m_pidcontroller;
     private double m_targetRotations;
-    private ShuffleboardPIDTuner m_shuffleboardPIDTuner;
 
     public ArmExtensionSubsystem(int motorId) {
         m_extendMotor = new CANSparkMax(motorId, MotorType.kBrushless);
@@ -69,9 +67,6 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
 
     public void configure(Configuration config) {
         m_config = config;
-        m_shuffleboardPIDTuner = new ShuffleboardPIDTuner("Arm Extension", m_config.m_shuffleboardTunerPRange,
-                m_config.m_shuffleboardTunerIRange, m_config.m_shuffleboardTunerDRange, m_config.m_extendP,
-                m_config.m_extendI, m_config.m_extendD);
         m_extendMotor.setIdleMode(m_config.m_extendMotorIdleMode);
         m_extendMotor.setSmartCurrentLimit(m_config.m_extendMotorStallLimitAmps, m_config.m_extendMotorFreeLimitAmps);
         m_pidcontroller = m_extendMotor.getPIDController();
@@ -141,21 +136,12 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
         return m_extendMotor.getEncoder().getPosition();
     }
 
-    public void updatePID() {
-        m_pidcontroller.setP(m_shuffleboardPIDTuner.getPValue());
-        m_pidcontroller.setI(m_shuffleboardPIDTuner.getIValue());
-        m_pidcontroller.setD(m_shuffleboardPIDTuner.getDValue());
-    }
-
     public double getAmps() {
         return m_extendMotor.getOutputCurrent();
     }
 
     @Override
     public void periodic() {
-        if (m_shuffleboardPIDTuner.arePIDsUpdated()) {
-            updatePID();
-        }
         if (isClosedLoopEnabled() && isMotorAtRotations()) {
             setClosedLoopEnabled(false);
         }

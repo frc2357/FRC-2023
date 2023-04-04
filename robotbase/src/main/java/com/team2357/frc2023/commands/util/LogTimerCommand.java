@@ -33,7 +33,7 @@ public class LogTimerCommand extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         if (!interrupted) {
-            Logger.getInstance().recordOutput(m_key, m_message);
+            Logger.getInstance().recordOutput("Log Timer Command Logged/"+m_key, m_message);
         }
     }
 }
