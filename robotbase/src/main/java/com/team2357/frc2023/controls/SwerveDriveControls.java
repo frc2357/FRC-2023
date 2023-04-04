@@ -9,11 +9,14 @@ import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.lib.triggers.AxisThresholdTrigger;
 import com.team2357.lib.util.XboxRaw;
 
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class SwerveDriveControls implements RumbleInterface {
     private static SwerveDriveControls s_instance;
@@ -21,6 +24,8 @@ public class SwerveDriveControls implements RumbleInterface {
     public static SwerveDriveControls getInstance() {
         return s_instance;
     }
+
+    private SwerveDriveSubsystem m_swerve;
 
     private XboxController m_controller;
     private double m_deadband;
@@ -33,15 +38,24 @@ public class SwerveDriveControls implements RumbleInterface {
     private JoystickButton m_yButton;
     private JoystickButton m_startButton;
 
+    private Trigger m_rightJoystickButton;
+
     private AxisThresholdTrigger m_leftTriggerPre;
     private AxisThresholdTrigger m_leftTriggerFull;
     private AxisThresholdTrigger m_rightTriggerPre;
     private AxisThresholdTrigger m_rightTriggerFull;
 
+    private ProfiledPIDController m_directionController;
+
     public static boolean isFlipped;
 
     public SwerveDriveControls(XboxController controller, double deadband) {
         s_instance = this;
+
+        m_swerve = SwerveDriveSubsystem.getInstance();
+
+        m_directionController = m_swerve.getAutoAlignThetaController();
+        m_directionController.enableContinuousInput(-Math.PI, Math.PI);
 
         m_controller = controller;
         m_deadband = deadband;
@@ -49,11 +63,11 @@ public class SwerveDriveControls implements RumbleInterface {
         m_aButton = new JoystickButton(m_controller, XboxRaw.A.value);
         m_bButton = new JoystickButton(m_controller, XboxRaw.B.value);
         m_yButton = new JoystickButton(m_controller, XboxRaw.Y.value);
-        
+
         m_backButton = new JoystickButton(m_controller, XboxRaw.Back.value);
         m_startButton = new JoystickButton(m_controller, XboxRaw.Start.value);
         m_aButton = new JoystickButton(m_controller, XboxRaw.A.value);
-        
+
         m_rightBumper = new JoystickButton(m_controller, XboxRaw.BumperRight.value);
         m_leftBumper = new JoystickButton(m_controller, XboxRaw.BumperLeft.value);
 
@@ -63,13 +77,15 @@ public class SwerveDriveControls implements RumbleInterface {
         m_leftTriggerPre = new AxisThresholdTrigger(m_controller, Axis.kLeftTrigger, 0.05);
         m_leftTriggerFull = new AxisThresholdTrigger(m_controller, Axis.kLeftTrigger, 0.75);
 
+        m_rightJoystickButton = new Trigger(() -> m_controller.getRightStickButtonPressed());
+
         mapControls();
     }
 
     public void mapControls() {
         // Zero swerve drive
-        m_backButton.whileTrue(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().zeroGyroscope()));
-        m_startButton.whileTrue(new InstantCommand(() -> SwerveDriveSubsystem.getInstance().setGyroScope(180)));
+        m_backButton.whileTrue(new InstantCommand(() -> m_swerve.zeroGyroscope()));
+        m_startButton.whileTrue(new InstantCommand(() -> m_swerve.setGyroScope(180)));
 
         // Intake commands
 
@@ -84,6 +100,10 @@ public class SwerveDriveControls implements RumbleInterface {
         m_rightTriggerFull.whileTrue(new IntakeCubeCommandGroup());
 
         m_aButton.onTrue(new ToggleRobotCentricDriveCommand());
+
+        m_rightJoystickButton.onTrue(new InstantCommand(() -> {
+            m_directionController.reset(m_swerve.getPose().getRotation().getRadians());
+        }));
     }
 
     public double getX() {
@@ -101,7 +121,32 @@ public class SwerveDriveControls implements RumbleInterface {
     }
 
     public double getRotation() {
-        return -modifyAxis(m_controller.getRightX());
+        if (!m_controller.getRightStickButton()) {
+            return -modifyAxis(m_controller.getRightX());
+        }
+
+        double currentRotation = m_swerve.getPose().getRotation().getRadians();
+        double targetRotation = getNearestCardinalDirection(m_swerve.getYaw0To360());
+
+        double velocity = m_directionController.calculate(currentRotation, targetRotation);
+        velocity = m_directionController.atGoal() ? 0 : velocity;
+
+        return velocity;
+    }
+
+    // Cardinal direction relative to field
+    public double getNearestCardinalDirection(double yaw) {
+        double direction = Math.PI; // Default to face grids (South)
+        if ((0 <= yaw && yaw < 45) || (315 <= yaw && yaw <= 360)) { // North
+			direction = 0;
+		} else if (45 <= yaw && yaw < 135) { // East
+			direction = Math.PI/2;
+		} else if (135 <= yaw && yaw < 225) { // South
+			direction = Math.PI;
+		} else if (225 <= yaw && yaw < 315) { // West
+			direction = -Math.PI/2;
+		}
+		return direction;
     }
 
     public double deadband(double value, double deadband) {
