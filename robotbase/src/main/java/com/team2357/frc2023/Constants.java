@@ -524,8 +524,8 @@ public final class Constants {
         public static final double DRIVE_CONTROLLER_DEADBAND = 0.05;
         public static final double GUNNER_CONTROLLER_DEADBAND = 0.1;
 
-        public static final double RUMBLE_INTENSITY = 1;
-        public static final double RUMBLE_TIMEOUT_SECONDS_ON_TELEOP_AUTO = 5;
+        public static final double RUMBLE_INTENSITY = 0.75;
+        public static final double RUMBLE_TIMEOUT_SECONDS_ON_TELEOP_AUTO = 1;
 
         public static final int BUTTON_BOARD_NUM_ROWS = 3;
         public static final int BUTTON_BOARD_NUM_COLS = 9;
