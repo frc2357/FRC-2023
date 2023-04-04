@@ -4,6 +4,9 @@
 
 package com.team2357.frc2023;
 
+
+import org.littletonrobotics.junction.Logger;
+
 import com.team2357.frc2023.commands.drive.DefaultDriveCommand;
 import com.team2357.frc2023.controls.GunnerControls;
 import com.team2357.frc2023.controls.SwerveDriveControls;
@@ -96,5 +99,9 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return m_autoCommandChooser.getSelectedAutoCommand();
+  }
+
+  public void logPressure() {
+    Logger.getInstance().recordOutput("Pressure", m_compressor.getPressure());
   }
 }
