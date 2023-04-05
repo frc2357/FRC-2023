@@ -78,18 +78,10 @@ public class RobotContainer {
         Constants.COMPRESSOR.MAX_PRESSURE_PSI);
     // m_compressor.disable();
 
-    // Configure Shuffleboard
-    configureShuffleboard();
+    m_autoCommandChooser = new AutoCommandChooser();
 
     // PathPlannerServer.startServer(5811); // 5811 = port number. adjust this
     // according to your needs
-  }
-
-  /**
-   * This method should set up the shuffleboard
-   */
-  public void configureShuffleboard() {
-    m_autoCommandChooser = new AutoCommandChooser();
   }
 
   /**

@@ -317,7 +317,7 @@ public final class Constants {
         public static final long WRIST_ZERO_WAIT_MS = 100;
 
         public static final double WRIST_RETRACT_ROTATIONS = 0.25;
-        public static final double WRIST_EXTENSION_RETRACT_ROTATIONS = 4;
+        public static final double WRIST_EXTENSION_RETRACT_ROTATIONS = 2.5;
         public static final double SCORE_CONE_MID_ROTATIONS = 14;
         public static final double SCORE_CUBE_MID_ROTATIONS = 15;
         public static final double SCORE_CONE_HIGH_ROTATIONS = 20;
