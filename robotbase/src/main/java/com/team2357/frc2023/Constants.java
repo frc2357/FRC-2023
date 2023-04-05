@@ -224,8 +224,8 @@ public final class Constants {
 
         // Auto score low
         public static final double AUTO_SCORE_LOW_ROTATIONS = 70;
-
         public static final double INTAKE_HANDOFF_WINCH_ROTATIONS = 60;
+        public static final double DUMP_WINCH_ROTATIONS = 100;
 
         public static final int WINCH_DEPLOY_PID_SLOT = 0;
         public static final int WINCH_STOW_PID_SLOT = 1;
