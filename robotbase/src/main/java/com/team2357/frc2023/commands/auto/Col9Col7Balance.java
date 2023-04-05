@@ -29,8 +29,7 @@ public class Col9Col7Balance extends ParallelCommandGroup {
                     // Arm
                     new SequentialCommandGroup(
                         // Score initial cone
-                        new ConeHighPrePoseArm(),
-                        new WaitCommand(0.5),
+                        new ConeHighPrePoseArm(5.0).withTimeout(1.25),
                         new ConeHighScoreArmReturn()
                     ),
 
@@ -38,7 +37,7 @@ public class Col9Col7Balance extends ParallelCommandGroup {
                     new SequentialCommandGroup(
                         // Score initial cone
                         new ConeHighPrePoseClaw(),
-                        new WaitCommand(1.25),
+                        new WaitCommand(1.0),
                         new ConeHighScoreClaw()
                     ),
 
@@ -50,7 +49,7 @@ public class Col9Col7Balance extends ParallelCommandGroup {
                         // Deploy intake
                         new ParallelCommandGroup(
                             new IntakeArmRotateDumbCommand(0.4).withTimeout(1.875),
-                            new IntakeRollerRunCommand(0.5).withTimeout(3)
+                            new IntakeRollerRunCommand(0.5).withTimeout(5.0)
                         )
                     )
                 ), // End Step 2
@@ -59,13 +58,12 @@ public class Col9Col7Balance extends ParallelCommandGroup {
                 new IntakeStowConeCommandGroup(),
 
                 // Step 4: Score second cone
-                new WaitCommand(2.0),
+                new WaitCommand(1.5),
                 new ParallelCommandGroup(
                     // Arm
                     new SequentialCommandGroup(
                         // Score second cone
-                        new ConeHighPrePoseArm(),
-                        new WaitCommand(0.5),
+                        new ConeHighPrePoseArm(1.0).withTimeout(1.6),
                         new ConeHighScoreArmReturn()
                     ),
 
@@ -73,7 +71,7 @@ public class Col9Col7Balance extends ParallelCommandGroup {
                     new SequentialCommandGroup(
                         // Score second cone
                         new ConeHighPrePoseClaw(),
-                        new WaitCommand(1.25),
+                        new WaitCommand(1.375),
                         new ConeHighScoreClaw()
                     ),
 
@@ -87,7 +85,7 @@ public class Col9Col7Balance extends ParallelCommandGroup {
 
             // Path movement
             new SequentialCommandGroup(
-                new WaitCommand(2.25),
+                new WaitCommand(1.65),
                 TrajectoryUtil.createTrajectoryPathCommand(getClass().getSimpleName(), new PathConstraints(3.0, 1.5), true),
                 new AutoBalanceCommand()
             )

@@ -12,7 +12,12 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 public class ConeHighPrePoseArm extends ParallelCommandGroup {
+
     public ConeHighPrePoseArm() {
+        this(0.0);
+    }
+
+    public ConeHighPrePoseArm(double extensionAdjust) {
         super(
             new SetRobotStateCommand(RobotState.State.ROBOT_PRE_SCORE_CONE_HIGH),
 
@@ -28,7 +33,7 @@ public class ConeHighPrePoseArm extends ParallelCommandGroup {
             // Extension
             new SequentialCommandGroup(
                 new ArmWaitForGreaterThanPositionCommand(Constants.ARM_ROTATION.EXTENSION_HIGH_START_ROTATIONS),
-                new ArmExtendToPositionCommand(Constants.ARM_EXTENSION.AUTO_SCORE_CONE_HIGH_ROTATIONS + 1)
+                new ArmExtendToPositionCommand(Constants.ARM_EXTENSION.AUTO_SCORE_CONE_HIGH_ROTATIONS + extensionAdjust)
             )
         );
     }
