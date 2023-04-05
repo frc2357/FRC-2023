@@ -8,9 +8,10 @@ import com.team2357.frc2023.commands.intake.IntakeRollerReverseCommand;
 import com.team2357.frc2023.commands.state.SetRobotStateCommand;
 import com.team2357.frc2023.state.RobotState;
 
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
-public class ConeLowClawPrePoseCommand extends SequentialCommandGroup {
+public class ConeLowClawPrePoseCommand extends ParallelCommandGroup {
     public ConeLowClawPrePoseCommand() {
         super(
             new SetRobotStateCommand(RobotState.State.ROBOT_PRE_SCORE_CONE_LOW),
@@ -22,7 +23,7 @@ public class ConeLowClawPrePoseCommand extends SequentialCommandGroup {
             ),
 
             // Intake Rollers
-            new IntakeRollerReverseCommand().withTimeout(1),
+            new IntakeRollerReverseCommand().withTimeout(0.5),
 
             // Arm
             new ArmRotateToPositionCommand(Constants.ARM_ROTATION.SCORE_LOW_ROTATIONS)
