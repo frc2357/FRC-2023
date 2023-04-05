@@ -4,7 +4,7 @@ import com.pathplanner.lib.PathConstraints;
 import com.team2357.frc2023.commands.auto.support.ConeHighPrePoseArm;
 import com.team2357.frc2023.commands.auto.support.ConeHighPrePoseClaw;
 import com.team2357.frc2023.commands.auto.support.ConeHighPrePoseIntake;
-import com.team2357.frc2023.commands.auto.support.ConeHighScoreArmReturn;
+import com.team2357.frc2023.commands.auto.support.HighScoreArmReturn;
 import com.team2357.frc2023.commands.auto.support.ConeHighScoreClaw;
 import com.team2357.frc2023.commands.drive.AutoBalanceCommand;
 import com.team2357.frc2023.commands.intake.IntakeArmRotateDumbCommand;
@@ -30,7 +30,7 @@ public class Col9Col7Balance extends ParallelCommandGroup {
                     new SequentialCommandGroup(
                         // Score initial cone
                         new ConeHighPrePoseArm(5.0).withTimeout(1.25),
-                        new ConeHighScoreArmReturn()
+                        new HighScoreArmReturn()
                     ),
 
                     // Claw
@@ -64,7 +64,7 @@ public class Col9Col7Balance extends ParallelCommandGroup {
                     new SequentialCommandGroup(
                         // Score second cone
                         new ConeHighPrePoseArm(1.0).withTimeout(1.6),
-                        new ConeHighScoreArmReturn()
+                        new HighScoreArmReturn()
                     ),
 
                     // Claw

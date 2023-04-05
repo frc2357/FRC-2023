@@ -9,8 +9,8 @@ import com.team2357.frc2023.commands.everybot.WristRotateToPositionCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
-public class ConeHighScoreArmReturn extends SequentialCommandGroup  {
-    public ConeHighScoreArmReturn() {
+public class HighScoreArmReturn extends SequentialCommandGroup  {
+    public HighScoreArmReturn() {
         super(
             new ParallelCommandGroup(
                 new ArmExtendToPositionCommand(Constants.ARM_EXTENSION.RETRACTED_ROTATIONS),
