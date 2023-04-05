@@ -420,6 +420,7 @@ public final class Constants {
         public static final double SCORE_CUBE_MID_ROTATIONS = 50;
         public static final double SCORE_CUBE_HIGH_ROTATIONS = 65;
         public static final double SCORE_CONE_LOW_ROTATIONS = 25;
+        public static final double SCORE_LOW_ROTATIONS = 25;
 
         public static final double ARM_ROTATION_GEAR_RATIO = 190.91;
         public static final double ARM_HANDOFF_ROTATIONS = ARM_ROTATION_GEAR_RATIO / 8;
