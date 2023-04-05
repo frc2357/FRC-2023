@@ -1,32 +1,33 @@
 package com.team2357.frc2023.commands.scoring.cone;
 
 import com.team2357.frc2023.Constants;
-import com.team2357.frc2023.state.RobotState;
 import com.team2357.frc2023.commands.armrotation.ArmRotateToPositionCommand;
-import com.team2357.frc2023.commands.everybot.ClawReleaseConeCommand;
-import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
-import com.team2357.frc2023.commands.intake.WinchRotateToPositionCommand;
+import com.team2357.frc2023.commands.everybot.ClawHoldConeCommand;
+import com.team2357.frc2023.commands.everybot.ClawIntakeConeCommand;
+import com.team2357.frc2023.commands.intake.IntakeRollerReverseCommand;
 import com.team2357.frc2023.commands.state.SetRobotStateCommand;
+import com.team2357.frc2023.state.RobotState;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 
-public class ConeLowPrePoseCommand extends SequentialCommandGroup {
+public class ConeLowPrePoseCommand extends ParallelCommandGroup {
     public ConeLowPrePoseCommand() {
         super(
-            new ParallelCommandGroup(
-                new SetRobotStateCommand(RobotState.State.ROBOT_PRE_SCORE_CONE_LOW),
-                new WinchRotateToPositionCommand(Constants.INTAKE_ARM.AUTO_SCORE_LOW_ROTATIONS),
-                new ArmRotateToPositionCommand(Constants.ARM_ROTATION.SCORE_CONE_LOW_ROTATIONS),
-                new ParallelDeadlineGroup(
-                    new WaitCommand(1),
-                    new ClawReleaseConeCommand(),
-                    new IntakeRollerRunCommand()
-                )
+            new SetRobotStateCommand(RobotState.State.ROBOT_PRE_SCORE_CONE_LOW),
+
+            // Claw Rollers
+            new SequentialCommandGroup(
+                new ClawIntakeConeCommand(),
+                new ClawHoldConeCommand()
             ),
-            new ArmRotateToPositionCommand(Constants.ARM_ROTATION.RETRACTED_ROTATIONS)
+
+            // Intake Rollers
+            new IntakeRollerReverseCommand().withTimeout(0.5),
+
+            // Arm
+            new ArmRotateToPositionCommand(Constants.ARM_ROTATION.SCORE_LOW_ROTATIONS)
         );
     }
+    
 }
