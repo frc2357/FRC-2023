@@ -316,7 +316,7 @@ public final class Constants {
         public static final double WRIST_ZERO_MAX_AMPS = 20;
         public static final long WRIST_ZERO_WAIT_MS = 100;
 
-        public static final double WRIST_RETRACT_ROTATIONS = 0;
+        public static final double WRIST_RETRACT_ROTATIONS = 0.25;
         public static final double WRIST_EXTENSION_RETRACT_ROTATIONS = 4;
         public static final double SCORE_CONE_MID_ROTATIONS = 14;
         public static final double SCORE_CUBE_MID_ROTATIONS = 15;
@@ -329,8 +329,10 @@ public final class Constants {
             config.m_wristAxisMaxSpeed = 0.5;
             config.m_maxSpeedPercent = 1;
 
-            config.m_wristMotorStallLimitAmps = 20;
-            config.m_wristMotorFreeLimitAmps = 20;
+            config.m_wristHoldMotorStallLimitAmps = 10;
+            config.m_wristHoldMotorFreeLimitAmps = 10;
+            config.m_wristRunMotorStallLimitAmps = 30;
+            config.m_wristRunMotorFreeLimitAmps = 30;
 
             config.m_isInverted = true;
 
