@@ -361,7 +361,7 @@ public final class Constants {
         public static final double RETRACTED_ROTATIONS = 0;
 
         // public static final double AUTO_SCORE_MID_ROTATIONS = 10;
-        public static final double SCORE_CONE_HIGH_ROTATIONS = 39;
+        public static final double SCORE_CONE_HIGH_ROTATIONS = 43;
         public static final double AUTO_SCORE_CONE_HIGH_ROTATIONS = 36;
         public static final double SCORE_CUBE_HIGH_ROTATIONS = 33;
 
@@ -527,7 +527,7 @@ public final class Constants {
         public static final double DRIVE_CONTROLLER_DEADBAND = 0.05;
         public static final double GUNNER_CONTROLLER_DEADBAND = 0.1;
 
-        public static final double RUMBLE_INTENSITY = 0.75;
+        public static final double RUMBLE_INTENSITY = 0.5;
         public static final double RUMBLE_TIMEOUT_SECONDS_ON_TELEOP_AUTO = 1;
 
         public static final int BUTTON_BOARD_NUM_ROWS = 3;

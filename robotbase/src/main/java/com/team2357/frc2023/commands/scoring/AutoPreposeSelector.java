@@ -102,7 +102,7 @@ public class AutoPreposeSelector {
 
     public static PreposeCommands verifyNotInPrepose(State preposeState, PreposeCommands preposeCommand) {
         if (RobotState.isInState(preposeState)) {
-            return preposeCommand;
+            return PreposeCommands.NONE;
         }
         return preposeCommand;
     }

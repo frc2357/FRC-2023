@@ -97,7 +97,7 @@ public class AutoScoreSelector {
     public static ScoreCommand verifyPreposeToScore(State preposeState, ScoreCommand scoreCommand) {
         if (!RobotState.isInState(preposeState)) {
             DriverStation.reportWarning(
-                    "Tried to score " + preposeState.name() + " from " + RobotState.getState().name(), null);
+                    "Tried to score " + preposeState.name() + " from " + RobotState.getState().name(), false);
             return ScoreCommand.NONE;
         }
         return scoreCommand;
