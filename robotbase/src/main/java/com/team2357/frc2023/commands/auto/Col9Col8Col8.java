@@ -10,23 +10,22 @@ import com.team2357.frc2023.commands.auto.support.ConeHighScoreClaw;
 import com.team2357.frc2023.commands.auto.support.CubeHighPrePoseArm;
 import com.team2357.frc2023.commands.auto.support.CubePrePoseClaw;
 import com.team2357.frc2023.commands.auto.support.CubeScoreClaw;
+import com.team2357.frc2023.commands.auto.support.CubeMidPrePoseArm;
 import com.team2357.frc2023.commands.intake.IntakeArmRotateDumbCommand;
+import com.team2357.frc2023.commands.intake.IntakeArmStowCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerReverseCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
-import com.team2357.frc2023.commands.intake.IntakeStowConeCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakeStowCubeCommandGroup;
-import com.team2357.frc2023.commands.scoring.DumpGamePieceCommand;
+import com.team2357.frc2023.commands.intake.WinchRotateToPositionCommand;
 import com.team2357.frc2023.commands.util.AutonomousZeroCommand;
-import com.team2357.frc2023.state.RobotState;
 import com.team2357.frc2023.trajectoryutil.TrajectoryUtil;
 
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
-public class Col9Col7Col8 extends ParallelCommandGroup {
-    public Col9Col7Col8() {
+public class Col9Col8Col8 extends ParallelCommandGroup {
+    public Col9Col8Col8() {
         addCommands(
             new SequentialCommandGroup(
                 // Step 1: Initialize
@@ -53,76 +52,81 @@ public class Col9Col7Col8 extends ParallelCommandGroup {
                     new SequentialCommandGroup(
                         // Score initial cone
                         new IntakeRollerReverseCommand().withTimeout(0.5),
+                        new WaitCommand(0.25),
                         // Deploy intake
                         new ParallelCommandGroup(
-                            new IntakeArmRotateDumbCommand(0.4).withTimeout(1.875),
-                            new IntakeRollerRunCommand(0.5).withTimeout(3.5)
+                            new IntakeArmRotateDumbCommand(0.6).withTimeout(1.875),
+                            new IntakeRollerRunCommand(0.7).withTimeout(3.5)
                         )
                     )
                 ), // End Step 2
 
                 // Step 3: Stow intake
-                new IntakeStowConeCommandGroup().withTimeout(2.0),
+                new IntakeStowCubeCommandGroup().withTimeout(2.0),
 
-                // Step 4: Score second cone (if we got it)
-                new WaitCommand(0.25),
-                new ConditionalCommand(
-                    new ParallelCommandGroup(
-                        // Arm
-                        new SequentialCommandGroup(
-                            // Score second cone
-                            new ConeHighPrePoseArm(1.0).withTimeout(1.6),
-                            new ArmExtendToPositionCommand(Constants.ARM_EXTENSION.AUTO_SCORE_CONE_HIGH_ROTATIONS - 5),
-                            new HighScoreArmReturn()
-                        ),
-
-                        // Claw
-                        new SequentialCommandGroup(
-                            // Score second cone
-                            new ConeHighPrePoseClaw(),
-                            new WaitCommand(1.25),
-                            new ConeHighScoreClaw()
-                        ),
-
-                        // Intake
-                        // Score second cone
-                        new IntakeRollerReverseCommand().withTimeout(0.5)
-                    ),
-                    new DumpGamePieceCommand().withTimeout(1.0),
-                    () -> RobotState.hasCone()
-                ), // End Step 4
-
-                // Deploy intake
-                new WaitCommand(0.5),
-                new ParallelCommandGroup(
-                    new IntakeArmRotateDumbCommand(0.4).withTimeout(1.875),
-                    new IntakeRollerRunCommand(0.6).withTimeout(3.5)
-                ),
-
-                // Step 5: Stow intake
-                new IntakeStowCubeCommandGroup(),
-
-                // Step 6: Score cube
+                // Step 4: Score first cube
                 new ParallelCommandGroup(
                     // Arm
                     new SequentialCommandGroup(
-                        // Score cube
+                        // Score first cube 
                         new CubeHighPrePoseArm().withTimeout(1.6),
+                        new ArmExtendToPositionCommand(Constants.ARM_EXTENSION.SCORE_CUBE_HIGH_ROTATIONS - 5),
                         new HighScoreArmReturn()
                     ),
 
                     // Claw
                     new SequentialCommandGroup(
-                        // Score cube
+                        // Score first cube
                         new CubePrePoseClaw(),
-                        new WaitCommand(1.0),
+                        new WaitCommand(0.85),
                         new CubeScoreClaw()
                     ),
 
                     // Intake
+                    // Score first cube
                     new SequentialCommandGroup(
-                        // Score cube
-                        new IntakeRollerReverseCommand().withTimeout(0.5)
+                        new IntakeRollerReverseCommand().withTimeout(0.5),
+                        new WaitCommand(0.5),
+                        new IntakeRollerRunCommand(0.7).withTimeout(3.5)
+                    ),
+
+                    new SequentialCommandGroup(
+                        new WinchRotateToPositionCommand(Constants.INTAKE_ARM.INTAKE_HANDOFF_WINCH_ROTATIONS),
+                        new IntakeArmStowCommand(),
+
+                        // Deploy intake
+                        new IntakeArmRotateDumbCommand(0.6).withTimeout(1.875)
+                    )
+                ), // End Step 4
+
+                // Step 5: Stow intake
+                new IntakeStowCubeCommandGroup(),
+
+                // Step 6: Score second cube
+                new ParallelCommandGroup(
+                    // Arm
+                    new SequentialCommandGroup(
+                        // Score second cube 
+                        new CubeMidPrePoseArm().withTimeout(1.6),
+                        new WaitCommand(1.75),
+                        new HighScoreArmReturn()
+                    ),
+
+                    // Claw
+                    new SequentialCommandGroup(
+                        // Score second cube
+                        new CubePrePoseClaw(),
+                        new WaitCommand(2.0),
+                        new CubeScoreClaw()
+                    ),
+
+                    // Intake
+                    // Score second cube
+                    new IntakeRollerReverseCommand().withTimeout(0.5),
+
+                    new SequentialCommandGroup(
+                        new WinchRotateToPositionCommand(Constants.INTAKE_ARM.INTAKE_HANDOFF_WINCH_ROTATIONS),
+                        new IntakeArmStowCommand()
                     )
                 ) // End Step 6
             ),
@@ -130,13 +134,13 @@ public class Col9Col7Col8 extends ParallelCommandGroup {
             // Path movement
             new SequentialCommandGroup(
                 new WaitCommand(1.65),
-                TrajectoryUtil.createTrajectoryPathCommand(getClass().getSimpleName(), new PathConstraints(3.25, 2.30), true)
+                TrajectoryUtil.createTrajectoryPathCommand(getClass().getSimpleName(), new PathConstraints(3.25, 2.50), true)
             )
         );
     }
 
     @Override
     public String toString() {
-        return "Col 9, Col 7, Col 8";
+        return "Col 9, Col 8, Col 8";
     }
 }
