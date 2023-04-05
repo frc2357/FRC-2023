@@ -58,12 +58,12 @@ public class Col9Col7Balance extends ParallelCommandGroup {
                 new IntakeStowConeCommandGroup(),
 
                 // Step 4: Score second cone
-                new WaitCommand(1.75),
+                new WaitCommand(1.5),
                 new ParallelCommandGroup(
                     // Arm
                     new SequentialCommandGroup(
                         // Score second cone
-                        new ConeHighPrePoseArm(0.5).withTimeout(1.6),
+                        new ConeHighPrePoseArm(1.0).withTimeout(1.6),
                         new ConeHighScoreArmReturn()
                     ),
 
