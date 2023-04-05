@@ -1,5 +1,7 @@
 package com.team2357.frc2023.commands.scoring.cube;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.commands.armrotation.ArmRotateToPositionCommand;
 import com.team2357.frc2023.commands.armrotation.ArmWaitForGreaterThanPositionCommand;
@@ -11,15 +13,20 @@ import com.team2357.frc2023.commands.intake.IntakeRollerReverseCommand;
 import com.team2357.frc2023.commands.intake.WinchRotateToPositionCommand;
 import com.team2357.frc2023.commands.state.SetRobotStateCommand;
 import com.team2357.frc2023.state.RobotState;
+import com.team2357.frc2023.subsystems.ArmExtensionSubsystem;
+import com.team2357.frc2023.subsystems.ArmRotationSubsystem;
+import com.team2357.frc2023.subsystems.WristSubsystem;
 
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
-public class CubeMidPrePoseCommand extends ParallelCommandGroup {
+public class CubeMidPrePoseCommand extends SequentialCommandGroup {
     public CubeMidPrePoseCommand() {
         super(
-            new SetRobotStateCommand(RobotState.State.ROBOT_PRE_SCORE_CUBE_MID),
+                new ParallelCommandGroup(
+                        new SetRobotStateCommand(RobotState.State.ROBOT_PRE_SCORE_CUBE_MID),
 
             // Claw Rollers
             new SequentialCommandGroup(
@@ -45,7 +52,10 @@ public class CubeMidPrePoseCommand extends ParallelCommandGroup {
             new SequentialCommandGroup(
                 new ArmWaitForGreaterThanPositionCommand(Constants.ARM_ROTATION.WRIST_CLEAR_INTAKE_ROTATIONS),
                 new WristRotateToPositionCommand(Constants.WRIST.SCORE_CUBE_MID_ROTATIONS)
-            )
-        );
+            )),
+                new InstantCommand(() -> Logger.getInstance().recordOutput("Pre Pose/Cube Mid prePose",
+                        new double[] { ArmRotationSubsystem.getInstance().getMotorRotations(),
+                                ArmExtensionSubsystem.getInstance().getMotorRotations(),
+                                WristSubsystem.getInstance().getRotations() })));
     }
 }
