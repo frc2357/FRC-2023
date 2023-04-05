@@ -11,6 +11,7 @@ import com.team2357.frc2023.commands.human.panic.IntakeRollerAxisCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeWinchAxisCommand;
 import com.team2357.frc2023.commands.intake.WinchAmpZeroCommand;
 import com.team2357.frc2023.commands.scoring.AutoLineupCommand;
+import com.team2357.frc2023.commands.scoring.DumpGamePieceCommand;
 import com.team2357.frc2023.commands.scoring.GunnerAutoScoreCommand;
 import com.team2357.frc2023.commands.scoring.GunnerScoreHighCommand;
 import com.team2357.frc2023.commands.scoring.GunnerScoreLowCommand;
@@ -206,6 +207,7 @@ public class GunnerControls implements RumbleInterface {
         yButton.whileTrue(new GunnerScoreHighCommand());
         xButton.whileTrue(new GunnerScoreMidCommand());
         aButton.whileTrue(new GunnerScoreLowCommand());
+        bButton.whileTrue(new DumpGamePieceCommand());
 
         m_leftBumper.whileTrue(new AutoLineupCommand());
         m_rightBumper.whileTrue(new GunnerAutoScoreCommand());

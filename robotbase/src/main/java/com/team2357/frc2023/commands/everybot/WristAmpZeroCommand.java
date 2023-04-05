@@ -34,7 +34,7 @@ public class WristAmpZeroCommand extends CommandBase {
         if (!interrupted) {
             Logger.getInstance().recordOutput("Wrist Zero", "success");
             WristSubsystem.getInstance().resetEncoder();
-            WristSubsystem.getInstance().setRotations(0);
+            WristSubsystem.getInstance().setRotations(Constants.WRIST.WRIST_RETRACT_ROTATIONS);
         } else {
             DriverStation.reportError("Wrist Zero interrupted!", false);
             Logger.getInstance().recordOutput("Wrist Zero", "interrupted");

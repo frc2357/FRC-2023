@@ -19,8 +19,10 @@ public class WristSubsystem extends ClosedLoopSubsystem {
         public double m_wristAxisMaxSpeed;
         public double m_maxSpeedPercent;
 
-        public int m_wristMotorStallLimitAmps;
-        public int m_wristMotorFreeLimitAmps;
+        public int m_wristHoldMotorStallLimitAmps;
+        public int m_wristHoldMotorFreeLimitAmps;
+        public int m_wristRunMotorStallLimitAmps;
+        public int m_wristRunMotorFreeLimitAmps;
 
         public boolean m_isInverted;
 
@@ -49,9 +51,11 @@ public class WristSubsystem extends ClosedLoopSubsystem {
     private SparkMaxPIDController m_pidController;
 
     private double m_targetRotations;
+    private boolean m_isHolding;
 
     public WristSubsystem(int motorId) {
         m_wristMotor = new CANSparkMax(motorId, MotorType.kBrushless);
+        m_isHolding = false;
 
         instance = this;
     }
@@ -60,7 +64,7 @@ public class WristSubsystem extends ClosedLoopSubsystem {
         m_config = config;
 
         m_wristMotor.setIdleMode(IdleMode.kBrake);
-        m_wristMotor.setSmartCurrentLimit(m_config.m_wristMotorStallLimitAmps, m_config.m_wristMotorFreeLimitAmps);
+        m_wristMotor.setSmartCurrentLimit(m_config.m_wristRunMotorStallLimitAmps, m_config.m_wristRunMotorFreeLimitAmps);
 
         m_pidController = m_wristMotor.getPIDController();
 
@@ -78,13 +82,31 @@ public class WristSubsystem extends ClosedLoopSubsystem {
                 m_config.m_smartMotionSlot);
     }
 
+    public boolean isHolding() {
+        return m_isHolding;
+    }
+
+    public void setHolding(boolean isHolding) {
+        if (m_isHolding != isHolding) {
+            m_isHolding = isHolding;
+
+            if (isHolding) {
+                m_wristMotor.setSmartCurrentLimit(m_config.m_wristHoldMotorStallLimitAmps, m_config.m_wristHoldMotorFreeLimitAmps);
+            } else {
+                m_wristMotor.setSmartCurrentLimit(m_config.m_wristRunMotorStallLimitAmps, m_config.m_wristRunMotorFreeLimitAmps);
+            }
+        }
+    }
+
     public void setRotations(double rotations) {
+        setHolding(false);
         setClosedLoopEnabled(true);
         m_targetRotations = rotations;
         m_pidController.setReference(m_targetRotations, CANSparkMax.ControlType.kSmartMotion);
     }
 
     public void stopMotor() {
+        setHolding(false);
         setClosedLoopEnabled(false);
         m_wristMotor.set(0.0);
     }
@@ -107,12 +129,14 @@ public class WristSubsystem extends ClosedLoopSubsystem {
     }
 
     public void setWristAxisSpeed(double axisSpeed) {
+        setHolding(false);
         setClosedLoopEnabled(false);
         double motorSpeed = (-axisSpeed) * m_config.m_wristAxisMaxSpeed;
         m_wristMotor.set(motorSpeed);
     }
 
     public void manualRotate(double speed) {
+        setHolding(false);
         setClosedLoopEnabled(false);
         m_wristMotor.set(speed);
     }
@@ -120,6 +144,7 @@ public class WristSubsystem extends ClosedLoopSubsystem {
     @Override
     public void periodic() {
         if (isClosedLoopEnabled() && isAtRotations()) {
+            setHolding(true);
             m_pidController.setReference(m_targetRotations, ControlType.kSmartMotion);
         }
     }

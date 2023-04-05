@@ -26,7 +26,7 @@ cross_a_y:0
 cross_b_a:1
 cross_b_x:0
 cross_b_y:0
-desc:AprilLeftPose
+desc:AprilRightPose
 desired_contour_region:0
 detector_conf:0.800000
 detector_idfilters:
@@ -67,10 +67,10 @@ pipeline_type:3
 red_balance:2028
 roi_x:0.000000
 roi_y:0.000000
-rsf:-0.09017
+rsf:-0.09195
 rspitch:-30
 rsroll:0.000000
-rss:-0.08384776
+rss:0.29
 rsu:1.06426
 rsyaw:0.000000
 sat_max:255

@@ -199,7 +199,7 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		);
 
 		setCoastMode();
-		
+
 		m_fieldVelocity = new Twist2d();
 		instance = this;
 	}
@@ -449,7 +449,14 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 			}
 
 			Logger.getInstance().recordOutput("filtered vision pose", pose);
+			Pose2d currentPose = getPose();
 			m_poseEstimator.addVisionMeasurement(pose, timestamp);
+			Pose2d updatedPose = getPose();
+
+			Logger.getInstance().recordOutput("Vision Correction (x, y, degrees)", new double[] {
+					currentPose.getX() - updatedPose.getX(),
+					currentPose.getY() - updatedPose.getY(),
+					currentPose.getRotation().getDegrees() - updatedPose.getRotation().getDegrees() });
 		}
 	}
 

@@ -17,12 +17,6 @@ public class ClawHoldCubeCommand extends CommandBase {
     @Override
     public boolean isFinished() {
         return false;
-    }
-
-    @Override
-    public void end(boolean interrupted) {
-        ClawSubsystem.getInstance().stopRollers();
-    }
-    
+    }    
 }
  

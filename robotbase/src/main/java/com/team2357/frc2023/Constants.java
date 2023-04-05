@@ -189,7 +189,7 @@ public final class Constants {
                 1.5);
         public static final PathConstraints GRID_ZERO_PATH_CONSTRAINTS = new PathConstraints(2, 1);
    
-        public static final double TIME_TO_COAST_SECONDS = 5;
+        public static final double TIME_TO_COAST_SECONDS = 10;
     }
 
     public static final class INTAKE_ROLLER {
@@ -224,8 +224,8 @@ public final class Constants {
 
         // Auto score low
         public static final double AUTO_SCORE_LOW_ROTATIONS = 70;
-
         public static final double INTAKE_HANDOFF_WINCH_ROTATIONS = 60;
+        public static final double DUMP_WINCH_ROTATIONS = 100;
 
         public static final int WINCH_DEPLOY_PID_SLOT = 0;
         public static final int WINCH_STOW_PID_SLOT = 1;
@@ -316,7 +316,7 @@ public final class Constants {
         public static final double WRIST_ZERO_MAX_AMPS = 20;
         public static final long WRIST_ZERO_WAIT_MS = 100;
 
-        public static final double WRIST_RETRACT_ROTATIONS = 0;
+        public static final double WRIST_RETRACT_ROTATIONS = 0.25;
         public static final double WRIST_EXTENSION_RETRACT_ROTATIONS = 4;
         public static final double SCORE_CONE_MID_ROTATIONS = 14;
         public static final double SCORE_CUBE_MID_ROTATIONS = 15;
@@ -329,8 +329,10 @@ public final class Constants {
             config.m_wristAxisMaxSpeed = 0.5;
             config.m_maxSpeedPercent = 1;
 
-            config.m_wristMotorStallLimitAmps = 20;
-            config.m_wristMotorFreeLimitAmps = 20;
+            config.m_wristHoldMotorStallLimitAmps = 10;
+            config.m_wristHoldMotorFreeLimitAmps = 10;
+            config.m_wristRunMotorStallLimitAmps = 30;
+            config.m_wristRunMotorFreeLimitAmps = 30;
 
             config.m_isInverted = true;
 
@@ -359,7 +361,7 @@ public final class Constants {
         public static final double RETRACTED_ROTATIONS = 0;
 
         // public static final double AUTO_SCORE_MID_ROTATIONS = 10;
-        public static final double SCORE_CONE_HIGH_ROTATIONS = 39;
+        public static final double SCORE_CONE_HIGH_ROTATIONS = 43;
         public static final double AUTO_SCORE_CONE_HIGH_ROTATIONS = 36;
         public static final double SCORE_CUBE_HIGH_ROTATIONS = 33;
 
@@ -418,6 +420,7 @@ public final class Constants {
         public static final double SCORE_CUBE_MID_ROTATIONS = 50;
         public static final double SCORE_CUBE_HIGH_ROTATIONS = 65;
         public static final double SCORE_CONE_LOW_ROTATIONS = 25;
+        public static final double SCORE_LOW_ROTATIONS = 25;
 
         public static final double ARM_ROTATION_GEAR_RATIO = 190.91;
         public static final double ARM_HANDOFF_ROTATIONS = ARM_ROTATION_GEAR_RATIO / 8;
@@ -524,8 +527,8 @@ public final class Constants {
         public static final double DRIVE_CONTROLLER_DEADBAND = 0.05;
         public static final double GUNNER_CONTROLLER_DEADBAND = 0.1;
 
-        public static final double RUMBLE_INTENSITY = 1;
-        public static final double RUMBLE_TIMEOUT_SECONDS_ON_TELEOP_AUTO = 5;
+        public static final double RUMBLE_INTENSITY = 0.5;
+        public static final double RUMBLE_TIMEOUT_SECONDS_ON_TELEOP_AUTO = 1;
 
         public static final int BUTTON_BOARD_NUM_ROWS = 3;
         public static final int BUTTON_BOARD_NUM_COLS = 9;
