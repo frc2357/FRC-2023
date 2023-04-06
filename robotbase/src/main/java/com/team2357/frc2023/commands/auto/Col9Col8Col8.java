@@ -100,7 +100,7 @@ public class Col9Col8Col8 extends ParallelCommandGroup {
                 ), // End Step 4
 
                 // Step 5: Stow intake
-                new IntakeStowCubeCommandGroup(),
+                new IntakeStowCubeCommandGroup().withTimeout(2.0),
 
                 // Step 6: Score second cube
                 new ParallelCommandGroup(
