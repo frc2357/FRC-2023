@@ -16,7 +16,7 @@ public class ClawHoldCubeCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return false;
+        return true;
     }    
 }
  
