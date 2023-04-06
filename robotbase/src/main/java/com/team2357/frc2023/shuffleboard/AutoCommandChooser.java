@@ -5,6 +5,7 @@ import com.team2357.frc2023.commands.auto.Col4StowBalance;
 import com.team2357.frc2023.commands.auto.Col6StowBalance;
 import com.team2357.frc2023.commands.auto.Col9Col7;
 import com.team2357.frc2023.commands.auto.Col9Col7Balance;
+import com.team2357.frc2023.commands.auto.Col9Col7Col8;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -21,7 +22,8 @@ public class AutoCommandChooser {
             new Col4StowBalance(),
             new Col6StowBalance(),
             new Col9Col7(),
-            new Col9Col7Balance()
+            new Col9Col7Balance(),
+            new Col9Col7Col8()
         };
 
         m_chooser = new SendableChooser<>();
