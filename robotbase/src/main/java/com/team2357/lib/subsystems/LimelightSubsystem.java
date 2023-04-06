@@ -25,6 +25,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.PubSubOption;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
@@ -40,6 +41,7 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
     public int m_targetingPipelineIndex = 0;
 
     public int m_aprilTagPipelineIndex = 1;
+    public int m_redAprilTagPipelineIndex = 3;
     public boolean m_isLimelightPrimaryStream = true;
 
     /** Angle of the Limelight axis from horizontal (degrees) */
@@ -122,6 +124,15 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
         PubSubOption.keepDuplicates(true));
 
     instance = this;
+  }
+
+  public void setAlliancePipeline(DriverStation.Alliance alliance) {
+    if (alliance == DriverStation.Alliance.Red) {
+      m_Configuration.m_aprilTagPipelineIndex = 3;
+    } else {
+      m_Configuration.m_aprilTagPipelineIndex = 1;
+    }
+    setAprilTagPipelineActive();
   }
 
   public void setConfiguration(Configuration configuration) {

@@ -6,6 +6,7 @@ import com.team2357.lib.subsystems.LimelightSubsystem;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 // Manages two limelight subsystems
@@ -40,6 +41,11 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
         m_rightLimelight = new LimelightSubsystem(rightLimelightName);
 
         m_instance = this;
+    }
+
+    public void setAlliance(DriverStation.Alliance alliance) {
+        m_leftLimelight.setAlliancePipeline(alliance);
+        m_rightLimelight.setAlliancePipeline(alliance);
     }
 
     public LimelightSubsystem getLimelight(LIMELIGHT limelight) {

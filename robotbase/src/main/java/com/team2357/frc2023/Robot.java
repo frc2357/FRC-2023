@@ -14,6 +14,7 @@ import com.team2357.frc2023.commands.drive.SetCoastOnDisableCommand;
 import com.team2357.frc2023.commands.drive.SyncDriveEncodersCommand;
 import com.team2357.frc2023.networktables.Buttonboard;
 import com.team2357.frc2023.state.RobotState;
+import com.team2357.frc2023.subsystems.DualLimelightManagerSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.frc2023.util.CountdownTimer;
 
@@ -101,6 +102,7 @@ public class Robot extends LoggedRobot {
     SwerveDriveSubsystem.getInstance().setBrakeMode();
 
     Buttonboard.getInstance().setAlliance();
+    DualLimelightManagerSubsystem.getInstance().setAlliance(Buttonboard.getInstance().getAlliance());
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
