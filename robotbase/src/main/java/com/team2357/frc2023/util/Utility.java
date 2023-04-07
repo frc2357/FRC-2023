@@ -48,21 +48,28 @@ public class Utility {
     }
 
     public static Pose2d gridColumnToTargetPose(int col) {
-
         if (col == -1) {
             return null;
         }
 
-        double y = Constants.FIELD.COLUMN_ZERO_SCORE_Y_METERS + Constants.FIELD.GRID_SCORE_Y_TRIM;
-        y += (col * Constants.FIELD.GRID_DISTANCE_METERS_BETWEEN_COLUMN);
+        if (Buttonboard.getInstance().getAlliance() == DriverStation.Alliance.Red) {
+            col = 8 - col;
+        }
 
+        double y = Constants.FIELD.COLUMN_ZERO_SCORE_Y_METERS;
+        y += (col * Constants.FIELD.GRID_DISTANCE_METERS_BETWEEN_COLUMN);
+ 
         double x = Constants.FIELD.GRID_SCORE_X_METERS;
 
         Rotation2d rot = Rotation2d.fromDegrees(Constants.FIELD.GRID_SCORE_ROTATION_DEGREES);
 
-        Pose2d pose = new Pose2d(x, y, rot);
+        Pose2d pose = flipPoseForCurrentAlliance(new Pose2d(x, y, rot));
 
-        return flipPoseForCurrentAlliance(pose);
+        double trim = Constants.FIELD.GRID_SCORE_Y_TRIM * (Buttonboard.getInstance().getAlliance() == DriverStation.Alliance.Red ? -1 : 1);
+        
+        Pose2d newPose = new Pose2d(pose.getX(), pose.getY() + trim, pose.getRotation());
+        
+        return newPose;
     }
 
     public static Pose2d flipPoseForCurrentAlliance(Pose2d pose) {

@@ -37,6 +37,7 @@ public class Col9Col8Col8 extends ParallelCommandGroup {
                     new SequentialCommandGroup(
                         // Score initial cone
                         new ConeHighPrePoseArm(5.0).withTimeout(1.25),
+                        new ArmExtendToPositionCommand(Constants.ARM_EXTENSION.SCORE_CUBE_HIGH_ROTATIONS - 5),
                         new HighScoreArmReturn()
                     ),
 
