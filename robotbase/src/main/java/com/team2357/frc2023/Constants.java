@@ -156,8 +156,8 @@ public final class Constants {
         public static final double BALANCE_FULL_TILT_DEGREES = 15;
         public static final double BALANCE_KP = 0.015;
         public static final double BALANCE_MAX_POWER = 0.3;
-        public static final double BALANCE_WAIT_MILLIS = 250;
-        public static final double BALANCE_DENOMINATOR_MULTIPLIER = 7.5;
+        public static final double BALANCE_WAIT_MILLIS = 500;
+        public static final double BALANCE_DENOMINATOR_MULTIPLIER = 5;
 
         public static final double TICKS_PER_ROTATION = 2048.0;
 

@@ -1,5 +1,6 @@
 package com.team2357.frc2023.controls;
 
+import com.team2357.frc2023.commands.drive.AutoBalanceCommand;
 import com.team2357.frc2023.commands.drive.ToggleRobotCentricDriveCommand;
 import com.team2357.frc2023.commands.intake.IntakeConeCommandGroup;
 import com.team2357.frc2023.commands.intake.IntakeCubeCommandGroup;
@@ -84,6 +85,7 @@ public class SwerveDriveControls implements RumbleInterface {
         m_rightTriggerFull.whileTrue(new IntakeCubeCommandGroup());
 
         m_aButton.onTrue(new ToggleRobotCentricDriveCommand());
+        m_bButton.whileTrue(new AutoBalanceCommand());
     }
 
     public double getX() {
