@@ -47,6 +47,6 @@ public class RedCol6StowBalance extends ParallelCommandGroup {
 
     @Override
     public String toString() {
-        return "Col 6, Stow, Balance";
+        return "RED Col 6, Stow, Balance";
     }
 }

@@ -92,6 +92,6 @@ public class BlueCol9Col7 extends ParallelCommandGroup {
 
     @Override
     public String toString() {
-        return "Col 9, Col 7";
+        return "BLUE Col 9, Col 7";
     }
 }
