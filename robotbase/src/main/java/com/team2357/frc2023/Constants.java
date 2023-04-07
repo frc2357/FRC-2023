@@ -156,8 +156,8 @@ public final class Constants {
         public static final double BALANCE_FULL_TILT_DEGREES = 15;
         public static final double BALANCE_KP = 0.015;
         public static final double BALANCE_MAX_POWER = 0.3;
-        public static final double BALANCE_WAIT_MILLIS = 250;
-        public static final double BALANCE_DENOMINATOR_MULTIPLIER = 2.5;
+        public static final double BALANCE_WAIT_MILLIS = 500;
+        public static final double BALANCE_DENOMINATOR_MULTIPLIER = 5;
 
         public static final double TICKS_PER_ROTATION = 2048.0;
 
@@ -443,8 +443,8 @@ public final class Constants {
 
             config.m_rotationMotorIdleMode = IdleMode.kBrake;
 
-            config.m_rotationMotorStallLimitAmps = 30;
-            config.m_rotationMotorFreeLimitAmps = 30;
+            config.m_rotationMotorStallLimitAmps = 50;
+            config.m_rotationMotorFreeLimitAmps = 50;
 
             config.m_isInverted = true;
 
@@ -573,7 +573,7 @@ public final class Constants {
         public static final double COLUMN_ZERO_SCORE_Y_METERS = 0.51;
         public static final double GRID_SCORE_X_METERS = 1.77;
         public static final double GRID_DISTANCE_METERS_BETWEEN_COLUMN = 0.5588;
-        public static final double GRID_SCORE_Y_TRIM = -0.1;
+        public static final double GRID_SCORE_Y_TRIM = -0.05;
         public static final double GRID_SCORE_ROTATION_DEGREES = 180;
     }
 }
