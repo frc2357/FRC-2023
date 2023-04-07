@@ -56,7 +56,7 @@ public class Col9Col8Col8 extends ParallelCommandGroup {
                         new WaitCommand(0.25),
                         // Deploy intake
                         new ParallelCommandGroup(
-                            new IntakeArmRotateDumbCommand(0.6).withTimeout(1.875),
+                            new IntakeArmRotateDumbCommand(0.6).withTimeout(1.3),
                             new IntakeRollerRunCommand(0.7).withTimeout(3.5)
                         )
                     )
@@ -64,7 +64,7 @@ public class Col9Col8Col8 extends ParallelCommandGroup {
 
                 // Step 3: Stow intake
                 new IntakeStowCubeCommandGroup().withTimeout(2.0),
-
+               
                 // Step 4: Score first cube
                 new ParallelCommandGroup(
                     // Arm
@@ -96,7 +96,7 @@ public class Col9Col8Col8 extends ParallelCommandGroup {
                         new IntakeArmStowCommand(),
 
                         // Deploy intake
-                        new IntakeArmRotateDumbCommand(0.6).withTimeout(1.875)
+                        new IntakeArmRotateDumbCommand(0.6).withTimeout(1.3)
                     )
                 ), // End Step 4
 
@@ -130,7 +130,7 @@ public class Col9Col8Col8 extends ParallelCommandGroup {
                         new IntakeArmStowCommand()
                     )
                 ) // End Step 6
-            ),
+                ),
 
             // Path movement
             new SequentialCommandGroup(

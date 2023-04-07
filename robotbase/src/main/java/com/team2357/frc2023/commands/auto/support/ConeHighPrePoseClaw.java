@@ -15,7 +15,7 @@ public class ConeHighPrePoseClaw extends ParallelCommandGroup {
 
             // Claw Rollers
             new SequentialCommandGroup(
-                new ClawIntakeConeCommand(),
+                new ClawIntakeConeCommand().withTimeout(0.25),
                 new ClawHoldConeCommand()
             )
         );
