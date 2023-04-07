@@ -417,10 +417,10 @@ public final class Constants {
         public static final double EXTENSION_HIGH_START_ROTATIONS = 45;
         public static final double SCORE_CONE_MID_ROTATIONS = 58;
         public static final double SCORE_CONE_HIGH_ROTATIONS = 72;
-        public static final double SCORE_CUBE_MID_ROTATIONS = 50;
-        public static final double SCORE_CUBE_HIGH_ROTATIONS = 65;
-        public static final double SCORE_CONE_LOW_ROTATIONS = 25;
-        public static final double SCORE_LOW_ROTATIONS = 25;
+        public static final double SCORE_CUBE_MID_ROTATIONS = 51;
+        public static final double SCORE_CUBE_HIGH_ROTATIONS = 66;
+        public static final double SCORE_CONE_LOW_ROTATIONS = 26;
+        public static final double SCORE_LOW_ROTATIONS = 26;
 
         public static final double ARM_ROTATION_GEAR_RATIO = 190.91;
         public static final double ARM_HANDOFF_ROTATIONS = ARM_ROTATION_GEAR_RATIO / 8;
