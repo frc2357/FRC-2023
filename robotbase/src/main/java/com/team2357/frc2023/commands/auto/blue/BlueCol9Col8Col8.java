@@ -56,7 +56,7 @@ public class BlueCol9Col8Col8 extends ParallelCommandGroup {
                         new WaitCommand(0.25),
                         // Deploy intake
                         new ParallelCommandGroup(
-                            new IntakeArmRotateDumbCommand(0.6).withTimeout(1.3),
+                            new IntakeArmRotateDumbCommand(0.6).withTimeout(1.1),
                             new IntakeRollerRunCommand(0.7).withTimeout(3.5)
                         )
                     )
@@ -96,7 +96,7 @@ public class BlueCol9Col8Col8 extends ParallelCommandGroup {
                         new IntakeArmStowCommand(),
 
                         // Deploy intake
-                        new IntakeArmRotateDumbCommand(0.6).withTimeout(1.3)
+                        new IntakeArmRotateDumbCommand(0.6).withTimeout(1.1)
                     )
                 ), // End Step 4
 
