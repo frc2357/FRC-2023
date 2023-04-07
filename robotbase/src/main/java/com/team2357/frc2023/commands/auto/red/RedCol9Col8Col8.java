@@ -1,4 +1,4 @@
-package com.team2357.frc2023.commands.auto;
+package com.team2357.frc2023.commands.auto.red;
 
 import com.pathplanner.lib.PathConstraints;
 import com.team2357.frc2023.Constants;
@@ -24,8 +24,8 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
-public class Col9Col8Col8 extends ParallelCommandGroup {
-    public Col9Col8Col8() {
+public class RedCol9Col8Col8 extends ParallelCommandGroup {
+    public RedCol9Col8Col8() {
         addCommands(
             new SequentialCommandGroup(
                 // Step 1: Initialize
