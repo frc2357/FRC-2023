@@ -152,8 +152,7 @@ public final class Constants {
         public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(306.3 - 180);
         public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(163.04 + 180);
 
-        public static final double BALANCE_LEVEL_DEGREES = 3.
-        5;
+        public static final double BALANCE_LEVEL_DEGREES = 3.5;
         public static final double BALANCE_FULL_TILT_DEGREES = 15;
         public static final double BALANCE_KP = 0.015;
         public static final double BALANCE_MAX_POWER = 0.3;
