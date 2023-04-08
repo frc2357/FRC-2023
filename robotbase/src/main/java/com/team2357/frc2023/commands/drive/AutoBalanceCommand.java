@@ -36,7 +36,12 @@ public class AutoBalanceCommand extends CommandLoggerBase {
             power = Math.min(Math.abs(Constants.DRIVE.BALANCE_KP * error), Constants.DRIVE.BALANCE_MAX_POWER);
             power = Math.copySign(power, error) * direction;
 
+            System.out.println("Power (before): " + power);
+            System.out.println("Difference: " + (prevAngle - angle));
+
             power /= (1 + (Math.abs(prevAngle - angle) * Constants.DRIVE.BALANCE_DENOMINATOR_MULTIPLIER));
+
+            System.out.println("Power (after): " + power);
 
             m_swerve.drive(power, 0, 0);
 
