@@ -152,12 +152,12 @@ public final class Constants {
         public static final double BACK_LEFT_MODULE_STEER_OFFSET = -Math.toRadians(306.3 - 180);
         public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(163.04 + 180);
 
-        public static final double BALANCE_LEVEL_DEGREES = 1;
+        public static final double BALANCE_LEVEL_DEGREES = 3.5;
         public static final double BALANCE_FULL_TILT_DEGREES = 15;
         public static final double BALANCE_KP = 0.015;
         public static final double BALANCE_MAX_POWER = 0.3;
         public static final double BALANCE_WAIT_MILLIS = 500;
-        public static final double BALANCE_DENOMINATOR_MULTIPLIER = 5;
+        public static final double BALANCE_DENOMINATOR_MULTIPLIER = 7.5;
 
         public static final double TICKS_PER_ROTATION = 2048.0;
 
@@ -275,8 +275,8 @@ public final class Constants {
 
             config.m_winchMotorAllowedError = 2;
             config.m_winchDeployRotations = 140;
-            config.m_winchHalfDeployRotations = 120;
-            config.m_winchStowRotations = 0.0;
+            config.m_winchHalfDeployRotations = 100;
+            config.m_winchStowRotations = 0.25;
 
             return config;
         }
@@ -361,7 +361,7 @@ public final class Constants {
         public static final double RETRACTED_ROTATIONS = 0;
 
         // public static final double AUTO_SCORE_MID_ROTATIONS = 10;
-        public static final double SCORE_CONE_HIGH_ROTATIONS = 43;
+        public static final double SCORE_CONE_HIGH_ROTATIONS = 45;
         public static final double AUTO_SCORE_CONE_HIGH_ROTATIONS = 36;
         public static final double SCORE_CUBE_HIGH_ROTATIONS = 33;
 
@@ -415,12 +415,12 @@ public final class Constants {
 
         public static final double WRIST_CLEAR_INTAKE_ROTATIONS = 30;
         public static final double EXTENSION_HIGH_START_ROTATIONS = 45;
-        public static final double SCORE_CONE_MID_ROTATIONS = 52;
-        public static final double SCORE_CONE_HIGH_ROTATIONS = 70;
-        public static final double SCORE_CUBE_MID_ROTATIONS = 50;
-        public static final double SCORE_CUBE_HIGH_ROTATIONS = 65;
-        public static final double SCORE_CONE_LOW_ROTATIONS = 25;
-        public static final double SCORE_LOW_ROTATIONS = 25;
+        public static final double SCORE_CONE_MID_ROTATIONS = 58;
+        public static final double SCORE_CONE_HIGH_ROTATIONS = 72;
+        public static final double SCORE_CUBE_MID_ROTATIONS = 51;
+        public static final double SCORE_CUBE_HIGH_ROTATIONS = 66;
+        public static final double SCORE_CONE_LOW_ROTATIONS = 26;
+        public static final double SCORE_LOW_ROTATIONS = 26;
 
         public static final double ARM_ROTATION_GEAR_RATIO = 190.91;
         public static final double ARM_HANDOFF_ROTATIONS = ARM_ROTATION_GEAR_RATIO / 8;
