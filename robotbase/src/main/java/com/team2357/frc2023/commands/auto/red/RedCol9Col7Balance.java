@@ -7,6 +7,7 @@ import com.team2357.frc2023.commands.auto.support.ConeHighPrePoseIntake;
 import com.team2357.frc2023.commands.auto.support.HighScoreArmReturn;
 import com.team2357.frc2023.commands.auto.support.ConeHighScoreClaw;
 import com.team2357.frc2023.commands.drive.AutoBalanceCommand;
+import com.team2357.frc2023.commands.drive.DetectChargeBreakCommand;
 import com.team2357.frc2023.commands.intake.IntakeArmRotateDumbCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
 import com.team2357.frc2023.commands.intake.IntakeStowConeCommandGroup;
@@ -14,6 +15,7 @@ import com.team2357.frc2023.commands.util.AutonomousZeroCommand;
 import com.team2357.frc2023.trajectoryutil.TrajectoryUtil;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
@@ -86,7 +88,10 @@ public class RedCol9Col7Balance extends ParallelCommandGroup {
             // Path movement
             new SequentialCommandGroup(
                 new WaitCommand(1.65),
-                TrajectoryUtil.createTrajectoryPathCommand(getClass().getSimpleName(), new PathConstraints(3.0, 1.5), true),
+                new ParallelRaceGroup(
+                    TrajectoryUtil.createTrajectoryPathCommand(getClass().getSimpleName(), new PathConstraints(3.0, 1.5), true),
+                    new DetectChargeBreakCommand()
+                    ),
                 new AutoBalanceCommand()
             )
         );

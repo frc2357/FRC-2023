@@ -1,6 +1,7 @@
 package com.team2357.frc2023.shuffleboard;
 
 import com.team2357.frc2023.commands.auto.ScoreHighCone;
+import com.team2357.frc2023.commands.auto.TestBalance;
 import com.team2357.frc2023.commands.auto.blue.BlueCol4StowBalance;
 import com.team2357.frc2023.commands.auto.blue.BlueCol6StowBalance;
 import com.team2357.frc2023.commands.auto.blue.BlueCol9Col7;
@@ -37,7 +38,8 @@ public class AutoCommandChooser {
             new BlueCol9Col7(),
             new BlueCol9Col7Balance(),
             new BlueCol9Col8Col8(),
-            new BlueCol9Col7Col8()
+            new BlueCol9Col7Col8(),
+            new TestBalance()
         };
 
         m_chooser = new SendableChooser<>();
