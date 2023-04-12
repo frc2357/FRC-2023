@@ -99,11 +99,10 @@ public final class Constants {
             config.m_wheelbaseMeters = 0.55245;
 
             config.m_maxVoltage = 10.0;
-            config.m_maxVelocityMetersPerSecond = 6380.0 / 60.0 *
+            config.m_maxVelocityMetersPerSecond = (6380.0 / 60.0 *
                     SdsModuleConfigurations.MK4I_L2.getDriveReduction() *
-                    SdsModuleConfigurations.MK4I_L2.getWheelDiameter() * Math.PI;
+                    SdsModuleConfigurations.MK4I_L2.getWheelDiameter() * Math.PI) / 4;
             config.m_robotCentricMaxVelocityPerSecond = config.m_maxVelocityMetersPerSecond / 2;
-
 
             config.m_maxAngularVelocityRadiansPerSecond = config.m_maxVelocityMetersPerSecond /
                     Math.hypot(config.m_trackwidthMeters / 2.0, config.m_wheelbaseMeters / 2.0);
@@ -133,11 +132,11 @@ public final class Constants {
             config.m_visionToleranceMeters = 0.1524;
 
             config.m_autoAlignDriveController = new ProfiledPIDController(
-                8.0, 0.0, 0.0, new TrapezoidProfile.Constraints(2, 1));
+                    8.0, 0.0, 0.0, new TrapezoidProfile.Constraints(2, 1));
 
             config.m_autoAlignThetaController = new ProfiledPIDController(
-                6.0, 0.0, 0.0, new TrapezoidProfile.Constraints(2, 1));  
-                    
+                    6.0, 0.0, 0.0, new TrapezoidProfile.Constraints(2, 1));
+
             return config;
         }
 
@@ -188,7 +187,7 @@ public final class Constants {
         public static final PathConstraints DEFAULT_PATH_CONSTRAINTS = new PathConstraints(2.5,
                 1.5);
         public static final PathConstraints GRID_ZERO_PATH_CONSTRAINTS = new PathConstraints(2, 1);
-   
+
         public static final double TIME_TO_COAST_SECONDS = 10;
     }
 

@@ -9,6 +9,10 @@ import com.team2357.frc2023.commands.human.panic.EverybotWristAxisCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeArmToggleCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeRollerAxisCommand;
 import com.team2357.frc2023.commands.human.panic.IntakeWinchAxisCommand;
+import com.team2357.frc2023.commands.intake.IntakeConeCommandGroup;
+import com.team2357.frc2023.commands.intake.IntakeCubeCommandGroup;
+import com.team2357.frc2023.commands.intake.IntakePreSignalConeCommandGroup;
+import com.team2357.frc2023.commands.intake.IntakePreSignalCubeCommandGroup;
 import com.team2357.frc2023.commands.intake.WinchAmpZeroCommand;
 import com.team2357.frc2023.commands.scoring.AutoLineupCommand;
 import com.team2357.frc2023.commands.scoring.DumpGamePieceCommand;
@@ -23,13 +27,15 @@ import com.team2357.lib.triggers.AxisThresholdTrigger;
 import com.team2357.lib.util.Utility;
 import com.team2357.lib.util.XboxRaw;
 
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+
+// ! GUNNER CONTROLLER IS FOR ROBOTICS TEAM MEMBERS ONLY! NO CHILDREN
 
 /**
  * These are the controls for the gunner.
@@ -67,6 +73,11 @@ public class GunnerControls implements RumbleInterface {
     public POVButton m_downDPad;
     public POVButton m_leftDPad;
 
+    private AxisThresholdTrigger m_leftTriggerPre;
+    private AxisThresholdTrigger m_leftTriggerFull;
+    private AxisThresholdTrigger m_rightTriggerPre;
+    private AxisThresholdTrigger m_rightTriggerFull;
+
     /**
      * @param builder The GunnerControlsBuilder object
      */
@@ -74,6 +85,12 @@ public class GunnerControls implements RumbleInterface {
         s_instance = this;
 
         m_controller = controller;
+
+        m_rightTriggerPre = new AxisThresholdTrigger(m_controller, Axis.kRightTrigger, 0.05);
+        m_rightTriggerFull = new AxisThresholdTrigger(m_controller, Axis.kRightTrigger, 0.75);
+
+        m_leftTriggerPre = new AxisThresholdTrigger(m_controller, Axis.kLeftTrigger, 0.05);
+        m_leftTriggerFull = new AxisThresholdTrigger(m_controller, Axis.kLeftTrigger, 0.75);
 
         // Triggers
         m_leftTrigger = new AxisThresholdTrigger(controller, Axis.kLeftTrigger, .1);
@@ -118,6 +135,17 @@ public class GunnerControls implements RumbleInterface {
     }
 
     private void mapControls() {
+
+        // Intake pre-signal (for human player)
+        m_leftTriggerPre.onTrue(new IntakePreSignalConeCommandGroup());
+        m_rightTriggerPre.onTrue(new IntakePreSignalCubeCommandGroup());
+
+        // Cone Intake deploy/stow
+        m_leftTriggerFull.whileTrue(new IntakeConeCommandGroup());
+
+        // Cone Intake deploy/stow
+        m_rightTriggerFull.whileTrue(new IntakeCubeCommandGroup());
+
         AxisInterface axisLeftStickX = () -> {
             return getLeftXAxis();
         };
@@ -183,7 +211,7 @@ public class GunnerControls implements RumbleInterface {
 
         // Arm extension / claw / wrist
         leftDPadOnly.whileTrue(new ArmExtensionAxisCommand(axisRightStickY));
-        
+
         // leftDPadAndA.onTrue(new WristToggleCommand());
         // leftDPadAndB.onTrue(new ClawToggleCommand());
 

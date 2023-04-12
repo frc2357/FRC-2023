@@ -27,17 +27,9 @@ public class SwerveDriveControls implements RumbleInterface {
     private double m_deadband;
 
     private JoystickButton m_backButton;
-    private JoystickButton m_rightBumper;
-    private JoystickButton m_leftBumper;
     private JoystickButton m_aButton;
     private JoystickButton m_bButton;
-    private JoystickButton m_yButton;
     private JoystickButton m_startButton;
-
-    private AxisThresholdTrigger m_leftTriggerPre;
-    private AxisThresholdTrigger m_leftTriggerFull;
-    private AxisThresholdTrigger m_rightTriggerPre;
-    private AxisThresholdTrigger m_rightTriggerFull;
 
     public static boolean isFlipped;
 
@@ -47,22 +39,11 @@ public class SwerveDriveControls implements RumbleInterface {
         m_controller = controller;
         m_deadband = deadband;
 
-        m_aButton = new JoystickButton(m_controller, XboxRaw.A.value);
-        m_bButton = new JoystickButton(m_controller, XboxRaw.B.value);
-        m_yButton = new JoystickButton(m_controller, XboxRaw.Y.value);
-        
+        // m_aButton = new JoystickButton(m_controller, XboxRaw.A.value);
+        // m_bButton = new JoystickButton(m_controller, XboxRaw.B.value);
+
         m_backButton = new JoystickButton(m_controller, XboxRaw.Back.value);
         m_startButton = new JoystickButton(m_controller, XboxRaw.Start.value);
-        m_aButton = new JoystickButton(m_controller, XboxRaw.A.value);
-        
-        m_rightBumper = new JoystickButton(m_controller, XboxRaw.BumperRight.value);
-        m_leftBumper = new JoystickButton(m_controller, XboxRaw.BumperLeft.value);
-
-        m_rightTriggerPre = new AxisThresholdTrigger(m_controller, Axis.kRightTrigger, 0.05);
-        m_rightTriggerFull = new AxisThresholdTrigger(m_controller, Axis.kRightTrigger, 0.75);
-
-        m_leftTriggerPre = new AxisThresholdTrigger(m_controller, Axis.kLeftTrigger, 0.05);
-        m_leftTriggerFull = new AxisThresholdTrigger(m_controller, Axis.kLeftTrigger, 0.75);
 
         mapControls();
     }
@@ -74,18 +55,18 @@ public class SwerveDriveControls implements RumbleInterface {
 
         // Intake commands
 
-        // Intake pre-signal (for human player)
-        m_leftTriggerPre.onTrue(new IntakePreSignalConeCommandGroup());
-        m_rightTriggerPre.onTrue(new IntakePreSignalCubeCommandGroup());
+        // // Intake pre-signal (for human player)
+        // m_leftTriggerPre.onTrue(new IntakePreSignalConeCommandGroup());
+        // m_rightTriggerPre.onTrue(new IntakePreSignalCubeCommandGroup());
 
-        // Cone Intake deploy/stow
-        m_leftTriggerFull.whileTrue(new IntakeConeCommandGroup());
+        // // Cone Intake deploy/stow
+        // m_leftTriggerFull.whileTrue(new IntakeConeCommandGroup());
 
-        // Cone Intake deploy/stow
-        m_rightTriggerFull.whileTrue(new IntakeCubeCommandGroup());
+        // // Cone Intake deploy/stow
+        // m_rightTriggerFull.whileTrue(new IntakeCubeCommandGroup());
 
-        m_aButton.onTrue(new ToggleRobotCentricDriveCommand());
-        m_bButton.whileTrue(new AutoBalanceCommand());
+        // m_aButton.onTrue(new ToggleRobotCentricDriveCommand());
+        // m_bButton.whileTrue(new AutoBalanceCommand());
     }
 
     public double getX() {
