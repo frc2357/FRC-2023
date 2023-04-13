@@ -57,7 +57,7 @@ public class BlueCol9Col7 extends ParallelCommandGroup {
                 new IntakeStowConeCommandGroup(),
 
                 // Step 4: Score second cone
-                new WaitCommand(1.5),
+                new WaitCommand(1),
                 new ParallelCommandGroup(
                     // Arm
                     new SequentialCommandGroup(
@@ -70,7 +70,7 @@ public class BlueCol9Col7 extends ParallelCommandGroup {
                     new SequentialCommandGroup(
                         // Score second cone
                         new ConeHighPrePoseClaw(),
-                        new WaitCommand(1.375),
+                        new WaitCommand(1.4),
                         new ConeHighScoreClaw()
                     ),
 

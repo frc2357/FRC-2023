@@ -24,7 +24,7 @@ public class CubeLowPrePoseCommand extends ParallelCommandGroup {
             ),
 
             // Intake Rollers
-            new IntakeRollerReverseCommand().withTimeout(1.0),
+            new IntakeRollerReverseCommand().withTimeout(2.0),
 
             // Arm
             new ArmRotateToPositionCommand(Constants.ARM_ROTATION.SCORE_LOW_ROTATIONS)
