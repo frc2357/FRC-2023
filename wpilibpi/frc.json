@@ -1,0 +1,35 @@
+{
+    "cameras": [
+        {
+            "brightness": 50,
+            "exposure": "auto",
+            "fps": 30,
+            "height": 720,
+            "name": "front",
+            "path": "/dev/video0",
+            "pixel format": "mjpeg",
+            "stream": {
+                "properties": []
+            },
+            "white balance": "auto",
+            "width": 1280
+        },
+        {
+            "brightness": 50,
+            "exposure": "auto",
+            "fps": 30,
+            "height": 720,
+            "name": "back",
+            "path": "/dev/video2",
+            "pixel format": "mjpeg",
+            "stream": {
+                "properties": []
+            },
+            "white balance": "auto",
+            "width": 1280
+        }
+    ],
+    "ntmode": "server",
+    "switched cameras": [],
+    "team": 2357
+}
