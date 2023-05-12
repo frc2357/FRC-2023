@@ -66,6 +66,8 @@ public class WristSubsystem extends ClosedLoopSubsystem {
         m_wristMotor.setIdleMode(IdleMode.kBrake);
         m_wristMotor.setSmartCurrentLimit(m_config.m_wristRunMotorStallLimitAmps, m_config.m_wristRunMotorFreeLimitAmps);
 
+        m_wristMotor.setInverted(m_config.m_isInverted);
+        
         m_pidController = m_wristMotor.getPIDController();
 
         m_pidController.setP(m_config.m_wristMotorP);

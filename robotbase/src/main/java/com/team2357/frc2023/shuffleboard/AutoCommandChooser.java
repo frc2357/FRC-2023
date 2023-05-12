@@ -1,12 +1,18 @@
 package com.team2357.frc2023.shuffleboard;
 
 import com.team2357.frc2023.commands.auto.ScoreHighCone;
-import com.team2357.frc2023.commands.auto.Col4StowBalance;
-import com.team2357.frc2023.commands.auto.Col6StowBalance;
-import com.team2357.frc2023.commands.auto.Col9Col7;
-import com.team2357.frc2023.commands.auto.Col9Col7Balance;
-import com.team2357.frc2023.commands.auto.Col9Col7Col8;
-import com.team2357.frc2023.commands.auto.Col9Col8Col8;
+import com.team2357.frc2023.commands.auto.blue.BlueCol4StowBalance;
+import com.team2357.frc2023.commands.auto.blue.BlueCol6StowBalance;
+import com.team2357.frc2023.commands.auto.blue.BlueCol9Col7;
+import com.team2357.frc2023.commands.auto.blue.BlueCol9Col7Balance;
+import com.team2357.frc2023.commands.auto.blue.BlueCol9Col7Col8;
+import com.team2357.frc2023.commands.auto.blue.BlueCol9Col8Col8;
+import com.team2357.frc2023.commands.auto.red.RedCol4StowBalance;
+import com.team2357.frc2023.commands.auto.red.RedCol6StowBalance;
+import com.team2357.frc2023.commands.auto.red.RedCol9Col7;
+import com.team2357.frc2023.commands.auto.red.RedCol9Col7Balance;
+import com.team2357.frc2023.commands.auto.red.RedCol9Col7Col8;
+import com.team2357.frc2023.commands.auto.red.RedCol9Col8Col8;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -20,12 +26,18 @@ public class AutoCommandChooser {
     public AutoCommandChooser() {
         m_autoCommands = new Command[] {
             new ScoreHighCone(),
-            new Col4StowBalance(),
-            new Col6StowBalance(),
-            new Col9Col7(),
-            new Col9Col7Balance(),
-            new Col9Col8Col8(),
-            new Col9Col7Col8()
+            new RedCol4StowBalance(),
+            new RedCol6StowBalance(),
+            new RedCol9Col7(),
+            new RedCol9Col7Balance(),
+            new RedCol9Col8Col8(),
+            new RedCol9Col7Col8(),
+            new BlueCol4StowBalance(),
+            new BlueCol6StowBalance(),
+            new BlueCol9Col7(),
+            new BlueCol9Col7Balance(),
+            new BlueCol9Col8Col8(),
+            new BlueCol9Col7Col8()
         };
 
         m_chooser = new SendableChooser<>();

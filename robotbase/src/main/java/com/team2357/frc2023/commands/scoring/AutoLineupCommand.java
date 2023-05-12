@@ -48,7 +48,7 @@ public class AutoLineupCommand extends CommandBase {
 
         m_targetPose = Utility.gridColumnToTargetPose(m_targetCol);
 
-        System.out.println("Auto line col: " + m_targetCol + " row: " + m_targetRow + " game: " + m_targetGamepiece);
+        // System.out.println("Auto line col: " + m_targetCol + " row: " + m_targetRow + " game: " + m_targetGamepiece);
 
         if (m_targetPose == null) {
             this.cancel();

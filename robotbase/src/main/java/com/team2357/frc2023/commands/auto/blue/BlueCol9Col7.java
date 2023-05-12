@@ -1,4 +1,4 @@
-package com.team2357.frc2023.commands.auto;
+package com.team2357.frc2023.commands.auto.blue;
 
 import com.pathplanner.lib.PathConstraints;
 import com.team2357.frc2023.commands.auto.support.ConeHighPrePoseArm;
@@ -16,8 +16,8 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
-public class Col9Col7 extends ParallelCommandGroup {
-    public Col9Col7() {
+public class BlueCol9Col7 extends ParallelCommandGroup {
+    public BlueCol9Col7() {
         addCommands(
             new SequentialCommandGroup(
                 // Step 1: Initialize
@@ -92,6 +92,6 @@ public class Col9Col7 extends ParallelCommandGroup {
 
     @Override
     public String toString() {
-        return "Col 9, Col 7";
+        return "BLUE Col 9, Col 7";
     }
 }

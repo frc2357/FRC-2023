@@ -1,4 +1,4 @@
-package com.team2357.frc2023.commands.auto;
+package com.team2357.frc2023.commands.auto.red;
 
 import com.pathplanner.lib.PathConstraints;
 import com.team2357.frc2023.commands.drive.AutoBalanceCommand;
@@ -14,8 +14,8 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
-public class Col6StowBalance extends ParallelCommandGroup {
-    public Col6StowBalance() {
+public class RedCol4StowBalance extends ParallelCommandGroup {
+    public RedCol4StowBalance() {
         addCommands(
             new SequentialCommandGroup(
                 // Initialize
@@ -47,6 +47,6 @@ public class Col6StowBalance extends ParallelCommandGroup {
 
     @Override
     public String toString() {
-        return "Col 6, Stow, Balance";
+        return "RED Col 4, Stow, Balance";
     }
 }

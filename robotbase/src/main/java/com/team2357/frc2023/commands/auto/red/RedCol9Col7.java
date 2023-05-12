@@ -1,4 +1,4 @@
-package com.team2357.frc2023.commands.auto;
+package com.team2357.frc2023.commands.auto.red;
 
 import com.pathplanner.lib.PathConstraints;
 import com.team2357.frc2023.commands.auto.support.ConeHighPrePoseArm;
@@ -6,7 +6,6 @@ import com.team2357.frc2023.commands.auto.support.ConeHighPrePoseClaw;
 import com.team2357.frc2023.commands.auto.support.ConeHighPrePoseIntake;
 import com.team2357.frc2023.commands.auto.support.HighScoreArmReturn;
 import com.team2357.frc2023.commands.auto.support.ConeHighScoreClaw;
-import com.team2357.frc2023.commands.drive.AutoBalanceCommand;
 import com.team2357.frc2023.commands.intake.IntakeArmRotateDumbCommand;
 import com.team2357.frc2023.commands.intake.IntakeRollerRunCommand;
 import com.team2357.frc2023.commands.intake.IntakeStowConeCommandGroup;
@@ -17,8 +16,8 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
-public class Col9Col7Balance extends ParallelCommandGroup {
-    public Col9Col7Balance() {
+public class RedCol9Col7 extends ParallelCommandGroup {
+    public RedCol9Col7() {
         addCommands(
             new SequentialCommandGroup(
                 // Step 1: Initialize
@@ -86,14 +85,13 @@ public class Col9Col7Balance extends ParallelCommandGroup {
             // Path movement
             new SequentialCommandGroup(
                 new WaitCommand(1.65),
-                TrajectoryUtil.createTrajectoryPathCommand(getClass().getSimpleName(), new PathConstraints(3.0, 1.5), true),
-                new AutoBalanceCommand()
+                TrajectoryUtil.createTrajectoryPathCommand(getClass().getSimpleName(), new PathConstraints(3.0, 1.5), true)
             )
         );
     }
 
     @Override
     public String toString() {
-        return "Col 9, Col 7, Balance";
+        return "RED Col 9, Col 7";
     }
 }

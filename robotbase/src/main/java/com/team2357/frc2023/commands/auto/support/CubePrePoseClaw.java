@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 public class CubePrePoseClaw extends SequentialCommandGroup {
     public CubePrePoseClaw() {
         super(
-            new ClawIntakeCubeCommand(),
+            new ClawIntakeCubeCommand().withTimeout(0.25),
             new ClawHoldCubeCommand()
         );
     }
