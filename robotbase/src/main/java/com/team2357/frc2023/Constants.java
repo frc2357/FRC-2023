@@ -189,6 +189,8 @@ public final class Constants {
         public static final PathConstraints GRID_ZERO_PATH_CONSTRAINTS = new PathConstraints(2, 1);
 
         public static final double TIME_TO_COAST_SECONDS = 10;
+
+        public static final double ELEMENTARY_DRIVE_REDUCTION = 4;
     }
 
     public static final class INTAKE_ROLLER {
@@ -330,8 +332,8 @@ public final class Constants {
 
             config.m_wristHoldMotorStallLimitAmps = 10;
             config.m_wristHoldMotorFreeLimitAmps = 10;
-            config.m_wristRunMotorStallLimitAmps = 30;
-            config.m_wristRunMotorFreeLimitAmps = 30;
+            config.m_wristRunMotorStallLimitAmps = 40;
+            config.m_wristRunMotorFreeLimitAmps = 40;
 
             config.m_isInverted = true;
 

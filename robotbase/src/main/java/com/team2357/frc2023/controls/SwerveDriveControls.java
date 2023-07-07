@@ -1,5 +1,6 @@
 package com.team2357.frc2023.controls;
 
+import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.commands.drive.AutoBalanceCommand;
 import com.team2357.frc2023.commands.drive.ToggleRobotCentricDriveCommand;
 import com.team2357.frc2023.commands.intake.IntakeConeCommandGroup;
@@ -30,6 +31,8 @@ public class SwerveDriveControls implements RumbleInterface {
     private JoystickButton m_aButton;
     private JoystickButton m_bButton;
     private JoystickButton m_startButton;
+
+    private boolean m_elementary = true;
 
     public static boolean isFlipped;
 
@@ -83,6 +86,10 @@ public class SwerveDriveControls implements RumbleInterface {
         return -modifyAxis(m_controller.getLeftY());
     }
 
+    public double applyElementaryReduction(double value) {
+        return value / Constants.DRIVE.ELEMENTARY_DRIVE_REDUCTION;
+    }
+
     public double getRotation() {
         return -modifyAxis(m_controller.getRightX());
     }
@@ -102,10 +109,18 @@ public class SwerveDriveControls implements RumbleInterface {
     public double modifyAxis(double value) {
         value = deadband(value, m_deadband);
         value = Math.copySign(value * value, value);
+
+        if (m_elementary) {
+            return applyElementaryReduction(value);
+        }
         return value;
     }
 
     public void setRumble(RumbleType type, double intensity) {
         m_controller.setRumble(type, intensity);
+    }
+
+    public void toggleElementary() {
+        m_elementary = !m_elementary;
     }
 }
