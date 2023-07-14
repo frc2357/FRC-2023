@@ -29,13 +29,9 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
      * 
      * @param leftLimelightName        Name of the left side limelight
      * @param rightLimelightName       Name ofr the right side limelight
-     * @param leftLimelightTXSetpoint  Value of the X angle of the right limelight
-     *                                 to get the left limelight in view
-     * @param rightLimelightTXSetpoint Value of the X angle of the left limelight to
-     *                                 get the right limelight in view
+     * 
      */
-    public DualLimelightManagerSubsystem(String leftLimelightName, String rightLimelightName,
-            double leftLimelightTXSetpoint, double rightLimelightTXSetpoint) {
+    public DualLimelightManagerSubsystem(String leftLimelightName, String rightLimelightName) {
         m_leftLimelight = new LimelightSubsystem(leftLimelightName);
         m_rightLimelight = new LimelightSubsystem(rightLimelightName);
 
@@ -68,6 +64,15 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
 
     public boolean isHumanPipelineActive() {
         return m_leftLimelight.isHumanPipelineActive() && m_rightLimelight.isHumanPipelineActive();
+    }
+
+    public void setGamepieceDetectorPipelineActive() {
+        m_rightLimelight.setGamepieceDetectorPipelineActive();
+        m_leftLimelight.setAprilTagPipelineActive();
+    }
+
+    public boolean isGamepieceDetectorPipelineActive() {
+       return m_rightLimelight.isGamepieceDetectorPipelineActive();
     }
 
     public boolean validTargetExists() {

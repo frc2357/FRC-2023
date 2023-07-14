@@ -35,6 +35,8 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
 
   public static class Configuration {
 
+    public int m_gamepieceDetectionPipeline = 3;
+
     public int m_humanPipelineIndex = 2;
 
     public int m_targetingPipelineIndex = 0;
@@ -200,6 +202,14 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
 
   public void setAprilTagPipelineActive() {
     m_pipelinePub.set(m_Configuration.m_aprilTagPipelineIndex);
+  }
+
+  public boolean isGamepieceDetectorPipelineActive() {
+    return getPipeline() == m_Configuration.m_gamepieceDetectionPipeline;
+  }
+
+  public void setGamepieceDetectorPipelineActive() {
+    m_pipelinePub.set(m_Configuration.m_gamepieceDetectionPipeline);
   }
 
   private int getPipeline() {
