@@ -14,6 +14,7 @@ import com.team2357.frc2023.subsystems.IntakeArmSubsystem;
 import com.team2357.frc2023.subsystems.IntakeRollerSubsystem;
 import com.team2357.frc2023.subsystems.SwerveDriveSubsystem;
 import com.team2357.frc2023.subsystems.WristSubsystem;
+import com.team2357.lib.subsystems.LimelightSubsystem;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
@@ -137,6 +138,8 @@ public final class Constants {
 
             config.m_autoAlignThetaController = new ProfiledPIDController(
                 6.0, 0.0, 0.0, new TrapezoidProfile.Constraints(2, 1));  
+
+            config.m_chaseController = new ProfiledPIDController(0.001, 0.0, 0.0, new TrapezoidProfile.Constraints(2, 1));
                     
             return config;
         }
@@ -496,6 +499,16 @@ public final class Constants {
 
         public static final double LEFT_LIMELIGHT_TX_SETPOINT = Double.NaN;
         public static final double RIGHT_LIMELIGHT_TX_SETPOINT = Double.NaN;
+
+        public static LimelightSubsystem.Configuration GET_CONFIG() {
+            LimelightSubsystem.Configuration config = new LimelightSubsystem.Configuration();
+
+            config.m_LimelightMountingHeightMeters = 1.06426;
+            config.m_targetHeightFromFloorMeters = 0;
+            config.m_LimelightMountingAngle = -30;
+
+            return config;
+        }
     }
 
     public static final class BUTTONBOARD {

@@ -74,6 +74,8 @@ public class SubsystemFactory {
         
         public DualLimelightManagerSubsystem CreateDualLimelightManagerSubsystem(){
                 DualLimelightManagerSubsystem manager = new DualLimelightManagerSubsystem(
-                        Constants.LIMELIGHT.LEFT_LIMELIGHT_NAME, Constants.LIMELIGHT.RIGHT_LIMELIGHT_NAME);                return manager;
+                        Constants.LIMELIGHT.LEFT_LIMELIGHT_NAME, Constants.LIMELIGHT.RIGHT_LIMELIGHT_NAME);
+                        manager.configureLimelights(Constants.LIMELIGHT.GET_CONFIG());
+                        return manager;
         }
 }

@@ -63,6 +63,9 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
     public double m_TargetHeight = 1;
 
     public double m_targetHeightFromFloor = 0;
+
+    public double m_LimelightMountingHeightMeters = 0;
+    public double m_targetHeightFromFloorMeters = 0;
   }
 
   private static LimelightSubsystem instance = null;
@@ -339,6 +342,21 @@ public class LimelightSubsystem extends ClosedLoopSubsystem {
     double heightDifference = m_Configuration.m_LimelightMountingHeightInches -
         m_Configuration.m_targetHeightFromFloor;
     double distance = heightDifference / Math.tan(Math.toRadians(angleDegrees));
+
+    return distance;
+  }
+
+  public double getMetersFromTarget() {
+    if(!validTargetExists()) {
+      return Double.NaN;
+    }
+
+    double angleToGoalDegrees = getTY() + m_Configuration.m_LimelightMountingAngle;
+
+    double heightDifference = m_Configuration.m_LimelightMountingHeightMeters -
+    m_Configuration.m_targetHeightFromFloorMeters;
+    
+    double distance = heightDifference / Math.tan(Math.toRadians(angleToGoalDegrees));
 
     return distance;
   }

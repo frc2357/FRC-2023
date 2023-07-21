@@ -142,6 +142,11 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 		 * Profiled PID controller for rotation for autoAlign
 		 */
 		public ProfiledPIDController m_autoAlignThetaController;
+
+		/**
+		 * Profiled PID controller for chasing the gamepiece
+		 */
+		public ProfiledPIDController m_chaseController;
 	}
 
 	public SwerveDriveSubsystem(int pigeonId, int[] frontLeftIds, int[] frontRightIds,
@@ -259,6 +264,10 @@ public class SwerveDriveSubsystem extends ClosedLoopSubsystem {
 
 	public ProfiledPIDController getAutoAlignThetaController() {
 		return m_config.m_autoAlignThetaController;
+	}
+
+	public ProfiledPIDController getChaseController() {
+		return m_config.m_chaseController;
 	}
 
 	public Twist2d getFieldVelocity() {

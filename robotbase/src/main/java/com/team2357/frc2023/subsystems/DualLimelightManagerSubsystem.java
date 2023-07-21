@@ -38,6 +38,11 @@ public class DualLimelightManagerSubsystem extends SubsystemBase {
         m_instance = this;
     }
 
+    public void configureLimelights(LimelightSubsystem.Configuration config) {
+        m_leftLimelight.setConfiguration(config);
+        m_rightLimelight.setConfiguration(config);
+    }
+
     public LimelightSubsystem getLimelight(LIMELIGHT limelight) {
         switch (limelight) {
             case LEFT:
