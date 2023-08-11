@@ -207,7 +207,7 @@ public final class Constants {
 
             config.m_rollerAxisMaxSpeed = 1;
 
-            config.m_rampRate = 1;
+            config.m_rampRate = 0.5;
 
             config.m_peakCurrentLimit = 40;
             config.m_peakCurrentDuration = 0;
@@ -217,6 +217,20 @@ public final class Constants {
             config.m_followerInverted = false;
             return config;
         }
+
+        public static final double INTAKE_MOTOR_PERCENT_OUTPUT = 0.35;
+
+        public static final double TOP_MOTOR_INTAKE_FACTOR = +1;
+        public static final double BOTTOM_MOTOR_INTAKE_FACTOR = 0;
+        
+        public static final double TOP_MOTOR_EJECT_FACTOR = -1;
+        public static final double BOTTOM_MOTOR_EJECT_FACTOR = +1;
+        
+        public static final double TOP_MOTOR_INDEX_FACTOR = +1;
+        public static final double BOTTOM_MOTOR_INDEX_FACTOR = -1;
+
+        public static final double TOP_MOTOR_ROLL_FACTOR = +1;
+        public static final double BOTTOM_MOTOR_ROLL_FACTOR = +1;
 
     }
 
@@ -277,7 +291,7 @@ public final class Constants {
             config.m_winchMotorAllowedError = 2;
             config.m_winchDeployRotations = 140;
             config.m_winchHalfDeployRotations = 100;
-            config.m_winchStowRotations = 0.25;
+            config.m_winchStowRotations = 0.5;
 
             return config;
         }
@@ -317,7 +331,7 @@ public final class Constants {
         public static final double WRIST_ZERO_MAX_AMPS = 20;
         public static final long WRIST_ZERO_WAIT_MS = 100;
 
-        public static final double WRIST_RETRACT_ROTATIONS = 0.25;
+        public static final double WRIST_RETRACT_ROTATIONS = 0.5;
         public static final double WRIST_EXTENSION_RETRACT_ROTATIONS = 2.5;
         public static final double SCORE_CONE_MID_ROTATIONS = 14;
         public static final double SCORE_CUBE_MID_ROTATIONS = 15;
@@ -542,7 +556,7 @@ public final class Constants {
     }
 
     public static final class ZEROING {
-        public static final double ZERO_ALL_WARNING_SECONDS = 0.25;
+        public static final double ZERO_ALL_WARNING_SECONDS = 0.5;
         public static final double ZERO_ALL_DEADLINE_SECONDS = 0.50;
     }
 

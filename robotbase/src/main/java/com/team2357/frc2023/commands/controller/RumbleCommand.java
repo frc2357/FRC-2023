@@ -3,8 +3,8 @@ package com.team2357.frc2023.commands.controller;
 import com.team2357.frc2023.Constants;
 import com.team2357.frc2023.controls.RumbleInterface;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class RumbleCommand extends CommandBase {

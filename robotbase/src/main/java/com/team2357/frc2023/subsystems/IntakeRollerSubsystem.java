@@ -3,15 +3,16 @@ package com.team2357.frc2023.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.team2357.frc2023.Constants;
 
-import edu.wpi.first.wpilibj.motorcontrol.Talon;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IntakeRollerSubsystem extends SubsystemBase {
     public static IntakeRollerSubsystem instance = null;
 
-    private TalonSRX m_masterIntakeMotor;
-    private TalonSRX m_followerIntakeMotor;
+    private TalonSRX m_topIntakeMotor;
+    private TalonSRX m_bottomIntakeMotor;
 
     public static IntakeRollerSubsystem getInstance() {
         return instance;
@@ -37,8 +38,8 @@ public class IntakeRollerSubsystem extends SubsystemBase {
     public Configuration m_config;
 
     public IntakeRollerSubsystem(int masterIntakeMotorId, int followerIntakeMotorId) {
-        m_masterIntakeMotor = new TalonSRX(masterIntakeMotorId);
-        m_followerIntakeMotor = new TalonSRX(followerIntakeMotorId);
+        m_topIntakeMotor = new TalonSRX(masterIntakeMotorId);
+        m_bottomIntakeMotor = new TalonSRX(followerIntakeMotorId);
 
         instance = this;
     }
@@ -46,22 +47,22 @@ public class IntakeRollerSubsystem extends SubsystemBase {
     public void configure(Configuration config) {
         m_config = config;
 
-        m_masterIntakeMotor.setInverted(m_config.m_masterInverted);
-        m_followerIntakeMotor.setInverted(m_config.m_followerInverted);
+        m_topIntakeMotor.setInverted(m_config.m_masterInverted);
+        m_bottomIntakeMotor.setInverted(m_config.m_followerInverted);
 
-        m_followerIntakeMotor.follow(m_masterIntakeMotor);
+        // m_bottomIntakeMotor.follow(m_topIntakeMotor);
 
-        m_masterIntakeMotor.setNeutralMode(NeutralMode.Brake);
-        m_masterIntakeMotor.enableCurrentLimit(true);
-        m_masterIntakeMotor.configPeakCurrentLimit(m_config.m_peakCurrentLimit);
-        m_masterIntakeMotor.configPeakCurrentDuration(m_config.m_peakCurrentDuration);
-        m_masterIntakeMotor.configContinuousCurrentLimit(m_config.m_continuousCurrentLimit);
+        m_topIntakeMotor.setNeutralMode(NeutralMode.Brake);
+        m_topIntakeMotor.enableCurrentLimit(true);
+        m_topIntakeMotor.configPeakCurrentLimit(m_config.m_peakCurrentLimit);
+        m_topIntakeMotor.configPeakCurrentDuration(m_config.m_peakCurrentDuration);
+        m_topIntakeMotor.configContinuousCurrentLimit(m_config.m_continuousCurrentLimit);
 
-        m_followerIntakeMotor.setNeutralMode(NeutralMode.Brake);
-        m_followerIntakeMotor.enableCurrentLimit(true);
-        m_followerIntakeMotor.configPeakCurrentLimit(m_config.m_peakCurrentLimit);
-        m_followerIntakeMotor.configPeakCurrentDuration(m_config.m_peakCurrentDuration);
-        m_followerIntakeMotor.configContinuousCurrentLimit(m_config.m_continuousCurrentLimit);
+        m_bottomIntakeMotor.setNeutralMode(NeutralMode.Brake);
+        m_bottomIntakeMotor.enableCurrentLimit(true);
+        m_bottomIntakeMotor.configPeakCurrentLimit(m_config.m_peakCurrentLimit);
+        m_bottomIntakeMotor.configPeakCurrentDuration(m_config.m_peakCurrentDuration);
+        m_bottomIntakeMotor.configContinuousCurrentLimit(m_config.m_continuousCurrentLimit);
     }
 
     public void runIntake(boolean reverse) {
@@ -73,29 +74,59 @@ public class IntakeRollerSubsystem extends SubsystemBase {
     }
 
     public void runIntake(double percentOutput) {
-        m_masterIntakeMotor.set(ControlMode.PercentOutput, percentOutput);
+        m_topIntakeMotor.set(ControlMode.PercentOutput, percentOutput);
     }
 
     public void setAxisRollerSpeed(double axisSpeed) {
         double motorSpeed = (-axisSpeed) * m_config.m_rollerAxisMaxSpeed;
 
-        m_masterIntakeMotor.set(ControlMode.PercentOutput, motorSpeed);
+        m_topIntakeMotor.set(ControlMode.PercentOutput, motorSpeed);
     }
 
     public void manualRunIntake(double percentOutput) {
-        m_masterIntakeMotor.set(ControlMode.PercentOutput, percentOutput);
+        m_topIntakeMotor.set(ControlMode.PercentOutput, percentOutput);
     }
 
     public double getCurrent() {
-        return m_masterIntakeMotor.getStatorCurrent();
+        return m_topIntakeMotor.getStatorCurrent();
     }
 
     public boolean isStalled(double stallCurrent) {
-        return (m_masterIntakeMotor.getStatorCurrent() >= stallCurrent) ||
-            (m_followerIntakeMotor.getStatorCurrent() >= stallCurrent);
+        return (m_topIntakeMotor.getStatorCurrent() >= stallCurrent) ||
+            (m_bottomIntakeMotor.getStatorCurrent() >= stallCurrent);
     }
 
+    public void intakeCube() {
+        m_topIntakeMotor.set(ControlMode.PercentOutput, Constants.INTAKE_ROLLER.TOP_MOTOR_INTAKE_FACTOR * Constants.INTAKE_ROLLER.INTAKE_MOTOR_PERCENT_OUTPUT);
+        m_bottomIntakeMotor.set(ControlMode.PercentOutput, Constants.INTAKE_ROLLER.BOTTOM_MOTOR_INTAKE_FACTOR * Constants.INTAKE_ROLLER.INTAKE_MOTOR_PERCENT_OUTPUT);
+    }
+
+    public void rollCube() {
+        m_topIntakeMotor.set(ControlMode.PercentOutput, Constants.INTAKE_ROLLER.TOP_MOTOR_ROLL_FACTOR * Constants.INTAKE_ROLLER.INTAKE_MOTOR_PERCENT_OUTPUT);
+        m_bottomIntakeMotor.set(ControlMode.PercentOutput, Constants.INTAKE_ROLLER.BOTTOM_MOTOR_ROLL_FACTOR * Constants.INTAKE_ROLLER.INTAKE_MOTOR_PERCENT_OUTPUT);
+    
+    }
+
+    public void indexCube() {
+        m_topIntakeMotor.set(ControlMode.PercentOutput, Constants.INTAKE_ROLLER.TOP_MOTOR_INDEX_FACTOR * Constants.INTAKE_ROLLER.INTAKE_MOTOR_PERCENT_OUTPUT);
+        m_bottomIntakeMotor.set(ControlMode.PercentOutput, Constants.INTAKE_ROLLER.BOTTOM_MOTOR_INDEX_FACTOR * Constants.INTAKE_ROLLER.INTAKE_MOTOR_PERCENT_OUTPUT);
+    
+    }
+
+    public void ejectCube() {
+        m_topIntakeMotor.set(ControlMode.PercentOutput, Constants.INTAKE_ROLLER.TOP_MOTOR_EJECT_FACTOR * Constants.INTAKE_ROLLER.INTAKE_MOTOR_PERCENT_OUTPUT);
+        m_bottomIntakeMotor.set(ControlMode.PercentOutput, Constants.INTAKE_ROLLER.BOTTOM_MOTOR_EJECT_FACTOR * Constants.INTAKE_ROLLER.INTAKE_MOTOR_PERCENT_OUTPUT);
+    }
+
+
     public void stopIntake() {
-        m_masterIntakeMotor.set(ControlMode.PercentOutput, 0.0);
+        m_topIntakeMotor.set(ControlMode.PercentOutput, 0.0);
+        m_bottomIntakeMotor.set(ControlMode.PercentOutput, 0.0);
+    }
+
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("Top roller amp draw", m_topIntakeMotor.getStatorCurrent());
+        SmartDashboard.putNumber("Bottom roller amp draw", m_bottomIntakeMotor.getStatorCurrent());
     }
 }

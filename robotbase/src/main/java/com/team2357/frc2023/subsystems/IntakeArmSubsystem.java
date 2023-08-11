@@ -248,24 +248,24 @@ public class IntakeArmSubsystem extends ClosedLoopSubsystem {
 
     @Override
     public void periodic() {
-        if (m_currentState != m_desiredState) {
-            if (m_desiredState == ArmState.Deployed) {
-                deployPeriodic();
-            } else if (m_desiredState == ArmState.Stowed) {
-                stowPeriodic();
-            } else if (m_desiredState == ArmState.HalfDeployed) {
-                halfDeployPeriodic();
-            }
-        }
+        // if (m_currentState != m_desiredState) {
+        //     if (m_desiredState == ArmState.Deployed) {
+        //         deployPeriodic();
+        //     } else if (m_desiredState == ArmState.Stowed) {
+        //         stowPeriodic();
+        //     } else if (m_desiredState == ArmState.HalfDeployed) {
+        //         halfDeployPeriodic();
+        //     }
+        // }
 
-        if (isClosedLoopEnabled() && isWinchAtRotations()) {
-            setClosedLoopEnabled(false);
-        }
+        // if (isClosedLoopEnabled() && isWinchAtRotations()) {
+        //     setClosedLoopEnabled(false);
+        // }
 
-        SmartDashboard.putNumber("Winch speed", m_winchMotor.getAppliedOutput());
-        SmartDashboard.putNumber("Winch amps", getAmps());
-        SmartDashboard.putNumber("Winch rotations",
-        m_winchMotor.getEncoder().getPosition());
+        // SmartDashboard.putNumber("Winch speed", m_winchMotor.getAppliedOutput());
+        // SmartDashboard.putNumber("Winch amps", getAmps());
+        // SmartDashboard.putNumber("Winch rotations",
+        // m_winchMotor.getEncoder().getPosition());
     }
 
     private void halfDeployPeriodic() {
