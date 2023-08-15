@@ -218,19 +218,18 @@ public final class Constants {
             return config;
         }
 
-        public static final double INTAKE_MOTOR_PERCENT_OUTPUT = 0.35;
 
-        public static final double TOP_MOTOR_INTAKE_FACTOR = +1;
-        public static final double BOTTOM_MOTOR_INTAKE_FACTOR = 0;
+        public static final double TOP_MOTOR_INTAKE_PERCENT_OUTPUT = +0.485;
+        public static final double BOTTOM_MOTOR_INTAKE_PERCENT_OUTPUT = +0.35;
         
-        public static final double TOP_MOTOR_EJECT_FACTOR = -1;
-        public static final double BOTTOM_MOTOR_EJECT_FACTOR = +1;
+        public static final double TOP_MOTOR_EJECT_PERCENT_OUTPUT = -0.5;
+        public static final double BOTTOM_MOTOR_EJECT_PERCENT_OUTPUT = +0.35;
         
-        public static final double TOP_MOTOR_INDEX_FACTOR = +1;
-        public static final double BOTTOM_MOTOR_INDEX_FACTOR = -1;
+        public static final double TOP_MOTOR_INDEX_PERCENT_OUTPUT = +0.5;
+        public static final double BOTTOM_MOTOR_INDEX_PERCENT_OUTPUT = -0.35;
 
-        public static final double TOP_MOTOR_ROLL_FACTOR = +1;
-        public static final double BOTTOM_MOTOR_ROLL_FACTOR = +1;
+        public static final double TOP_MOTOR_ROLL_PERCENT_OUTPUT = +0.5;
+        public static final double BOTTOM_MOTOR_ROLL_PERCENT_OUTPUT = +0.35;
 
     }
 
