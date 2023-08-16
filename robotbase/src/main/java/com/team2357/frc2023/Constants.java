@@ -219,8 +219,8 @@ public final class Constants {
         }
 
 
-        public static final double TOP_MOTOR_INTAKE_PERCENT_OUTPUT = +0.485;
-        public static final double BOTTOM_MOTOR_INTAKE_PERCENT_OUTPUT = +0.35;
+        public static final double TOP_MOTOR_INTAKE_PERCENT_OUTPUT = +0.49;
+        public static final double BOTTOM_MOTOR_INTAKE_PERCENT_OUTPUT = +0.2;
         
         public static final double TOP_MOTOR_EJECT_PERCENT_OUTPUT = -0.5;
         public static final double BOTTOM_MOTOR_EJECT_PERCENT_OUTPUT = +0.35;
