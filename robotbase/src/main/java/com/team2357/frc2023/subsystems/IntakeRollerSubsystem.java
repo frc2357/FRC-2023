@@ -1,8 +1,9 @@
 package com.team2357.frc2023.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.team2357.frc2023.Constants;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -11,8 +12,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class IntakeRollerSubsystem extends SubsystemBase {
     public static IntakeRollerSubsystem instance = null;
 
-    private TalonSRX m_topIntakeMotor;
-    private TalonSRX m_bottomIntakeMotor;
+    private CANSparkMax m_topIntakeMotor;
+    private CANSparkMax m_bottomIntakeMotor;
 
     public static IntakeRollerSubsystem getInstance() {
         return instance;
@@ -38,8 +39,8 @@ public class IntakeRollerSubsystem extends SubsystemBase {
     public Configuration m_config;
 
     public IntakeRollerSubsystem(int masterIntakeMotorId, int followerIntakeMotorId) {
-        m_topIntakeMotor = new TalonSRX(masterIntakeMotorId);
-        m_bottomIntakeMotor = new TalonSRX(followerIntakeMotorId);
+        m_topIntakeMotor = new CANSparkMax(masterIntakeMotorId, MotorType.kBrushless);
+        m_bottomIntakeMotor = new CANSparkMax(followerIntakeMotorId, MotorType.kBrushless);
 
         instance = this;
     }
@@ -52,81 +53,87 @@ public class IntakeRollerSubsystem extends SubsystemBase {
 
         // m_bottomIntakeMotor.follow(m_topIntakeMotor);
 
-        m_topIntakeMotor.setNeutralMode(NeutralMode.Brake);
-        m_topIntakeMotor.enableCurrentLimit(true);
-        m_topIntakeMotor.configPeakCurrentLimit(m_config.m_peakCurrentLimit);
-        m_topIntakeMotor.configPeakCurrentDuration(m_config.m_peakCurrentDuration);
-        m_topIntakeMotor.configContinuousCurrentLimit(m_config.m_continuousCurrentLimit);
+        m_topIntakeMotor.setIdleMode(IdleMode.kBrake);
+        m_topIntakeMotor.setSmartCurrentLimit(m_config.m_peakCurrentLimit, m_config.m_continuousCurrentLimit);
 
-        m_bottomIntakeMotor.setNeutralMode(NeutralMode.Brake);
-        m_bottomIntakeMotor.enableCurrentLimit(true);
-        m_bottomIntakeMotor.configPeakCurrentLimit(m_config.m_peakCurrentLimit);
-        m_bottomIntakeMotor.configPeakCurrentDuration(m_config.m_peakCurrentDuration);
-        m_bottomIntakeMotor.configContinuousCurrentLimit(m_config.m_continuousCurrentLimit);
+        m_bottomIntakeMotor.setIdleMode(IdleMode.kBrake);
+        m_bottomIntakeMotor.setSmartCurrentLimit(m_config.m_peakCurrentLimit, m_config.m_continuousCurrentLimit);
+
+        // m_topIntakeMotor.setNeutralMode(NeutralMode.Brake);
+        // m_topIntakeMotor.enableCurrentLimit(true);
+        // m_topIntakeMotor.configPeakCurrentLimit(m_config.m_peakCurrentLimit);
+        // m_topIntakeMotor.configPeakCurrentDuration(m_config.m_peakCurrentDuration);
+        // m_topIntakeMotor.configContinuousCurrentLimit(m_config.m_continuousCurrentLimit);
+
+        // m_bottomIntakeMotor.setNeutralMode(NeutralMode.Brake);
+        // m_bottomIntakeMotor.enableCurrentLimit(true);
+        // m_bottomIntakeMotor.configPeakCurrentLimit(m_config.m_peakCurrentLimit);
+        // m_bottomIntakeMotor.configPeakCurrentDuration(m_config.m_peakCurrentDuration);
+        // m_bottomIntakeMotor.configContinuousCurrentLimit(m_config.m_continuousCurrentLimit);
     }
 
-    public void runIntake(boolean reverse) {
-        if (reverse) {
-            runIntake(m_config.m_reversePercentOutput);
-        } else {
-            runIntake(m_config.m_runPercentOutput);
-        }
-    }
+    // public void runIntake(boolean reverse) {
+    //     if (reverse) {
+    //         runIntake(m_config.m_reversePercentOutput);
+    //     } else {
+    //         runIntake(m_config.m_runPercentOutput);
+    //     }
+    // }
 
-    public void runIntake(double percentOutput) {
-        m_topIntakeMotor.set(ControlMode.PercentOutput, percentOutput);
-    }
+    // public void runIntake(double percentOutput) {
+    //     m_topIntakeMotor.set(ControlMode.PercentOutput, percentOutput);
+    // }
 
-    public void setAxisRollerSpeed(double axisSpeed) {
-        double motorSpeed = (-axisSpeed) * m_config.m_rollerAxisMaxSpeed;
+    // public void setAxisRollerSpeed(double axisSpeed) {
+    //     double motorSpeed = (-axisSpeed) * m_config.m_rollerAxisMaxSpeed;
 
-        m_topIntakeMotor.set(ControlMode.PercentOutput, motorSpeed);
-    }
+    //     m_topIntakeMotor.set(ControlMode.PercentOutput, motorSpeed);
+    // }
 
-    public void manualRunIntake(double percentOutput) {
-        m_topIntakeMotor.set(ControlMode.PercentOutput, percentOutput);
-    }
+    // public void manualRunIntake(double percentOutput) {
+    //     m_topIntakeMotor.set(ControlMode.PercentOutput, percentOutput);
+    // }
 
-    public double getCurrent() {
-        return m_topIntakeMotor.getStatorCurrent();
-    }
+    // public double getCurrent() {
+    //     return m_topIntakeMotor.getStatorCurrent();
+    // }
 
-    public boolean isStalled(double stallCurrent) {
-        return (m_topIntakeMotor.getStatorCurrent() >= stallCurrent) ||
-            (m_bottomIntakeMotor.getStatorCurrent() >= stallCurrent);
-    }
+    // public boolean isStalled(double stallCurrent) {
+    //     return (m_topIntakeMotor.getStatorCurrent() >= stallCurrent) ||
+    //         (m_bottomIntakeMotor.getStatorCurrent() >= stallCurrent);
+    // }
 
     public void intakeCube() {
-        m_topIntakeMotor.set(ControlMode.PercentOutput, Constants.INTAKE_ROLLER.TOP_MOTOR_INTAKE_PERCENT_OUTPUT);
-        m_bottomIntakeMotor.set(ControlMode.PercentOutput, Constants.INTAKE_ROLLER.BOTTOM_MOTOR_INTAKE_PERCENT_OUTPUT);
+        m_topIntakeMotor.set(Constants.INTAKE_ROLLER.TOP_MOTOR_INTAKE_PERCENT_OUTPUT);
+        m_bottomIntakeMotor.set(Constants.INTAKE_ROLLER.BOTTOM_MOTOR_INTAKE_PERCENT_OUTPUT);
     }
 
     public void rollCube() {
-        m_topIntakeMotor.set(ControlMode.PercentOutput, Constants.INTAKE_ROLLER.TOP_MOTOR_ROLL_PERCENT_OUTPUT);
-        m_bottomIntakeMotor.set(ControlMode.PercentOutput, Constants.INTAKE_ROLLER.BOTTOM_MOTOR_ROLL_PERCENT_OUTPUT);
+        m_topIntakeMotor.set(Constants.INTAKE_ROLLER.TOP_MOTOR_ROLL_PERCENT_OUTPUT);
+        m_bottomIntakeMotor.set(Constants.INTAKE_ROLLER.BOTTOM_MOTOR_ROLL_PERCENT_OUTPUT);
     
     }
 
     public void indexCube() {
-        m_topIntakeMotor.set(ControlMode.PercentOutput, Constants.INTAKE_ROLLER.TOP_MOTOR_INDEX_PERCENT_OUTPUT);
-        m_bottomIntakeMotor.set(ControlMode.PercentOutput, Constants.INTAKE_ROLLER.BOTTOM_MOTOR_INDEX_PERCENT_OUTPUT);
+        m_topIntakeMotor.set(Constants.INTAKE_ROLLER.TOP_MOTOR_INDEX_PERCENT_OUTPUT);
+        m_bottomIntakeMotor.set(Constants.INTAKE_ROLLER.BOTTOM_MOTOR_INDEX_PERCENT_OUTPUT);
     
     }
 
     public void ejectCube() {
-        m_topIntakeMotor.set(ControlMode.PercentOutput, Constants.INTAKE_ROLLER.TOP_MOTOR_EJECT_PERCENT_OUTPUT);
-        m_bottomIntakeMotor.set(ControlMode.PercentOutput, Constants.INTAKE_ROLLER.BOTTOM_MOTOR_EJECT_PERCENT_OUTPUT);
+        m_topIntakeMotor.set(Constants.INTAKE_ROLLER.TOP_MOTOR_EJECT_PERCENT_OUTPUT);
+        m_bottomIntakeMotor.set(Constants.INTAKE_ROLLER.BOTTOM_MOTOR_EJECT_PERCENT_OUTPUT);
     }
 
 
     public void stopIntake() {
-        m_topIntakeMotor.set(ControlMode.PercentOutput, 0.0);
-        m_bottomIntakeMotor.set(ControlMode.PercentOutput, 0.0);
+        m_topIntakeMotor.set(0.0);
+        m_bottomIntakeMotor.set(0.0);
     }
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Top roller amp draw", m_topIntakeMotor.getStatorCurrent());
-        SmartDashboard.putNumber("Bottom roller amp draw", m_bottomIntakeMotor.getStatorCurrent());
+        SmartDashboard.putNumber("Top roller amp draw", m_topIntakeMotor.getOutputCurrent());
+        SmartDashboard.putNumber("Bottom roller amp draw", m_bottomIntakeMotor.getOutputCurrent());
     }
 }
