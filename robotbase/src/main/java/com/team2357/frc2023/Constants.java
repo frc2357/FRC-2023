@@ -213,14 +213,14 @@ public final class Constants {
             config.m_peakCurrentDuration = 0;
             config.m_continuousCurrentLimit = 40;
 
-            config.m_masterInverted = true;
-            config.m_followerInverted = false;
+            config.m_masterInverted = false;
+            config.m_followerInverted = true;
             return config;
         }
 
 
-        public static final double TOP_MOTOR_INTAKE_PERCENT_OUTPUT = +0.49;
-        public static final double BOTTOM_MOTOR_INTAKE_PERCENT_OUTPUT = +0.2;
+        public static final double TOP_MOTOR_INTAKE_PERCENT_OUTPUT = +0.5;
+        public static final double BOTTOM_MOTOR_INTAKE_PERCENT_OUTPUT = +0.75;
         
         public static final double TOP_MOTOR_EJECT_PERCENT_OUTPUT = -0.5;
         public static final double BOTTOM_MOTOR_EJECT_PERCENT_OUTPUT = +0.35;
