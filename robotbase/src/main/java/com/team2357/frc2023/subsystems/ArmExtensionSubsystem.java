@@ -146,7 +146,7 @@ public class ArmExtensionSubsystem extends ClosedLoopSubsystem {
             setClosedLoopEnabled(false);
         }
 
-       SmartDashboard.putNumber("arm extension rot", getMotorRotations());
+    //    SmartDashboard.putNumber("arm extension rot", getMotorRotations());
        //System.out.println("Arm ext: " + getMotorRotations());
     }
 }

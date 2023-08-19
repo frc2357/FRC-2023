@@ -18,6 +18,16 @@ public class IntakeRollerSubsystem extends SubsystemBase {
     private CANSparkMax m_topIntakeMotor;
     private TalonFX m_bottomIntakeMotor;
 
+    // Used for SmartDashboard. Set in constants for permanent numbers
+    private double m_topMotorIntakePO = Constants.INTAKE_ROLLER.TOP_MOTOR_INTAKE_PERCENT_OUTPUT;
+    private double m_bottomMotorIntakePO = Constants.INTAKE_ROLLER.BOTTOM_MOTOR_INTAKE_PERCENT_OUTPUT;
+    private double m_topMotorEjectPO = Constants.INTAKE_ROLLER.TOP_MOTOR_EJECT_PERCENT_OUTPUT;
+    private double m_bottomMotorEjectPO = Constants.INTAKE_ROLLER.BOTTOM_MOTOR_EJECT_PERCENT_OUTPUT;
+    private double m_topMotorIndexPO = Constants.INTAKE_ROLLER.TOP_MOTOR_INDEX_PERCENT_OUTPUT;
+    private double m_bottomMotorIndexPO = Constants.INTAKE_ROLLER.BOTTOM_MOTOR_INDEX_PERCENT_OUTPUT;
+    private double m_topMotorRollPO = Constants.INTAKE_ROLLER.TOP_MOTOR_ROLL_PERCENT_OUTPUT;
+    private double m_bottomMotorRollPO = Constants.INTAKE_ROLLER.BOTTOM_MOTOR_ROLL_PERCENT_OUTPUT;
+
     public static IntakeRollerSubsystem getInstance() {
         return instance;
     }
@@ -45,7 +55,20 @@ public class IntakeRollerSubsystem extends SubsystemBase {
         m_topIntakeMotor = new CANSparkMax(masterIntakeMotorId, MotorType.kBrushless);
         m_bottomIntakeMotor = new TalonFX(followerIntakeMotorId, "CANivore");
 
+        initSmartDashboard();
+
         instance = this;
+    }
+
+    private void initSmartDashboard() {
+        SmartDashboard.putNumber("(PICKUP) Top Motor Percent Output", m_topMotorIntakePO);
+        SmartDashboard.putNumber("(PICKUP) Bottom Motor Percent Output", m_bottomMotorIntakePO);
+        SmartDashboard.putNumber("(EJECT) Top Motor Percent Output", m_topMotorEjectPO);
+        SmartDashboard.putNumber("(EJECT) Bottom Motor Percent Output", m_bottomMotorEjectPO);
+        SmartDashboard.putNumber("(INDEX) Top Motor Percent Output", m_topMotorIndexPO);
+        SmartDashboard.putNumber("(INDEX) Bottom Motor Percent Output", m_bottomMotorIndexPO);
+        SmartDashboard.putNumber("(ROLL) Top Motor Percent Output", m_topMotorRollPO);
+        SmartDashboard.putNumber("(ROLL) Bottom Motor Percent Output", m_bottomMotorRollPO);
     }
 
     public void configure(Configuration config) {
@@ -140,7 +163,13 @@ public class IntakeRollerSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Top roller amp draw", m_topIntakeMotor.getOutputCurrent());
-        SmartDashboard.putNumber("Bottom roller amp draw", m_bottomIntakeMotor.getOutputCurrent());
+        m_topMotorIntakePO = SmartDashboard.getNumber("(PICKUP) Top Motor Percent Output", 0);
+        m_topMotorEjectPO = SmartDashboard.getNumber("(EJECT) Top Motor Percent Output", 0);
+        m_topMotorIndexPO = SmartDashboard.getNumber("(INDEX) Top Motor Percent Output", 0);
+        m_topMotorRollPO = SmartDashboard.getNumber("(ROLL) Top Motor Percent Output", 0);
+        m_bottomMotorIntakePO = SmartDashboard.getNumber("(PICKUP) Bottom Motor Percent Output", 0);
+        m_bottomMotorEjectPO = SmartDashboard.getNumber("(EJECT) Bottom Motor Percent Output", 0);
+        m_bottomMotorIndexPO = SmartDashboard.getNumber("(INDEX) Bottom Motor Percent Output", 0);
+        m_bottomMotorRollPO = SmartDashboard.getNumber("(ROLL) Bottom Motor Percent Output", 0);
     }
 }
