@@ -134,25 +134,25 @@ public class IntakeRollerSubsystem extends SubsystemBase {
     }
 
     public void intakeCube() {
-        m_topIntakeMotor.set(Constants.INTAKE_ROLLER.TOP_MOTOR_INTAKE_PERCENT_OUTPUT);
-        m_bottomIntakeMotor.set(ControlMode.PercentOutput, Constants.INTAKE_ROLLER.BOTTOM_MOTOR_INTAKE_PERCENT_OUTPUT);
+        m_topIntakeMotor.set(m_topMotorIntakePO);
+        m_bottomIntakeMotor.set(ControlMode.PercentOutput, m_bottomMotorIntakePO);
     }
 
     public void rollCube() {
-        m_topIntakeMotor.set(Constants.INTAKE_ROLLER.TOP_MOTOR_ROLL_PERCENT_OUTPUT);
-        m_bottomIntakeMotor.set(ControlMode.PercentOutput, Constants.INTAKE_ROLLER.BOTTOM_MOTOR_ROLL_PERCENT_OUTPUT);
+        m_topIntakeMotor.set(m_topMotorRollPO);
+        m_bottomIntakeMotor.set(ControlMode.PercentOutput, m_bottomMotorRollPO);
     
     }
 
     public void indexCube() {
-        m_topIntakeMotor.set(Constants.INTAKE_ROLLER.TOP_MOTOR_INDEX_PERCENT_OUTPUT);
-        m_bottomIntakeMotor.set(ControlMode.PercentOutput, Constants.INTAKE_ROLLER.BOTTOM_MOTOR_INDEX_PERCENT_OUTPUT);
+        m_topIntakeMotor.set(m_topMotorIndexPO);
+        m_bottomIntakeMotor.set(ControlMode.PercentOutput, m_bottomMotorIndexPO);
     
     }
 
     public void ejectCube() {
-        m_topIntakeMotor.set(Constants.INTAKE_ROLLER.TOP_MOTOR_EJECT_PERCENT_OUTPUT);
-        m_bottomIntakeMotor.set(ControlMode.PercentOutput, Constants.INTAKE_ROLLER.BOTTOM_MOTOR_EJECT_PERCENT_OUTPUT);
+        m_topIntakeMotor.set(m_topMotorEjectPO);
+        m_bottomIntakeMotor.set(ControlMode.PercentOutput, m_bottomMotorEjectPO);
     }
 
 
